@@ -9,7 +9,7 @@
 >
 > Le mostramos InfraPilot AI. En 4 minutos tiene las tres versiones.
 >
-> Ese es el momento que diseñamos.
+> Ese es el momento que dise coñamos.
 
 ---
 
