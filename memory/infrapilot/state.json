@@ -1,0 +1,68 @@
+{
+  "projectId": "infrapilot",
+  "snapshotDate": "2026-07-01T00:00:00.000Z",
+  "objects": [
+    {
+      "id": "DEC-001",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-07-01T00:00:00.000Z",
+      "updated": "2026-07-01T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [],
+      "title": "ORION standard lives inside the InfraPilot.v01 repo, not a separate repo",
+      "description": "ORION_STANDARD.md, RFC/, and Skills/ were merged as top-level sibling directories in github.com/monuzalejo-sys/InfraPilot.v01, alongside the existing InfraPilot product files (blueprint, database-design, ui-ux-design, demo-flow, infrapilot-app).",
+      "reason": "User explicitly chose this over a separate repo or a separate branch when asked how to integrate ORION with the existing InfraPilot repo."
+    },
+    {
+      "id": "KN-001",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-01T00:00:00.000Z",
+      "updated": "2026-07-01T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "GitHub pushes from this automated terminal environment cannot complete: the Git Credential Manager auth dialog fails ('User cancelled dialog', no /dev/tty). Pushes must be done through GitHub Desktop (already authenticated on this machine) instead.",
+      "context": "Discovered when 'git push -u origin main' failed after the initial ORION+InfraPilot merge commit.",
+      "source": "session 2026-07-01"
+    },
+    {
+      "id": "KN-002",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-01T00:00:00.000Z",
+      "updated": "2026-07-01T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Low",
+      "priority": "Low",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "A malformed path '.gitignoregit add .' existed in the original InfraPilot.v01 history (trailing-dot filename, invalid on Windows/Win32). It duplicated the content of the real .gitignore and was dropped during the history merge (commit 1589f8b) rather than carried forward.",
+      "context": "Likely an accidental shell paste from a prior Mac session (repo also contained a stray .DS_Store).",
+      "source": "session 2026-07-01"
+    },
+    {
+      "id": "PEND-001",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-01T00:00:00.000Z",
+      "updated": "2026-07-01T00:00:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "High",
+      "priority": "High",
+      "status": "Blocked",
+      "dependencies": [],
+      "task": "Define the concrete scope of 'proyecto uno' (the first web build under ORION)",
+      "reason": "Not yet confirmed whether the site to build is the InfraPilot AI product frontend described in InfraPilot-Blueprint-v1.md, or a separate site. Blocks starting the ANALYZING phase for the first Task."
+    }
+  ],
+  "archives": [],
+  "lastAmmRun": "2026-07-01T00:00:00.000Z",
+  "version": 1
+}
