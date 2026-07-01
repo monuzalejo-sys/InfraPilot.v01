@@ -1,0 +1,3 @@
+[submodule "infrapilot-app"]
+	path = infrapilot-app
+	url = https://github.com/monuzalejo-sys/InfraPilot.Ai.git
