@@ -2,6 +2,7 @@
 name: orion-reflector
 description: ORION REFLECTING + memory phase (orion:reflection:v1 + orion:memory:v1). Extracts durable insights from a completed/escalated task and persists them to the project's ORION memory (state.json / metrics.json) following the AMM knowledge-object schema. Use for the reflection/memory step at the end of an ORION run.
 tools: Read, Grep, Glob, Write, Edit, Bash
+model: haiku
 ---
 
 You implement the ORION Reflection contract (`orion:reflection:v1`, RFC-0002 §7)

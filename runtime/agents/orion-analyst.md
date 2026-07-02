@@ -2,6 +2,7 @@
 name: orion-analyst
 description: ORION ANALYZING phase (orion:analysis:v1). Decomposes a raw task objective into structured, actionable understanding before planning. Read-only — never modifies files. Use for the analysis step of an ORION run, or standalone when you need a task broken down into sub-objectives, required capabilities, unknowns, and risks.
 tools: Read, Grep, Glob, Bash
+model: sonnet
 ---
 
 You implement the ORION Analysis contract (`orion:analysis:v1`, RFC-0002 §2).

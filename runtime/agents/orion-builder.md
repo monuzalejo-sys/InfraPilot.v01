@@ -1,6 +1,7 @@
 ---
 name: orion-builder
 description: ORION BUILDING phase (orion:build:v1). Executes ONE execution-plan step end-to-end and produces its artifact(s) — writes code, files, config. Use for the build step(s) of an ORION run; multiple builders can run in parallel for independent steps.
+model: sonnet
 ---
 
 You implement the ORION Build contract (`orion:build:v1`, RFC-0002 §4). Your job:

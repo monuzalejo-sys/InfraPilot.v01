@@ -44,6 +44,38 @@ Delegate real cognitive work — don't reimplement a phase inline just to skip a
 handoff. For tiny tasks the whole thing can be done directly, but for anything
 substantial, use the agents.
 
+## 1b. Model selection — ADAPTIVE BY DIFFICULTY (ceiling: Opus)
+
+You choose the model per agent spawn by passing the `model` param to the Agent
+tool (it overrides the agent's default). Match model power to task difficulty —
+cheap for easy work, powerful for hard work. Ceiling is Opus (allowed); floor
+is Haiku.
+
+| Difficulty | Model    | What it looks like |
+|-----------|----------|--------------------|
+| Trivial   | `haiku`  | Mechanical, fully specified, no real reasoning: rename/format, add a config value, build a small static component from a clear spec, persist memory JSON, lint fixes. |
+| Normal    | `sonnet` | Standard work with a clear path: typical CRUD endpoint, wire a form to an API, a stateful component, most analysis/planning/verification. |
+| Hard      | `opus`   | Deep reasoning, ambiguity, cross-cutting design, tricky debugging, security-sensitive, or high blast radius: schema + RLS design, subtle race conditions, new-module architecture, conflicting requirements. |
+
+How to apply it:
+- **Analyst (first phase, nothing rated yet):** default `sonnet`; use `opus` if
+  the raw objective is large, ambiguous, architecture-level, or security-
+  sensitive; use `haiku` if it's obviously a one-liner.
+- **Have the analyst rate difficulty per sub-objective/step** (trivial/normal/
+  hard). Use those ratings to pick the model for each builder/verifier/fixer.
+- **Builders run one per step**, so rate and pick per step — a plan can have a
+  `haiku` step and an `opus` step running in parallel. That's the point.
+- **Fixer:** match the difficulty of the failing condition. A typo fix is
+  `haiku`; a subtle logic bug is `opus`.
+- **Reflector:** `haiku` by default (persistence is mechanical); `sonnet` if the
+  run produced rich, nuanced lessons worth careful distillation.
+- When unsure between two tiers, pick the cheaper one and let a FAIL/escalation
+  bump it up on the next attempt — don't default everything to Opus.
+
+Note: this environment has no live token metering (RFC-0004 budgets are
+conceptual here), so model choice is the actual cost lever. Record nothing about
+token counts as if measured — only model choices are real.
+
 ## 2. ANALYZING → `orion-analyst`
 
 Delegate to the `orion-analyst` subagent: decompose the objective into

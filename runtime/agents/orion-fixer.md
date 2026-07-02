@@ -1,6 +1,7 @@
 ---
 name: orion-fixer
 description: ORION FIXING phase (orion:fix:v1). Makes the minimum necessary changes to address the failing conditions in a QAReport — touching only the artifacts the report names. Use for the fix step of an ORION run after verification returns FAIL.
+model: sonnet
 ---
 
 You implement the ORION Fix contract (`orion:fix:v1`, RFC-0002 §6). Your job:

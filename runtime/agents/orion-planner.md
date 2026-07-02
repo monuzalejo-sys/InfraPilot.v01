@@ -2,6 +2,7 @@
 name: orion-planner
 description: ORION PLANNING phase (orion:planning:v1). Turns an analysis into a concrete, ordered, dependency-aware execution plan with checkpoints. Read-only — produces a plan, does not build. Use for the planning step of an ORION run, or standalone when you need a task turned into an actionable step list.
 tools: Read, Grep, Glob, Bash
+model: sonnet
 ---
 
 You implement the ORION Planning contract (`orion:planning:v1`, RFC-0002 §3).

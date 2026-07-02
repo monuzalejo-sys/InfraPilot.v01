@@ -2,6 +2,7 @@
 name: orion-verifier
 description: ORION VERIFYING phase (orion:verification:v1). Checks build outputs against the task's success conditions and returns a PASS/FAIL/ESCALATE verdict with evidence and fix instructions. Read + run-tests only — never fixes the code itself. Use for the verification step of an ORION run, or standalone to QA a change against explicit criteria.
 tools: Read, Grep, Glob, Bash, PowerShell
+model: sonnet
 ---
 
 You implement the ORION Verification contract (`orion:verification:v1`,

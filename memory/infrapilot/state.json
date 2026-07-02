@@ -189,11 +189,26 @@
       "status": "Accepted",
       "dependencies": ["ARCH-001"],
       "title": "Six dedicated ORION subagents created, mapped to the RFC-0002 contracts",
-      "description": "Created user-level Claude Code subagents in C:\\Users\\Kalel\\.claude\\agents\\ : orion-analyst (orion:analysis:v1, read-only), orion-planner (orion:planning:v1, read-only), orion-builder (orion:build:v1, full tools, one per plan step, parallel where independent), orion-verifier (orion:verification:v1, read+run-tests only, no edits), orion-fixer (orion:fix:v1, edits only the artifacts a QAReport names), and orion-reflector (orion:reflection:v1 + orion:memory:v1, writes to memory/*.json). Tools are restricted per contract (e.g. analyst/planner/verifier cannot modify files). The /orion SKILL.md was updated so each phase delegates to its named agent; the main conversation acts as the orchestrator/runtime. Prior to this, /orion only used the generic built-in agent types (Explore/general-purpose/Plan) — no custom ORION agents existed.",
+      "description": "Created user-level Claude Code subagents in C:\\Users\\Kalel\\.claude\\agents\\ : orion-analyst (orion:analysis:v1, read-only), orion-planner (orion:planning:v1, read-only), orion-builder (orion:build:v1, full tools, one per plan step, parallel where independent), orion-verifier (orion:verification:v1, read+run-tests only, no edits), orion-fixer (orion:fix:v1, edits only the artifacts a QAReport names), and orion-reflector (orion:reflection:v1 + orion:memory:v1, writes to memory/*.json). Tools are restricted per contract (e.g. analyst/planner/verifier cannot modify files). The /orion SKILL.md was updated so each phase delegates to its named agent; the main conversation acts as the orchestrator/runtime. Prior to this, /orion only used the generic built-in agent types (Explore/general-purpose/Plan) — no custom ORION agents existed. Verified live 2026-07-01: agents load in-session (no restart needed) and orion-analyst returned a correct response.",
       "reason": "User asked whether the agents were created correctly; they were not (only the skill existed). User authorized creating them ('tienes acceso total'). Mapping agents 1:1 to the ORION contracts makes the system faithful to the user's own standard rather than generic."
+    },
+    {
+      "id": "DEC-004",
+      "type": "Decision",
+      "tier": "Permanent",
+      "created": "2026-07-01T02:30:00.000Z",
+      "updated": "2026-07-01T02:30:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": ["DEC-003"],
+      "title": "ORION model policy: adaptive by difficulty, ceiling Opus",
+      "description": "The orchestrator picks each agent's model by task/step difficulty via the Agent tool's model param: trivial->haiku, normal->sonnet, hard->opus (ceiling Opus is allowed; floor Haiku). The orion-analyst rates difficulty per sub-objective/step and those ratings drive builder/verifier/fixer model choice; builders run one-per-step so a single plan can mix haiku and opus steps in parallel. Agent frontmatter defaults were set (analyst/planner/builder/verifier/fixer = sonnet, reflector = haiku) so a naive spawn doesn't inherit the main conversation's model. Full rubric lives in the '1b. Model selection' section of ~/.claude/skills/orion/SKILL.md (mirrored in runtime/skills/).",
+      "reason": "User chose adaptive-by-difficulty with an Opus ceiling. This environment has no live token metering (RFC-0004 budgets are conceptual here), so model choice is the only real cost lever — spending should track difficulty instead of defaulting everything to the most expensive model."
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-07-01T02:00:00.000Z",
-  "version": 4
+  "lastAmmRun": "2026-07-01T02:30:00.000Z",
+  "version": 5
 }
