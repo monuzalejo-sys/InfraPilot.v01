@@ -1,6 +1,6 @@
 {
   "projectId": "infrapilot",
-  "snapshotDate": "2026-07-01T04:00:00.000Z",
+  "snapshotDate": "2026-07-01T05:00:00.000Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -256,14 +256,14 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-07-01T04:00:00.000Z",
-      "updated": "2026-07-01T04:00:00.000Z",
+      "updated": "2026-07-01T05:00:00.000Z",
       "lifetime": "Sprint",
       "impact": "Medium",
       "priority": "Medium",
-      "status": "Ready",
+      "status": "Done",
       "dependencies": [],
       "task": "F3 (Tax rate mismatch): cotizador and presupuestos hardcode 'IGV 18%' (Peru) but app generates budgets for Colombia (IVA 19%). Need canonical tax-by-country table and use budget.taxRate instead of hardcoded rates.",
-      "reason": "Escalated finding from orion-analyst audit. Affects user-facing calculations; needs data governance decision (where is the source of truth for country tax rates?) before fixing."
+      "reason": "Resolved (commit 2805e0a, verified PASS): now uses budget.taxRate for both math and displayed %, with taxLabel()/defaultTaxRate() helpers in lib/utils.ts branching by currency (COP/MXN->IVA @0.19/0.16, PEN->IGV @0.18, else 'Impuesto'/0.18). NOTE: the tax-by-currency table is hardcoded in lib/utils.ts using standard legal rates for the 3 currencies the app currently uses (COP primary) — if InfraPilot expands to more countries or a formal tax source-of-truth is wanted, revisit that helper. Flag for user confirmation of the rate table."
     },
     {
       "id": "PEND-007",
@@ -309,6 +309,6 @@
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-07-01T04:00:00.000Z",
-  "version": 7
+  "lastAmmRun": "2026-07-01T05:00:00.000Z",
+  "version": 8
 }
