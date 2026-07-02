@@ -176,9 +176,24 @@
       "component": "ORION Task runtime invocation",
       "description": "The ORION lifecycle (ANALYZING -> PLANNING -> BUILDING -> VERIFYING -> FIXING -> REFLECTING -> DONE/ESCALATED) is invoked as a Claude Code skill at C:\\Users\\Kalel\\.claude\\skills\\orion\\SKILL.md ('/orion <task>'), installed at user level so it works across all projects on this machine, not just InfraPilot. BUILDING delegates substantial independent work to real Agent subagents; REFLECTING writes directly to memory/<projectId>/state.json and metrics.json following the AMM schema (no live TS runtime executes the AMM source — the assistant emulates its contract by hand).",
       "pattern": "Manually-operated Cognitive Runtime: the assistant itself plays the runtime role each invocation, rather than a standalone always-on process."
+    },
+    {
+      "id": "DEC-003",
+      "type": "Decision",
+      "tier": "Permanent",
+      "created": "2026-07-01T02:00:00.000Z",
+      "updated": "2026-07-01T02:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": ["ARCH-001"],
+      "title": "Six dedicated ORION subagents created, mapped to the RFC-0002 contracts",
+      "description": "Created user-level Claude Code subagents in C:\\Users\\Kalel\\.claude\\agents\\ : orion-analyst (orion:analysis:v1, read-only), orion-planner (orion:planning:v1, read-only), orion-builder (orion:build:v1, full tools, one per plan step, parallel where independent), orion-verifier (orion:verification:v1, read+run-tests only, no edits), orion-fixer (orion:fix:v1, edits only the artifacts a QAReport names), and orion-reflector (orion:reflection:v1 + orion:memory:v1, writes to memory/*.json). Tools are restricted per contract (e.g. analyst/planner/verifier cannot modify files). The /orion SKILL.md was updated so each phase delegates to its named agent; the main conversation acts as the orchestrator/runtime. Prior to this, /orion only used the generic built-in agent types (Explore/general-purpose/Plan) — no custom ORION agents existed.",
+      "reason": "User asked whether the agents were created correctly; they were not (only the skill existed). User authorized creating them ('tienes acceso total'). Mapping agents 1:1 to the ORION contracts makes the system faithful to the user's own standard rather than generic."
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-07-01T01:00:00.000Z",
-  "version": 3
+  "lastAmmRun": "2026-07-01T02:00:00.000Z",
+  "version": 4
 }
