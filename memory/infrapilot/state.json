@@ -1,6 +1,6 @@
 {
   "projectId": "infrapilot",
-  "snapshotDate": "2026-07-01T00:00:00.000Z",
+  "snapshotDate": "2026-07-01T04:00:00.000Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -139,14 +139,14 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-07-01T01:00:00.000Z",
+      "updated": "2026-07-01T04:00:00.000Z",
       "lifetime": "Sprint",
       "impact": "Medium",
       "priority": "Medium",
-      "status": "Ready",
+      "status": "Done",
       "dependencies": [],
       "task": "General audit/polish pass over infrapilot-app (bugs, UI consistency, leftover mock-only code paths) once a concrete scope is chosen with the user.",
-      "reason": "User said the long-term goal is to perfect the app but did not pick a specific scope yet before ending the session — left open for the next /orion run to propose options."
+      "reason": "COMPLETED in session 3: orion-analyst audited the app, orion-fixer applied 7 safe fixes (Groq scope, mock deletions, turbopack.root, lint fixes), orion-verifier confirmed PASS; committed as 5efdde3 in infrapilot-app submodule."
     },
     {
       "id": "PEND-004",
@@ -221,9 +221,94 @@
       "title": "ORION autocommits on verification PASS; push stays manual",
       "description": "Standing policy: when an ORION task passes VERIFYING, autocommit the changes in whichever repo changed (app code -> infrapilot-app submodule / InfraPilot.Ai; memory & docs -> parent InfraPilot.v01), with a clear message. Do NOT push (terminal push blocked, KN-001) — list pending commits for the user to push via GitHub Desktop. Escalated/failed tasks are not auto-committed.",
       "reason": "User chose 'autocommit al pasar verificación' so work is checkpointed automatically without losing the manual-push safety gate."
+    },
+    {
+      "id": "KN-005",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-01T04:00:00.000Z",
+      "updated": "2026-07-01T04:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "infrapilot-app's next build was failing because the Groq client was instantiated at module scope in app/api/cotizar/route.ts and app/api/licitaciones/analyze/route.ts, causing the build to fail when GROQ_API_KEY was not in the environment. FIXED by moving client instantiation into the request handlers (after the missing key guard) and committed as 5efdde3. Pattern: never instantiate API-key-dependent clients at module scope in Next route files — construct them inside the handler after validating the key is present.",
+      "context": "This was F2 in the audit: classified as REAL BUG (build-breaking). Deletion of 6 mock-*.ts files (F5, ~2,650 lines removed) would have failed the build until this was fixed.",
+      "source": "session 2026-07-01, orion-analyst audit + orion-fixer fix + orion-verifier PASS (commit 5efdde3)"
+    },
+    {
+      "id": "PEND-005",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-01T04:00:00.000Z",
+      "updated": "2026-07-01T04:00:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "High",
+      "priority": "High",
+      "status": "Ready",
+      "dependencies": [],
+      "task": "F1 (Excel export): lib/excel-export.ts always exports hardcoded mock data (mockGeneratedBudget), ignoring the real AI-generated budget from parameters. Decision needed: keep demo export mode with a flag, or parameterize exportPresupuestoExcel(budget) to export real data.",
+      "reason": "Escalated finding from orion-analyst audit. Not safe to fix without understanding product intent (demo vs. real export). Marked ESCALATED per contract because behavior change could break user flows if misunderstood."
+    },
+    {
+      "id": "PEND-006",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-01T04:00:00.000Z",
+      "updated": "2026-07-01T04:00:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Ready",
+      "dependencies": [],
+      "task": "F3 (Tax rate mismatch): cotizador and presupuestos hardcode 'IGV 18%' (Peru) but app generates budgets for Colombia (IVA 19%). Need canonical tax-by-country table and use budget.taxRate instead of hardcoded rates.",
+      "reason": "Escalated finding from orion-analyst audit. Affects user-facing calculations; needs data governance decision (where is the source of truth for country tax rates?) before fixing."
+    },
+    {
+      "id": "PEND-007",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-01T04:00:00.000Z",
+      "updated": "2026-07-01T04:00:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Ready",
+      "dependencies": [],
+      "task": "F4 (React hooks lint): 6 remaining 'set-state-in-effect' lint warnings in apus/dashboard/precios/predictor/presupuestos pages + sidebar.tsx. Fixing all 6 correctly could alter data-loading behavior (render waterfall, stale deps, etc.). Need reviewed batch fix or explicit suppression decision.",
+      "reason": "Escalated finding from orion-analyst audit. Too risky to auto-fix without domain understanding of the page load flows; each page may have intentional patterns. Needs either explicit suppression via eslint comment or careful UX review."
+    },
+    {
+      "id": "PEND-008",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-01T04:00:00.000Z",
+      "updated": "2026-07-01T04:00:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "Low",
+      "priority": "Low",
+      "status": "Ready",
+      "dependencies": [],
+      "task": "F10-router (unused router vars): login/page.tsx:19 and sidebar.tsx:163 declare unused 'router' variables. Verify they are not intended-but-unwired navigation (e.g. logout redirect) before deleting.",
+      "reason": "Escalated finding from orion-analyst audit. Low risk but non-obvious whether these are dead code or future-wired; needs user confirmation."
+    },
+    {
+      "id": "PEND-009",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-01T04:00:00.000Z",
+      "updated": "2026-07-01T04:00:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "Low",
+      "priority": "Low",
+      "status": "Ready",
+      "dependencies": [],
+      "task": "Stray lockfile: C:\\Users\\Kalel\\package-lock.json exists outside infrapilot-app and may affect other projects on this machine. Do not delete without explicit user confirmation.",
+      "reason": "Escalated finding from orion-analyst audit. Not a code quality issue but a housekeeping one; safest approach is to ask user first."
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-07-01T03:00:00.000Z",
-  "version": 6
+  "lastAmmRun": "2026-07-01T04:00:00.000Z",
+  "version": 7
 }
