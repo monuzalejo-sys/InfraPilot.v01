@@ -136,10 +136,26 @@ Append one entry to `<repo-root>/memory/<projectId>/metrics.json` in the
 enough; there's no live token metering in this environment, so
 context/compression fields can be left at reasonable defaults).
 
+## 7b. COMMIT — autocommit on verification pass
+
+Once VERIFYING returns PASS for the task, commit automatically (standing
+policy, DEC-005):
+- Commit in whichever repo actually changed. Remember InfraPilot is TWO nested
+  repos: app code lives in the `infrapilot-app` submodule (repo InfraPilot.Ai);
+  ORION memory/docs live in the parent (repo InfraPilot.v01). A task may produce
+  commits in both — commit the app changes in the submodule first, then the
+  memory/pointer changes in the parent.
+- Write a clear message ending with the standard Co-Authored-By trailer.
+- Do NOT push. Terminal `git push` fails here (Git Credential Manager) — tell
+  the user to push via GitHub Desktop. List the pending commits so they know.
+- If verification did not pass (ESCALATED), do not auto-commit; leave the tree
+  for the user to inspect unless they say otherwise.
+
 ## 8. DONE / ESCALATED
 
 Report concisely: what changed, what got verified, what's now recorded in
-memory, and — if ESCALATED — the exact decision a human needs to make.
+memory, what was committed (and that push is still manual), and — if
+ESCALATED — the exact decision a human needs to make.
 
 ## Ground rules
 

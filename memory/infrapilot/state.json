@@ -206,9 +206,24 @@
       "title": "ORION model policy: adaptive by difficulty, ceiling Opus",
       "description": "The orchestrator picks each agent's model by task/step difficulty via the Agent tool's model param: trivial->haiku, normal->sonnet, hard->opus (ceiling Opus is allowed; floor Haiku). The orion-analyst rates difficulty per sub-objective/step and those ratings drive builder/verifier/fixer model choice; builders run one-per-step so a single plan can mix haiku and opus steps in parallel. Agent frontmatter defaults were set (analyst/planner/builder/verifier/fixer = sonnet, reflector = haiku) so a naive spawn doesn't inherit the main conversation's model. Full rubric lives in the '1b. Model selection' section of ~/.claude/skills/orion/SKILL.md (mirrored in runtime/skills/).",
       "reason": "User chose adaptive-by-difficulty with an Opus ceiling. This environment has no live token metering (RFC-0004 budgets are conceptual here), so model choice is the only real cost lever — spending should track difficulty instead of defaulting everything to the most expensive model."
+    },
+    {
+      "id": "DEC-005",
+      "type": "Decision",
+      "tier": "Permanent",
+      "created": "2026-07-01T03:00:00.000Z",
+      "updated": "2026-07-01T03:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [],
+      "title": "ORION autocommits on verification PASS; push stays manual",
+      "description": "Standing policy: when an ORION task passes VERIFYING, autocommit the changes in whichever repo changed (app code -> infrapilot-app submodule / InfraPilot.Ai; memory & docs -> parent InfraPilot.v01), with a clear message. Do NOT push (terminal push blocked, KN-001) — list pending commits for the user to push via GitHub Desktop. Escalated/failed tasks are not auto-committed.",
+      "reason": "User chose 'autocommit al pasar verificación' so work is checkpointed automatically without losing the manual-push safety gate."
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-07-01T02:30:00.000Z",
-  "version": 5
+  "lastAmmRun": "2026-07-01T03:00:00.000Z",
+  "version": 6
 }
