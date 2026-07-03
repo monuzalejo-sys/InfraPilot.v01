@@ -1,6 +1,6 @@
 {
   "projectId": "infrapilot",
-  "snapshotDate": "2026-07-01T05:00:00.000Z",
+  "snapshotDate": "2026-07-02T05:30:00.000Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -20,9 +20,9 @@
     {
       "id": "KN-001",
       "type": "Knowledge",
-      "tier": "Project",
+      "tier": "Permanent",
       "created": "2026-07-01T00:00:00.000Z",
-      "updated": "2026-07-01T00:00:00.000Z",
+      "updated": "2026-07-02T04:30:00.000Z",
       "lifetime": "Permanent",
       "impact": "Medium",
       "priority": "Medium",
@@ -37,8 +37,8 @@
       "type": "Knowledge",
       "tier": "Project",
       "created": "2026-07-01T00:00:00.000Z",
-      "updated": "2026-07-01T00:00:00.000Z",
-      "lifetime": "Permanent",
+      "updated": "2026-07-02T04:30:00.000Z",
+      "lifetime": "Project",
       "impact": "Low",
       "priority": "Low",
       "status": "Current",
@@ -46,20 +46,6 @@
       "fact": "A malformed path '.gitignoregit add .' existed in the original InfraPilot.v01 history (trailing-dot filename, invalid on Windows/Win32). It duplicated the content of the real .gitignore and was dropped during the history merge (commit 1589f8b) rather than carried forward.",
       "context": "Likely an accidental shell paste from a prior Mac session (repo also contained a stray .DS_Store).",
       "source": "session 2026-07-01"
-    },
-    {
-      "id": "PEND-001",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-07-01T00:00:00.000Z",
-      "updated": "2026-07-01T01:00:00.000Z",
-      "lifetime": "Sprint",
-      "impact": "High",
-      "priority": "High",
-      "status": "Done",
-      "dependencies": [],
-      "task": "Define the concrete scope of 'proyecto uno' (the first web build under ORION)",
-      "reason": "Resolved: the site is infrapilot-app (the InfraPilot AI product), already scaffolded and deployed on Vercel. The task is refining/completing it, not building from scratch."
     },
     {
       "id": "DEC-002",
@@ -81,8 +67,8 @@
       "type": "Knowledge",
       "tier": "Project",
       "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-07-01T01:00:00.000Z",
-      "lifetime": "Permanent",
+      "updated": "2026-07-02T04:30:00.000Z",
+      "lifetime": "Project",
       "impact": "High",
       "priority": "High",
       "status": "Current",
@@ -96,8 +82,8 @@
       "type": "Knowledge",
       "tier": "Project",
       "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-07-01T01:00:00.000Z",
-      "lifetime": "Permanent",
+      "updated": "2026-07-02T04:30:00.000Z",
+      "lifetime": "Project",
       "impact": "High",
       "priority": "High",
       "status": "Current",
@@ -133,20 +119,6 @@
       "dependencies": ["KN-004"],
       "task": "Verify/configure real Supabase credentials end-to-end (local .env + confirm what's actually set on Vercel), so login, register, and data persistence work for real instead of only via mock data files.",
       "reason": "User's stated long-term goal is to 'perfeccionar' (refine/polish) infrapilot-app. This is the biggest concrete functional gap found during analysis."
-    },
-    {
-      "id": "PEND-003",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-07-01T04:00:00.000Z",
-      "lifetime": "Sprint",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Done",
-      "dependencies": [],
-      "task": "General audit/polish pass over infrapilot-app (bugs, UI consistency, leftover mock-only code paths) once a concrete scope is chosen with the user.",
-      "reason": "COMPLETED in session 3: orion-analyst audited the app, orion-fixer applied 7 safe fixes (Groq scope, mock deletions, turbopack.root, lint fixes), orion-verifier confirmed PASS; committed as 5efdde3 in infrapilot-app submodule."
     },
     {
       "id": "PEND-004",
@@ -227,8 +199,8 @@
       "type": "Knowledge",
       "tier": "Project",
       "created": "2026-07-01T04:00:00.000Z",
-      "updated": "2026-07-01T04:00:00.000Z",
-      "lifetime": "Permanent",
+      "updated": "2026-07-02T04:30:00.000Z",
+      "lifetime": "Project",
       "impact": "High",
       "priority": "High",
       "status": "Current",
@@ -250,20 +222,6 @@
       "dependencies": [],
       "task": "F1 (Excel export): lib/excel-export.ts always exports hardcoded mock data (mockGeneratedBudget), ignoring the real AI-generated budget from parameters. Decision needed: keep demo export mode with a flag, or parameterize exportPresupuestoExcel(budget) to export real data.",
       "reason": "Escalated finding from orion-analyst audit. Not safe to fix without understanding product intent (demo vs. real export). Marked ESCALATED per contract because behavior change could break user flows if misunderstood."
-    },
-    {
-      "id": "PEND-006",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-07-01T04:00:00.000Z",
-      "updated": "2026-07-01T05:00:00.000Z",
-      "lifetime": "Sprint",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Done",
-      "dependencies": [],
-      "task": "F3 (Tax rate mismatch): cotizador and presupuestos hardcode 'IGV 18%' (Peru) but app generates budgets for Colombia (IVA 19%). Need canonical tax-by-country table and use budget.taxRate instead of hardcoded rates.",
-      "reason": "Resolved (commit 2805e0a, verified PASS): now uses budget.taxRate for both math and displayed %, with taxLabel()/defaultTaxRate() helpers in lib/utils.ts branching by currency (COP/MXN->IVA @0.19/0.16, PEN->IGV @0.18, else 'Impuesto'/0.18). NOTE: the tax-by-currency table is hardcoded in lib/utils.ts using standard legal rates for the 3 currencies the app currently uses (COP primary) — if InfraPilot expands to more countries or a formal tax source-of-truth is wanted, revisit that helper. Flag for user confirmation of the rate table."
     },
     {
       "id": "PEND-007",
@@ -306,9 +264,94 @@
       "dependencies": [],
       "task": "Stray lockfile: C:\\Users\\Kalel\\package-lock.json exists outside infrapilot-app and may affect other projects on this machine. Do not delete without explicit user confirmation.",
       "reason": "Escalated finding from orion-analyst audit. Not a code quality issue but a housekeeping one; safest approach is to ask user first."
+    },
+    {
+      "id": "KN-006",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-07-02T05:00:00.000Z",
+      "updated": "2026-07-02T05:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": ["ARCH-001", "DEC-004"],
+      "fact": "ORION agent hardening for autonomy: all 6 agents (analyst, planner, builder, verifier, fixer, reflector) now enforce single-responsibility boundaries. Builder/fixer cannot commit; analyst/planner/verifier read-only; reflector writes memory only. All agents have hard output caps (e.g., builder max 4000 chars per step, analyst max 3000 per finding). Model policy: haiku for trivial/routine, sonnet for normal, opus for hard tasks (ceiling Opus); planner rates difficulty per step and builder inherits ratings to spawn parallel subagents at appropriate model tier. Reflector baked in AMM schema (no runtime parsing of knowledge-objects.ts); records modelOutcomes per agent spawn (phase, model, verdict) for learning loop.",
+      "context": "Session 2026-07-02 hardened the ORION ecosystem for continuous autonomy; E2E test passed with zero fix cycles (analyst→planner→builder→verifier→reflector, haiku/sonnet mix).",
+      "source": "session 2026-07-02"
+    },
+    {
+      "id": "KN-007",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-07-02T05:00:00.000Z",
+      "updated": "2026-07-02T05:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "AMM Schema invariant: tier MUST match lifetime per RFC-0002 §5.2. Tier (Working/Project/Permanent) is a Kubernetes-like cardinality constraint: Working items are Session-scoped; Project items are Sprint/Project lifetime; Permanent items are Permanent lifetime. The validator (tools/validate-memory.mjs) caught real violations in session 2026-07-02: KN-001..005 initially had lifetime=Permanent tier=Project (invalid); repair was KN-001→tier Permanent (machine-level fact justifies permanence); KN-002..005→lifetime Project (facts about infrapilot-app project, not eternal truths). Lesson: future architects must validate tier⟷lifetime pairing on every memory write.",
+      "context": "Discovered during validation of the E2E pipeline; zero-dep Node.js validator runs offline and caught violations that would have persisted indefinitely if not automated.",
+      "source": "session 2026-07-02, tools/validate-memory.mjs"
+    },
+    {
+      "id": "DEC-006",
+      "type": "Decision",
+      "tier": "Permanent",
+      "created": "2026-07-02T05:00:00.000Z",
+      "updated": "2026-07-02T05:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": ["DEC-003"],
+      "title": "AMM schema embedded in reflector agent, not runtime-parsed",
+      "description": "Instead of the reflector loading knowledge-objects.ts at runtime to validate/parse the AMM schema, the schema is baked into the agent's SYSTEM prompt as a table + constraints (LIFETIME_TO_TIER, status values, type-specific fields). This eliminates a runtime TS parser dependency, reduces latency (no file I/O per reflection), and makes the schema version explicit per run (reflector inherits it from its frontmatter at agent load time). If the schema evolves, the reflector's SYSTEM prompt is updated; no AMM-runtime process exists to bump a version field.",
+      "reason": "Session 2026-07-02 verified that a hand-emulated schema (no live runtime) is viable for ORION's current scale. Baking the schema into the reflector is safer and simpler than attempting to maintain a separate parser binary."
+    },
+    {
+      "id": "KN-008",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-02T05:30:00.000Z",
+      "updated": "2026-07-02T05:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "infrapilot-app's tax-by-currency table is hardcoded in lib/utils.ts with standard legal rates: COP and MXN use IVA @19% and @16% respectively; PEN uses IGV @18%; fallback is 'Impuesto' @18%. This branching is correct for the current 3-currency deployment (COP primary), but if InfraPilot expands to additional countries or wants to pull rates from an external source of truth (tax authority APIs, a database, etc.), the helpers (taxLabel(), defaultTaxRate()) must be refactored to consume dynamic configuration instead of literal values.",
+      "context": "Extracted from PEND-006 F3 (Tax rate mismatch) resolution. The hardcoded rates are intentional and correct per currency, but the pattern (literal switch on currency) is brittle if country coverage expands.",
+      "source": "session 2026-07-02, PEND-006 caveat"
     }
   ],
-  "archives": [],
-  "lastAmmRun": "2026-07-01T05:00:00.000Z",
-  "version": 8
+  "archives": [
+    {
+      "id": "ARC-001",
+      "archivedId": "PEND-001",
+      "archivedType": "Pending",
+      "archivedAt": "2026-07-02T05:30:00.000Z",
+      "reason": "Expired",
+      "notes": "Sprint item, Done status, no dependencies, resolution already captured in KN-003 (infrapilot-app is working app, refine-not-build)"
+    },
+    {
+      "id": "ARC-002",
+      "archivedId": "PEND-003",
+      "archivedType": "Pending",
+      "archivedAt": "2026-07-02T05:30:00.000Z",
+      "reason": "Expired",
+      "notes": "Sprint item, Done status, no dependencies, findings captured in KN-005 and escalated items PEND-005..009"
+    },
+    {
+      "id": "ARC-003",
+      "archivedId": "PEND-006",
+      "archivedType": "Pending",
+      "archivedAt": "2026-07-02T05:30:00.000Z",
+      "reason": "Expired",
+      "notes": "Sprint item, Done status, no dependencies, caveat extracted to KN-008 before archiving"
+    }
+  ],
+  "lastAmmRun": "2026-07-02T05:30:00.000Z",
+  "version": 11
 }

@@ -11,6 +11,18 @@ export interface TypeMetrics {
   archived: number
 }
 
+/**
+ * One agent spawn's outcome within a run. The learning signal for the
+ * ADAPTIVE model-selection policy: runtimes without live token metering use
+ * model tier (haiku/sonnet/opus) as the cost lever, and calibrate future
+ * choices from these verdicts.
+ */
+export interface ModelOutcome {
+  phase: string // 'analysis' | 'planning' | 'build:<step-id>' | 'verification' | 'fix' | 'reflection' | 'curation'
+  model: string // 'haiku' | 'sonnet' | 'opus'
+  verdict: 'ok' | 'fail' | 'escalate'
+}
+
 export interface SessionMetrics {
   sessionId: string
   runId: string
@@ -18,6 +30,8 @@ export interface SessionMetrics {
   startedAt: string
   completedAt: string
   durationMs: number
+
+  modelOutcomes?: ModelOutcome[]
 
   contextSaved: number
   compressionRatio: number

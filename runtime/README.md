@@ -4,8 +4,10 @@ This directory version-controls how the ORION standard is actually *run* on
 this machine via Claude Code. These files are **copies for the repo**; the
 **operative** copies (the ones Claude Code loads) live outside the repo at:
 
-- Skill:  `~/.claude/skills/orion/SKILL.md`  → invoked as `/orion <task>`
-- Agents: `~/.claude/agents/orion-*.md`      → spawned by the skill per phase
+- Skills: `~/.claude/skills/orion*/SKILL.md` → `/orion <task>` (main lifecycle),
+  `/orion-status` (session-start briefing), `/orion-close` (session close +
+  memory curation), `/orion-validate` (memory compliance check)
+- Agents: `~/.claude/agents/orion-*.md`      → spawned by the skills per phase
 
 If you edit a file here, mirror the change to the operative location (and
 vice-versa), then restart Claude Code — skills and agents are loaded at
@@ -25,10 +27,18 @@ one dedicated subagent:
 | VERIFYING   | orion:verification:v1   | orion-verifier   | read + run tests (no edits) |
 | FIXING      | orion:fix:v1            | orion-fixer      | edits only the artifacts a QAReport names |
 | REFLECTING  | orion:reflection:v1 + orion:memory:v1 | orion-reflector | writes memory/*.json |
+| (curation)  | AMM SPECIFICATION §5-§7 | orion-curator    | dedupes/archives/compacts memory/*.json |
 
 Reflection/memory is persisted under `../memory/<projectId>/state.json` and
 `metrics.json` following the AMM knowledge-object schema
-(`../Skills/autonomous-memory-manager/schemas/`).
+(`../Skills/autonomous-memory-manager/schemas/`). Memory files are validated
+with `node ../tools/validate-memory.mjs <memory-dir>` after every reflection
+and at session close; the reflector also records `modelOutcomes`
+({phase, model, verdict}) per run, which future runs read to calibrate model
+choice (the RFC-0004 ADAPTIVE strategy implemented without token metering).
+Context economy is enforced through minimum-privilege briefs (the orchestrator
+reads memory/conventions once and excerpts into each agent brief) and hard
+output caps in every agent definition.
 
 ## Model policy — adaptive by difficulty (ceiling: Opus)
 

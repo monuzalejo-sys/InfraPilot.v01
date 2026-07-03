@@ -181,7 +181,13 @@ ContextBudget {
   reserved_output:   Tokens           // REQUIRED. Tokens reserved for final output. Excluded from allocations.
   overflow_policy:   ContextOverflowPolicy  // REQUIRED. What to do when budget is exhausted.
   allocation_strategy: ContextAllocationStrategy  // REQUIRED. How to distribute budget.
+  measurement_mode:  MeasurementMode?       // OPTIONAL. Default MEASURED. How token figures are obtained.
 }
+
+MeasurementMode =
+  | MEASURED     // Real token counts from the model provider
+  | ESTIMATED    // Derived from a declared proxy (e.g. chars/4, tool-call counts)
+  | UNAVAILABLE  // No metering exists in this environment; token fields are not populated
 ```
 
 **Normative rule N1-R5:** The sum of `allocated` values MUST NOT exceed `total_tokens - reserved_output`.
@@ -189,6 +195,8 @@ ContextBudget {
 **Normative rule N1-R6:** A Runtime MUST update `consumed` after each contract invocation with the actual tokens used.
 
 **Normative rule N1-R7:** When `sum(consumed.values()) >= total_tokens - reserved_output`, the Runtime MUST execute the `overflow_policy` immediately.
+
+**Normative rule N1-R16:** A Runtime whose `measurement_mode` is `UNAVAILABLE` MUST NOT report fabricated token values. Token-typed fields MAY be reported as 0 provided the mode is declared. Honest absence of data is compliant; invented data is a protocol violation.
 
 ### 3.4 ContextPackage
 
@@ -325,6 +333,7 @@ Produced by the Verification Contract. The central quality document.
 
 ```
 QAReport {
+  id:                  String         // REQUIRED. Unique per report. Referenced by FixResult.qa_report_id.
   task_id:             TaskID         // REQUIRED.
   verdict:             Verdict        // REQUIRED.
   checks:              List<QACheck>  // REQUIRED. One check per success condition.
@@ -341,7 +350,7 @@ QACheck {
 }
 
 FixInstruction {
-  condition_id:        String   // REQUIRED. Which failing condition this fixes.
+  condition:           String   // REQUIRED. The exact text of the failing success_condition this fixes. Success conditions have no separate IDs — they are identified by their literal text.
   affected_artifacts:  List<String>  // REQUIRED. Which artifacts need modification.
   description:         String   // REQUIRED. What change to make.
   scope:               String   // REQUIRED. MUST describe minimum necessary change only.

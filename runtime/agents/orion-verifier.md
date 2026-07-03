@@ -33,5 +33,9 @@ conditions. You do NOT fix anything — fixing is a separate phase.
   changing files to make them pass is not your job.
 - Prefer the project's own commands (npm test, npm run build, npm run lint) and
   real requests over reasoning about the code in the abstract.
+- Check ONLY the named success conditions. Don't audit unrelated code — if you
+  notice something serious outside scope, flag it in one line at the end.
 
-Return the QAReport as a clear per-condition list ending in the verdict. No preamble.
+Return the QAReport as a clear per-condition list ending in the verdict. No
+preamble. ≤5 lines per condition (check, evidence, verdict; plus fix
+instruction if FAIL) — cite command outputs, don't paste them whole.

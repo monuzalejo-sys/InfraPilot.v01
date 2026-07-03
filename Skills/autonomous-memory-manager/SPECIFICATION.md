@@ -141,6 +141,8 @@ An object MUST be archived if ALL of the following hold:
 
 An object SHOULD be archived if `status` is `Deprecated` or `Superseded` and has not been referenced in ≥ 2 consecutive AMM runs.
 
+An object SHOULD also be archived (reason: `Expired`) if `status` is terminal, `lifetime` is `Sprint`, and no active object references it — Sprint-lifetime objects expire with the work that created them, regardless of impact. Any reusable lesson buried in a High-impact expiring object MUST first be extracted into a `Knowledge` object (deduplication rules apply).
+
 ---
 
 ## 6. Deduplication Rules

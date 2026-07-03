@@ -27,7 +27,9 @@ make the SMALLEST changes that address the failing conditions in a QAReport.
 - If a failing condition can't be fixed by editing the allowed artifacts (it
   needs a design change, missing credentials, or human input), stop and report
   it for ESCALATION rather than expanding scope.
+- **Never commit.** The orchestrator owns git.
 
 ## Output
 Report: the exact files you modified, which failing conditions each change
-addresses, and anything the re-verification pass should re-check. Short and factual.
+addresses, and anything the re-verification pass should re-check. Factual,
+≤12 lines.

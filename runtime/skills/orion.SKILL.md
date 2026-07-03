@@ -29,11 +29,15 @@ this skill exists so the user doesn't have to babysit every phase.
 
 - `projectId` = current repo's folder name, lowercased (e.g. `infrapilot`
   for `InfraPilot.v01`). If genuinely unclear which project, ask once.
-- Memory root = `<repo-root>/memory/<projectId>/` (create if missing).
-- If `<repo-root>/memory/<projectId>/state.json` exists, read it first.
-  It holds prior Decisions, Constraints, Risks, and Pending items from past
-  runs — respect existing Decisions/Constraints, don't re-litigate them,
-  and check whether this task resolves any open Pending item.
+- Memory root = `<repo-root>/memory/<projectId>/` (create if missing), where
+  `<repo-root>` is the OUTERMOST enclosing git repo — with nested repos
+  (e.g. the `infrapilot-app` submodule inside InfraPilot.v01) memory always
+  lives in the parent, never the submodule. One project = one memory.
+- If `state.json` exists there, read it ONCE now. It holds prior Decisions,
+  Constraints, Risks, and Pending items — respect existing
+  Decisions/Constraints, don't re-litigate them, and check whether this task
+  resolves any open Pending item. You will excerpt from this read for every
+  agent brief; no agent should re-read the file.
 
 Each phase below maps to an ORION behavioral contract (RFC-0002) and has a
 dedicated subagent. You (the main conversation) are the RUNTIME/orchestrator:
@@ -76,13 +80,44 @@ Note: this environment has no live token metering (RFC-0004 budgets are
 conceptual here), so model choice is the actual cost lever. Record nothing about
 token counts as if measured — only model choices are real.
 
+Learning loop: `metrics.json` sessions carry `modelOutcomes` entries
+(`{phase, model, verdict}`) from past runs. When you read memory in phase 1,
+glance at the last few: if a model tier keeps producing FAILs for a phase or
+step type, rate that work one tier harder this run; if opus keeps being spent
+on work that never fails, rate it one tier cheaper. That is the ADAPTIVE
+allocation strategy (RFC-0004 §4.1) implemented with the levers this
+environment actually has.
+
+## 1c. Context economy — MINIMUM PRIVILEGE briefs (RFC-0004 N4-R10)
+
+Subagent spawns are the token cost of an ORION run. Control them:
+
+- **Read once, excerpt forward.** You read state.json and the project's
+  conventions once in phase 1. Each agent brief includes only the LINES that
+  agent needs (the 2-5 relevant memory objects, the one convention that
+  applies), not file paths to re-read, and never the whole file.
+- **Compact briefs.** An agent brief = objective + its phase inputs + relevant
+  excerpts + what "done" looks like. If a brief exceeds ~60 lines, you're
+  pasting instead of excerpting.
+- **Compact outputs are enforced** in the agent definitions (analyst ≤40
+  lines, planner ≤30, builder ≤15, verifier ≤5/condition, reflector ≤15).
+  If an agent returns bloat anyway, summarize it before forwarding — never
+  chain-paste one agent's full output into the next brief when a summary
+  carries the same decisions.
+- **Don't spawn for the trivial.** A phase whose entire work is one thought or
+  one file edit is done inline; spawning an agent for it costs more than it
+  saves. Conversely, don't inline substantial work just to skip a handoff.
+- **Parallel builders share nothing.** Each gets only its own step + the plan
+  summary — not the other steps' details.
+
 ## 2. ANALYZING → `orion-analyst`
 
 Delegate to the `orion-analyst` subagent: decompose the objective into
-sub-objectives, required capabilities, affected files/systems, unknowns,
-risks, and concrete checkable success conditions. Give it the objective, the
-project dir, and the relevant prior memory. It's read-only. If it recommends
-ESCALATE (incoherent/under-specified objective), stop and ask the user.
+sub-objectives (each rated trivial/normal/hard), required capabilities,
+affected files/systems, unknowns, risks, and concrete checkable success
+conditions. Give it the objective, the project dir, and the relevant memory
+EXCERPTS (not the file). It's read-only. If it recommends ESCALATE
+(incoherent/under-specified objective), stop and ask the user.
 
 ## 3. PLANNING → `orion-planner`
 
@@ -119,11 +154,24 @@ a precise summary of what's blocking. Don't loop indefinitely.
 
 ## 7. REFLECTING + memory → `orion-reflector`
 
-Hand the `orion-reflector` subagent a summary of the run (objective, what was
-built, the verdict, fix-cycle count, outcome). It reflects and persists to
-`<repo-root>/memory/<projectId>/state.json` + `metrics.json`. Reflection is
-MANDATORY on every terminal path, including ESCALATED/ABORTED. If you skip the
-agent and do this inline instead, still update memory the same way:
+Hand the `orion-reflector` subagent a summary of the run: objective, what was
+built, the verdict, fix-cycle count, outcome, AND the model choices you made
+per phase/step with each one's result — the reflector records these as
+`modelOutcomes` so future runs can calibrate (see 1b learning loop). Give it
+the absolute memory dir path. Reflection is MANDATORY on every terminal path,
+including ESCALATED/ABORTED.
+
+Afterwards:
+- If the reflector ends with `CURATION RECOMMENDED`, spawn `orion-curator`
+  (haiku) on the memory dir — it dedupes, archives expired objects, and keeps
+  state.json cheap to load.
+- Validate the memory files: run
+  `node C:\Users\Kalel\ORION\tools\validate-memory.mjs <memory-dir>` — it's a
+  local script, near-zero cost. If it reports errors, have the reflector (or
+  yourself, if trivial) fix the JSON before finishing.
+
+If you skip the agent and do this inline instead, still update memory the
+same way:
 
 - Add Decision/Risk/Pending/Knowledge/Constraint objects for anything
   non-obvious this run produced (id prefix per `ID_PREFIXES` in the

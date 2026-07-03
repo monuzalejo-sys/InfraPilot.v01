@@ -350,6 +350,8 @@ For compliance verification, a Runtime MUST emit the following observable events
 
 **N4-R23:** These events MUST be accessible from outside the Runtime for compliance verification. The format and transport mechanism are implementation-specific, but the events MUST be observable.
 
+**N4-R24 (Measurement honesty):** A Runtime operating with `measurement_mode = ESTIMATED` or `UNAVAILABLE` (RFC-0001 §3.3) MUST declare that mode in its `BUDGET_DECLARED` event and MUST NOT present estimated or absent values as measured. In `UNAVAILABLE` mode, the token-denominated requirements of this RFC are satisfied by declaring the mode and using the Runtime's real cost levers (e.g. model-tier selection per task difficulty) in place of token allocation; fabricating token figures to appear compliant is a protocol violation.
+
 ---
 
 ## 10. Alternative Implementation Test

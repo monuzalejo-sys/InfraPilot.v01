@@ -119,7 +119,7 @@ export interface ArchiveRecord {
   archivedId: string
   archivedType: KnowledgeObjectType
   archivedAt: string
-  reason: 'Deprecated' | 'Superseded' | 'Merged' | 'LowValue'
+  reason: 'Deprecated' | 'Superseded' | 'Merged' | 'LowValue' | 'Expired'
   supersededBy?: string
 }
 

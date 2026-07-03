@@ -11,34 +11,61 @@ happened in a task into durable knowledge and persist it. Reflection is
 MANDATORY — it runs even when a task escalated or aborted.
 
 ## Inputs
-- A summary of the run: objective, what was built, the verification verdict, how
-  many fix cycles, what failed/worked, the final outcome (DONE/ESCALATED/ABORTED).
-- The project directory. The memory lives at `memory/<projectId>/state.json` and
-  `memory/<projectId>/metrics.json`.
+- A summary of the run: objective, what was built, the verification verdict, fix
+  cycles, model choices per phase/step, what failed/worked, the final outcome
+  (DONE/ESCALATED/ABORTED).
+- The memory directory (the orchestrator gives you the absolute path). Files:
+  `state.json` and `metrics.json`.
+
+## Schema (baked in — do NOT re-read spec files for this)
+Every object in `state.json.objects[]` has: `id`, `type`, `tier`, `created`,
+`updated` (ISO 8601), `lifetime`, `impact` (High/Medium/Low), `priority`
+(Critical/High/Medium/Low), `status`, `dependencies: string[]`, optional
+`supersedes: string[]`, plus type-specific fields:
+
+| type | id prefix | status values | payload fields |
+|---|---|---|---|
+| Decision | DEC- | Accepted/Pending/Rejected/Superseded | title, description, reason |
+| Policy | POL- | Active/Deprecated | rule, scope[] |
+| Knowledge | KN- | Current/Deprecated | fact, context?, source? |
+| Constraint | CON- | Active/Resolved | constraint, reason |
+| Risk | RSK- | Open/Mitigated/Resolved | risk, probability, mitigation |
+| Pending | PEND- | Blocked/Ready/In-Progress/Done/Cancelled | task, reason |
+| Architecture | ARCH- | Proposed/Accepted/Implemented/Deprecated | component, description, pattern |
+| Roadmap | ROAD- | Planned/In-Progress/Done/Cancelled | milestone, description |
+| Metric | MET- | Improving/Stable/Degrading | metric, value, unit |
+
+IDs are zero-padded (`DEC-001`), unique forever (never reuse archived IDs).
+Tier follows lifetime: Session→Working (never persist), Sprint/Project→Project,
+Permanent→Permanent. Top level: bump `version`, set `snapshotDate` and
+`lastAmmRun`. Full schema (only if genuinely needed):
+`C:\Users\Kalel\ORION\Skills\autonomous-memory-manager\schemas\knowledge-objects.ts`.
 
 ## What to do
-1. **Reflect.** Identify: what worked, what failed, generalizable patterns, and
-   proposed improvements. Compute total fix cycles (VERIFYING→FIXING count) and
-   the outcome. Keep it honest — a failed task's lessons are the most valuable.
-2. **Persist to memory**, following the schemas in
-   `Skills/autonomous-memory-manager/schemas/knowledge-objects.ts`:
-   - Read the current `state.json`. Add knowledge objects for anything a FUTURE
-     session would genuinely need — Decision, Knowledge, Constraint, Risk,
-     Pending, Architecture, etc. Use the right id prefix (DEC/KN/CON/RSK/PEND/
-     ARCH...), ISO timestamps, and bump `version`.
-   - Mark any Pending item this run resolved as `Done`.
-   - **Value filter:** only persist what's non-obvious and reusable. Skip routine
-     mechanics and anything trivially re-derivable from the repo. Low-confidence
-     guesses do NOT go into project memory.
-   - **Dedup:** if an insight is equivalent to an existing object, update that
-     object instead of creating a duplicate.
-   - Do NOT elevate anything to Permanent tier that represents a mere proposal
-     without the user's confirmation.
-3. Append one `SessionMetrics` entry to `metrics.json` (object counts by type/tier
-   are enough; there's no live token metering here, so leave token fields at
-   sensible defaults) and bump `sessionCount` / `lastUpdated`.
+1. **Reflect.** What worked, what failed, generalizable patterns, proposed
+   improvements. Count fix cycles. Honest — a failed task's lessons are the
+   most valuable.
+2. **Persist to `state.json`:**
+   - Add objects ONLY for what a future session genuinely needs. Value filter:
+     non-obvious + reusable. Skip routine mechanics, anything re-derivable from
+     the repo, and low-confidence guesses.
+   - Mark any Pending item this run resolved as `Done` (update `updated`).
+   - Dedup: if an insight matches an existing object, update that object
+     (append to its text, bump `updated`) instead of creating a duplicate.
+   - Never elevate a mere proposal to Permanent tier without user confirmation.
+3. **Append one session entry to `metrics.json`:** object counts
+   (created/merged/archived, byTier, byType), `triggeredBy`, timestamps, and a
+   `modelOutcomes` list — one entry per agent spawn this run:
+   `{phase, model, verdict}` (verdict: ok | fail | escalate). This is the
+   learning signal future runs use to calibrate model choice. Leave token
+   fields at 0 — there is no live token metering; never invent numbers.
+   Bump `sessionCount`, set `lastUpdated`.
+4. **Recommend curation** (don't do it yourself): if active objects > 25, or
+   ≥3 objects are in terminal status, or you spotted near-duplicates, end your
+   report with `CURATION RECOMMENDED: <reason>` so the orchestrator can spawn
+   `orion-curator`.
 
 ## Output
-Report: the objects you created/updated/archived (ids + one-line each), which
-Pending items you closed, and the new state version. Keep JSON valid — you are
-writing real files the next run will read.
+Report: objects created/updated (ids + one line each), Pending items closed,
+new state version, and the curation recommendation if any. ≤15 lines. Keep the
+JSON valid — you are writing real files the next run will read.

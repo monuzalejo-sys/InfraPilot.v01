@@ -30,52 +30,51 @@ The Lifecycle Protocol is what makes ORION a protocol rather than a collection o
                           │ objective present
                           ▼
                      ┌──────────┐
-                     │ANALYZING │◄──────────────────────────┐
-                     └────┬─────┘                           │
-                          │ AnalysisOutput valid             │
-                          ▼                                  │
-                     ┌──────────┐                            │
-                     │ PLANNING │                            │
-                     └────┬─────┘                            │
-                          │ ExecutionPlan valid               │
-                          │ budget check passed              │
-                          ▼                                  │
-                     ┌──────────┐                            │
-             ┌──────►│ BUILDING │                            │
-             │       └────┬─────┘                            │
-             │            │ all steps complete               │
-             │            ▼                                  │
-             │      ┌───────────┐     attempt_count          │
-             │      │ VERIFYING │────────< max_attempts ─────┘
-             │      └─────┬─────┘     (loop back)
-             │    PASS    │    FAIL
+                     │ANALYZING │
+                     └────┬─────┘
+                          │ AnalysisOutput valid
+                          ▼
+                     ┌──────────┐
+                     │ PLANNING │
+                     └────┬─────┘
+                          │ ExecutionPlan valid
+                          │ budget check passed
+                          ▼
+                     ┌──────────┐
+             ┌──────►│ BUILDING │
+             │       └────┬─────┘
+             │            │ all steps complete
+             │            ▼
+             │      ┌───────────┐
+             │      │ VERIFYING │
+             │      └─────┬─────┘
              │            │
-             │  ┌─────────┴──────────┐
-             │  │                    │
-             │  ▼ verdict=ESCALATE   ▼ verdict=FAIL AND
-             │ ┌───────────┐        attempt_count < max
-             │ │ ESCALATED │        │
-             │ └───────────┘        ▼
-             │                 ┌─────────┐
-             │                 │ FIXING  │
-             │                 └────┬────┘
-             │                      │ FixResult produced
-             └──────────────────────┘ (go back to BUILDING)
-                    │
-                    │ PASS verdict
-                    ▼
-              ┌───────────┐
-              │ REFLECTING│
-              └─────┬─────┘
-                    │ ReflectionReport + MemoryRecords produced
-                    ▼
-               ┌────────┐
-               │  DONE  │
-               └────────┘
+             │   ┌────────┼──────────────────────┐
+             │   │ PASS   │ FAIL AND             │ verdict=ESCALATE, OR
+             │   │        │ attempt_count        │ FAIL AND attempt_count
+             │   │        │ < max_attempts       │ >= max_attempts
+             │   │        ▼                      ▼
+             │   │   ┌─────────┐          (REFLECTING first,
+             │   │   │ FIXING  │           per N3-R3)
+             │   │   └────┬────┘                 │
+             │   │        │ FixResult produced   ▼
+             └───┼────────┘ (re-enter BUILDING  ┌───────────┐
+                 │           for affected steps │ ESCALATED │
+                 │           only, N3-R8)       └───────────┘
+                 ▼
+           ┌───────────┐
+           │ REFLECTING│
+           └─────┬─────┘
+                 │ ReflectionReport + MemoryRecords produced
+                 ▼
+            ┌────────┐
+            │  DONE  │
+            └────────┘
 
 
 From any state:
   context_budget exhausted + overflow_policy=ABORT  →  ABORTED
+  (REFLECTING is attempted first with remaining budget, per N3-R3)
 ```
 
 ### 1.2 State Definitions

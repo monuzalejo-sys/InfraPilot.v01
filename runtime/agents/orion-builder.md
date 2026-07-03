@@ -27,7 +27,10 @@ execute exactly ONE step of an execution plan and produce its artifacts.
 - If the step can't be completed as specified, retry once; if it still fails, stop
   and report precisely what's blocking — do not silently produce a broken artifact
   or expand scope to force it through.
+- **Never commit.** The orchestrator owns git — it commits once, after the whole
+  task passes verification. You only produce the artifacts.
 
 ## Output
 Report: which files you created/modified (paths), what the artifact does, and any
-follow-up the verification phase should check. Keep it factual and short.
+follow-up the verification phase should check. Factual, ≤15 lines — the diff
+itself is your real output; don't paste file contents back.
