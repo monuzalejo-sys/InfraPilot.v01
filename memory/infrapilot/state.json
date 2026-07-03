@@ -1,6 +1,6 @@
 {
   "projectId": "infrapilot",
-  "snapshotDate": "2026-07-02T06:00:00.000Z",
+  "snapshotDate": "2026-07-02T07:00:00.000Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -111,16 +111,16 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-07-01T01:00:00.000Z",
+      "updated": "2026-07-02T07:00:00.000Z",
       "lifetime": "Sprint",
       "impact": "High",
       "priority": "High",
-      "status": "Ready",
+      "status": "In-Progress",
       "dependencies": [
         "KN-004"
       ],
       "task": "Verify/configure real Supabase credentials end-to-end (local .env + confirm what's actually set on Vercel), so login, register, and data persistence work for real instead of only via mock data files.",
-      "reason": "User's stated long-term goal is to 'perfeccionar' (refine/polish) infrapilot-app. This is the biggest concrete functional gap found during analysis."
+      "reason": "Phase A DONE 2026-07-02 (verified PASS 5/5): schema.sql moved to migrations/000_initial_schema.sql (001 depends on it), .env.example created (the ONLY 3 vars the code reads), supabase/README.md documents run order + auth model + Vercel setup. NO missing tables (000+001 cover every .from() call); login/register is pure Supabase Auth, no custom profile table. Phase B blocked on user: create/choose Supabase project, provide NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY (+ optional GROQ_API_KEY), run the 2 migrations in order, set same 3 vars on Vercel. Then verify login/register/persistence live."
     },
     {
       "id": "PEND-004",
@@ -383,6 +383,35 @@
       "dependencies": [],
       "task": "Optionally make the AMM TypeScript reference implementation real: add package.json + tsconfig + vitest, convert tests/TEST-CASES.md into executable tests, implement the N-AMM-R9 demotion branch, and replace/lower the Jaccard 0.85 dedup threshold (it almost never fires on real sentences). Alternative already applied: src/ is explicitly marked as non-building reference pseudocode in the AMM README.",
       "reason": "Honesty gap identified in ecosystem review: spec claims a reference implementation but the code cannot compile or run. Low priority — the operative implementation is the reflector/curator agents + validator script."
+    },
+    {
+      "id": "KN-010",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-02T07:00:00.000Z",
+      "updated": "2026-07-02T07:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "Definitive infrapilot-app config map (analyst-verified with file:line): only 3 env vars are read anywhere — NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY (lib/supabase/client.ts:5-6, lib/supabase/server.ts:7-8, proxy.ts:6,15-16) and GROQ_API_KEY (app/api/cotizar/route.ts:7,14; app/api/licitaciones/analyze/route.ts:112,119, both guarded with early 500). Auth is 100% Supabase Auth: login/register call signInWithPassword/signUp client-side; full_name/company live in Auth user_metadata; every table has RLS auth.uid() = user_id. Schema is fully covered by migrations 000_initial_schema.sql (projects, budgets, activity, triggers) + 001_prices_apus.sql (price_items, apus, apu_components, budgets ALTERs) — 001 fails without 000. proxy.ts skips ALL auth checks when Supabase vars are unset (open access/mock mode).",
+      "context": "PEND-002 phase A analysis. Supersedes the vaguer parts of KN-004 (KN-004 remains for the mock-data behavior description).",
+      "source": "session 2026-07-02, orion-analyst (sonnet) + orion-verifier PASS"
+    },
+    {
+      "id": "PEND-011",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-02T07:00:00.000Z",
+      "updated": "2026-07-02T07:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Low",
+      "priority": "Low",
+      "status": "Ready",
+      "dependencies": [],
+      "task": "Product decision on @anthropic-ai/sdk: it is in package.json but never imported (all AI calls go through Groq), while the landing page claims Claude/Anthropic branding. Either remove the dead dependency (and fix the marketing copy) or actually wire Anthropic in for the AI features.",
+      "reason": "Found during PEND-002 analysis. Removing is trivial; wiring Anthropic is a feature decision the user owns."
     }
   ],
   "archives": [
@@ -411,6 +440,6 @@
       "notes": "Sprint item, Done status, no dependencies, caveat extracted to KN-008 before archiving"
     }
   ],
-  "lastAmmRun": "2026-07-02T06:00:00.000Z",
-  "version": 12
+  "lastAmmRun": "2026-07-02T07:00:00.000Z",
+  "version": 13
 }
