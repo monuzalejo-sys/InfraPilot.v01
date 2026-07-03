@@ -21,6 +21,7 @@ export interface ModelOutcome {
   phase: string // 'analysis' | 'planning' | 'build:<step-id>' | 'verification' | 'fix' | 'reflection' | 'curation'
   model: string // 'haiku' | 'sonnet' | 'opus'
   verdict: 'ok' | 'fail' | 'escalate'
+  tokens?: number // measured subagent_tokens from the spawn's completion notification; absent = not measured (never fabricated)
 }
 
 export interface SessionMetrics {

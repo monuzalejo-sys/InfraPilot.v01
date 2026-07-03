@@ -1,0 +1,39 @@
+{
+  "projectId": "_permanent",
+  "snapshotDate": "2026-07-02T05:45:00.000Z",
+  "objects": [
+    {
+      "id": "KN-001",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-07-02T05:45:00.000Z",
+      "updated": "2026-07-02T05:45:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "On this machine, terminal 'git push' cannot complete (Git Credential Manager dialog fails: 'User cancelled dialog', no /dev/tty). Commit locally and push via GitHub Desktop, which is already authenticated. Applies to every repo/project on this machine.",
+      "context": "Machine-level fact promoted from infrapilot memory (KN-001 there). Kept in both while infrapilot PEND-004 references the local copy.",
+      "source": "session 2026-07-01"
+    },
+    {
+      "id": "KN-002",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-07-02T05:45:00.000Z",
+      "updated": "2026-07-02T05:45:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "Claude Code agent-spawn completion notifications include measured usage: subagent_tokens, tool_uses, duration_ms. The ORION orchestrator collects these per spawn and passes them to the reflector, so metrics.json modelOutcomes carry MEASURED token costs per phase/model (measurement_mode MEASURED for spawns). The orchestrator's own inline consumption remains unmetered — never fabricate it.",
+      "context": "Discovered 2026-07-02 during the E2E pipeline test; upgraded ORION's Context Economy from conceptual to measured for delegated work.",
+      "source": "session 2026-07-02"
+    }
+  ],
+  "archives": [],
+  "lastAmmRun": "2026-07-02T05:45:00.000Z",
+  "version": 1
+}

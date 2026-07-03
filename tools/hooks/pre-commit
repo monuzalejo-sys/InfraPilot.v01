@@ -1,0 +1,20 @@
+#!/bin/sh
+# ORION pre-commit hook: refuse to commit invalid ORION memory files.
+# Versioned copy lives at tools/hooks/pre-commit; install with:
+#   cp tools/hooks/pre-commit .git/hooks/pre-commit
+# Validates every memory/<projectId>/ dir whose state.json or metrics.json is staged.
+
+repo_root=$(git rev-parse --show-toplevel)
+dirs=$(git diff --cached --name-only | grep -E '^memory/[^/]+/(state|metrics)\.json$' | xargs -r -n1 dirname | sort -u)
+[ -z "$dirs" ] && exit 0
+
+status=0
+for d in $dirs; do
+  echo "pre-commit: validating $d"
+  node "$repo_root/tools/validate-memory.mjs" "$repo_root/$d" || status=1
+done
+
+if [ $status -ne 0 ]; then
+  echo "pre-commit: ORION memory is INVALID — commit blocked. Fix the errors above (or run /orion-validate)."
+fi
+exit $status

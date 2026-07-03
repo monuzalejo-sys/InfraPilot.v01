@@ -38,6 +38,12 @@ this skill exists so the user doesn't have to babysit every phase.
   Decisions/Constraints, don't re-litigate them, and check whether this task
   resolves any open Pending item. You will excerpt from this read for every
   agent brief; no agent should re-read the file.
+- If `memory/<projectId>/brief.md` exists, read it INSTEAD of hunting the
+  repo's convention files (CLAUDE.md/AGENTS.md/README) — it's the curated
+  1-page brief you excerpt into agent briefs. If it's missing or stale, have
+  the curator (re)generate it at session close.
+- Also read `C:\Users\Kalel\ORION\memory\permanent\state.json` — machine-level
+  facts shared across ALL projects (a handful of objects, one cheap read).
 
 Each phase below maps to an ORION behavioral contract (RFC-0002) and has a
 dedicated subagent. You (the main conversation) are the RUNTIME/orchestrator:
@@ -76,12 +82,15 @@ How to apply it:
 - When unsure between two tiers, pick the cheaper one and let a FAIL/escalation
   bump it up on the next attempt — don't default everything to Opus.
 
-Note: this environment has no live token metering (RFC-0004 budgets are
-conceptual here), so model choice is the actual cost lever. Record nothing about
-token counts as if measured — only model choices are real.
+Cost measurement: each agent spawn's REAL token usage arrives in its
+completion notification (`subagent_tokens`). Collect these and hand them to
+the reflector so `metrics.json` records MEASURED per-phase consumption
+(`measurement_mode: MEASURED` for spawns, RFC-0001 §3.3). Your own inline
+consumption is not metered — never invent a figure for it. Model choice is
+the cost lever; the measured numbers tell you whether it's working.
 
 Learning loop: `metrics.json` sessions carry `modelOutcomes` entries
-(`{phase, model, verdict}`) from past runs. When you read memory in phase 1,
+(`{phase, model, verdict, tokens}`) from past runs. When you read memory in phase 1,
 glance at the last few: if a model tier keeps producing FAILs for a phase or
 step type, rate that work one tier harder this run; if opus keeps being spent
 on work that never fails, rate it one tier cheaper. That is the ADAPTIVE
@@ -110,6 +119,25 @@ Subagent spawns are the token cost of an ORION run. Control them:
 - **Parallel builders share nothing.** Each gets only its own step + the plan
   summary — not the other steps' details.
 
+## 1d. Proportional lifecycle — ceremony must match task size
+
+The full agent pipeline exists for substantial work; do not pay it for small
+tasks. Gate by scope, assessed honestly in phase 1:
+
+- **Trivial** (one file, fully specified, no unknowns): everything inline —
+  zero spawns. Verify with the concrete check the task implies (run the
+  command, hit the route). Reflect inline; memory update stays mandatory.
+- **Small** (2-4 files, clear path, low blast radius): analyze + plan inline
+  (a 5-line TodoWrite plan is enough), build inline or with ONE builder, spawn
+  the verifier (evidence rules always apply), reflect inline.
+- **Substantial** (multi-step, parallelizable, cross-cutting, or high risk):
+  full pipeline — analyst, planner, parallel builders, verifier, reflector.
+
+When in doubt between two levels, start lower — a FAIL from verification
+escalates the next attempt naturally. Reflection is NEVER skipped at any
+level; inline reflection just means you write state.json/metrics.json
+yourself, to the same schema the reflector uses.
+
 ## 2. ANALYZING → `orion-analyst`
 
 Delegate to the `orion-analyst` subagent: decompose the objective into
@@ -136,6 +164,12 @@ acceptance criteria, and the project conventions — a fresh agent has none of
 this conversation's context. Trivial steps you may do directly. Keep TodoWrite
 current as steps complete.
 
+For plans of ≥3 steps, verify incrementally: after each step the planner
+marked as a checkpoint (or any `hard` step), run a quick scoped check — a
+haiku verifier or a direct build/test command — BEFORE launching steps that
+depend on it. Failing fast on step 1 is far cheaper than discovering it after
+step 5 was built on top.
+
 ## 5. VERIFYING → `orion-verifier`
 
 Hand the task's success conditions and the changed artifacts to the
@@ -156,8 +190,9 @@ a precise summary of what's blocking. Don't loop indefinitely.
 
 Hand the `orion-reflector` subagent a summary of the run: objective, what was
 built, the verdict, fix-cycle count, outcome, AND the model choices you made
-per phase/step with each one's result — the reflector records these as
-`modelOutcomes` so future runs can calibrate (see 1b learning loop). Give it
+per phase/step with each one's result and its measured `subagent_tokens` from
+the completion notification — the reflector records these as `modelOutcomes`
+so future runs can calibrate (see 1b learning loop). Give it
 the absolute memory dir path. Reflection is MANDATORY on every terminal path,
 including ESCALATED/ABORTED.
 

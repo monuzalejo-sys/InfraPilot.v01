@@ -54,9 +54,11 @@ const err = (msg) => errors.push(msg)
 const warn = (msg) => warns.push(msg)
 const isIso = (s) => typeof s === 'string' && !Number.isNaN(Date.parse(s))
 
-const dir = process.argv[2]
+const args = process.argv.slice(2).filter(a => a !== '--stats')
+const statsMode = process.argv.includes('--stats')
+const dir = args[0]
 if (!dir) {
-  console.error('Usage: node validate-memory.mjs <memory-dir>')
+  console.error('Usage: node validate-memory.mjs <memory-dir> [--stats]')
   process.exit(2)
 }
 
@@ -195,4 +197,28 @@ for (const w of warns) console.log(`  WARN  ${w}`)
 console.log(errors.length === 0
   ? `  RESULT: VALID${warns.length ? ` (${warns.length} warning${warns.length > 1 ? 's' : ''})` : ''}`
   : `  RESULT: INVALID — ${errors.length} error(s)`)
+
+// ---- --stats: model calibration table from modelOutcomes ----
+if (statsMode && metrics && Array.isArray(metrics.sessions)) {
+  const agg = new Map() // "phase|model" -> {ok, fail, escalate, tokens: [..]}
+  for (const s of metrics.sessions) {
+    for (const m of s?.modelOutcomes ?? []) {
+      const phase = String(m.phase ?? '?').replace(/^build:.*/, 'build')
+      const key = `${phase}|${m.model}`
+      const e = agg.get(key) ?? { ok: 0, fail: 0, escalate: 0, tokens: [] }
+      if (m.verdict in e) e[m.verdict]++
+      if (typeof m.tokens === 'number' && m.tokens > 0) e.tokens.push(m.tokens)
+      agg.set(key, e)
+    }
+  }
+  console.log('  MODEL CALIBRATION (all sessions):')
+  if (agg.size === 0) console.log('    no modelOutcomes recorded yet')
+  for (const [key, e] of [...agg.entries()].sort()) {
+    const [phase, model] = key.split('|')
+    const avg = e.tokens.length ? ` | avg ${Math.round(e.tokens.reduce((a, b) => a + b, 0) / e.tokens.length / 1000)}k tok` : ''
+    const hint = e.fail + e.escalate > e.ok ? '  → rate this work a tier HARDER'
+      : (model !== 'haiku' && e.fail + e.escalate === 0 && e.ok >= 3 ? '  → consider a CHEAPER tier' : '')
+    console.log(`    ${phase.padEnd(13)} ${model.padEnd(7)} ok:${e.ok} fail:${e.fail} esc:${e.escalate}${avg}${hint}`)
+  }
+}
 process.exit(errors.length === 0 ? 0 : 1)

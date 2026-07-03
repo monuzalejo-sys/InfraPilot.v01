@@ -16,6 +16,13 @@
 
 AMM is the autonomous memory management skill for ORION-compliant runtimes. It runs continuously without human commands, triggered by observable events in the task lifecycle.
 
+> **Implementation status:** the TypeScript in `src/` is a non-building
+> reference implementation — there is no build config or executable test
+> suite; read it as precise pseudocode. `SPECIFICATION.md` is the normative
+> document. The operative implementation of this spec on this machine is the
+> `orion-reflector` + `orion-curator` agents (see `../../runtime/`), with
+> `../../tools/validate-memory.mjs` enforcing the schema.
+
 AMM is not a summarizer. It is a continuous optimization process that treats cognitive memory as a finite resource requiring active management across the entire project lifetime.
 
 ---

@@ -249,7 +249,7 @@ What happens *inside* each contract invocation is not observable behavior. It is
 | RFC-0004 | N-4 | Context Economy Protocol | Draft |
 | RFC-0005 | C-3 | Scalability Protocol | Draft |
 | RFC-0006 | C-1 | Compliance Protocol | Draft |
-| RFC-0007 | C-2 | Versioning Protocol | **Planned — not yet written** |
+| RFC-0007 | C-2 | Versioning Protocol | Draft |
 
 ---
 

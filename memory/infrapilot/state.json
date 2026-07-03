@@ -1,6 +1,6 @@
 {
   "projectId": "infrapilot",
-  "snapshotDate": "2026-07-02T05:30:00.000Z",
+  "snapshotDate": "2026-07-02T06:00:00.000Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -116,7 +116,9 @@
       "impact": "High",
       "priority": "High",
       "status": "Ready",
-      "dependencies": ["KN-004"],
+      "dependencies": [
+        "KN-004"
+      ],
       "task": "Verify/configure real Supabase credentials end-to-end (local .env + confirm what's actually set on Vercel), so login, register, and data persistence work for real instead of only via mock data files.",
       "reason": "User's stated long-term goal is to 'perfeccionar' (refine/polish) infrapilot-app. This is the biggest concrete functional gap found during analysis."
     },
@@ -130,7 +132,9 @@
       "impact": "Low",
       "priority": "Medium",
       "status": "Ready",
-      "dependencies": ["KN-001"],
+      "dependencies": [
+        "KN-001"
+      ],
       "task": "Push local commits (d68fac0, f971daa, d0cbb2d, and this session's memory-update commit) to origin/main via GitHub Desktop.",
       "reason": "Terminal git push doesn't work in this environment (see KN-001) — pending manual push next time the user is at GitHub Desktop."
     },
@@ -159,7 +163,9 @@
       "impact": "High",
       "priority": "High",
       "status": "Accepted",
-      "dependencies": ["ARCH-001"],
+      "dependencies": [
+        "ARCH-001"
+      ],
       "title": "Six dedicated ORION subagents created, mapped to the RFC-0002 contracts",
       "description": "Created user-level Claude Code subagents in C:\\Users\\Kalel\\.claude\\agents\\ : orion-analyst (orion:analysis:v1, read-only), orion-planner (orion:planning:v1, read-only), orion-builder (orion:build:v1, full tools, one per plan step, parallel where independent), orion-verifier (orion:verification:v1, read+run-tests only, no edits), orion-fixer (orion:fix:v1, edits only the artifacts a QAReport names), and orion-reflector (orion:reflection:v1 + orion:memory:v1, writes to memory/*.json). Tools are restricted per contract (e.g. analyst/planner/verifier cannot modify files). The /orion SKILL.md was updated so each phase delegates to its named agent; the main conversation acts as the orchestrator/runtime. Prior to this, /orion only used the generic built-in agent types (Explore/general-purpose/Plan) — no custom ORION agents existed. Verified live 2026-07-01: agents load in-session (no restart needed) and orion-analyst returned a correct response.",
       "reason": "User asked whether the agents were created correctly; they were not (only the skill existed). User authorized creating them ('tienes acceso total'). Mapping agents 1:1 to the ORION contracts makes the system faithful to the user's own standard rather than generic."
@@ -174,7 +180,9 @@
       "impact": "High",
       "priority": "High",
       "status": "Accepted",
-      "dependencies": ["DEC-003"],
+      "dependencies": [
+        "DEC-003"
+      ],
       "title": "ORION model policy: adaptive by difficulty, ceiling Opus",
       "description": "The orchestrator picks each agent's model by task/step difficulty via the Agent tool's model param: trivial->haiku, normal->sonnet, hard->opus (ceiling Opus is allowed; floor Haiku). The orion-analyst rates difficulty per sub-objective/step and those ratings drive builder/verifier/fixer model choice; builders run one-per-step so a single plan can mix haiku and opus steps in parallel. Agent frontmatter defaults were set (analyst/planner/builder/verifier/fixer = sonnet, reflector = haiku) so a naive spawn doesn't inherit the main conversation's model. Full rubric lives in the '1b. Model selection' section of ~/.claude/skills/orion/SKILL.md (mirrored in runtime/skills/).",
       "reason": "User chose adaptive-by-difficulty with an Opus ceiling. This environment has no live token metering (RFC-0004 budgets are conceptual here), so model choice is the only real cost lever — spending should track difficulty instead of defaulting everything to the most expensive model."
@@ -275,7 +283,10 @@
       "impact": "High",
       "priority": "High",
       "status": "Current",
-      "dependencies": ["ARCH-001", "DEC-004"],
+      "dependencies": [
+        "ARCH-001",
+        "DEC-004"
+      ],
       "fact": "ORION agent hardening for autonomy: all 6 agents (analyst, planner, builder, verifier, fixer, reflector) now enforce single-responsibility boundaries. Builder/fixer cannot commit; analyst/planner/verifier read-only; reflector writes memory only. All agents have hard output caps (e.g., builder max 4000 chars per step, analyst max 3000 per finding). Model policy: haiku for trivial/routine, sonnet for normal, opus for hard tasks (ceiling Opus); planner rates difficulty per step and builder inherits ratings to spawn parallel subagents at appropriate model tier. Reflector baked in AMM schema (no runtime parsing of knowledge-objects.ts); records modelOutcomes per agent spawn (phase, model, verdict) for learning loop.",
       "context": "Session 2026-07-02 hardened the ORION ecosystem for continuous autonomy; E2E test passed with zero fix cycles (analyst→planner→builder→verifier→reflector, haiku/sonnet mix).",
       "source": "session 2026-07-02"
@@ -305,7 +316,9 @@
       "impact": "Medium",
       "priority": "High",
       "status": "Accepted",
-      "dependencies": ["DEC-003"],
+      "dependencies": [
+        "DEC-003"
+      ],
       "title": "AMM schema embedded in reflector agent, not runtime-parsed",
       "description": "Instead of the reflector loading knowledge-objects.ts at runtime to validate/parse the AMM schema, the schema is baked into the agent's SYSTEM prompt as a table + constraints (LIFETIME_TO_TIER, status values, type-specific fields). This eliminates a runtime TS parser dependency, reduces latency (no file I/O per reflection), and makes the schema version explicit per run (reflector inherits it from its frontmatter at agent load time). If the schema evolves, the reflector's SYSTEM prompt is updated; no AMM-runtime process exists to bump a version field.",
       "reason": "Session 2026-07-02 verified that a hand-emulated schema (no live runtime) is viable for ORION's current scale. Baking the schema into the reflector is safer and simpler than attempting to maintain a separate parser binary."
@@ -324,6 +337,52 @@
       "fact": "infrapilot-app's tax-by-currency table is hardcoded in lib/utils.ts with standard legal rates: COP and MXN use IVA @19% and @16% respectively; PEN uses IGV @18%; fallback is 'Impuesto' @18%. This branching is correct for the current 3-currency deployment (COP primary), but if InfraPilot expands to additional countries or wants to pull rates from an external source of truth (tax authority APIs, a database, etc.), the helpers (taxLabel(), defaultTaxRate()) must be refactored to consume dynamic configuration instead of literal values.",
       "context": "Extracted from PEND-006 F3 (Tax rate mismatch) resolution. The hardcoded rates are intentional and correct per currency, but the pattern (literal switch on currency) is brittle if country coverage expands.",
       "source": "session 2026-07-02, PEND-006 caveat"
+    },
+    {
+      "id": "DEC-007",
+      "type": "Decision",
+      "tier": "Permanent",
+      "created": "2026-07-02T06:00:00.000Z",
+      "updated": "2026-07-02T06:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-004"
+      ],
+      "title": "Proportional lifecycle: ceremony scales with task size",
+      "description": "Standing policy (SKILL.md 1d): trivial tasks (1 file, fully specified) run fully inline with zero agent spawns; small tasks (2-4 files) use at most one builder plus a spawned verifier; only substantial multi-step work pays the full analyst->planner->builders->verifier->reflector pipeline. Reflection (memory update) is mandatory at every level, inline or spawned. Rationale: the E2E test showed the full pipeline costs ~10x inline execution for small artifacts (~168k subagent tokens for a 91-line README).",
+      "reason": "User asked for minimum token consumption per task; full-pipeline-by-default was the single largest waste. Verified 2026-07-02: this session's improvement batch ran inline at a small fraction of the E2E cost."
+    },
+    {
+      "id": "KN-009",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-02T06:00:00.000Z",
+      "updated": "2026-07-02T06:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "A pre-commit hook validates ORION memory on every commit of this repo: staged changes to memory/*/state.json or metrics.json trigger tools/validate-memory.mjs and an INVALID result blocks the commit. The versioned copy lives at tools/hooks/pre-commit; the ACTIVE copy at .git/hooks/pre-commit is NOT tracked by git, so after a fresh clone it must be reinstalled with: cp tools/hooks/pre-commit .git/hooks/pre-commit",
+      "context": "Installed 2026-07-02 so schema enforcement doesn't depend on any agent remembering to run the validator. The validator also gained a --stats flag that prints a model-calibration table from metrics.json modelOutcomes.",
+      "source": "session 2026-07-02"
+    },
+    {
+      "id": "PEND-010",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-02T06:00:00.000Z",
+      "updated": "2026-07-02T06:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Low",
+      "priority": "Low",
+      "status": "Ready",
+      "dependencies": [],
+      "task": "Optionally make the AMM TypeScript reference implementation real: add package.json + tsconfig + vitest, convert tests/TEST-CASES.md into executable tests, implement the N-AMM-R9 demotion branch, and replace/lower the Jaccard 0.85 dedup threshold (it almost never fires on real sentences). Alternative already applied: src/ is explicitly marked as non-building reference pseudocode in the AMM README.",
+      "reason": "Honesty gap identified in ecosystem review: spec claims a reference implementation but the code cannot compile or run. Low priority — the operative implementation is the reflector/curator agents + validator script."
     }
   ],
   "archives": [
@@ -352,6 +411,6 @@
       "notes": "Sprint item, Done status, no dependencies, caveat extracted to KN-008 before archiving"
     }
   ],
-  "lastAmmRun": "2026-07-02T05:30:00.000Z",
-  "version": 11
+  "lastAmmRun": "2026-07-02T06:00:00.000Z",
+  "version": 12
 }

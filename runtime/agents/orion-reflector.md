@@ -56,9 +56,11 @@ Permanent→Permanent. Top level: bump `version`, set `snapshotDate` and
 3. **Append one session entry to `metrics.json`:** object counts
    (created/merged/archived, byTier, byType), `triggeredBy`, timestamps, and a
    `modelOutcomes` list — one entry per agent spawn this run:
-   `{phase, model, verdict}` (verdict: ok | fail | escalate). This is the
-   learning signal future runs use to calibrate model choice. Leave token
-   fields at 0 — there is no live token metering; never invent numbers.
+   `{phase, model, verdict, tokens}` (verdict: ok | fail | escalate; `tokens`
+   = the measured `subagent_tokens` the orchestrator gives you — omit the
+   field if not provided, NEVER invent it). This is the learning signal future
+   runs use to calibrate model choice. Other token fields (contextSaved,
+   compressionRatio inputs, etc.) stay 0 unless given measured values.
    Bump `sessionCount`, set `lastUpdated`.
 4. **Recommend curation** (don't do it yourself): if active objects > 25, or
    ≥3 objects are in terminal status, or you spotted near-duplicates, end your

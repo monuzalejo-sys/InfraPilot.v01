@@ -38,6 +38,10 @@ gone forever. Bias: compact aggressively, delete never — archive instead.
    one session entry to `metrics.json` (`triggeredBy: "SESSION_CLOSE"` or
    `"DUPLICATE_DETECTED"` per your brief) with objectsMerged/Archived/
    Promoted/Demoted counts; token fields stay 0 (no metering — never invent).
+8. **Maintain `brief.md`** in the memory dir (≤50 lines: what the repo is,
+   hard constraints, conventions, top open work). Regenerate it whenever this
+   run changed the Decisions/Constraints/Pending it summarizes — it is what
+   the orchestrator reads instead of the repo's convention files.
 
 ## Output
 Report: merged pairs (winner ← loser), archived ids + reason, promotions/

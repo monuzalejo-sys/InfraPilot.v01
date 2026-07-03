@@ -11,9 +11,11 @@ READ-ONLY skill: no agents, no edits, minimal tokens.
 1. Locate the memory: `<outermost-repo-root>/memory/<projectId>/` (for work
    under `C:\Users\Kalel\ORION`, that's `C:\Users\Kalel\ORION\memory\infrapilot`).
    If there is no memory dir, say so and offer to start a first `/orion` run.
-2. Run `node C:\Users\Kalel\ORION\tools\validate-memory.mjs <memory-dir>` —
-   one cheap command; include its RESULT line. If INVALID, list the errors and
-   offer to repair before anything else.
+2. Run `node C:\Users\Kalel\ORION\tools\validate-memory.mjs <memory-dir> --stats`
+   — one cheap command; include its RESULT line. If INVALID, list the errors
+   and offer to repair before anything else. The MODEL CALIBRATION table it
+   prints is the learning signal: surface any "rate HARDER"/"CHEAPER tier"
+   hints so the next /orion run applies them.
 3. Read `state.json` (one read — it's the same data the validator just
    checked). Report, in this order, only what's actionable:
    - **Pendientes abiertos** (status Ready/Blocked/In-Progress), grouped by
