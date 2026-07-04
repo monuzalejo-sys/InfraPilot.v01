@@ -1,6 +1,6 @@
 {
   "projectId": "_permanent",
-  "snapshotDate": "2026-07-02T05:45:00.000Z",
+  "snapshotDate": "2026-07-03T00:00:00.000Z",
   "objects": [
     {
       "id": "KN-001",
@@ -31,9 +31,24 @@
       "fact": "Claude Code agent-spawn completion notifications include measured usage: subagent_tokens, tool_uses, duration_ms. The ORION orchestrator collects these per spawn and passes them to the reflector, so metrics.json modelOutcomes carry MEASURED token costs per phase/model (measurement_mode MEASURED for spawns). The orchestrator's own inline consumption remains unmetered — never fabricate it.",
       "context": "Discovered 2026-07-02 during the E2E pipeline test; upgraded ORION's Context Economy from conceptual to measured for delegated work.",
       "source": "session 2026-07-02"
+    },
+    {
+      "id": "KN-003",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-07-03T00:00:00.000Z",
+      "updated": "2026-07-03T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "infrapilot Supabase project: ref zrogravgwhoijajzciem, URL https://zrogravgwhoijajzciem.supabase.co. Client-safe publishable anon key (sb_publishable_ format, the new Supabase key style equivalent to legacy anon) is stored in infrapilot-app/.env.local (gitignored). Re-readable from Supabase Dashboard -> Project Settings -> API. SECURITY RULE: never request, paste into chat, or store the service_role/secret key; publishable keys are public-by-design (they ship in the browser bundle) so they are safe, secrets are not.",
+      "context": "Recorded at 2026-07-03 session close. Raw key intentionally kept only in .env.local, not in committed memory.",
+      "source": "session 2026-07-03"
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-07-02T05:45:00.000Z",
-  "version": 1
+  "lastAmmRun": "2026-07-03T00:00:00.000Z",
+  "version": 2
 }
