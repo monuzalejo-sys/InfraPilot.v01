@@ -1,11 +1,11 @@
 {
   "projectId": "infrapilot",
-  "sessionCount": 9,
+  "sessionCount": 11,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
-  "avgKnowledgeDensity": 0.0034,
+  "avgKnowledgeDensity": 0.0032,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-07-03T00:00:00.000Z",
+  "lastUpdated": "2026-07-05T23:59:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-07-01-001",
@@ -536,6 +536,177 @@
           "tokens": 2295
         }
       ]
+    },
+    {
+      "sessionId": "session-2026-07-05-001",
+      "runId": "orion-close-2",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-07-05T00:00:00.000Z",
+      "completedAt": "2026-07-05T00:00:00.000Z",
+      "durationMs": 0,
+      "contextSaved": 0,
+      "compressionRatio": 1,
+      "knowledgePreservedPercent": 100,
+      "duplicateReduction": 0,
+      "estimatedTokenSavings": 0,
+      "knowledgeDensity": 0.0034,
+      "objectsCreated": 6,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "byTier": {
+        "working": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "project": {
+          "objectCount": 5,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "permanent": {
+          "objectCount": 1,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        }
+      },
+      "byType": {
+        "Knowledge": {
+          "count": 5,
+          "created": 5,
+          "merged": 0,
+          "archived": 0
+        },
+        "Pending": {
+          "count": 2,
+          "created": 2,
+          "merged": 0,
+          "archived": 0
+        }
+      },
+      "modelOutcomes": [
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 19674
+        },
+        {
+          "phase": "build:dashboard-editorial",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 82193
+        },
+        {
+          "phase": "build:lector-ia",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 68739
+        },
+        {
+          "phase": "build:topografia",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 125
+        },
+        {
+          "phase": "build:restyle-datos",
+          "model": "sonnet",
+          "verdict": "escalate",
+          "tokens": 793
+        },
+        {
+          "phase": "build:restyle-flujo",
+          "model": "sonnet",
+          "verdict": "escalate",
+          "tokens": 269
+        },
+        {
+          "phase": "build:ui-tokens",
+          "model": "sonnet",
+          "verdict": "escalate",
+          "tokens": 7
+        },
+        {
+          "phase": "build:presupuestos-predictor",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 160043
+        },
+        {
+          "phase": "build:licitaciones",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 91277
+        },
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 37428
+        }
+      ]
+    },
+    {
+      "sessionId": "session-2026-07-05-amm",
+      "runId": "amm-curation-1",
+      "triggeredBy": "SESSION_CLOSE",
+      "startedAt": "2026-07-05T23:59:00.000Z",
+      "completedAt": "2026-07-05T23:59:00.000Z",
+      "durationMs": 0,
+      "contextSaved": 0,
+      "compressionRatio": 1.24,
+      "knowledgePreservedPercent": 100,
+      "duplicateReduction": 3,
+      "estimatedTokenSavings": 0,
+      "knowledgeDensity": 0.0032,
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 7,
+      "objectsPromoted": 0,
+      "objectsDemoted": 2,
+      "byTier": {
+        "working": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "project": {
+          "objectCount": 22,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "permanent": {
+          "objectCount": 10,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        }
+      },
+      "byType": {
+        "Decision": {
+          "count": 4,
+          "archived": 0
+        },
+        "Knowledge": {
+          "count": 17,
+          "archived": 3
+        },
+        "Constraint": {
+          "count": 1,
+          "archived": 0
+        },
+        "Pending": {
+          "count": 10,
+          "archived": 5
+        },
+        "Architecture": {
+          "count": 1,
+          "archived": 0
+        }
+      },
+      "notes": "AMM curation pass: archived 7 items (PEND-005/007/008/011/012 Expired, KN-011 Superseded). Demoted 2 items to Low impact (KN-004 subsumed by KN-010, KN-012 superseded by KN-016) due to active dependencies (PEND-002 -> KN-010, PEND-012 -> KN-016). Consolidated redesign arc (KN-016 canonical app-wide system, KN-012 kept as low-impact backward ref). Active objects: 33->32 (no knowledge loss, all resolutions captured in commits or remaining objects)."
     }
   ]
 }

@@ -1,6 +1,5 @@
 {
   "projectId": "infrapilot",
-  "snapshotDate": "2026-07-03T00:00:00.000Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -82,15 +81,15 @@
       "type": "Knowledge",
       "tier": "Project",
       "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-07-02T04:30:00.000Z",
+      "updated": "2026-07-05T23:59:00.000Z",
       "lifetime": "Project",
-      "impact": "High",
-      "priority": "High",
+      "impact": "Low",
+      "priority": "Low",
       "status": "Current",
       "dependencies": [],
-      "fact": "No .env file exists locally for infrapilot-app. UI pages render using lib/mock-*.ts data files (mock-data, mock-colombia-apus, mock-colombia-licitaciones, mock-colombia-materials, mock-colombia-projects, mock-budget-detail, mock-licitacion, mock-predictor). API routes (app/api/budgets, /apus, /prices, /cotizar, /licitaciones/analyze, /projects) are for-real wired to Supabase and require an authenticated user — without env vars configured, proxy.ts lets all traffic through (auth check is skipped) but calls to these routes would fail against a real Supabase client. supabase/migrations only has 001_prices_apus.sql so far.",
-      "context": "Local Supabase config may or may not match what's set on Vercel — not yet verified whether Vercel's deployment has real working credentials or is also running in a degraded/mock mode.",
-      "source": "session 2026-07-01"
+      "fact": "[DEPRECATED: see KN-010 for definitive config map] Initial app config overview: no .env file locally, UI pages use mock data (lib/mock-*.ts), API routes wired to Supabase, proxy.ts skips auth when env vars unset.",
+      "context": "Demoted from High impact to Low after KN-010 provided analyst-verified definitive config reference (file:line scope). Kept in objects[] because PEND-002 references it; link will be updated next session.",
+      "source": "session 2026-07-01, demoted 2026-07-05"
     },
     {
       "id": "CON-001",
@@ -111,23 +110,23 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-07-03T00:00:00.000Z",
+      "updated": "2026-07-05T23:59:00.000Z",
       "lifetime": "Sprint",
       "impact": "High",
       "priority": "High",
       "status": "In-Progress",
       "dependencies": [
-        "KN-004"
+        "KN-010"
       ],
       "task": "Verify/configure real Supabase credentials end-to-end (local .env + confirm what's actually set on Vercel), so login, register, and data persistence work for real instead of only via mock data files.",
-      "reason": "Phase A DONE 2026-07-02 (verified PASS 5/5): schema.sql moved to migrations/000_initial_schema.sql (001 depends on it), .env.example created (the ONLY 3 vars the code reads), supabase/README.md documents run order + auth model + Vercel setup. NO missing tables (000+001 cover every .from() call); login/register is pure Supabase Auth, no custom profile table. Phase B blocked on user: create/choose Supabase project, provide NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY (+ optional GROQ_API_KEY), run the 2 migrations in order, set same 3 vars on Vercel. Then verify login/register/persistence live. 2026-07-03: local creds NOW configured — .env.local created with real NEXT_PUBLIC_SUPABASE_URL (https://zrogravgwhoijajzciem.supabase.co) + sb_publishable_ anon key (gitignored, verified not staged). STILL PENDING by user: run the 2 migrations in Supabase SQL editor (000 then 001), set the 3 vars in Vercel env, confirm Vercel-GitHub Git link. Then live-verify real-mode login/register/persistence."
+      "reason": "Phase A DONE 2026-07-02 (verified PASS 5/5). 2026-07-03: local creds configured (.env.local, gitignored). 2026-07-05: registro+login REALES verified live in-browser against Supabase (test user prommter.ai.agency+infrapilot-test@gmail.com created successfully; no blocking email-confirmation gate). STILL PENDING by user: run migrations 000+001 in Supabase SQL editor, set the 3 env vars on Vercel, confirm Vercel-GitHub Git link. Core auth path is now proven working end-to-end locally; remaining work is deployment configuration, not code."
     },
     {
       "id": "PEND-004",
       "type": "Pending",
       "tier": "Project",
       "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-07-01T01:00:00.000Z",
+      "updated": "2026-07-05T00:00:00.000Z",
       "lifetime": "Sprint",
       "impact": "Low",
       "priority": "Medium",
@@ -135,8 +134,8 @@
       "dependencies": [
         "KN-001"
       ],
-      "task": "Push local commits (d68fac0, f971daa, d0cbb2d, and this session's memory-update commit) to origin/main via GitHub Desktop.",
-      "reason": "Terminal git push doesn't work in this environment (see KN-001) — pending manual push next time the user is at GitHub Desktop."
+      "task": "Push local commits to origin/main via GitHub Desktop.",
+      "reason": "Terminal git push doesn't work in this environment (see KN-001) — pending manual push next time the user is at GitHub Desktop. As of 2026-07-05: infrapilot-app (submodule) has {0eef64b, ca18cc7, 720fda7} pending push; parent InfraPilot.v01 has {0d60adc, 50e1690, 02d8d58 and earlier} pending push."
     },
     {
       "id": "ARCH-001",
@@ -216,48 +215,6 @@
       "fact": "infrapilot-app's next build was failing because the Groq client was instantiated at module scope in app/api/cotizar/route.ts and app/api/licitaciones/analyze/route.ts, causing the build to fail when GROQ_API_KEY was not in the environment. FIXED by moving client instantiation into the request handlers (after the missing key guard) and committed as 5efdde3. Pattern: never instantiate API-key-dependent clients at module scope in Next route files — construct them inside the handler after validating the key is present.",
       "context": "This was F2 in the audit: classified as REAL BUG (build-breaking). Deletion of 6 mock-*.ts files (F5, ~2,650 lines removed) would have failed the build until this was fixed.",
       "source": "session 2026-07-01, orion-analyst audit + orion-fixer fix + orion-verifier PASS (commit 5efdde3)"
-    },
-    {
-      "id": "PEND-005",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-07-01T04:00:00.000Z",
-      "updated": "2026-07-01T04:00:00.000Z",
-      "lifetime": "Sprint",
-      "impact": "High",
-      "priority": "High",
-      "status": "Ready",
-      "dependencies": [],
-      "task": "F1 (Excel export): lib/excel-export.ts always exports hardcoded mock data (mockGeneratedBudget), ignoring the real AI-generated budget from parameters. Decision needed: keep demo export mode with a flag, or parameterize exportPresupuestoExcel(budget) to export real data.",
-      "reason": "Escalated finding from orion-analyst audit. Not safe to fix without understanding product intent (demo vs. real export). Marked ESCALATED per contract because behavior change could break user flows if misunderstood."
-    },
-    {
-      "id": "PEND-007",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-07-01T04:00:00.000Z",
-      "updated": "2026-07-01T04:00:00.000Z",
-      "lifetime": "Sprint",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Ready",
-      "dependencies": [],
-      "task": "F4 (React hooks lint): 6 remaining 'set-state-in-effect' lint warnings in apus/dashboard/precios/predictor/presupuestos pages + sidebar.tsx. Fixing all 6 correctly could alter data-loading behavior (render waterfall, stale deps, etc.). Need reviewed batch fix or explicit suppression decision.",
-      "reason": "Escalated finding from orion-analyst audit. Too risky to auto-fix without domain understanding of the page load flows; each page may have intentional patterns. Needs either explicit suppression via eslint comment or careful UX review."
-    },
-    {
-      "id": "PEND-008",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-07-01T04:00:00.000Z",
-      "updated": "2026-07-01T04:00:00.000Z",
-      "lifetime": "Sprint",
-      "impact": "Low",
-      "priority": "Low",
-      "status": "Ready",
-      "dependencies": [],
-      "task": "F10-router (unused router vars): login/page.tsx:19 and sidebar.tsx:163 declare unused 'router' variables. Verify they are not intended-but-unwired navigation (e.g. logout redirect) before deleting.",
-      "reason": "Escalated finding from orion-analyst audit. Low risk but non-obvious whether these are dead code or future-wired; needs user confirmation."
     },
     {
       "id": "PEND-009",
@@ -400,52 +357,6 @@
       "source": "session 2026-07-02, orion-analyst (sonnet) + orion-verifier PASS"
     },
     {
-      "id": "PEND-011",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-07-02T07:00:00.000Z",
-      "updated": "2026-07-02T07:00:00.000Z",
-      "lifetime": "Project",
-      "impact": "Low",
-      "priority": "Low",
-      "status": "Ready",
-      "dependencies": [],
-      "task": "Product decision on @anthropic-ai/sdk: it is in package.json but never imported (all AI calls go through Groq), while the landing page claims Claude/Anthropic branding. Either remove the dead dependency (and fix the marketing copy) or actually wire Anthropic in for the AI features.",
-      "reason": "Found during PEND-002 analysis. Removing is trivial; wiring Anthropic is a feature decision the user owns."
-    },
-    {
-      "id": "KN-011",
-      "type": "Knowledge",
-      "tier": "Project",
-      "created": "2026-07-03T00:00:00.000Z",
-      "updated": "2026-07-03T00:00:00.000Z",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "UNCOMMITTED, UNVERIFIED work sits in the infrapilot-app working tree from the interrupted 2026-07-02 redesign run (session hit its limit mid-BUILDING). Modified: app/page.tsx (full landing rewrite 425->234 lines, server component), app/layout.tsx (+JetBrains_Mono via next/font as --font-mono), app/globals.css (+.landing palette tokens + font-mono utility), lib/supabase/client.ts (isSupabaseConfigured + createClient() returns null instead of throwing), components/sidebar.tsx, app/(auth)/login+register/page.tsx, and 7 (dashboard) pages (demo-mode guards). New file: components/demo-notice.tsx. NOT committed because full verification never completed (autocommit needs verification PASS, DEC-005). Working tree persists on disk across sessions; recover by resuming, not rebuilding.",
-      "context": "Next session must: npm run build (isolated), verify landing + all internal pages at 375/768/1280px, verify real-mode with .env.local, then commit app repo + parent per 7b.",
-      "source": "session 2026-07-02/03, interrupted redesign run"
-    },
-    {
-      "id": "KN-012",
-      "type": "Knowledge",
-      "tier": "Project",
-      "created": "2026-07-03T00:00:00.000Z",
-      "updated": "2026-07-03T00:00:00.000Z",
-      "lifetime": "Project",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "dependencies": [
-        "KN-011"
-      ],
-      "fact": "Landing redesign design system (per user art-direction references): warm paper bg #F6F3ED, near-black ink #1B1A17, warm gray #8A857C, brass accent #A8895B, hairline borders #E5E0D6. Giant uppercase clamped hero (Inter), JetBrains Mono for taglines/micro-labels/01-02-03/footer, inline-SVG blueprint crosshair accents (no image assets), single brass CTA, 3 value points, no fake stats, no provider (Claude/Anthropic) claims. Palette SCOPED to a .landing wrapper + arbitrary bg-[var(--paper)] so the dashboard theme is untouched. Demo mode: lib/supabase/client.ts returns null when unconfigured; components/demo-notice.tsx shows a Modo demo banner on data pages; login/register keep form visible with submit disabled.",
-      "context": "Browser-verified while interrupted: landing 0 overflow at 375px; dashboard/precios/login render in demo mode with banner, no crash, no 375px overflow. Desktop + build NOT yet verified.",
-      "source": "session 2026-07-02, orion-builder A (opus) + B (sonnet)"
-    },
-    {
       "id": "KN-013",
       "type": "Knowledge",
       "tier": "Project",
@@ -463,21 +374,133 @@
       "source": "session 2026-07-03"
     },
     {
-      "id": "PEND-012",
-      "type": "Pending",
+      "id": "KN-014",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-05T00:00:00.000Z",
+      "updated": "2026-07-05T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "React 19 StrictMode failure pattern: the 'lazy guard' idiom in a component body (if (!started) { setStarted(true); void load(); }) fires setState synchronously during render, before mount, triggering an async side effect outside an effect boundary -> console error under StrictMode's double-invoke. Fix: move the guard into a useEffect (mount effect) instead of inline render logic. Project convention adopted: where the lazy-guard-in-render pattern is intentional and already effect-wrapped, suppress react-hooks/set-state-in-effect with a scoped eslint-disable-next-line + comment explaining why, rather than restructuring further. Two separate builders reproduced this same mistake independently this session (build:restyle-datos, build:restyle-flujo) before the orchestrator fixed it inline — treat this as a known trap when assigning React 19 StrictMode work to builders.",
+      "context": "Found while resolving PEND-007 (6 set-state-in-effect warnings) during the 2026-07-05 full-app redesign.",
+      "source": "session 2026-07-05"
+    },
+    {
+      "id": "KN-015",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-05T00:00:00.000Z",
+      "updated": "2026-07-05T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "KN-005"
+      ],
+      "fact": "New features added 2026-07-05: (1) /lector + /api/lector — an AI data-reader feature using Groq llama-3.3-70b-versatile (same client-in-handler pattern as KN-005), persists parsed results via the existing /api/prices and /api/apus routes. GROQ_API_KEY is EMPTY in .env.local, so this path degrades gracefully with a clear user-facing message but the live AI path has NOT been exercised end-to-end (see PEND-013). (2) /topografia — a surveying-engineer tool built on pure functions in lib/topo/{csv,cubicacion,nivelacion}.ts, each with an executable __selfTest() (10/10 PASS via node's built-in TS type-stripping, no test framework needed).",
+      "context": "Built to satisfy the user's 'herramienta esencial para ingeniero topográfico' and 'lector de datos IA' requirements this session.",
+      "source": "session 2026-07-05, build:lector-ia (opus) + build:topografia (opus)"
+    },
+    {
+      "id": "KN-012",
+      "type": "Knowledge",
       "tier": "Project",
       "created": "2026-07-03T00:00:00.000Z",
-      "updated": "2026-07-03T00:00:00.000Z",
-      "lifetime": "Sprint",
-      "impact": "High",
-      "priority": "High",
-      "status": "Ready",
-      "dependencies": [
-        "KN-011",
+      "updated": "2026-07-05T23:59:00.000Z",
+      "lifetime": "Project",
+      "impact": "Low",
+      "priority": "Low",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "[DEPRECATED: see KN-016 for current system] Landing redesign design system (warm paper #F6F3ED, ink #1B1A17, brass #A8895B). Initially scoped to .landing wrapper; later extended app-wide (see KN-016).",
+      "context": "Kept in objects[] for backward reference from PEND-012 dependency chain, but functionality fully superseded by KN-016 which extends to entire app.",
+      "source": "session 2026-07-02/03, demoted 2026-07-05"
+    },
+    {
+      "id": "KN-016",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-05T00:00:00.000Z",
+      "updated": "2026-07-05T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "supersedes": [
         "KN-012"
       ],
-      "task": "Resume the interrupted redesign run: npm run build (isolated), verify landing + all internal pages at 375/768/1280px, run orion-verifier on the diff, verify real-mode login/register/persistence with .env.local, then autocommit app repo (infrapilot-app) + parent pointer per DEC-005/7b.",
-      "reason": "Substantial uncommitted work (KN-011) must be verified and committed before it drifts. User paused deliberately; do not rebuild — resume."
+      "fact": "The warm-paper editorial redesign was extended 2026-07-05 from just the landing page to the ENTIRE app: design tokens now live in :root of globals.css (not scoped to a .landing wrapper), shared primitives in components/editorial.tsx, and ui/* primitives (badge, button, card, input, progress, separator, tabs, textarea) are all tokenized against the same palette. This supersedes KN-012's .landing-scoped approach — the whole product now shares one visual system.",
+      "context": "Verified 8/8 PASS across dashboard/cotizador/apus/precios/predictor/presupuestos/licitaciones/lector/topografia routes.",
+      "source": "session 2026-07-05, build:dashboard-editorial (opus)"
+    },
+    {
+      "id": "KN-017",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-05T00:00:00.000Z",
+      "updated": "2026-07-05T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "The xlsx npm package (dependency of excel-export.ts and the prices/import flow) has high-severity vulnerabilities with no fix available via npm registry. The actual fix is to install the official tarball from cdn.sheetjs.com (version 0.20.3) instead of the npm-published version. This machine's agent permission classifier blocks agents from installing packages via arbitrary URLs, so this upgrade requires manual action by the user (npm install https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz or equivalent).",
+      "context": "Found during this session's dependency/security pass; deferred as PEND-014 rather than force-installed.",
+      "source": "session 2026-07-05"
+    },
+    {
+      "id": "KN-018",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-07-05T00:00:00.000Z",
+      "updated": "2026-07-05T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "DEC-004"
+      ],
+      "fact": "ORION agent-spawn reliability observed 2026-07-05: 3 of 10 spawns this session died mid-work (2 hit session/context limits, 1 got a connection-closed error) while leaving partial-but-real work on disk. Recovery protocol used successfully: diff the dead agent's claimed file ownership against actual `git status`/working-tree state, then either (a) finish the remaining delta inline in the orchestrator when small, or (b) re-spawn a narrowly-scoped agent targeting only the unfinished files. Do not blindly re-spawn the same broad task — it duplicates already-completed work and wastes tokens.",
+      "context": "Affected phases: build:restyle-datos (sonnet, escalate), build:restyle-flujo (sonnet, escalate), build:ui-tokens (sonnet, escalate). All three left recoverable partial work; none required a full restart.",
+      "source": "session 2026-07-05"
+    },
+    {
+      "id": "PEND-013",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-05T00:00:00.000Z",
+      "updated": "2026-07-05T00:00:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Blocked",
+      "dependencies": [
+        "KN-015"
+      ],
+      "task": "Test /api/lector end-to-end once the user sets a real GROQ_API_KEY in .env.local (currently empty, so the AI parsing path has never been exercised live, only its degraded no-key fallback).",
+      "reason": "Blocked on the user providing a real Groq API key; code path exists and degrades gracefully but is unverified live."
+    },
+    {
+      "id": "PEND-014",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-05T00:00:00.000Z",
+      "updated": "2026-07-05T00:00:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "Low",
+      "priority": "Low",
+      "status": "Blocked",
+      "dependencies": [
+        "KN-017"
+      ],
+      "task": "Manually update the xlsx dependency to the official SheetJS CDN tarball (0.20.3) to resolve high-severity vulnerabilities that have no npm-registry fix.",
+      "reason": "Agent permission classifier blocks installing packages from arbitrary URLs; requires user action outside the agent sandbox."
     }
   ],
   "archives": [
@@ -504,8 +527,57 @@
       "archivedAt": "2026-07-02T05:30:00.000Z",
       "reason": "Expired",
       "notes": "Sprint item, Done status, no dependencies, caveat extracted to KN-008 before archiving"
+    },
+    {
+      "id": "ARC-004",
+      "archivedId": "PEND-005",
+      "archivedType": "Pending",
+      "archivedAt": "2026-07-05T23:59:00.000Z",
+      "reason": "Expired",
+      "notes": "Sprint item, Done status, no dependencies, resolution captured in commit 720fda7 (parametrized exportPresupuestoExcel)"
+    },
+    {
+      "id": "ARC-005",
+      "archivedId": "PEND-007",
+      "archivedType": "Pending",
+      "archivedAt": "2026-07-05T23:59:00.000Z",
+      "reason": "Expired",
+      "notes": "Sprint item, Done status, no dependencies, resolution captured in KN-014 (lazy guard pattern + scoped eslint-disable convention)"
+    },
+    {
+      "id": "ARC-006",
+      "archivedId": "PEND-008",
+      "archivedType": "Pending",
+      "archivedAt": "2026-07-05T23:59:00.000Z",
+      "reason": "Expired",
+      "notes": "Sprint item, Done status, no dependencies, dead code cleanup completed this session"
+    },
+    {
+      "id": "ARC-007",
+      "archivedId": "PEND-011",
+      "archivedType": "Pending",
+      "archivedAt": "2026-07-05T23:59:00.000Z",
+      "reason": "Expired",
+      "notes": "Project-lifetime item, Done status, no dependencies, dependency removal verified in KN-015"
+    },
+    {
+      "id": "ARC-008",
+      "archivedId": "PEND-012",
+      "archivedType": "Pending",
+      "archivedAt": "2026-07-05T23:59:00.000Z",
+      "reason": "Expired",
+      "notes": "Sprint item, Done status, work completed and committed (commits 0eef64b, ca18cc7, 720fda7, 0d60adc, 50e1690), design system captured in KN-016"
+    },
+    {
+      "id": "ARC-009",
+      "archivedId": "KN-011",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-07-05T23:59:00.000Z",
+      "reason": "Superseded",
+      "notes": "Uncommitted/unverified work from interrupted redesign (2026-07-02). All work was resumed and successfully committed 2026-07-05 (see KN-016, PEND-012)"
     }
   ],
-  "lastAmmRun": "2026-07-03T00:00:00.000Z",
-  "version": 14
+  "lastAmmRun": "2026-07-05T23:59:00.000Z",
+  "snapshotDate": "2026-07-05T23:59:00.000Z",
+  "version": 16
 }
