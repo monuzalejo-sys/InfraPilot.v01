@@ -17,9 +17,13 @@ export class StateGenerator {
     // Also exclude objects that appear in distillation.merged (winner may have same ID as existing)
     const mergedIds = new Set(distillation.merged.map(m => m.id))
 
-    const survivingObjects = before.objects.filter(
-      obj => !archivedIds.has(obj.id) && !supersededIds.has(obj.id) && !mergedIds.has(obj.id)
-    )
+    // N-AMM-R9: demoted objects replace their prior version in place —
+    // exclude the stale copy here, the demoted copy is added back below.
+    const demotedById = new Map(distillation.demoted.map(d => [d.id, d]))
+
+    const survivingObjects = before.objects
+      .filter(obj => !archivedIds.has(obj.id) && !supersededIds.has(obj.id) && !mergedIds.has(obj.id))
+      .map(obj => demotedById.get(obj.id) ?? obj)
 
     const newObjects: AnyKnowledgeObject[] = [
       ...survivingObjects,
@@ -54,7 +58,7 @@ export class StateGenerator {
         archivedId: id,
         archivedType: obj.type,
         archivedAt: now,
-        reason: obj.status === 'Deprecated' ? 'Deprecated' : 'LowValue',
+        reason: distillation.archivedReasons[id] ?? (obj.status === 'Deprecated' ? 'Deprecated' : 'LowValue'),
       })
     }
 

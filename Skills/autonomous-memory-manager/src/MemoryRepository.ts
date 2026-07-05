@@ -166,8 +166,8 @@ export class MemoryRepository implements IMemoryRepository {
 
   private computeTrend(sessions: SessionMetrics[]): 'Improving' | 'Stable' | 'Degrading' {
     if (sessions.length < 3) return 'Stable'
-    const recent = sessions.slice(-3).map(s => s.compressionRatio)
-    const delta = recent[2] - recent[0]
+    const [first, , last] = sessions.slice(-3).map(s => s.compressionRatio)
+    const delta = last! - first!
     if (delta > 0.05) return 'Improving'
     if (delta < -0.05) return 'Degrading'
     return 'Stable'

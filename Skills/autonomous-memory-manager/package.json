@@ -1,0 +1,17 @@
+{
+  "name": "@orion-skills/autonomous-memory-manager",
+  "version": "1.0.0-draft",
+  "private": true,
+  "type": "module",
+  "description": "AMM — Autonomous Memory Manager. ORION Skill implementation (see SPECIFICATION.md).",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.0",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
+  }
+}

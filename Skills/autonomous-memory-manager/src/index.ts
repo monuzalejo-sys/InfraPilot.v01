@@ -35,7 +35,7 @@ export function createAmm(config: AmmConfig): AmmInstance {
   )
 
   const detector = new EventDetector()
-  detector.onEvent(event => curator.onEvent(event))
+  detector.onEvent(async event => { await curator.onEvent(event) })
 
   return { detector, curator, repository }
 }
@@ -48,6 +48,6 @@ export { MemoryRepository } from './MemoryRepository'
 export { MetricsEngine } from './MetricsEngine'
 
 export type { DetectionContext, EventHandler } from './EventDetector'
-export type { DistillationResult } from './KnowledgeDistiller'
+export type { DistillationResult, ArchiveReason } from './KnowledgeDistiller'
 export type { RunResult, RunMode, CompletionHandler } from './MemoryCurator'
 export type { MetricsInput } from './MetricsEngine'

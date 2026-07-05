@@ -16,12 +16,16 @@
 
 AMM is the autonomous memory management skill for ORION-compliant runtimes. It runs continuously without human commands, triggered by observable events in the task lifecycle.
 
-> **Implementation status:** the TypeScript in `src/` is a non-building
-> reference implementation — there is no build config or executable test
-> suite; read it as precise pseudocode. `SPECIFICATION.md` is the normative
-> document. The operative implementation of this spec on this machine is the
+> **Implementation status:** the TypeScript in `src/` is a real, building,
+> tested implementation of this specification — `npx tsc --noEmit` passes
+> strict-mode with zero errors, and `npx vitest run` exercises it against the
+> compliance suite in `tests/`. `SPECIFICATION.md` remains the normative
+> document; where the original pseudocode diverged from it, the spec won and
+> the deviation is documented inline (see `src/KnowledgeDistiller.ts`). The
+> operative implementation of this spec on this machine is still the
 > `orion-reflector` + `orion-curator` agents (see `../../runtime/`), with
-> `../../tools/validate-memory.mjs` enforcing the schema.
+> `../../tools/validate-memory.mjs` enforcing the schema — this package is
+> the standalone, testable reference those agents are modeled on.
 
 AMM is not a summarizer. It is a continuous optimization process that treats cognitive memory as a finite resource requiring active management across the entire project lifetime.
 
@@ -70,9 +74,37 @@ autonomous-memory-manager/
 ├── examples/
 │   ├── session-close.md      ← SESSION_CLOSE trigger example
 │   └── context-overflow.md   ← CONTEXT_HIGH_WATERMARK example
-└── tests/
-    └── TEST-CASES.md         ← compliance test suite
+├── tests/
+│   ├── TEST-CASES.md         ← compliance test suite (prose form, normative)
+│   ├── fixtures.ts           ← shared KnowledgeObject/MemoryEvent builders
+│   └── *.test.ts             ← executable vitest translation of TEST-CASES.md
+├── package.json              ← private package, scoped to this skill only
+└── tsconfig.json             ← strict TypeScript config
 ```
+
+---
+
+## Development
+
+This package is self-contained — its `package.json` and `tsconfig.json` live
+here, not at any repo root, and `node_modules` is scoped to this directory.
+
+```bash
+cd Skills/autonomous-memory-manager
+npm install        # installs typescript, vitest, @types/node (devDependencies only)
+
+npm run typecheck  # npx tsc --noEmit — strict mode, must exit 0
+npm test           # npx vitest run  — must be all green
+```
+
+Requires Node 24+ (uses `"type": "module"` + ESM throughout).
+
+`tests/*.test.ts` is the executable form of `tests/TEST-CASES.md` — each
+`TC-AMM-NN` case maps to one or more `it()` blocks referencing its ID in a
+comment. Where the reference pseudocode's behavior diverged from
+`SPECIFICATION.md` (the merge-similarity threshold, and the N-AMM-R9 demotion
+branch), the code comments in `src/KnowledgeDistiller.ts` document the
+decision and why the spec won.
 
 ---
 
