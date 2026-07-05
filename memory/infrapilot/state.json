@@ -516,6 +516,21 @@
       "fact": "Claude Code built-in agent permission classifier enforces two hard blocks: (1) 'npm install' from external URLs (tarball CDN) is forbidden — agents cannot bypass package registry lock-in (see PEND-014, xlsx SheetJS CDN); (2) INSERT/UPDATE/DELETE operations against shared databases (like infrapilot-app's Supabase project) are forbidden without explicit user approval — agents may SELECT/read, but must ask before persisting data to shared resources (see PEND-002 write test). Both are safety gates; require manual user action or explicit write permission outside the agent sandbox.",
       "context": "Discovered during this session (2026-07-05) when attempting to install fixed dependencies and test data writes. Complements KN-018 (agent spawn reliability + recovery protocol); these are the 'permission boundary' facts agents must respect.",
       "source": "session 2026-07-05"
+    },
+    {
+      "id": "KN-020",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-05T22:00:00.000Z",
+      "updated": "2026-07-05T22:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "Landing v2 (commit a6314fe): hero full-viewport recreado 1:1 de la referencia del usuario 'Precisión en cada ciclo' — titular 2 líneas sin punto, subline mono subrayada 'Hacemos tus ideas / más rápido y mejor.', rail vertical 'Infra Pilot · System v2.4', regla con ticks, knob latón 3D, pill táctil (diamante→/cotizador, ciclo→/dashboard), scroll-pill derecha, collage técnico SVG inline (sección de terreno con cotas y hatching + panel de vidrio con editor de código + líneas de dimensión), luz suave desde la derecha. SIN nav tradicional: acceso solo vía 'INGRESAR' mono top-right y footer. Supersede la descripción del hero en KN-016; el resto del sistema editorial sigue vigente.",
+      "context": "Referencia visual v2 entregada por el usuario 2026-07-05; pidió 99% de similitud. Verificado: build exit 0, 2 líneas exactas a 1366px, sin overflow 375/1366, 0 errores consola.",
+      "source": "session 2026-07-05, run landing-v2 (inline, sin spawns)"
     }
   ],
   "archives": [
@@ -592,7 +607,7 @@
       "notes": "Uncommitted/unverified work from interrupted redesign (2026-07-02). All work was resumed and successfully committed 2026-07-05 (see KN-016, PEND-012)"
     }
   ],
-  "lastAmmRun": "2026-07-05T23:59:00.000Z",
-  "snapshotDate": "2026-07-05T23:59:00.000Z",
-  "version": 17
+  "lastAmmRun": "2026-07-05T22:00:00.000Z",
+  "snapshotDate": "2026-07-05T22:00:00.000Z",
+  "version": 18
 }
