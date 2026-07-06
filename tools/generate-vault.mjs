@@ -8,17 +8,22 @@
  * Ediciones manuales del vault NO se sincronizan de vuelta — son input
  * humano para la próxima curación.
  *
- * Uso: node tools/generate-vault.mjs <memory-dir>
+ * Uso: node tools/generate-vault.mjs <memory-dir> [out-dir] [file-prefix]
+ *   out-dir     destino (default: <memory-dir>/vault)
+ *   file-prefix prefijo de nombres de archivo, para evitar colisiones de
+ *               [[links]] al fusionar varios proyectos en un mismo vault
  * Cero dependencias. Se regenera completo en cada ejecución.
  */
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync, existsSync } from "node:fs"
 import { join } from "node:path"
 
 const dir = process.argv[2]
-if (!dir) { console.error("uso: node generate-vault.mjs <memory-dir>"); process.exit(1) }
+if (!dir) { console.error("uso: node generate-vault.mjs <memory-dir> [out-dir] [file-prefix]"); process.exit(1) }
+const outArg = process.argv[3]
+const prefix = process.argv[4] ?? ""
 
 const state = JSON.parse(readFileSync(join(dir, "state.json"), "utf8"))
-const vaultDir = join(dir, "vault")
+const vaultDir = outArg ?? join(dir, "vault")
 mkdirSync(vaultDir, { recursive: true })
 
 // limpieza: el vault es 100% generado
@@ -51,10 +56,10 @@ for (const o of state.objects) {
     lines.push(`**${k}:** ${v}`, "")
   }
   if (o.dependencies?.length)
-    lines.push(`**Depende de:** ${o.dependencies.map((d) => `[[${d}]]`).join(" · ")}`, "")
+    lines.push(`**Depende de:** ${o.dependencies.map((d) => `[[${prefix}${d}]]`).join(" · ")}`, "")
   if (backlinks[o.id]?.length)
-    lines.push(`**Referenciado por:** ${backlinks[o.id].map((d) => `[[${d}]]`).join(" · ")}`, "")
-  writeFileSync(join(vaultDir, `${o.id}.md`), lines.join("\n") + "\n")
+    lines.push(`**Referenciado por:** ${backlinks[o.id].map((d) => `[[${prefix}${d}]]`).join(" · ")}`, "")
+  writeFileSync(join(vaultDir, `${prefix}${o.id}.md`), lines.join("\n") + "\n")
 }
 
 // índice agrupado por tipo
@@ -64,7 +69,7 @@ const idx = [`# Memoria ORION — ${state.projectId}`, "",
   `Generado de state.json v${state.version} (${state.snapshotDate}). NO editar a mano: se regenera en cada cierre de sesión.`, ""]
 for (const [type, objs] of Object.entries(byType).sort()) {
   idx.push(`## ${type} (${objs.length})`, "")
-  for (const o of objs) idx.push(`- [[${o.id}]] \`${o.status}\` — ${titleOf(o).slice(0, 70)}`)
+  for (const o of objs) idx.push(`- [[${prefix}${o.id}]] \`${o.status}\` — ${titleOf(o).slice(0, 70)}`)
   idx.push("")
 }
 if (state.archives?.length) {

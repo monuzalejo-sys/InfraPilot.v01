@@ -571,7 +571,7 @@
       "type": "Decision",
       "tier": "Permanent",
       "created": "2026-07-06T06:00:00.000Z",
-      "updated": "2026-07-06T06:00:00.000Z",
+      "updated": "2026-07-06T06:30:00.000Z",
       "lifetime": "Permanent",
       "impact": "High",
       "priority": "High",
@@ -580,7 +580,7 @@
         "DEC-007"
       ],
       "title": "Ecosistema ORION v3: resiliencia a muertes, calibración aplicada, vault Obsidian",
-      "description": "5 mejoras aplicadas 2026-07-06: (1) wave.json — manifiesto efímero de ola escrito antes de spawns paralelos (gitignored, se borra al completar; sesiones futuras recuperan olas muertas sin arqueología); (2) reflector atómico — orden dependency-safe en un solo write + auto-validación obligatoria antes de reportar (sessionCount==sessions.length); (3) calibración aplicada — analyst default haiku para objetivos claros, y modelOutcomes con subtipos build:visual|page|api|lib|infra para no diluir señal (infra-deaths no cuentan como señal de capacidad); (4) brief.md es el contexto primario del orquestador, state.json solo lecturas dirigidas; (5) tools/generate-vault.mjs — vista Obsidian unidireccional de la memoria (un .md por objeto con [[links]] + _INDEX), regenerada en cada close. POLÍTICA transversal nueva: los scripts deterministas los ejecuta el orquestador; los agentes solo hacen trabajo de juicio.",
+      "description": "5 mejoras aplicadas 2026-07-06: (1) wave.json — manifiesto efímero de ola escrito antes de spawns paralelos (gitignored, se borra al completar; sesiones futuras recuperan olas muertas sin arqueología); (2) reflector atómico — orden dependency-safe en un solo write + auto-validación obligatoria antes de reportar (sessionCount==sessions.length); (3) calibración aplicada — analyst default haiku para objetivos claros, y modelOutcomes con subtipos build:visual|page|api|lib|infra para no diluir señal (infra-deaths no cuentan como señal de capacidad); (4) brief.md es el contexto primario del orquestador, state.json solo lecturas dirigidas; (5) tools/generate-vault.mjs — vista Obsidian unidireccional de la memoria (un .md por objeto con [[links]] + _INDEX), regenerada en cada close. POLÍTICA transversal nueva: los scripts deterministas los ejecuta el orquestador; los agentes solo hacen trabajo de juicio. EXPORT COMPLETO: tools/export-vault.mjs <destino> genera un vault externo con Sistema (estándar, RFCs, agents, skills, spec AMM) + todos los proyectos (permanent con prefijo PERM- para evitar colisión de links). El vault del usuario vive en C:/Users/Kalel/ORION-Vault — regenerarlo tras cada close si hubo cambios de memoria.",
       "reason": "Derivadas del análisis medido de 16 sesiones: 5/28 spawns muertos por infraestructura (fallo #1), una corrupción de memoria por write parcial, calibración sin aplicar, y pedido del usuario de vista navegable de la memoria (Obsidian). Skills/agents actualizados en ~/.claude y espejados en runtime/."
     }
   ],
@@ -666,7 +666,7 @@
       "notes": "Sprint item, Done status (commit 21774b5, AMM implementation fully tested, 41 tests PASS), no active dependencies. All knowledge captured in KN-010 + test suites."
     }
   ],
-  "lastAmmRun": "2026-07-06T06:00:00.000Z",
-  "snapshotDate": "2026-07-06T06:00:00.000Z",
-  "version": 21
+  "lastAmmRun": "2026-07-06T06:30:00.000Z",
+  "snapshotDate": "2026-07-06T06:30:00.000Z",
+  "version": 22
 }
