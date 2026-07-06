@@ -33,15 +33,20 @@ this skill exists so the user doesn't have to babysit every phase.
   `<repo-root>` is the OUTERMOST enclosing git repo — with nested repos
   (e.g. the `infrapilot-app` submodule inside InfraPilot.v01) memory always
   lives in the parent, never the submodule. One project = one memory.
-- If `state.json` exists there, read it ONCE now. It holds prior Decisions,
-  Constraints, Risks, and Pending items — respect existing
-  Decisions/Constraints, don't re-litigate them, and check whether this task
-  resolves any open Pending item. You will excerpt from this read for every
-  agent brief; no agent should re-read the file.
-- If `memory/<projectId>/brief.md` exists, read it INSTEAD of hunting the
-  repo's convention files (CLAUDE.md/AGENTS.md/README) — it's the curated
-  1-page brief you excerpt into agent briefs. If it's missing or stale, have
-  the curator (re)generate it at session close.
+- CONTEXT DISCIPLINE (cheapest first): if `memory/<projectId>/brief.md`
+  exists and is fresh (regenerated at the last close), read THAT as primary
+  context — it's the curated 1-page summary that also replaces hunting the
+  repo's convention files. Consult `state.json` only with TARGETED reads
+  (grep the specific object ids the brief points to). Read state.json in
+  full ONLY if brief.md is missing or stale — then have the curator
+  regenerate it at close. Memory holds prior Decisions/Constraints/Risks/
+  Pendings — respect them, don't re-litigate, and check whether this task
+  resolves an open Pending. You excerpt from memory for every agent brief;
+  no agent re-reads the files.
+- If `memory/<projectId>/wave.json` exists at session start, a previous
+  session DIED MID-WAVE: it maps builders to owned files and contracts.
+  Recover per its content (diff ownership vs `git status`, verify completed
+  work directly, re-spawn only what's genuinely missing), then delete it.
 - Also read `C:\Users\Kalel\ORION\memory\permanent\state.json` — machine-level
   facts shared across ALL projects (a handful of objects, one cheap read).
 
@@ -68,9 +73,10 @@ is Haiku.
 | Hard      | `opus`   | Deep reasoning, ambiguity, cross-cutting design, tricky debugging, security-sensitive, or high blast radius: schema + RLS design, subtle race conditions, new-module architecture, conflicting requirements. |
 
 How to apply it:
-- **Analyst (first phase, nothing rated yet):** default `sonnet`; use `opus` if
-  the raw objective is large, ambiguous, architecture-level, or security-
-  sensitive; use `haiku` if it's obviously a one-liner.
+- **Analyst (first phase, nothing rated yet):** default `haiku` when the
+  objective is clear and bounded (calibration 2026-07: sonnet analysis was
+  3/3 ok with headroom — cheaper tier justified); `sonnet` when ambiguous or
+  multi-part; `opus` only if architecture-level or security-sensitive.
 - **Have the analyst rate difficulty per sub-objective/step** (trivial/normal/
   hard). Use those ratings to pick the model for each builder/verifier/fixer.
 - **Builders run one per step**, so rate and pick per step — a plan can have a
@@ -96,6 +102,14 @@ step type, rate that work one tier harder this run; if opus keeps being spent
 on work that never fails, rate it one tier cheaper. That is the ADAPTIVE
 allocation strategy (RFC-0004 §4.1) implemented with the levers this
 environment actually has.
+
+Phase naming for `modelOutcomes`: build steps use a SUBTYPE so calibration
+signals don't blur — `build:visual` (design/UI fidelity), `build:page`
+(standard page/component), `build:api` (routes/handlers), `build:lib`
+(pure logic/algorithms), `build:infra` (config/tooling). Past data shows
+these behave differently per tier (visual escalated on sonnet; api/page ran
+fine on sonnet). Infra-death escalates (session limit, process exit) are
+NOT capability signals — note them as such so they don't inflate a tier.
 
 ## 1c. Context economy — MINIMUM PRIVILEGE briefs (RFC-0004 N4-R10)
 
@@ -163,6 +177,16 @@ each builder fully: its single step, the exact files/namespace it owns, the
 acceptance criteria, and the project conventions — a fresh agent has none of
 this conversation's context. Trivial steps you may do directly. Keep TodoWrite
 current as steps complete.
+
+WAVE MANIFEST (crash resilience — agent deaths are the #1 measured failure
+mode): BEFORE spawning 2+ parallel builders, write
+`memory/<projectId>/wave.json`: `{ "startedAt": ISO, "objective": "...",
+"steps": [{ "step": "...", "model": "...", "owns": ["paths"], "contract":
+"1-line acceptance", "status": "spawned" }] }`. It is EPHEMERAL and schema-
+free (the validator ignores it; never committed — add to .gitignore once).
+Update statuses as builders land; DELETE the file when the wave completes.
+If any session finds it at startup, it recovers the wave without archaeology
+(see phase 1). Single-builder runs don't need it.
 
 For plans of ≥3 steps, verify incrementally: after each step the planner
 marked as a checkpoint (or any `hard` step), run a quick scoped check — a

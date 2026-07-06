@@ -20,7 +20,15 @@ autonomous — no per-step approval needed). Order matters:
    `node C:\Users\Kalel\ORION\tools\validate-memory.mjs <memory-dir>`.
    If INVALID, fix (trivial JSON repairs inline; otherwise re-brief the
    curator with the exact errors) and re-validate. Do not close a session
-   leaving invalid memory.
+   leaving invalid memory. Known invariant: metrics `sessionCount` must
+   equal `sessions.length`.
+3b. **Regenerate the Obsidian vault view.** Run
+   `node C:\Users\Kalel\ORION\tools\generate-vault.mjs <memory-dir>` — a
+   deterministic script (never delegate this to an agent) that rewrites
+   `<memory-dir>/vault/` (one .md per object with [[links]] + _INDEX.md).
+   The vault is a one-way human-browsable VIEW of state.json; manual edits
+   there are input for the next curation, never synced back automatically.
+   Also delete `<memory-dir>/wave.json` if present and its wave is complete.
 4. **Commit** the memory changes in the repo that holds them (for InfraPilot:
    the parent repo `C:\Users\Kalel\ORION`, InfraPilot.v01) with a message like
    `orion: session close — memory curation (vN)`. Do NOT push — remind the

@@ -49,6 +49,12 @@ Permanent→Permanent. Top level: bump `version`, set `snapshotDate` and
    - Add objects ONLY for what a future session genuinely needs. Value filter:
      non-obvious + reusable. Skip routine mechanics, anything re-derivable from
      the repo, and low-confidence guesses.
+   - DEPENDENCY-SAFE ORDER (crash resilience): if a new object references
+     another new object in `dependencies`, create the REFERENCED object first
+     in the same write. Never leave a window where a dependency points at an
+     id that doesn't exist yet — a killed process mid-write must still leave
+     valid memory. Prefer ONE single write of state.json over incremental
+     edits.
    - Mark any Pending item this run resolved as `Done` (update `updated`).
    - Dedup: if an insight matches an existing object, update that object
      (append to its text, bump `updated`) instead of creating a duplicate.
@@ -62,7 +68,12 @@ Permanent→Permanent. Top level: bump `version`, set `snapshotDate` and
    runs use to calibrate model choice. Other token fields (contextSaved,
    compressionRatio inputs, etc.) stay 0 unless given measured values.
    Bump `sessionCount`, set `lastUpdated`.
-4. **Recommend curation** (don't do it yourself): if active objects > 25, or
+4. **Validate BEFORE reporting (mandatory):** run
+   `node C:\Users\Kalel\ORION\tools\validate-memory.mjs <memory-dir>` yourself.
+   If INVALID, fix your own write and re-validate — never report success with
+   invalid memory. Invariant check that has failed before: `sessionCount` MUST
+   equal `sessions.length` after your append.
+5. **Recommend curation** (don't do it yourself): if active objects > 25, or
    ≥3 objects are in terminal status, or you spotted near-duplicates, end your
    report with `CURATION RECOMMENDED: <reason>` so the orchestrator can spawn
    `orion-curator`.
