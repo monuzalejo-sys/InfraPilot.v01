@@ -77,21 +77,6 @@
       "source": "session 2026-07-01"
     },
     {
-      "id": "KN-004",
-      "type": "Knowledge",
-      "tier": "Project",
-      "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-07-05T23:59:00.000Z",
-      "lifetime": "Project",
-      "impact": "Low",
-      "priority": "Low",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "[DEPRECATED: see KN-010 for definitive config map] Initial app config overview: no .env file locally, UI pages use mock data (lib/mock-*.ts), API routes wired to Supabase, proxy.ts skips auth when env vars unset.",
-      "context": "Demoted from High impact to Low after KN-010 provided analyst-verified definitive config reference (file:line scope). Kept in objects[] because PEND-002 references it; link will be updated next session.",
-      "source": "session 2026-07-01, demoted 2026-07-05"
-    },
-    {
       "id": "CON-001",
       "type": "Constraint",
       "tier": "Project",
@@ -392,21 +377,6 @@
       "source": "session 2026-07-05, build:lector-ia (opus) + build:topografia (opus)"
     },
     {
-      "id": "KN-012",
-      "type": "Knowledge",
-      "tier": "Project",
-      "created": "2026-07-03T00:00:00.000Z",
-      "updated": "2026-07-05T23:59:00.000Z",
-      "lifetime": "Project",
-      "impact": "Low",
-      "priority": "Low",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "[DEPRECATED: see KN-016 for current system] Landing redesign design system (warm paper #F6F3ED, ink #1B1A17, brass #A8895B). Initially scoped to .landing wrapper; later extended app-wide (see KN-016).",
-      "context": "Kept in objects[] for backward reference from PEND-012 dependency chain, but functionality fully superseded by KN-016 which extends to entire app.",
-      "source": "session 2026-07-02/03, demoted 2026-07-05"
-    },
-    {
       "id": "KN-016",
       "type": "Knowledge",
       "tier": "Project",
@@ -582,6 +552,23 @@
       "title": "Ecosistema ORION v3: resiliencia a muertes, calibración aplicada, vault Obsidian",
       "description": "5 mejoras aplicadas 2026-07-06: (1) wave.json — manifiesto efímero de ola escrito antes de spawns paralelos (gitignored, se borra al completar; sesiones futuras recuperan olas muertas sin arqueología); (2) reflector atómico — orden dependency-safe en un solo write + auto-validación obligatoria antes de reportar (sessionCount==sessions.length); (3) calibración aplicada — analyst default haiku para objetivos claros, y modelOutcomes con subtipos build:visual|page|api|lib|infra para no diluir señal (infra-deaths no cuentan como señal de capacidad); (4) brief.md es el contexto primario del orquestador, state.json solo lecturas dirigidas; (5) tools/generate-vault.mjs — vista Obsidian unidireccional de la memoria (un .md por objeto con [[links]] + _INDEX), regenerada en cada close. POLÍTICA transversal nueva: los scripts deterministas los ejecuta el orquestador; los agentes solo hacen trabajo de juicio. EXPORT COMPLETO: tools/export-vault.mjs <destino> genera un vault externo con Sistema (estándar, RFCs, agents, skills, spec AMM) + todos los proyectos (permanent con prefijo PERM- para evitar colisión de links). El vault del usuario vive en C:/Users/Kalel/ORION-Vault — regenerarlo tras cada close si hubo cambios de memoria.",
       "reason": "Derivadas del análisis medido de 16 sesiones: 5/28 spawns muertos por infraestructura (fallo #1), una corrupción de memoria por write parcial, calibración sin aplicar, y pedido del usuario de vista navegable de la memoria (Obsidian). Skills/agents actualizados en ~/.claude y espejados en runtime/."
+    },
+    {
+      "id": "KN-023",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-06T06:30:00.000Z",
+      "updated": "2026-07-06T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-021"
+      ],
+      "fact": "PATRÓN 'disciplina nueva' VALIDADO en segunda instancia (informatica). Topografía en 2026-07-05 fue piloto; informatica en 2026-07-06 confirma el patrón es reproducible sin modificar infra. Topografía: lib/topo/*.ts puro + /topografia con tabs. Informática: lib/informatica/*.ts puro (modelos, costos, IFPUG) + /informatica con tabs + sidebar auto-reactivo. Ambas extienden disciplinas.ts solo con 1 entrada + usan __selfTest() ejecutable vía node type-stripping. WAVE.JSON (éfemero, gitignored) demostró ser efectivo: creado antes de spawns paralelos → borrado al completar, sin necesidad de arqueología de ola muerta. Templatización lista para estructura, eléctrica, mecánica, etc.",
+      "context": "RUN informatica (2026-07-06, 0 fix cycles, DONE). Commits: app 1b6e520 (4 archivos, +1370 líneas), parent ac8a44e. Build exit 0 (27 rutas), self-tests 8/8, 0 errores consola, browser 2 tabs OK (ejemplos, sidebar 'Ing. Informática').",
+      "source": "session 2026-07-06, run informatica"
     }
   ],
   "archives": [
@@ -664,9 +651,25 @@
       "archivedAt": "2026-07-06T04:30:00.000Z",
       "reason": "Expired",
       "notes": "Sprint item, Done status (commit 21774b5, AMM implementation fully tested, 41 tests PASS), no active dependencies. All knowledge captured in KN-010 + test suites."
+    },
+    {
+      "id": "ARC-11",
+      "archivedId": "KN-004",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-07-06T20:42:54.215Z",
+      "reason": "Merged",
+      "notes": "Deprecated in favor of KN-010"
+    },
+    {
+      "id": "ARC-12",
+      "archivedId": "KN-012",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-07-06T20:42:54.216Z",
+      "reason": "Merged",
+      "notes": "Deprecated in favor of KN-016"
     }
   ],
-  "lastAmmRun": "2026-07-06T06:30:00.000Z",
-  "snapshotDate": "2026-07-06T06:30:00.000Z",
-  "version": 22
+  "lastAmmRun": "2026-07-06T20:42:54.216Z",
+  "snapshotDate": "2026-07-06T20:42:54.216Z",
+  "version": 24
 }
