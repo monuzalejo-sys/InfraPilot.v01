@@ -2,7 +2,7 @@
 
 Maintained by orion-curator. The orchestrator reads THIS instead of hunting
 CLAUDE.md/AGENTS.md/README per session, and excerpts from it into agent briefs.
-Regenerate when Decisions/Constraints change. Last regenerated: 2026-07-05 (v16).
+Regenerate when Decisions/Constraints change. Last regenerated: 2026-07-06 (v20).
 
 ## What this repo is
 InfraPilot.v01 (github.com/monuzalejo-sys/InfraPilot.v01) holds THREE things:
@@ -38,7 +38,8 @@ repo; memory/docs commits go to the parent. Memory ALWAYS lives in the parent.
   `node tools/validate-memory.mjs memory/infrapilot`.
 
 ## Top open work (see state.json for full list)
-- PEND-002 (High): real Supabase credentials end-to-end (login/persistence).
-- PEND-004 (Ready): Push local commits to origin/main via GitHub Desktop.
-- PEND-013 (Blocked): Test /api/lector end-to-end (needs real GROQ_API_KEY).
-- PEND-014 (Blocked): Update xlsx to CDN tarball (security fix, requires user action).
+- PEND-002 (High, In-Progress): real Supabase credentials on Vercel (local done, prod pending).
+- PEND-004 (Low, Ready): Push local commits via GitHub Desktop.
+- PEND-013 (Medium, Blocked): Test /api/lector end-to-end (needs real GROQ_API_KEY).
+- PEND-014 (Low, Blocked): Update xlsx to CDN tarball (security fix, user action).
+- PEND-015 (High, Blocked): Apply migration 002_suppliers_quotes in Supabase, then verify /proveedores flow live.

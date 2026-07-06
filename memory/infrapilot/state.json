@@ -126,7 +126,7 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-07-05T00:00:00.000Z",
+      "updated": "2026-07-06T04:30:00.000Z",
       "lifetime": "Sprint",
       "impact": "Low",
       "priority": "Medium",
@@ -134,7 +134,7 @@
       "dependencies": [
         "KN-001"
       ],
-      "task": "Push local commits to origin/main via GitHub Desktop.",
+      "task": "Push vía GitHub Desktop (app primero, luego parent). Pendientes ahora: app {a6314fe landing v2, 131040f proveedores+comparativa}; parent {2760909, d7ebca0, aaaadd8, 53fc712 + cierre de sesión}. Nota: si Desktop muestra archivos modificados solo por line endings LF→CRLF, ignorar/refrescar — no committear churn de EOL.",
       "reason": "Terminal git push doesn't work in this environment (see KN-001) — pending manual push next time the user is at GitHub Desktop. As of 2026-07-05: infrapilot-app (submodule) has {0eef64b, ca18cc7, 720fda7} pending push; parent InfraPilot.v01 has {0d60adc, 50e1690, 02d8d58 and earlier} pending push."
     },
     {
@@ -328,20 +328,6 @@
       "source": "session 2026-07-02"
     },
     {
-      "id": "PEND-010",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-07-02T06:00:00.000Z",
-      "updated": "2026-07-05T23:59:00.000Z",
-      "lifetime": "Project",
-      "impact": "Low",
-      "priority": "Low",
-      "status": "Done",
-      "dependencies": [],
-      "task": "Optionally make the AMM TypeScript reference implementation real: add package.json + tsconfig + vitest, convert tests/TEST-CASES.md into executable tests, implement the N-AMM-R9 demotion branch, and replace/lower the Jaccard 0.85 dedup threshold (it almost never fires on real sentences). Alternative already applied: src/ is explicitly marked as non-building reference pseudocode in the AMM README.",
-      "reason": "DONE 2026-07-05 (commit 21774b5): package.json + tsconfig.json + vitest.config.ts added; tests/ directory (5 suites, 41 tests, all PASS) replaces TEST-CASES.md; KnowledgeDistiller.applyDemotionPolicy() implements N-AMM-R9 (terminal+referenced -> demote impact Low, no archive; spec-vs-schema caveat noted in code); Jaccard dedup uses 0.5 threshold with token normalization (lowercase, accents stripped, stopwords ES/EN); tsc strict mode: exit 0. README updated with test instructions."
-    },
-    {
       "id": "KN-010",
       "type": "Knowledge",
       "tier": "Project",
@@ -531,6 +517,54 @@
       "fact": "Landing v2 (commit a6314fe): hero full-viewport recreado 1:1 de la referencia del usuario 'Precisión en cada ciclo' — titular 2 líneas sin punto, subline mono subrayada 'Hacemos tus ideas / más rápido y mejor.', rail vertical 'Infra Pilot · System v2.4', regla con ticks, knob latón 3D, pill táctil (diamante→/cotizador, ciclo→/dashboard), scroll-pill derecha, collage técnico SVG inline (sección de terreno con cotas y hatching + panel de vidrio con editor de código + líneas de dimensión), luz suave desde la derecha. SIN nav tradicional: acceso solo vía 'INGRESAR' mono top-right y footer. Supersede la descripción del hero en KN-016; el resto del sistema editorial sigue vigente.",
       "context": "Referencia visual v2 entregada por el usuario 2026-07-05; pidió 99% de similitud. Verificado: build exit 0, 2 líneas exactas a 1366px, sin overflow 375/1366, 0 errores consola.",
       "source": "session 2026-07-05, run landing-v2 (inline, sin spawns)"
+    },
+    {
+      "id": "KN-021",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-06T00:00:00.000Z",
+      "updated": "2026-07-06T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "lib/disciplines.ts is the canonical registry of InfraPilot's engineering disciplines: an array of DisciplineConfig objects (id, label, modules, categories, units). The sidebar's main nav derives from getNavSections(), which iterates this array. Adding a new engineering discipline (e.g., 'estructura') requires editing ONLY lib/disciplines.ts: append to the array with id/label/modules/categories/units. Current disciplines: core (construcción, includes new /proveedores feature), topografia, licitaciones, analisis. The sidebar reactivity + routing is already generic and will auto-pick up new entries.",
+      "context": "Established pattern session 2026-07-06 when adding the new Proveedores module to the core discipline. The registry avoids scattered config and makes discipline discovery declarative.",
+      "source": "session 2026-07-06, infrapilot-app commit 131040f"
+    },
+    {
+      "id": "KN-022",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-06T00:00:00.000Z",
+      "updated": "2026-07-06T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "PEND-015"
+      ],
+      "fact": "Supabase migration pattern (error.code 42P01 / /does not exist|schema cache/) for all future migrations (003+): when an API route attempts to query a table that doesn't exist because a later migration hasn't run, the route detects error.code === '42P01' or error message contains /does not exist|schema cache/ and responds HTTP 503 {error:'MIGRATION_NNN_REQUIRED'}. The client's components/migration-notice.tsx catches 503 responses and displays a clear banner. This pattern was established for MIGRATION_002 (suppliers_quotes table) and must be reused for 003+ to gracefully degrade and inform users of pending migrations without breaking the app.",
+      "context": "Built 2026-07-06 to support the new /proveedores feature (supplier management + price comparatives). Reduces user friction when migrations haven't been applied yet.",
+      "source": "session 2026-07-06, infrapilot-app commit 131040f (app/api/*, components/migration-notice.tsx, supabase/migrations/002_suppliers_quotes.sql)"
+    },
+    {
+      "id": "PEND-015",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-06T04:30:00.000Z",
+      "updated": "2026-07-06T04:30:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "High",
+      "priority": "High",
+      "status": "Blocked",
+      "dependencies": [
+        "KN-022"
+      ],
+      "task": "Usuario: ejecutar supabase/migrations/002_suppliers_quotes.sql en Supabase SQL Editor (después de 000 y 001). Luego verificar en vivo: crear proveedor en /proveedores, añadir cotización en el panel expandible de /precios, botón usar mejor precio, y flujo lector→cotizaciones (este último requiere además GROQ_API_KEY, PEND-013).",
+      "reason": "La feature proveedores+comparativa (commit 131040f) degrada con banner MIGRATION_002_REQUIRED hasta que la migración corra. Bloqueado en el usuario."
     }
   ],
   "archives": [
@@ -605,9 +639,17 @@
       "archivedAt": "2026-07-05T23:59:00.000Z",
       "reason": "Superseded",
       "notes": "Uncommitted/unverified work from interrupted redesign (2026-07-02). All work was resumed and successfully committed 2026-07-05 (see KN-016, PEND-012)"
+    },
+    {
+      "id": "ARC-010",
+      "archivedId": "PEND-010",
+      "archivedType": "Pending",
+      "archivedAt": "2026-07-06T04:30:00.000Z",
+      "reason": "Expired",
+      "notes": "Sprint item, Done status (commit 21774b5, AMM implementation fully tested, 41 tests PASS), no active dependencies. All knowledge captured in KN-010 + test suites."
     }
   ],
-  "lastAmmRun": "2026-07-05T22:00:00.000Z",
-  "snapshotDate": "2026-07-05T22:00:00.000Z",
-  "version": 18
+  "lastAmmRun": "2026-07-06T04:30:00.000Z",
+  "snapshotDate": "2026-07-06T04:30:00.000Z",
+  "version": 20
 }
