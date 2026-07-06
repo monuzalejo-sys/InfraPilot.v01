@@ -1,11 +1,11 @@
 {
   "projectId": "infrapilot",
-  "sessionCount": 13,
+  "sessionCount": 14,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0.0032,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-07-05T22:00:00.000Z",
+  "lastUpdated": "2026-07-05T23:30:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-07-01-001",
@@ -809,6 +809,44 @@
           "archived": 0
         }
       },
+      "modelOutcomes": []
+    },
+    {
+      "sessionId": "session-2026-07-05-004",
+      "runId": "orion-verify-e2e-local",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-07-05T23:30:00.000Z",
+      "completedAt": "2026-07-05T23:30:00.000Z",
+      "durationMs": 0,
+      "contextSaved": 0,
+      "compressionRatio": 1,
+      "knowledgePreservedPercent": 100,
+      "duplicateReduction": 0,
+      "estimatedTokenSavings": 0,
+      "knowledgeDensity": 0.0034,
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "byTier": {
+        "working": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "project": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "permanent": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        }
+      },
+      "byType": {},
       "modelOutcomes": []
     }
   ]
