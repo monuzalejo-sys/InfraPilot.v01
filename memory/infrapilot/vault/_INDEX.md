@@ -1,6 +1,6 @@
 # Memoria ORION — infrapilot
 
-Generado de state.json v27 (2026-07-07T00:00:00.000Z). NO editar a mano: se regenera en cada cierre de sesión.
+Generado de state.json v29 (2026-07-07T01:00:00.000Z). NO editar a mano: se regenera en cada cierre de sesión.
 
 ## Architecture (1)
 
@@ -10,7 +10,7 @@ Generado de state.json v27 (2026-07-07T00:00:00.000Z). NO editar a mano: se rege
 
 - [[CON-001]] `Active` — infrapilot-app/AGENTS.md (imported by CLAUDE.md) explicitly warns: thi
 
-## Decision (7)
+## Decision (8)
 
 - [[DEC-001]] `Accepted` — ORION standard lives inside the InfraPilot.v01 repo, not a separate re
 - [[DEC-002]] `Accepted` — infrapilot-app registered as a proper git submodule pointing at monuza
@@ -19,8 +19,9 @@ Generado de state.json v27 (2026-07-07T00:00:00.000Z). NO editar a mano: se rege
 - [[DEC-005]] `Accepted` — ORION autocommits on verification PASS; push stays manual
 - [[DEC-006]] `Accepted` — AMM schema embedded in reflector agent, not runtime-parsed
 - [[DEC-007]] `Accepted` — Proportional lifecycle: ceremony scales with task size
+- [[DEC-008]] `Accepted` — Ecosistema ORION v3: resiliencia a muertes, calibración aplicada, vaul
 
-## Knowledge (21)
+## Knowledge (23)
 
 - [[KN-001]] `Current` — GitHub pushes from this automated terminal environment cannot complete
 - [[KN-002]] `Current` — A malformed path '.gitignoregit add .' existed in the original InfraPi
@@ -37,12 +38,14 @@ Generado de state.json v27 (2026-07-07T00:00:00.000Z). NO editar a mano: se rege
 - [[KN-016]] `Current` — The warm-paper editorial redesign was extended 2026-07-05 from just th
 - [[KN-017]] `Current` — The xlsx npm package (dependency of excel-export.ts and the prices/imp
 - [[KN-018]] `Current` — ORION agent-spawn reliability observed 2026-07-05: 3 of 10 spawns this
+- [[KN-022]] `Current` — Supabase migration pattern (error.code 42P01 / /does not exist|schema 
 - [[KN-019]] `Current` — Claude Code built-in agent permission classifier enforces two hard blo
 - [[KN-020]] `Current` — Landing v2 (commit a6314fe): hero full-viewport recreado 1:1 de la ref
 - [[KN-021]] `Current` — lib/disciplines.ts is the canonical registry of InfraPilot's engineeri
 - [[KN-024]] `Current` — SheetJS/xlsx round-trip discovery: the xlsx library silently DISCARDS 
 - [[KN-025]] `Current` — PATRÓN disciplina nueva VALIDADO (tercera instancia tras topografía 20
 - [[KN-026]] `Current` — Patrón: 'contratos cruzados en ola paralela'. Cuando un builder parale
+- [[KN-027]] `Current` — Incidente 2026-07-06: una curación (haiku) BORRÓ silenciosamente DEC-0
 
 ## Pending (6)
 

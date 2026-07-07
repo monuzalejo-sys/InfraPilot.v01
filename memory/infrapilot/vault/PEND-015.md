@@ -16,3 +16,5 @@ updated: 2026-07-06T04:30:00.000Z
 
 **task:** Usuario: aplicar migración 002_suppliers_quotes.sql en Supabase SQL Editor (después de 000 y 001). Luego verificar en vivo: crear proveedor en /proveedores, cotización en comparativa de /precios, usar mejor precio, y flujo lector→cotizaciones (este requiere además GROQ_API_KEY, PEND-013).
 
+**Referenciado por:** [[KN-022]]
+

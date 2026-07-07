@@ -31,6 +31,15 @@ gone forever. Bias: compact aggressively, delete never — archive instead.
    impact AND contains no project-specific names/paths. Rare — when in doubt,
    don't.
 5. **IDs are never reused.** `archives[]` preserves them forever.
+5b. **NEVER DELETE (N-AMM-R8, hard invariant):** every id present in the
+   state you received MUST appear in your output — either still in
+   `objects[]` or as a new ArchiveRecord in `archives[]`. Existing
+   ArchiveRecords are never removed either. Both lists only grow or hold.
+   A pre-commit hook (tools/check-r8.mjs) compares your output against git
+   HEAD and BLOCKS the commit if any id vanished — incident 2026-07-06:
+   a curation silently dropped DEC-008 and KN-022 and they had to be
+   restored from git history. Before finishing, self-check: count ids in
+   (objects + archives) — it must be ≥ the count you started with.
 6. **Do not touch objects outside your scope (N-AMM-R12):** you curate; you do
    not add new task knowledge, change decisions' meaning, or close Pending
    items that aren't yours to close.

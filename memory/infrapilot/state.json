@@ -459,6 +459,23 @@
       "reason": "Agent permission classifier blocks installing packages from arbitrary URLs; requires user action outside the agent sandbox."
     },
     {
+      "id": "KN-022",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-06T00:00:00.000Z",
+      "updated": "2026-07-06T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "PEND-015"
+      ],
+      "fact": "Supabase migration pattern (error.code 42P01 / /does not exist|schema cache/) for all future migrations (003+): when an API route attempts to query a table that doesn't exist because a later migration hasn't run, the route detects error.code === '42P01' or error message contains /does not exist|schema cache/ and responds HTTP 503 {error:'MIGRATION_NNN_REQUIRED'}. The client's components/migration-notice.tsx catches 503 responses and displays a clear banner. This pattern was established for MIGRATION_002 (suppliers_quotes table) and must be reused for 003+ to gracefully degrade and inform users of pending migrations without breaking the app.",
+      "context": "Built 2026-07-06 to support the new /proveedores feature (supplier management + price comparatives). Reduces user friction when migrations haven't been applied yet.",
+      "source": "session 2026-07-06, infrapilot-app commit 131040f (app/api/*, components/migration-notice.tsx, supabase/migrations/002_suppliers_quotes.sql)"
+    },
+    {
       "id": "PEND-015",
       "type": "Pending",
       "tier": "Project",
@@ -633,6 +650,38 @@
       "dependencies": [],
       "milestone": "Etapa 6 — App (PWA primero)",
       "description": "La web se vuelve instalable: PWA con manifest + service worker (offline para las calculadoras client-side, que ya son puras), icono, splash. Evaluar después app nativa (Capacitor/React Native) si la PWA se queda corta. Es el camino más corto al \"app para mejor manejo\" del dueño."
+    },
+    {
+      "id": "DEC-008",
+      "type": "Decision",
+      "tier": "Permanent",
+      "created": "2026-07-06T06:00:00.000Z",
+      "updated": "2026-07-06T06:30:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-007"
+      ],
+      "title": "Ecosistema ORION v3: resiliencia a muertes, calibración aplicada, vault Obsidian",
+      "description": "5 mejoras aplicadas 2026-07-06: (1) wave.json — manifiesto efímero de ola escrito antes de spawns paralelos (gitignored, se borra al completar; sesiones futuras recuperan olas muertas sin arqueología); (2) reflector atómico — orden dependency-safe en un solo write + auto-validación obligatoria antes de reportar (sessionCount==sessions.length); (3) calibración aplicada — analyst default haiku para objetivos claros, y modelOutcomes con subtipos build:visual|page|api|lib|infra para no diluir señal (infra-deaths no cuentan como señal de capacidad); (4) brief.md es el contexto primario del orquestador, state.json solo lecturas dirigidas; (5) tools/generate-vault.mjs — vista Obsidian unidireccional de la memoria (un .md por objeto con [[links]] + _INDEX), regenerada en cada close. POLÍTICA transversal nueva: los scripts deterministas los ejecuta el orquestador; los agentes solo hacen trabajo de juicio. EXPORT COMPLETO: tools/export-vault.mjs <destino> genera un vault externo con Sistema (estándar, RFCs, agents, skills, spec AMM) + todos los proyectos (permanent con prefijo PERM- para evitar colisión de links). El vault del usuario vive en C:/Users/Kalel/ORION-Vault — regenerarlo tras cada close si hubo cambios de memoria.",
+      "reason": "Derivadas del análisis medido de 16 sesiones: 5/28 spawns muertos por infraestructura (fallo #1), una corrupción de memoria por write parcial, calibración sin aplicar, y pedido del usuario de vista navegable de la memoria (Obsidian). Skills/agents actualizados en ~/.claude y espejados en runtime/."
+    },
+    {
+      "id": "KN-027",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-07-07T01:00:00.000Z",
+      "updated": "2026-07-07T01:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "Incidente 2026-07-06: una curación (haiku) BORRÓ silenciosamente DEC-008 y KN-022 de state.json sin ArchiveRecord (violación N-AMM-R8), indetectable para el validador stateless. Se restauraron desde git history. GUARDA PERMANENTE: tools/check-r8.mjs compara la versión staged contra git HEAD en el pre-commit hook — cualquier id desaparecido sin ArchiveRecord bloquea el commit; los ArchiveRecords tampoco pueden eliminarse (ambas listas solo crecen). Regla 5b añadida al prompt del orion-curator con auto-chequeo de conteo.",
+      "context": "Detectado por el diff del vault regenerado (archivos .md eliminados que no estaban en la lista de archivado del curator) — el vault sirvió de detector de pérdidas.",
+      "source": "session 2026-07-06/07, run ROAD-001 close"
     }
   ],
   "archives": [
@@ -749,8 +798,7 @@
       "notes": "Merged into KN-025 (enhanced with quips integration). KN-025 is the definitive 'new discipline template' with lib/ + page/ + quips pattern, validated in 3 instances (topografia, informatica, implicit in ROAD-001)."
     }
   ],
-  "lastAmmRun": "2026-07-07T00:00:00.000Z",
-  "snapshotDate": "2026-07-07T00:00:00.000Z",
-  "version": 27
+  "lastAmmRun": "2026-07-07T01:00:00.000Z",
+  "snapshotDate": "2026-07-07T01:00:00.000Z",
+  "version": 29
 }
-
