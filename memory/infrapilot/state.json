@@ -682,6 +682,21 @@
       "fact": "Incidente 2026-07-06: una curación (haiku) BORRÓ silenciosamente DEC-008 y KN-022 de state.json sin ArchiveRecord (violación N-AMM-R8), indetectable para el validador stateless. Se restauraron desde git history. GUARDA PERMANENTE: tools/check-r8.mjs compara la versión staged contra git HEAD en el pre-commit hook — cualquier id desaparecido sin ArchiveRecord bloquea el commit; los ArchiveRecords tampoco pueden eliminarse (ambas listas solo crecen). Regla 5b añadida al prompt del orion-curator con auto-chequeo de conteo.",
       "context": "Detectado por el diff del vault regenerado (archivos .md eliminados que no estaban en la lista de archivado del curator) — el vault sirvió de detector de pérdidas.",
       "source": "session 2026-07-06/07, run ROAD-001 close"
+    },
+    {
+      "id": "DEC-009",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-07-07T02:30:00.000Z",
+      "updated": "2026-07-07T02:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [],
+      "title": "Navegación por módulos exclusivos de profesión; dashboard = presentación",
+      "description": "Cada disciplina agrupa TODAS las herramientas de su oficio: Construcción (cotizador, presupuestos, precios, APUs, proveedores, lector, licitaciones, predictor, copiloto), Topografía, Informática. El dashboard dejó de ser panel de datos: es la PRESENTACIÓN de la app (qué es, cómo funciona en 3 pasos, hub de módulos, visión de escalamiento). lib/disciplines.ts ganó esNavegacion/icon y getModulosProfesion(); el sidebar deriva todo del registry. Widgets RadarPrecios/Timeline/ChipRiesgoIA quedaron exportados sin uso — se reubican dentro de Construcción en ROAD-003. Commits: app 6737e21, parent 212b20b.",
+      "reason": "Pedido explícito del dueño 2026-07-07: módulos separados por profesión con sus herramientas dentro, y que el dashboard explique el funcionamiento y la visión de escalar, limpio."
     }
   ],
   "archives": [
@@ -798,7 +813,7 @@
       "notes": "Merged into KN-025 (enhanced with quips integration). KN-025 is the definitive 'new discipline template' with lib/ + page/ + quips pattern, validated in 3 instances (topografia, informatica, implicit in ROAD-001)."
     }
   ],
-  "lastAmmRun": "2026-07-07T01:00:00.000Z",
-  "snapshotDate": "2026-07-07T01:00:00.000Z",
-  "version": 29
+  "lastAmmRun": "2026-07-07T02:30:00.000Z",
+  "snapshotDate": "2026-07-07T02:30:00.000Z",
+  "version": 30
 }

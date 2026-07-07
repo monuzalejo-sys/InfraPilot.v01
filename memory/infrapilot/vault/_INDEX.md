@@ -1,6 +1,6 @@
 # Memoria ORION — infrapilot
 
-Generado de state.json v29 (2026-07-07T01:00:00.000Z). NO editar a mano: se regenera en cada cierre de sesión.
+Generado de state.json v30 (2026-07-07T02:30:00.000Z). NO editar a mano: se regenera en cada cierre de sesión.
 
 ## Architecture (1)
 
@@ -10,7 +10,7 @@ Generado de state.json v29 (2026-07-07T01:00:00.000Z). NO editar a mano: se rege
 
 - [[CON-001]] `Active` — infrapilot-app/AGENTS.md (imported by CLAUDE.md) explicitly warns: thi
 
-## Decision (8)
+## Decision (9)
 
 - [[DEC-001]] `Accepted` — ORION standard lives inside the InfraPilot.v01 repo, not a separate re
 - [[DEC-002]] `Accepted` — infrapilot-app registered as a proper git submodule pointing at monuza
@@ -20,6 +20,7 @@ Generado de state.json v29 (2026-07-07T01:00:00.000Z). NO editar a mano: se rege
 - [[DEC-006]] `Accepted` — AMM schema embedded in reflector agent, not runtime-parsed
 - [[DEC-007]] `Accepted` — Proportional lifecycle: ceremony scales with task size
 - [[DEC-008]] `Accepted` — Ecosistema ORION v3: resiliencia a muertes, calibración aplicada, vaul
+- [[DEC-009]] `Accepted` — Navegación por módulos exclusivos de profesión; dashboard = presentaci
 
 ## Knowledge (23)
 
