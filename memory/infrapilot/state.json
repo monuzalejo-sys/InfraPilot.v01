@@ -459,6 +459,20 @@
       "reason": "Agent permission classifier blocks installing packages from arbitrary URLs; requires user action outside the agent sandbox."
     },
     {
+      "id": "PEND-015",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-06T04:30:00.000Z",
+      "updated": "2026-07-06T04:30:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "High",
+      "priority": "High",
+      "status": "Blocked",
+      "dependencies": [],
+      "task": "Usuario: aplicar migración 002_suppliers_quotes.sql en Supabase SQL Editor (después de 000 y 001). Luego verificar en vivo: crear proveedor en /proveedores, cotización en comparativa de /precios, usar mejor precio, y flujo lector→cotizaciones (este requiere además GROQ_API_KEY, PEND-013).",
+      "reason": "Feature proveedores+comparativa (commit 131040f) degrada con banner MIGRATION_002_REQUIRED hasta que corra. Bloqueado en el usuario. ROAD-002 depende de esto."
+    },
+    {
       "id": "KN-019",
       "type": "Knowledge",
       "tier": "Project",
@@ -504,61 +518,26 @@
       "source": "session 2026-07-06, infrapilot-app commit 131040f"
     },
     {
-      "id": "KN-022",
+      "id": "KN-024",
       "type": "Knowledge",
       "tier": "Project",
-      "created": "2026-07-06T00:00:00.000Z",
-      "updated": "2026-07-06T00:00:00.000Z",
+      "created": "2026-07-06T08:05:00.000Z",
+      "updated": "2026-07-06T08:05:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
       "status": "Current",
-      "dependencies": [
-        "PEND-015"
-      ],
-      "fact": "Supabase migration pattern (error.code 42P01 / /does not exist|schema cache/) for all future migrations (003+): when an API route attempts to query a table that doesn't exist because a later migration hasn't run, the route detects error.code === '42P01' or error message contains /does not exist|schema cache/ and responds HTTP 503 {error:'MIGRATION_NNN_REQUIRED'}. The client's components/migration-notice.tsx catches 503 responses and displays a clear banner. This pattern was established for MIGRATION_002 (suppliers_quotes table) and must be reused for 003+ to gracefully degrade and inform users of pending migrations without breaking the app.",
-      "context": "Built 2026-07-06 to support the new /proveedores feature (supplier management + price comparatives). Reduces user friction when migrations haven't been applied yet.",
-      "source": "session 2026-07-06, infrapilot-app commit 131040f (app/api/*, components/migration-notice.tsx, supabase/migrations/002_suppliers_quotes.sql)"
+      "dependencies": [],
+      "fact": "SheetJS/xlsx round-trip discovery: the xlsx library silently DISCARDS formula cells {t:'n', f} if they carry NO pre-computed `v` value when the .xlsx binary is written. Workaround verified: every cell with f:'formula' MUST carry v:precalculated_numeric_result. lib/excel-export.ts implements this as function f(formula, value, fmt) that always bundles the precalculated value. Export pattern for modules: lib/<module>-export.ts exports crearLibroConFormulas(hojas, nombreArchivo) as a utility — clients can consume this for editable, formula-driven exports without relearning SheetJS internals. Pattern: every new module that exports Excel MUST use crearLibroConFormulas and populate all formula cells via f(formula, value).",
+      "context": "Discovered during ROAD-001 (hub + Excel exports). Verified via round-trip test: XLSX.write → XLSX.read confirms formulas persist only when v is present. This is a silent data-loss bug in the xlsx library if the precalculated value is omitted.",
+      "source": "session 2026-07-06, build:visual (dashboard hub with Excel export, opus)"
     },
     {
-      "id": "PEND-015",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-07-06T04:30:00.000Z",
-      "updated": "2026-07-06T04:30:00.000Z",
-      "lifetime": "Sprint",
-      "impact": "High",
-      "priority": "High",
-      "status": "Blocked",
-      "dependencies": [
-        "KN-022"
-      ],
-      "task": "Usuario: ejecutar supabase/migrations/002_suppliers_quotes.sql en Supabase SQL Editor (después de 000 y 001). Luego verificar en vivo: crear proveedor en /proveedores, añadir cotización en el panel expandible de /precios, botón usar mejor precio, y flujo lector→cotizaciones (este último requiere además GROQ_API_KEY, PEND-013).",
-      "reason": "La feature proveedores+comparativa (commit 131040f) degrada con banner MIGRATION_002_REQUIRED hasta que la migración corra. Bloqueado en el usuario."
-    },
-    {
-      "id": "DEC-008",
-      "type": "Decision",
-      "tier": "Permanent",
-      "created": "2026-07-06T06:00:00.000Z",
-      "updated": "2026-07-06T06:30:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "High",
-      "priority": "High",
-      "status": "Accepted",
-      "dependencies": [
-        "DEC-007"
-      ],
-      "title": "Ecosistema ORION v3: resiliencia a muertes, calibración aplicada, vault Obsidian",
-      "description": "5 mejoras aplicadas 2026-07-06: (1) wave.json — manifiesto efímero de ola escrito antes de spawns paralelos (gitignored, se borra al completar; sesiones futuras recuperan olas muertas sin arqueología); (2) reflector atómico — orden dependency-safe en un solo write + auto-validación obligatoria antes de reportar (sessionCount==sessions.length); (3) calibración aplicada — analyst default haiku para objetivos claros, y modelOutcomes con subtipos build:visual|page|api|lib|infra para no diluir señal (infra-deaths no cuentan como señal de capacidad); (4) brief.md es el contexto primario del orquestador, state.json solo lecturas dirigidas; (5) tools/generate-vault.mjs — vista Obsidian unidireccional de la memoria (un .md por objeto con [[links]] + _INDEX), regenerada en cada close. POLÍTICA transversal nueva: los scripts deterministas los ejecuta el orquestador; los agentes solo hacen trabajo de juicio. EXPORT COMPLETO: tools/export-vault.mjs <destino> genera un vault externo con Sistema (estándar, RFCs, agents, skills, spec AMM) + todos los proyectos (permanent con prefijo PERM- para evitar colisión de links). El vault del usuario vive en C:/Users/Kalel/ORION-Vault — regenerarlo tras cada close si hubo cambios de memoria.",
-      "reason": "Derivadas del análisis medido de 16 sesiones: 5/28 spawns muertos por infraestructura (fallo #1), una corrupción de memoria por write parcial, calibración sin aplicar, y pedido del usuario de vista navegable de la memoria (Obsidian). Skills/agents actualizados en ~/.claude y espejados en runtime/."
-    },
-    {
-      "id": "KN-023",
+      "id": "KN-025",
       "type": "Knowledge",
       "tier": "Project",
-      "created": "2026-07-06T06:30:00.000Z",
-      "updated": "2026-07-06T06:30:00.000Z",
+      "created": "2026-07-06T08:05:00.000Z",
+      "updated": "2026-07-06T08:05:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
@@ -566,9 +545,94 @@
       "dependencies": [
         "KN-021"
       ],
-      "fact": "PATRÓN 'disciplina nueva' VALIDADO en segunda instancia (informatica). Topografía en 2026-07-05 fue piloto; informatica en 2026-07-06 confirma el patrón es reproducible sin modificar infra. Topografía: lib/topo/*.ts puro + /topografia con tabs. Informática: lib/informatica/*.ts puro (modelos, costos, IFPUG) + /informatica con tabs + sidebar auto-reactivo. Ambas extienden disciplinas.ts solo con 1 entrada + usan __selfTest() ejecutable vía node type-stripping. WAVE.JSON (éfemero, gitignored) demostró ser efectivo: creado antes de spawns paralelos → borrado al completar, sin necesidad de arqueología de ola muerta. Templatización lista para estructura, eléctrica, mecánica, etc.",
-      "context": "RUN informatica (2026-07-06, 0 fix cycles, DONE). Commits: app 1b6e520 (4 archivos, +1370 líneas), parent ac8a44e. Build exit 0 (27 rutas), self-tests 8/8, 0 errores consola, browser 2 tabs OK (ejemplos, sidebar 'Ing. Informática').",
-      "source": "session 2026-07-06, run informatica"
+      "fact": "PATRÓN disciplina nueva VALIDADO (tercera instancia tras topografía 2026-07-05 + informática 2026-07-06 piloto + ahora en ROAD-001 hub): lib/quips.ts + components/profesion-quips.tsx es la plantilla de identidad por profesión. Toda disciplina nueva debe: (1) extender QUIPS en lib/quips.ts con entrada [disciplina]: [Quip[]] = [{tipo, texto, autor}]); (2) importar <ProfesionQuips discipline='id'/> al pie de su /página (módulo). Quips son NOTORIO pero NO invasivo — card editorial pequeña, botón de rotación discreto, 1 quip visible por defecto. El patrón demostrado en topografía y informática es reproducible sin modificar infra.",
+      "context": "Validado durante ROAD-001: el hub muestra profesiones (Construcción, Topografía, Informática) + acordeón desplegable para herramientas. Las quips aparecen al pie del topografía card y del informática card. Estructura visual + navegación son genéricas; solo hay que llenar QUIPS + ProfesionQuips.",
+      "source": "session 2026-07-06, build:visual/hub (opus) + build:page/topografia (opus) + build:page/informatica (sonnet)"
+    },
+    {
+      "id": "KN-026",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-06T08:05:00.000Z",
+      "updated": "2026-07-06T08:05:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "Patrón: 'contratos cruzados en ola paralela'. Cuando un builder paralelo consume lo que otro produce en la misma ola (ej: ProfesionQuips importa crearLibroConFormulas de excel-export antes de que esa función esté completa), el consumidor deja el import y uso COMENTADOS con TODO si el proveedor no aterrizó al momento de su tsc. El orquestador descomenta los comentarios al cerrar la ola. Esta estrategia permite paralelismo máximo pero requiere diligencia post-ola: en ROAD-001 pasó con FileSpreadsheet (import faltante tras descomentar, detectado + arreglado inline, 1 fix trivial). Alternativa futura: secuenciar consumidor DESPUÉS de proveedor si la dependencia es fuerte y el paralelismo no compensa.",
+      "context": "Patrón validado en ROAD-001 (hub + Excel + quips). Costó 1 micro-fix (import olvidado) durante verificación. Documentar para equipos paralelos futuras.",
+      "source": "session 2026-07-06, run ROAD-001"
+    },
+    {
+      "id": "ROAD-002",
+      "type": "Roadmap",
+      "tier": "Project",
+      "created": "2026-07-06T08:05:00.000Z",
+      "updated": "2026-07-06T08:05:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Planned",
+      "dependencies": [],
+      "milestone": "Etapa 2 — Activación en producción",
+      "description": "Del lado del usuario: migración 002 (proveedores/comparativa), GROQ_API_KEY (activa Cotizador IA y Lector), 3 vars en Vercel. Luego: verificación E2E completa en la URL pública (login, persistencia, IA real, todos los módulos). Depende de PEND-002/013/015."
+    },
+    {
+      "id": "ROAD-003",
+      "type": "Roadmap",
+      "tier": "Project",
+      "created": "2026-07-06T08:05:00.000Z",
+      "updated": "2026-07-06T08:05:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Planned",
+      "dependencies": [],
+      "milestone": "Etapa 3 — Integración entre módulos y construcción profundizada",
+      "description": "Los módulos alimentan presupuestos: estimación informática → presupuesto guardable; cubicación → partidas de movimiento de tierras; comparativa de precios → APUs con mejor precio. La disciplina construcción (cotizador/APUs/presupuestos) se profundiza al nivel del módulo modelo."
+    },
+    {
+      "id": "ROAD-004",
+      "type": "Roadmap",
+      "tier": "Project",
+      "created": "2026-07-06T08:05:00.000Z",
+      "updated": "2026-07-06T08:05:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Planned",
+      "dependencies": [],
+      "milestone": "Etapa 4 — Tercera ingeniería con la plantilla validada",
+      "description": "Nueva disciplina (candidatas: eléctrica —cálculo de circuitos/tableros— o estructural —vigas/cargas—; decide el dueño) usando la plantilla KN-023: registry + libs puras con self-tests + página de pestañas + quips. Meta: crearla en UNA ola corta y documentar el tiempo/costo como benchmark de escalamiento."
+    },
+    {
+      "id": "ROAD-005",
+      "type": "Roadmap",
+      "tier": "Project",
+      "created": "2026-07-06T08:05:00.000Z",
+      "updated": "2026-07-06T08:05:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Planned",
+      "dependencies": [],
+      "milestone": "Etapa 5 — Cuentas de equipo y perfiles profesionales",
+      "description": "Multi-usuario por empresa (Supabase: organizaciones, roles, RLS por org), perfil profesional que personaliza el hub (tu ingeniería primero), onboarding por disciplina. Prepara el modelo de negocio multi-vertical."
+    },
+    {
+      "id": "ROAD-006",
+      "type": "Roadmap",
+      "tier": "Project",
+      "created": "2026-07-06T08:05:00.000Z",
+      "updated": "2026-07-06T08:05:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Planned",
+      "dependencies": [],
+      "milestone": "Etapa 6 — App (PWA primero)",
+      "description": "La web se vuelve instalable: PWA con manifest + service worker (offline para las calculadoras client-side, que ya son puras), icono, splash. Evaluar después app nativa (Capacitor/React Native) si la PWA se queda corta. Es el camino más corto al \"app para mejor manejo\" del dueño."
     }
   ],
   "archives": [
@@ -667,9 +731,26 @@
       "archivedAt": "2026-07-06T20:42:54.216Z",
       "reason": "Merged",
       "notes": "Deprecated in favor of KN-016"
+    },
+    {
+      "id": "ARC-13",
+      "archivedId": "ROAD-001",
+      "archivedType": "Roadmap",
+      "archivedAt": "2026-07-07T00:00:00.000Z",
+      "reason": "Expired",
+      "notes": "Project-lifetime milestone completed 2026-07-06 (status Done). No active dependencies. Roadmap item visible for one cycle post-completion per policy; archived now to compact memory. Work captured in commits 0464a7a (app) + 33273bb (parent), knowledge preserved in KN-024, KN-025, KN-026. Etapa 1 (hub+Excel+quips+poligonal) DONE."
+    },
+    {
+      "id": "ARC-14",
+      "archivedId": "KN-023",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-07-07T00:00:00.000Z",
+      "reason": "Merged",
+      "notes": "Merged into KN-025 (enhanced with quips integration). KN-025 is the definitive 'new discipline template' with lib/ + page/ + quips pattern, validated in 3 instances (topografia, informatica, implicit in ROAD-001)."
     }
   ],
-  "lastAmmRun": "2026-07-06T20:42:54.216Z",
-  "snapshotDate": "2026-07-06T20:42:54.216Z",
-  "version": 24
+  "lastAmmRun": "2026-07-07T00:00:00.000Z",
+  "snapshotDate": "2026-07-07T00:00:00.000Z",
+  "version": 27
 }
+

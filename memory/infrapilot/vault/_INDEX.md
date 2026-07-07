@@ -1,6 +1,6 @@
 # Memoria ORION — infrapilot
 
-Generado de state.json v24 (2026-07-06T20:42:54.216Z). NO editar a mano: se regenera en cada cierre de sesión.
+Generado de state.json v27 (2026-07-07T00:00:00.000Z). NO editar a mano: se regenera en cada cierre de sesión.
 
 ## Architecture (1)
 
@@ -10,7 +10,7 @@ Generado de state.json v24 (2026-07-06T20:42:54.216Z). NO editar a mano: se rege
 
 - [[CON-001]] `Active` — infrapilot-app/AGENTS.md (imported by CLAUDE.md) explicitly warns: thi
 
-## Decision (8)
+## Decision (7)
 
 - [[DEC-001]] `Accepted` — ORION standard lives inside the InfraPilot.v01 repo, not a separate re
 - [[DEC-002]] `Accepted` — infrapilot-app registered as a proper git submodule pointing at monuza
@@ -19,9 +19,8 @@ Generado de state.json v24 (2026-07-06T20:42:54.216Z). NO editar a mano: se rege
 - [[DEC-005]] `Accepted` — ORION autocommits on verification PASS; push stays manual
 - [[DEC-006]] `Accepted` — AMM schema embedded in reflector agent, not runtime-parsed
 - [[DEC-007]] `Accepted` — Proportional lifecycle: ceremony scales with task size
-- [[DEC-008]] `Accepted` — Ecosistema ORION v3: resiliencia a muertes, calibración aplicada, vaul
 
-## Knowledge (20)
+## Knowledge (21)
 
 - [[KN-001]] `Current` — GitHub pushes from this automated terminal environment cannot complete
 - [[KN-002]] `Current` — A malformed path '.gitignoregit add .' existed in the original InfraPi
@@ -41,8 +40,9 @@ Generado de state.json v24 (2026-07-06T20:42:54.216Z). NO editar a mano: se rege
 - [[KN-019]] `Current` — Claude Code built-in agent permission classifier enforces two hard blo
 - [[KN-020]] `Current` — Landing v2 (commit a6314fe): hero full-viewport recreado 1:1 de la ref
 - [[KN-021]] `Current` — lib/disciplines.ts is the canonical registry of InfraPilot's engineeri
-- [[KN-022]] `Current` — Supabase migration pattern (error.code 42P01 / /does not exist|schema 
-- [[KN-023]] `Current` — PATRÓN 'disciplina nueva' VALIDADO en segunda instancia (informatica).
+- [[KN-024]] `Current` — SheetJS/xlsx round-trip discovery: the xlsx library silently DISCARDS 
+- [[KN-025]] `Current` — PATRÓN disciplina nueva VALIDADO (tercera instancia tras topografía 20
+- [[KN-026]] `Current` — Patrón: 'contratos cruzados en ola paralela'. Cuando un builder parale
 
 ## Pending (6)
 
@@ -51,9 +51,17 @@ Generado de state.json v24 (2026-07-06T20:42:54.216Z). NO editar a mano: se rege
 - [[PEND-009]] `Ready` — Stray lockfile: C:\Users\Kalel\package-lock.json exists outside infrap
 - [[PEND-013]] `Blocked` — Test /api/lector end-to-end once the user sets a real GROQ_API_KEY in 
 - [[PEND-014]] `Blocked` — Manually update the xlsx dependency to the official SheetJS CDN tarbal
-- [[PEND-015]] `Blocked` — Usuario: ejecutar supabase/migrations/002_suppliers_quotes.sql en Supa
+- [[PEND-015]] `Blocked` — Usuario: aplicar migración 002_suppliers_quotes.sql en Supabase SQL Ed
 
-## Archivado (12)
+## Roadmap (5)
+
+- [[ROAD-002]] `Planned` — Etapa 2 — Activación en producción
+- [[ROAD-003]] `Planned` — Etapa 3 — Integración entre módulos y construcción profundizada
+- [[ROAD-004]] `Planned` — Etapa 4 — Tercera ingeniería con la plantilla validada
+- [[ROAD-005]] `Planned` — Etapa 5 — Cuentas de equipo y perfiles profesionales
+- [[ROAD-006]] `Planned` — Etapa 6 — App (PWA primero)
+
+## Archivado (14)
 
 - ~~PEND-001~~ (Expired) — Sprint item, Done status, no dependencies, resolution alread
 - ~~PEND-003~~ (Expired) — Sprint item, Done status, no dependencies, findings captured
@@ -67,4 +75,6 @@ Generado de state.json v24 (2026-07-06T20:42:54.216Z). NO editar a mano: se rege
 - ~~PEND-010~~ (Expired) — Sprint item, Done status (commit 21774b5, AMM implementation
 - ~~KN-004~~ (Merged) — Deprecated in favor of KN-010
 - ~~KN-012~~ (Merged) — Deprecated in favor of KN-016
+- ~~ROAD-001~~ (Expired) — Project-lifetime milestone completed 2026-07-06 (status Done
+- ~~KN-023~~ (Merged) — Merged into KN-025 (enhanced with quips integration). KN-025
 

@@ -1,11 +1,11 @@
 {
   "projectId": "infrapilot",
-  "sessionCount": 19,
+  "sessionCount": 22,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0.0033,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-07-06T20:42:54.216Z",
+  "lastUpdated": "2026-07-06T08:05:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-07-01-001",
@@ -1164,6 +1164,198 @@
         }
       },
       "notes": "Final curation: archived KN-004 (merged->KN-010) and KN-012 (merged->KN-016), both Low impact with no active dependencies. No duplicates found among remaining objects. Knowledge preserved 100%."
+    },
+    {
+      "sessionId": "session-2026-07-06-road001",
+      "runId": "orion-road001",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-07-06T07:30:00.000Z",
+      "completedAt": "2026-07-06T08:05:00.000Z",
+      "durationMs": 0,
+      "contextSaved": 0,
+      "compressionRatio": 1,
+      "knowledgePreservedPercent": 100,
+      "duplicateReduction": 0,
+      "estimatedTokenSavings": 0,
+      "knowledgeDensity": 0.0034,
+      "objectsCreated": 2,
+      "objectsMerged": 1,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "byTier": {
+        "working": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "project": {
+          "objectCount": 2,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "permanent": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        }
+      },
+      "byType": {
+        "Knowledge": {
+          "count": 2,
+          "created": 2,
+          "merged": 0,
+          "archived": 0
+        },
+        "Roadmap": {
+          "count": 1,
+          "created": 0,
+          "merged": 1,
+          "archived": 0
+        }
+      },
+      "modelOutcomes": [
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 52255
+        },
+        {
+          "phase": "build:lib/excel-export",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 88401
+        },
+        {
+          "phase": "build:page/topografia",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 46815
+        },
+        {
+          "phase": "build:lib/poligonal",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 89558
+        }
+      ],
+      "notes": "RUN ROAD-001 DONE: hub + Excel fórmulas + quips + poligonal. 0 fix cycles, 1 trivial inline fix (import icono). Commits: app 0464a7a (+1431 líneas, 9 archivos), parent 33273bb. Build OK (27 rutas), poligonal self-tests 3/3 PASS, accordion hub funcional, quips en topografía+informática, 0 errores consola. KN-024 (xlsx round-trip: fórmulas require v:precalculated), KN-025 (quips pattern validated). ROAD-001→Done, ROAD-002..006 remain Planned."
+    },
+    {
+      "sessionId": "session-2026-07-06-reflection",
+      "runId": "orion-reflection-road001",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-07-06T08:05:00.000Z",
+      "completedAt": "2026-07-06T08:05:00.000Z",
+      "durationMs": 0,
+      "contextSaved": 0,
+      "compressionRatio": 1,
+      "knowledgePreservedPercent": 100,
+      "duplicateReduction": 0,
+      "estimatedTokenSavings": 0,
+      "knowledgeDensity": 0.0034,
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "byTier": {
+        "working": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "project": {
+          "objectCount": 1,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "permanent": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        }
+      },
+      "byType": {
+        "Knowledge": {
+          "count": 1,
+          "created": 1,
+          "merged": 0,
+          "archived": 0
+        }
+      },
+      "modelOutcomes": [
+        {
+          "phase": "reflection",
+          "model": "haiku",
+          "verdict": "ok"
+        }
+      ],
+      "notes": "Reflection on ROAD-001: documented cross-contract parallel-builder pattern (KN-026). ROAD-001 marked Done (status updated 2026-07-06). No additional pending items or curation needed. Active objects: 42 (>25 threshold reached — see curation recommendation)."
+    },
+    {
+      "sessionId": "session-2026-07-07-amm",
+      "runId": "amm-curation-session-close",
+      "triggeredBy": "SESSION_CLOSE",
+      "startedAt": "2026-07-07T00:00:00.000Z",
+      "completedAt": "2026-07-07T00:00:00.000Z",
+      "durationMs": 0,
+      "contextSaved": 0,
+      "compressionRatio": 1.05,
+      "knowledgePreservedPercent": 100,
+      "duplicateReduction": 1,
+      "estimatedTokenSavings": 0,
+      "knowledgeDensity": 0.0034,
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 2,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "byTier": {
+        "working": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "project": {
+          "objectCount": 20,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "permanent": {
+          "objectCount": 10,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        }
+      },
+      "byType": {
+        "Decision": {
+          "count": 7,
+          "archived": 0
+        },
+        "Knowledge": {
+          "count": 21,
+          "archived": 1
+        },
+        "Constraint": {
+          "count": 1,
+          "archived": 0
+        },
+        "Pending": {
+          "count": 6,
+          "archived": 0
+        },
+        "Architecture": {
+          "count": 1,
+          "archived": 0
+        },
+        "Roadmap": {
+          "count": 5,
+          "archived": 1
+        }
+      },
+      "notes": "AMM SESSION_CLOSE curation: archived ROAD-001 (Done, no deps, 1 cycle retention policy) + KN-023 (merged→KN-025). Restored PEND-015 (was accidentally missing). Dedup verified across KN-014..026: distinct patterns (React/agent-reliability/xlsx/Excel-formulas/quips/cross-contract). PEND-002/004/009/013/014/015 coherent (Blocked/Ready/In-Progress waiting user). Version 26→27, brief.md regenerated (roadmap 6 etapas ROAD-001 done, hub+disciplines+Excel+quips+poligonal, disciplina template validated). Active: 42→41 objects."
     }
   ]
 }
