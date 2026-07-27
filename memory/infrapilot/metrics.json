@@ -1,6 +1,6 @@
 {
   "projectId": "infrapilot",
-  "sessionCount": 24,
+  "sessionCount": 25,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0.0033,
@@ -1293,6 +1293,69 @@
         }
       ],
       "notes": "Reflection on ROAD-001: documented cross-contract parallel-builder pattern (KN-026). ROAD-001 marked Done (status updated 2026-07-06). No additional pending items or curation needed. Active objects: 42 (>25 threshold reached — see curation recommendation)."
+    },
+    {
+      "sessionId": "session-2026-07-27-amm",
+      "runId": "amm-curation-session-close-v32",
+      "triggeredBy": "SESSION_CLOSE",
+      "startedAt": "2026-07-27T00:00:00.000Z",
+      "completedAt": "2026-07-27T00:00:00.000Z",
+      "durationMs": 0,
+      "contextSaved": 0,
+      "compressionRatio": 1.02,
+      "knowledgePreservedPercent": 100,
+      "duplicateReduction": 0,
+      "estimatedTokenSavings": 0,
+      "knowledgeDensity": 0.0034,
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 1,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "byTier": {
+        "working": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "project": {
+          "objectCount": 21,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "permanent": {
+          "objectCount": 10,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        }
+      },
+      "byType": {
+        "Decision": {
+          "count": 10,
+          "archived": 0
+        },
+        "Knowledge": {
+          "count": 23,
+          "archived": 1
+        },
+        "Constraint": {
+          "count": 1,
+          "archived": 0
+        },
+        "Pending": {
+          "count": 6,
+          "archived": 0
+        },
+        "Architecture": {
+          "count": 1,
+          "archived": 0
+        },
+        "Roadmap": {
+          "count": 5,
+          "archived": 0
+        }
+      },
+      "notes": "AMM SESSION_CLOSE curation v32: archived KN-020 (landing v2 visual, superseded by DEC-010 skill estudio-diseno commit 3aa86c6). Dedup verified across KN-014..027: all distinct patterns. PEND-002/004/013/014/015 remain Blocked/In-Progress per user constraints. No duplicates found. Active: 46→45 objects. Version bump 31→32. Brief.md regenerated (estudio-diseno skill as canonical design system, ROAD-001 completed, 6 roadmap stages active)."
     },
     {
       "sessionId": "session-2026-07-07-amm",

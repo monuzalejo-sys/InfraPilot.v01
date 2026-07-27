@@ -1,6 +1,6 @@
 # Memoria ORION — infrapilot
 
-Generado de state.json v31 (2026-07-07T10:15:00.000Z). NO editar a mano: se regenera en cada cierre de sesión.
+Generado de state.json v32 (2026-07-27T00:00:00.000Z). NO editar a mano: se regenera en cada cierre de sesión.
 
 ## Architecture (1)
 
@@ -23,7 +23,7 @@ Generado de state.json v31 (2026-07-07T10:15:00.000Z). NO editar a mano: se rege
 - [[DEC-009]] `Accepted` — Navegación por módulos exclusivos de profesión; dashboard = presentaci
 - [[DEC-010]] `Accepted` — Sistema de diseño canónico: skill estudio-diseno (El estudio del ingen
 
-## Knowledge (23)
+## Knowledge (22)
 
 - [[KN-001]] `Current` — GitHub pushes from this automated terminal environment cannot complete
 - [[KN-002]] `Current` — A malformed path '.gitignoregit add .' existed in the original InfraPi
@@ -42,7 +42,6 @@ Generado de state.json v31 (2026-07-07T10:15:00.000Z). NO editar a mano: se rege
 - [[KN-018]] `Current` — ORION agent-spawn reliability observed 2026-07-05: 3 of 10 spawns this
 - [[KN-022]] `Current` — Supabase migration pattern (error.code 42P01 / /does not exist|schema 
 - [[KN-019]] `Current` — Claude Code built-in agent permission classifier enforces two hard blo
-- [[KN-020]] `Current` — Landing v2 (commit a6314fe): hero full-viewport recreado 1:1 de la ref
 - [[KN-021]] `Current` — lib/disciplines.ts is the canonical registry of InfraPilot's engineeri
 - [[KN-024]] `Current` — SheetJS/xlsx round-trip discovery: the xlsx library silently DISCARDS 
 - [[KN-025]] `Current` — PATRÓN disciplina nueva VALIDADO (tercera instancia tras topografía 20
@@ -66,8 +65,9 @@ Generado de state.json v31 (2026-07-07T10:15:00.000Z). NO editar a mano: se rege
 - [[ROAD-005]] `Planned` — Etapa 5 — Cuentas de equipo y perfiles profesionales
 - [[ROAD-006]] `Planned` — Etapa 6 — App (PWA primero)
 
-## Archivado (14)
+## Archivado (15)
 
+- ~~KN-020~~ (Superseded) — Landing v2 visual details (commit a6314fe) replaced by DEC-0
 - ~~PEND-001~~ (Expired) — Sprint item, Done status, no dependencies, resolution alread
 - ~~PEND-003~~ (Expired) — Sprint item, Done status, no dependencies, findings captured
 - ~~PEND-006~~ (Expired) — Sprint item, Done status, no dependencies, caveat extracted 

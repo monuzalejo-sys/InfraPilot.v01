@@ -14,8 +14,8 @@
 - **Roadmap 6 stages** (ROAD-001..006): Etapa 1 DONE (hub + Excel fórmulas + quips + poligonal). Etapas 2–6 planned (production activation, cross-module integrations, third discipline, team accounts, PWA).
 - **Disciplines registry** (lib/disciplines.ts): canonical array (construcción, topografía, licitaciones, analítica, informática). Add = append; sidebar + routing auto-react.
 - **New Discipline Template** (KN-025): lib/disciplina/ (pure functions + __selfTest), /disciplina page (tabs), ProfesionQuips at footer. Validated 3× (topografía, informática, implicit in ROAD-001). Ready for estructura, eléctrica, mecánica.
-- **Editorial design** (KN-016): warm paper #F6F3ED, ink #1B1A17, brass #A8895B. App-wide via :root + editorial.tsx.
-- **Landing v2** (KN-020): hero full-viewport, 2-line titular, mono subline, 3D brass knob, pill nav, SVG collage (terrain + code + dimensions).
+- **Design System Canonical** (DEC-010): skill estudio-diseno "El estudio del ingeniero moderno" defines exact palette (#F8F6F2 bg, #FCFBF8 cards, #171717 sidebar, etc.), typography (huge + light + air), components as physical objects (plano, archivador, libreta), buttons as tool-capsules, editorial composition, 2px/180ms microinteractions, AI as silent companion. Supersedes prior landing sketches; first application: landing commit 3aa86c6.
+- **Editorial design** (KN-016): warm paper system app-wide via :root + editorial.tsx (typography, spacing, shadows, component tokenization).
 - **Excel Export Pattern** (KN-024): xlsx round-trip silently discards formulas without precalculated `v` value; lib/excel-export.ts bundles f(formula, value, fmt); all new modules use crearLibroConFormulas().
 - **Supabase migrations** (2026-07-06): 000_initial_schema + 001_prices_apus applied (6 tables, RLS active). 002_suppliers_quotes pending user apply (PEND-015).
 
@@ -37,13 +37,16 @@
 5. **PEND-004** (Ready, Low): Push via GitHub Desktop (pending manual action).
 6. **PEND-009** (Ready, Low): Stray C:\Users\Kalel\package-lock.json (housekeeping, ask user first).
 
-## Decisions (7 active: 2 Project, 5 Permanent)
+## Decisions (10 active: 2 Project, 8 Permanent)
 - DEC-001: ORION standard in InfraPilot.v01 repo (not separate) [Project].
 - DEC-002: infrapilot-app registered as proper git submodule [Project].
 - DEC-003/004: Six ORION agents + adaptive model policy (haiku/sonnet/opus by difficulty) [Permanent].
 - DEC-005: Autocommit on VERIFYING PASS; push manual [Permanent].
 - DEC-006: AMM schema embedded in reflector agent [Permanent].
 - DEC-007: Proportional lifecycle: ceremony scales with task size [Permanent].
+- DEC-008: ORION v3 ecosystem (wave.json, atomic reflector, applied calibration, Obsidian vault) [Permanent].
+- DEC-009: Module navigation by discipline; dashboard = app presentation [Project].
+- DEC-010: Design system canonical: skill estudio-diseno "El estudio del ingeniero moderno" [Permanent].
 
 ## Key Facts
 - **App status**: Working Next.js 16 with Supabase auth (live), 11 modules (dashboard hub, cotizador, APUs, licitaciones, predictor, presupuestos, topografía, lector IA, informatica, proveedores, comparativa). Build exit 0, 27 routes, all modules 8/8 self-tests PASS.
@@ -52,6 +55,6 @@
 - **Parallel builders** (KN-026): Cross-contract dependencies safe via commented TODOs; orchestrator uncomments post-ola. Practiced in ROAD-001 (1 trivial fix, import).
 
 ## Memory State
-- **Active**: 41 objects (7 Decisions, 21 Knowledge, 1 Constraint, 6 Pending, 1 Architecture, 5 Roadmap).
-- **Archived**: 14 items (PEND-001..012, KN-004/011/012/023, ROAD-001 post-completion).
-- **Version**: 27. Last AMM: 2026-07-07 SESSION_CLOSE. Validation: VALID.
+- **Active**: 45 objects (10 Decisions, 23 Knowledge, 1 Constraint, 6 Pending, 1 Architecture, 5 Roadmap).
+- **Archived**: 15 items (PEND-001..012, KN-004/011/012/020/023, ROAD-001 post-completion).
+- **Version**: 32. Last AMM: 2026-07-27 SESSION_CLOSE. Validation: PENDING.

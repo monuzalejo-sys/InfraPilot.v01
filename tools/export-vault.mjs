@@ -43,15 +43,27 @@ sys += copyIf(join(root, "Skills", "autonomous-memory-manager", "README.md"),
   join(dest, "Sistema", "AMM-README.md"))
 
 // ── 2. Proyectos: cada memoria con su vault enlazado ───────────────
+// Además de las memorias bajo ORION/memory/, se pueden pasar memorias de
+// proyectos que viven en OTRO repo como argumentos extra:
+//   node tools/export-vault.mjs <destino> C:/ruta/otro-repo/memory/<projectId>
+// Sin esto, un proyecto fuera de ORION queda invisible en el vault.
 const memRoot = join(root, "memory")
+const externas = process.argv.slice(3).filter((p) => existsSync(join(p, "state.json")))
+const internas = readdirSync(memRoot)
+  .map((proj) => join(memRoot, proj))
+  .filter((d) => statSync(d).isDirectory() && existsSync(join(d, "state.json")))
+
 const proyectos = []
-for (const proj of readdirSync(memRoot)) {
-  const mdir = join(memRoot, proj)
-  if (!statSync(mdir).isDirectory() || !existsSync(join(mdir, "state.json"))) continue
+for (const mdir of [...internas, ...externas]) {
+  const proj = basename(mdir)
   const out = join(dest, "Proyectos", proj)
-  // prefijo por proyecto evita colisiones de [[links]] entre memorias
-  // (p.ej. KN-001 existe en infrapilot Y en permanent)
-  const prefix = proj === "permanent" ? "PERM-" : ""
+  // Prefijo por proyecto: evita que los [[links]] choquen entre memorias
+  // (KN-001 existe en infrapilot, en permanent Y en estanco-contable).
+  // infrapilot va sin prefijo por ser el proyecto original del vault.
+  const prefix =
+    proj === "infrapilot" ? "" :
+    proj === "permanent" ? "PERM-" :
+    proj.slice(0, 3).toUpperCase() + "-"
   execFileSync("node", [generator, mdir, out, prefix], { stdio: "inherit" })
   copyIf(join(mdir, "brief.md"), join(out, "_BRIEF.md"))
   const st = JSON.parse(readFileSync(join(mdir, "state.json"), "utf8"))

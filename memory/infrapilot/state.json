@@ -505,21 +505,6 @@
       "source": "session 2026-07-05"
     },
     {
-      "id": "KN-020",
-      "type": "Knowledge",
-      "tier": "Project",
-      "created": "2026-07-05T22:00:00.000Z",
-      "updated": "2026-07-05T22:00:00.000Z",
-      "lifetime": "Project",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "Landing v2 (commit a6314fe): hero full-viewport recreado 1:1 de la referencia del usuario 'Precisión en cada ciclo' — titular 2 líneas sin punto, subline mono subrayada 'Hacemos tus ideas / más rápido y mejor.', rail vertical 'Infra Pilot · System v2.4', regla con ticks, knob latón 3D, pill táctil (diamante→/cotizador, ciclo→/dashboard), scroll-pill derecha, collage técnico SVG inline (sección de terreno con cotas y hatching + panel de vidrio con editor de código + líneas de dimensión), luz suave desde la derecha. SIN nav tradicional: acceso solo vía 'INGRESAR' mono top-right y footer. Supersede la descripción del hero en KN-016; el resto del sistema editorial sigue vigente.",
-      "context": "Referencia visual v2 entregada por el usuario 2026-07-05; pidió 99% de similitud. Verificado: build exit 0, 2 líneas exactas a 1366px, sin overflow 375/1366, 0 errores consola.",
-      "source": "session 2026-07-05, run landing-v2 (inline, sin spawns)"
-    },
-    {
       "id": "KN-021",
       "type": "Knowledge",
       "tier": "Project",
@@ -716,6 +701,15 @@
   ],
   "archives": [
     {
+      "id": "ARC-015",
+      "archivedId": "KN-020",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-07-27T00:00:00.000Z",
+      "reason": "Superseded",
+      "notes": "Landing v2 visual details (commit a6314fe) replaced by DEC-010 skill estudio-diseno (commit 3aa86c6). Canonical design system now lives in the skill manifest, not separate landing knowledge.",
+      "supersededBy": "DEC-010"
+    },
+    {
       "id": "ARC-001",
       "archivedId": "PEND-001",
       "archivedType": "Pending",
@@ -828,7 +822,7 @@
       "notes": "Merged into KN-025 (enhanced with quips integration). KN-025 is the definitive 'new discipline template' with lib/ + page/ + quips pattern, validated in 3 instances (topografia, informatica, implicit in ROAD-001)."
     }
   ],
-  "lastAmmRun": "2026-07-07T10:15:00.000Z",
-  "snapshotDate": "2026-07-07T10:15:00.000Z",
-  "version": 31
+  "lastAmmRun": "2026-07-27T00:00:00.000Z",
+  "snapshotDate": "2026-07-27T00:00:00.000Z",
+  "version": 32
 }
