@@ -1,5 +1,10 @@
 {
   "projectId": "infrapilot",
+  "sessionCount": 27,
+  "totalContextSaved": 0,
+  "avgCompressionRatio": 1,
+  "avgKnowledgeDensity": 0.0033,
+  "trendCompressionRatio": "Stable",
   "objects": [
     {
       "id": "DEC-001",
@@ -111,7 +116,7 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-07-06T04:30:00.000Z",
+      "updated": "2026-07-28T00:00:00.000Z",
       "lifetime": "Sprint",
       "impact": "Low",
       "priority": "Medium",
@@ -119,7 +124,7 @@
       "dependencies": [
         "KN-001"
       ],
-      "task": "Push vía GitHub Desktop (app primero, luego parent). Pendientes ahora: app {a6314fe landing v2, 131040f proveedores+comparativa}; parent {2760909, d7ebca0, aaaadd8, 53fc712 + cierre de sesión}. Nota: si Desktop muestra archivos modificados solo por line endings LF→CRLF, ignorar/refrescar — no committear churn de EOL.",
+      "task": "Push vía GitHub Desktop (app primero, luego parent). Pendientes ahora: app {a6314fe landing v2, 131040f proveedores+comparativa, 91ab9d6 ROAD-003/004/006 integración cruzada+eléctrica+PWA+cuentas de equipo}; parent {2760909, d7ebca0, aaaadd8, 53fc712 + cierre de sesión}. Nota: si Desktop muestra archivos modificados solo por line endings LF→CRLF, ignorar/refrescar — no committear churn de EOL.",
       "reason": "Terminal git push doesn't work in this environment (see KN-001) — pending manual push next time the user is at GitHub Desktop. As of 2026-07-05: infrapilot-app (submodule) has {0eef64b, ca18cc7, 720fda7} pending push; parent InfraPilot.v01 has {0d60adc, 50e1690, 02d8d58 and earlier} pending push."
     },
     {
@@ -414,7 +419,7 @@
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-07-05T00:00:00.000Z",
-      "updated": "2026-07-05T00:00:00.000Z",
+      "updated": "2026-07-28T00:00:00.000Z",
       "lifetime": "Permanent",
       "impact": "High",
       "priority": "High",
@@ -422,7 +427,7 @@
       "dependencies": [
         "DEC-004"
       ],
-      "fact": "ORION agent-spawn reliability observed 2026-07-05: 3 of 10 spawns this session died mid-work (2 hit session/context limits, 1 got a connection-closed error) while leaving partial-but-real work on disk. Recovery protocol used successfully: diff the dead agent's claimed file ownership against actual `git status`/working-tree state, then either (a) finish the remaining delta inline in the orchestrator when small, or (b) re-spawn a narrowly-scoped agent targeting only the unfinished files. Do not blindly re-spawn the same broad task — it duplicates already-completed work and wastes tokens.",
+      "fact": "ORION agent-spawn reliability observed 2026-07-05: 3 of 10 spawns this session died mid-work (2 hit session/context limits, 1 got a connection-closed error) while leaving partial-but-real work on disk. Recovery protocol used successfully: diff the dead agent's claimed file ownership against actual `git status`/working-tree state, then either (a) finish the remaining delta inline in the orchestrator when small, or (b) re-spawn a narrowly-scoped agent targeting only the unfinished files. Do not blindly re-spawn the same broad task — it duplicates already-completed work and wastes tokens. New death mode observed 2026-07-28: a builder finished its work correctly on disk but returned an EMPTY/truncated report ('leaving the build running in background') without closing out its own verification. The orchestrator confirmed the artifact directly on disk and accepted it as done. Protocol: on a truncated/empty report, ALWAYS verify disk state before re-spawning — re-spawning here would have duplicated already-completed work. Separately, 2 of 15 spawns this session died from session limits (INFRA_DEATH) leaving no work at all in one case and complete work in the other — per RFC, infra-death does not inflate or deflate model-tier signal, record it as such rather than as a model failure.",
       "context": "Affected phases: build:restyle-datos (sonnet, escalate), build:restyle-flujo (sonnet, escalate), build:ui-tokens (sonnet, escalate). All three left recoverable partial work; none required a full restart.",
       "source": "session 2026-07-05"
     },
@@ -581,60 +586,18 @@
       "description": "Del lado del usuario: migración 002 (proveedores/comparativa), GROQ_API_KEY (activa Cotizador IA y Lector), 3 vars en Vercel. Luego: verificación E2E completa en la URL pública (login, persistencia, IA real, todos los módulos). Depende de PEND-002/013/015."
     },
     {
-      "id": "ROAD-003",
-      "type": "Roadmap",
-      "tier": "Project",
-      "created": "2026-07-06T08:05:00.000Z",
-      "updated": "2026-07-06T08:05:00.000Z",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "High",
-      "status": "Planned",
-      "dependencies": [],
-      "milestone": "Etapa 3 — Integración entre módulos y construcción profundizada",
-      "description": "Los módulos alimentan presupuestos: estimación informática → presupuesto guardable; cubicación → partidas de movimiento de tierras; comparativa de precios → APUs con mejor precio. La disciplina construcción (cotizador/APUs/presupuestos) se profundiza al nivel del módulo modelo."
-    },
-    {
-      "id": "ROAD-004",
-      "type": "Roadmap",
-      "tier": "Project",
-      "created": "2026-07-06T08:05:00.000Z",
-      "updated": "2026-07-06T08:05:00.000Z",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "High",
-      "status": "Planned",
-      "dependencies": [],
-      "milestone": "Etapa 4 — Tercera ingeniería con la plantilla validada",
-      "description": "Nueva disciplina (candidatas: eléctrica —cálculo de circuitos/tableros— o estructural —vigas/cargas—; decide el dueño) usando la plantilla KN-023: registry + libs puras con self-tests + página de pestañas + quips. Meta: crearla en UNA ola corta y documentar el tiempo/costo como benchmark de escalamiento."
-    },
-    {
       "id": "ROAD-005",
       "type": "Roadmap",
       "tier": "Project",
       "created": "2026-07-06T08:05:00.000Z",
-      "updated": "2026-07-06T08:05:00.000Z",
+      "updated": "2026-07-28T00:00:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
-      "status": "Planned",
+      "status": "In-Progress",
       "dependencies": [],
       "milestone": "Etapa 5 — Cuentas de equipo y perfiles profesionales",
-      "description": "Multi-usuario por empresa (Supabase: organizaciones, roles, RLS por org), perfil profesional que personaliza el hub (tu ingeniería primero), onboarding por disciplina. Prepara el modelo de negocio multi-vertical."
-    },
-    {
-      "id": "ROAD-006",
-      "type": "Roadmap",
-      "tier": "Project",
-      "created": "2026-07-06T08:05:00.000Z",
-      "updated": "2026-07-06T08:05:00.000Z",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "High",
-      "status": "Planned",
-      "dependencies": [],
-      "milestone": "Etapa 6 — App (PWA primero)",
-      "description": "La web se vuelve instalable: PWA con manifest + service worker (offline para las calculadoras client-side, que ya son puras), icono, splash. Evaluar después app nativa (Capacitor/React Native) si la PWA se queda corta. Es el camino más corto al \"app para mejor manejo\" del dueño."
+      "description": "Multi-usuario por empresa (Supabase: organizaciones, roles, RLS por org), perfil profesional que personaliza el hub (tu ingeniería primero), onboarding por disciplina. Prepara el modelo de negocio multi-vertical. PARCIAL 2026-07-28: código completo (migración 003 + API organizaciones/perfil + página /perfil, todo degradando a 503) pero la migración no se ha ejecutado — ver RSK-001. Personalización del hub pendiente en PEND-016."
     },
     {
       "id": "DEC-008",
@@ -697,6 +660,115 @@
       "title": "Sistema de diseño canónico: skill estudio-diseno (El estudio del ingeniero moderno)",
       "description": "El manifiesto visual del dueño vive como skill de usuario en ~/.claude/skills/estudio-diseno/SKILL.md (espejo en runtime/skills/estudio-diseno.SKILL.md): paleta EXACTA de blanco cálido (#F8F6F2 bg, #FCFBF8 cards, #171717 sidebar, #111111 ink, #666666 muted, #E7E4DE bordes, #F2EFE9 hover, #4D7C59/#B98A3C/#B94A48 estados), tipografía enorme y ligera con mucho aire, componentes como OBJETOS FÍSICOS (hoja técnica, plano desplegado, archivador, libreta de IA), botones-herramienta cápsula con glifo, composición editorial orgánica, microinteracciones 2px/180ms sin rebotes, IA como compañero silencioso (nunca chat protagonista), y prohibiciones explícitas (nada de azules eléctricos, morados, neones, gradientes tecnológicos, dashboards saturados, plantillas). TODA UI nueva o rediseñada debe invocar esta skill primero. Primera aplicación: landing de InfraPilot (commit 3aa86c6), verificada en navegador.",
       "reason": "El dueño rechazó landings previas por genéricas y entregó un manifiesto propio; convertirlo en skill evita que cada run reinvente (o repita el error)."
+    },
+    {
+      "id": "KN-028",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-28T00:00:00.000Z",
+      "updated": "2026-07-28T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "proxy.ts redirected /sw.js and /manifest.webmanifest to /login (307) because neither path was in PUBLIC_PATHS. The build passed and each builder verified their own piece in isolation; the failure only surfaced running curl against the dev server. Fixed by adding both paths to PUBLIC_PATHS. Lesson: for any feature the browser requests without a session (PWA assets, webhooks, .well-known/*), always check the middleware/proxy matcher explicitly — a green build does not cover routes the middleware intercepts.",
+      "context": "Found building the PWA feature (ROAD-006) 2026-07-28; caught live by orion-verifier, not by build/tsc.",
+      "source": "session 2026-07-28, ROAD-006 PWA build"
+    },
+    {
+      "id": "KN-029",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-28T00:00:00.000Z",
+      "updated": "2026-07-28T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "DEC-010"
+      ],
+      "fact": "The estudio-diseno skill's declared palette (#F8F6F2/#171717) has drifted from the actually-implemented tokens in app/globals.css (--paper #f6f3ed, --rail #232019). Builders needing concrete color/theme values (e.g. a PWA manifest's theme_color) must read globals.css as the source of truth for exact values, and use the skill only for composition/design principles, not literal hex codes.",
+      "context": "Detected while building the PWA manifest (ROAD-006), which needed an exact theme_color.",
+      "source": "session 2026-07-28, build:infra/pwa-manifest (sonnet)"
+    },
+    {
+      "id": "KN-031",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-07-28T00:00:00.000Z",
+      "updated": "2026-07-28T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "KN-026"
+      ],
+      "fact": "Ownership overlap ACROSS waves (distinct from KN-026's same-wave case): builders 'quips' and 'origen-de-presupuesto' both touched presupuestos/page.tsx in different waves; the second restructured the page and the first builder's quips survived only in the detail view, not the list view. Per-wave disjoint ownership does not protect a file that gets touched again in a LATER wave. Found by reviewing the prerendered HTML, not the build. When planning multi-wave work, track which files were touched in prior waves and re-verify their state after any later wave that restructures them.",
+      "context": "Found during verification of ROAD-003 (cross-module integration + quips coverage).",
+      "source": "session 2026-07-28, verification/sonnet"
+    },
+    {
+      "id": "RSK-001",
+      "type": "Risk",
+      "tier": "Project",
+      "created": "2026-07-28T00:00:00.000Z",
+      "updated": "2026-07-28T00:00:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "High",
+      "priority": "High",
+      "status": "Open",
+      "dependencies": [],
+      "risk": "supabase/migrations/003_organizations.sql (233 lines: RLS with security-definer helpers, owner-bootstrap trigger) has never been executed — this machine has no psql, no supabase CLI, and no Docker. It was reviewed by reading only (verifier PASS on code review) with no runtime guarantee.",
+      "probability": "Medium",
+      "mitigation": "Apply first against a throwaway/test Supabase project, then run it TWICE to confirm the migration is idempotent, before applying to the real infrapilot project. Only after that, apply to production and re-verify the /organizaciones + /perfil routes stop returning 503."
+    },
+    {
+      "id": "RSK-002",
+      "type": "Risk",
+      "tier": "Project",
+      "created": "2026-07-28T00:00:00.000Z",
+      "updated": "2026-07-28T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Open",
+      "dependencies": [],
+      "risk": "The ampacity tables in lib/electrica/circuitos.ts (IEC/NEC-based) are only MEDIUM-confidence reference data, explicitly declared as advisory and overridable by parameter. If the app is used under a different local code (e.g. Chile's NCh Elec. 4/2003) the built-in values could be wrong for that jurisdiction.",
+      "probability": "Low",
+      "mitigation": "Before presenting circuitos.ts results as authoritative engineering output in any jurisdiction other than IEC/NEC, validate the tables against the applicable local electrical code and expose them as clearly-labeled defaults the user can override."
+    },
+    {
+      "id": "PEND-016",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-28T00:00:00.000Z",
+      "updated": "2026-07-28T00:00:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Ready",
+      "dependencies": [
+        "RSK-001"
+      ],
+      "task": "Personalizar el hub por profesión (mostrar la disciplina del usuario primero) una vez la migración 003 esté aplicada y /perfil deje de degradar a 503.",
+      "reason": "Deliberadamente NO hecho este run: dashboard/page.tsx es un Server Component declarado 'sin fetches ni stats'; añadir un fetch de perfil que hoy siempre da 503 contradice ese diseño. ROAD-005 depende de esto."
+    },
+    {
+      "id": "PEND-017",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-07-28T00:00:00.000Z",
+      "updated": "2026-07-28T00:00:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "Low",
+      "priority": "Low",
+      "status": "Ready",
+      "dependencies": [],
+      "task": "app/api/budgets/route.ts no valida el body antes del insert; si falta description (NOT NULL) da 500 crudo en vez de 400.",
+      "reason": "Hallazgo del verificador durante ROAD-003, fuera de alcance de este run."
     }
   ],
   "archives": [
@@ -820,9 +892,33 @@
       "archivedAt": "2026-07-07T00:00:00.000Z",
       "reason": "Merged",
       "notes": "Merged into KN-025 (enhanced with quips integration). KN-025 is the definitive 'new discipline template' with lib/ + page/ + quips pattern, validated in 3 instances (topografia, informatica, implicit in ROAD-001)."
+    },
+    {
+      "id": "ARC-16",
+      "archivedId": "ROAD-003",
+      "archivedType": "Roadmap",
+      "archivedAt": "2026-07-28T00:00:00.000Z",
+      "reason": "Expired",
+      "notes": "Etapa 3 — Integración entre módulos y construcción profundizada. Status Done 2026-07-28 (commit 91ab9d6). Cross-module integrations implemented: informática→presupuestos, topografía→tierras, precios→APUs. Disciplina construcción deepened. Knowledge preserved in KN-031 (ownership overlap caveat)."
+    },
+    {
+      "id": "ARC-17",
+      "archivedId": "ROAD-004",
+      "archivedType": "Roadmap",
+      "archivedAt": "2026-07-28T00:00:00.000Z",
+      "reason": "Expired",
+      "notes": "Etapa 4 — Tercera ingeniería con la plantilla validada. Status Done 2026-07-28 (commit 91ab9d6). Nueva disciplina eléctrica (circuitos+tableros) implementada usando template KN-025. Registry now has 4 disciplines. Caveat: RSK-002 (ampacity tables medium-confidence, override per jurisdiction)."
+    },
+    {
+      "id": "ARC-18",
+      "archivedId": "ROAD-006",
+      "archivedType": "Roadmap",
+      "archivedAt": "2026-07-28T00:00:00.000Z",
+      "reason": "Expired",
+      "notes": "Etapa 6 — App (PWA primero). Status Done 2026-07-28 (commit 91ab9d6). PWA fully implemented: manifest, icons, viewport, service worker. Offline mode ready for client-side calculators. Bug: proxy.ts redirected /sw.js and /manifest.webmanifest to login (fixed, documented in KN-028)."
     }
   ],
-  "lastAmmRun": "2026-07-27T00:00:00.000Z",
-  "snapshotDate": "2026-07-27T00:00:00.000Z",
-  "version": 32
+  "lastAmmRun": "2026-07-28T20:00:00.000Z",
+  "snapshotDate": "2026-07-28T20:00:00.000Z",
+  "version": 34
 }

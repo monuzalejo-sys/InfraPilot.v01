@@ -1,11 +1,11 @@
 {
   "projectId": "infrapilot",
-  "sessionCount": 25,
+  "sessionCount": 27,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0.0033,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-07-07T10:15:00.000Z",
+  "lastUpdated": "2026-07-28T20:00:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-07-01-001",
@@ -1522,6 +1522,228 @@
           "tokens": 111096
         }
       ]
+    },
+    {
+      "sessionId": "session-2026-07-28-roadmap-close",
+      "runId": "orion-road003-004-006",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-07-28T00:00:00.000Z",
+      "completedAt": "2026-07-28T00:00:00.000Z",
+      "durationMs": 0,
+      "contextSaved": 0,
+      "compressionRatio": 1,
+      "knowledgePreservedPercent": 100,
+      "duplicateReduction": 0,
+      "estimatedTokenSavings": 0,
+      "knowledgeDensity": 0.0034,
+      "objectsCreated": 7,
+      "objectsMerged": 6,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "byTier": {
+        "working": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "project": {
+          "objectCount": 39,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "permanent": {
+          "objectCount": 13,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        }
+      },
+      "byType": {
+        "Knowledge": {
+          "count": 25,
+          "created": 3,
+          "merged": 1,
+          "archived": 0
+        },
+        "Pending": {
+          "count": 8,
+          "created": 2,
+          "merged": 1,
+          "archived": 0
+        },
+        "Risk": {
+          "count": 2,
+          "created": 2,
+          "merged": 0,
+          "archived": 0
+        },
+        "Roadmap": {
+          "count": 5,
+          "created": 0,
+          "merged": 4,
+          "archived": 0
+        }
+      },
+      "modelOutcomes": [
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 81579
+        },
+        {
+          "phase": "build:lib/quips",
+          "model": "haiku",
+          "verdict": "ok",
+          "tokens": 31552
+        },
+        {
+          "phase": "build:lib/to-presupuesto",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 133384
+        },
+        {
+          "phase": "build:lib/to-partidas",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 131873
+        },
+        {
+          "phase": "build:page/reprecio-apus",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 70338
+        },
+        {
+          "phase": "build:page/quips-7paginas",
+          "model": "haiku",
+          "verdict": "ok",
+          "tokens": 110894
+        },
+        {
+          "phase": "build:lib/electrica",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 101024
+        },
+        {
+          "phase": "build:infra/migracion-003",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 59408
+        },
+        {
+          "phase": "build:infra/pwa-manifest",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 87344
+        },
+        {
+          "phase": "build:page/electrica",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 132946
+        },
+        {
+          "phase": "build:api/organizaciones",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 71701
+        },
+        {
+          "phase": "build:infra/service-worker",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 83155
+        },
+        {
+          "phase": "build:page/origen-presupuesto",
+          "model": "sonnet",
+          "verdict": "escalate",
+          "tokens": 0
+        },
+        {
+          "phase": "build:page/perfil-org",
+          "model": "opus",
+          "verdict": "escalate",
+          "tokens": 0
+        },
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 75296
+        }
+      ],
+      "notes": "RUN ROAD-003/004/006 DONE (ROAD-005 parcial): 15 tareas, verificador PASS 5/5, 0 ciclos de fix, commit 91ab9d6 (app, 36 archivos +4713 líneas), sin push (PEND-004 actualizado). 2 spawns murieron por límite de sesión (INFRA_DEATH, verdict escalate/tokens 0 por convención — no son señal de capacidad de modelo): build:page/origen-presupuesto dejó el trabajo completo en disco (aceptado inline), build:page/perfil-org no escribió nada (rehecho inline). Nuevos: KN-028 (bug proxy.ts bloqueando /sw.js y /manifest.webmanifest), KN-029 (deriva paleta skill vs globals.css), KN-031 (solape de ownership entre olas en presupuestos/page.tsx), RSK-001 (migración 003 sin aplicar, sin psql/CLI/Docker), RSK-002 (tablas eléctricas de confianza media), PEND-016 (personalizar hub, bloqueado por RSK-001), PEND-017 (validación de body en budgets API). KN-018 ampliado con nuevo modo de muerte de agente (reporte vacío con trabajo completo en disco). ROAD-003/004/006 -> Done, ROAD-005 -> In-Progress. Active objects: 45->52 (>25 threshold, curación recomendada)."
+    },
+    {
+      "sessionId": "session-2026-07-28-amm-close",
+      "runId": "amm-curation-session-close",
+      "triggeredBy": "SESSION_CLOSE",
+      "startedAt": "2026-07-28T20:00:00.000Z",
+      "completedAt": "2026-07-28T20:00:00.000Z",
+      "durationMs": 0,
+      "contextSaved": 0,
+      "compressionRatio": 1.06,
+      "knowledgePreservedPercent": 100,
+      "duplicateReduction": 0,
+      "estimatedTokenSavings": 0,
+      "knowledgeDensity": 0.0034,
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 3,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "byTier": {
+        "working": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "project": {
+          "objectCount": 20,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "permanent": {
+          "objectCount": 10,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        }
+      },
+      "byType": {
+        "Decision": {
+          "count": 10,
+          "archived": 0
+        },
+        "Knowledge": {
+          "count": 25,
+          "archived": 0
+        },
+        "Constraint": {
+          "count": 1,
+          "archived": 0
+        },
+        "Pending": {
+          "count": 8,
+          "archived": 0
+        },
+        "Architecture": {
+          "count": 1,
+          "archived": 0
+        },
+        "Roadmap": {
+          "count": 2,
+          "archived": 3
+        },
+        "Risk": {
+          "count": 2,
+          "archived": 0
+        }
+      },
+      "notes": "AMM SESSION_CLOSE curation: archived ROAD-003/004/006 (all Done 2026-07-28, no active deps, sprint policy expire). Dedup verified across KN-014..031: all distinct patterns (React/agent-reliability/xlsx/formulas/quips/parallel-builders/incident/middleware/palette-drift/ownership-overlap). No duplicates found. ROAD-005 remains In-Progress (team accounts, blocked RSK-001). Brief.md regenerated: 6 disciplines (construcción+topografía+licitaciones+analítica+informática+eléctrica), PWA active, budgets with origen field, cross-module integrations live. Version 33→34. Active: 49→46 objects. Three user blockers noted: migración 002, migración 003 (RSK-001), GROQ_API_KEY."
     }
   ]
 }
