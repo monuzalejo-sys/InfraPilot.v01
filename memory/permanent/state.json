@@ -1,6 +1,6 @@
 {
   "projectId": "_permanent",
-  "snapshotDate": "2026-07-03T00:00:00.000Z",
+  "snapshotDate": "2026-08-01T00:00:00.000Z",
   "objects": [
     {
       "id": "KN-001",
@@ -46,9 +46,51 @@
       "fact": "infrapilot Supabase project: ref zrogravgwhoijajzciem, URL https://zrogravgwhoijajzciem.supabase.co. Client-safe publishable anon key (sb_publishable_ format, the new Supabase key style equivalent to legacy anon) is stored in infrapilot-app/.env.local (gitignored). Re-readable from Supabase Dashboard -> Project Settings -> API. SECURITY RULE: never request, paste into chat, or store the service_role/secret key; publishable keys are public-by-design (they ship in the browser bundle) so they are safe, secrets are not.",
       "context": "Recorded at 2026-07-03 session close. Raw key intentionally kept only in .env.local, not in committed memory.",
       "source": "session 2026-07-03"
+    },
+    {
+      "id": "KN-004",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-01T00:00:00.000Z",
+      "updated": "2026-08-01T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "GENERAR PDF EN ESTA MAQUINA: no hay Python (ni `python` ni `python3`), asi que reportlab/pypdf NO son opcion. Lo que SI funciona: Microsoft Edge headless, ya instalado. Comando verificado 2026-08-01 (genero un PDF de 11 paginas): \"/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe\" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf=\"C:\\ruta\\salida.pdf\" \"file:///C:/ruta/entrada.html\" . Se escribe el documento en HTML con @page/@media print y sale un PDF con tipografia y maquetacion controladas.",
+      "context": "Descubierto al generar el plan del asadero. Edge esta en Program Files (x86)."
+    },
+    {
+      "id": "KN-005",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-01T00:00:00.000Z",
+      "updated": "2026-08-01T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "VERIFICAR UN PDF SIN poppler: `pdftoppm` no esta instalado, asi que la herramienta Read no puede renderizar paginas de PDF. Para comprobar que un PDF salio bien, parsear su estructura con node: contar /Type /Page, revisar que empiece por %PDF- y termine en %%EOF. Es suficiente para confirmar que no salio corrupto ni vacio.",
+      "context": "Usado 2026-08-01 tras generar el plan del asadero con Edge headless."
+    },
+    {
+      "id": "KN-006",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-01T00:00:00.000Z",
+      "updated": "2026-08-01T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "CLASE DE BUG RECURRENTE — DOS FUENTES DE VERDAD: cuando un flujo de alta (registro, onboarding, creacion) PERSISTE una entidad en un sitio y otra pantalla la LEE de otro, la entidad existe pero es invisible, y el sintoma tipico es 'no hay X registrados' justo despues de haber creado X. Paso literal en estanco-contable con las sucursales (ver KN-012 alli). REGLA: al construir cualquier alta, comprobar explicitamente que la pantalla que consume esa entidad lee del MISMO sitio donde el alta escribe. Es barato de verificar y deja al usuario encerrado fuera de su propia app si se escapa.",
+      "context": "Generalizado desde el bug de locales de estanco-contable, reportado por el dueno 2026-08-01."
     }
   ],
   "archives": [],
   "lastAmmRun": "2026-07-03T00:00:00.000Z",
-  "version": 2
+  "version": 3
 }
