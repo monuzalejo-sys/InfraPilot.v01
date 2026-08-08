@@ -1,6 +1,6 @@
 # Memoria ORION — infrapilot
 
-Generado de state.json v32 (2026-07-27T00:00:00.000Z). NO editar a mano: se regenera en cada cierre de sesión.
+Generado de state.json v34 (2026-07-28T20:00:00.000Z). NO editar a mano: se regenera en cada cierre de sesión.
 
 ## Architecture (1)
 
@@ -23,7 +23,7 @@ Generado de state.json v32 (2026-07-27T00:00:00.000Z). NO editar a mano: se rege
 - [[DEC-009]] `Accepted` — Navegación por módulos exclusivos de profesión; dashboard = presentaci
 - [[DEC-010]] `Accepted` — Sistema de diseño canónico: skill estudio-diseno (El estudio del ingen
 
-## Knowledge (22)
+## Knowledge (25)
 
 - [[KN-001]] `Current` — GitHub pushes from this automated terminal environment cannot complete
 - [[KN-002]] `Current` — A malformed path '.gitignoregit add .' existed in the original InfraPi
@@ -47,8 +47,11 @@ Generado de state.json v32 (2026-07-27T00:00:00.000Z). NO editar a mano: se rege
 - [[KN-025]] `Current` — PATRÓN disciplina nueva VALIDADO (tercera instancia tras topografía 20
 - [[KN-026]] `Current` — Patrón: 'contratos cruzados en ola paralela'. Cuando un builder parale
 - [[KN-027]] `Current` — Incidente 2026-07-06: una curación (haiku) BORRÓ silenciosamente DEC-0
+- [[KN-028]] `Current` — proxy.ts redirected /sw.js and /manifest.webmanifest to /login (307) b
+- [[KN-029]] `Current` — The estudio-diseno skill's declared palette (#F8F6F2/#171717) has drif
+- [[KN-031]] `Current` — Ownership overlap ACROSS waves (distinct from KN-026's same-wave case)
 
-## Pending (6)
+## Pending (8)
 
 - [[PEND-002]] `In-Progress` — Verify/configure real Supabase credentials end-to-end (local .env + co
 - [[PEND-004]] `Ready` — Push vía GitHub Desktop (app primero, luego parent). Pendientes ahora:
@@ -56,16 +59,20 @@ Generado de state.json v32 (2026-07-27T00:00:00.000Z). NO editar a mano: se rege
 - [[PEND-013]] `Blocked` — Test /api/lector end-to-end once the user sets a real GROQ_API_KEY in 
 - [[PEND-014]] `Blocked` — Manually update the xlsx dependency to the official SheetJS CDN tarbal
 - [[PEND-015]] `Blocked` — Usuario: aplicar migración 002_suppliers_quotes.sql en Supabase SQL Ed
+- [[PEND-016]] `Ready` — Personalizar el hub por profesión (mostrar la disciplina del usuario p
+- [[PEND-017]] `Ready` — app/api/budgets/route.ts no valida el body antes del insert; si falta 
 
-## Roadmap (5)
+## Risk (2)
+
+- [[RSK-001]] `Open` — supabase/migrations/003_organizations.sql (233 lines: RLS with securit
+- [[RSK-002]] `Open` — The ampacity tables in lib/electrica/circuitos.ts (IEC/NEC-based) are 
+
+## Roadmap (2)
 
 - [[ROAD-002]] `Planned` — Etapa 2 — Activación en producción
-- [[ROAD-003]] `Planned` — Etapa 3 — Integración entre módulos y construcción profundizada
-- [[ROAD-004]] `Planned` — Etapa 4 — Tercera ingeniería con la plantilla validada
-- [[ROAD-005]] `Planned` — Etapa 5 — Cuentas de equipo y perfiles profesionales
-- [[ROAD-006]] `Planned` — Etapa 6 — App (PWA primero)
+- [[ROAD-005]] `In-Progress` — Etapa 5 — Cuentas de equipo y perfiles profesionales
 
-## Archivado (15)
+## Archivado (18)
 
 - ~~KN-020~~ (Superseded) — Landing v2 visual details (commit a6314fe) replaced by DEC-0
 - ~~PEND-001~~ (Expired) — Sprint item, Done status, no dependencies, resolution alread
@@ -82,4 +89,7 @@ Generado de state.json v32 (2026-07-27T00:00:00.000Z). NO editar a mano: se rege
 - ~~KN-012~~ (Merged) — Deprecated in favor of KN-016
 - ~~ROAD-001~~ (Expired) — Project-lifetime milestone completed 2026-07-06 (status Done
 - ~~KN-023~~ (Merged) — Merged into KN-025 (enhanced with quips integration). KN-025
+- ~~ROAD-003~~ (Expired) — Etapa 3 — Integración entre módulos y construcción profundiz
+- ~~ROAD-004~~ (Expired) — Etapa 4 — Tercera ingeniería con la plantilla validada. Stat
+- ~~ROAD-006~~ (Expired) — Etapa 6 — App (PWA primero). Status Done 2026-07-28 (commit 
 
