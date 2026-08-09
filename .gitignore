@@ -7,3 +7,15 @@ node_modules
 memory/*/wave.json
 memory/*/.obsidian/
 memory/*/vault/.obsidian/
+
+# respaldos del instalador del runtime
+*.bak
+
+# bandeja de borrado manual (device_bash no puede borrar)
+_to_delete/
+
+# Vehiculos de publicacion (repos propios, no submodulos de ORION)
+mercaplazarepo/
+superarrozrepo/
+estancorepo/
+wrdrepo/
