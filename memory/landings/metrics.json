@@ -1,0 +1,18 @@
+{
+  "projectId": "landings",
+  "sessionCount": 1,
+  "totalContextSaved": 0,
+  "avgCompressionRatio": 1,
+  "avgKnowledgeDensity": 0,
+  "trendCompressionRatio": "Stable",
+  "lastUpdated": "2026-08-19T00:00:00.000Z",
+  "sessions": [
+    {
+      "completedAt": "2026-08-19T00:00:00.000Z",
+      "objectsCreated": 4,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "note": "Prompt v2 de la portada de placita: ejes animacion/color/impacto especificados con numeros medidos."
+    }
+  ]
+}

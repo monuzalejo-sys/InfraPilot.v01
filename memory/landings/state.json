@@ -1,0 +1,102 @@
+{
+  "projectId": "landings",
+  "snapshotDate": "2026-08-19T00:00:00.000Z",
+  "objects": [
+    {
+      "id": "POL-001",
+      "type": "Policy",
+      "tier": "Project",
+      "created": "2026-08-16T00:00:00.000Z",
+      "updated": "2026-08-16T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Active",
+      "dependencies": [],
+      "rule": "TENSION DE REGISTRO — el minimalismo del manifiesto 'estudio del ingeniero moderno' (skill estudio-diseno) es para el INTERIOR de la app, donde un trabajador necesita calma para trabajar. Una landing publica tiene otro trabajo: VENDER. La senal para elegir registro es QUIEN MIRA la pantalla: trabajador adentro = calma; cliente afuera = venta. En una landing: producto protagonista, color y movimiento con gusto (paleta calida de base + acentos del propio producto), interactividad real, CERO fotos de stock genericas. Se mantienen siempre las prohibiciones del manifiesto: nada de azules electricos, morados, neones ni gradientes tecnologicos.",
+      "scope": "Toda landing/portada publica de cualquier proyecto del dueno. NO aplica al interior de las apps (POS, dashboards, modulos), donde el manifiesto se sigue al pie de la letra.",
+      "context": "Leccion pagada: el 2026-08-05, sobre la landing de la placita, el dueno la rechazo textualmente: 'la landing que haces es una basura... muy minimalista... quiero que esta landing sea mas interactiva, mas llamativa, es para vender frutas'. Aplicar el manifiesto a una portada la hace ver vacia/pobre.",
+      "source": "sesion 2026-08-05 (rechazo del dueno); confirmada en fable 5/pollo-landing/memory/pollo-landing/brief.md"
+    },
+    {
+      "id": "KN-001",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-08-16T00:00:00.000Z",
+      "updated": "2026-08-16T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "MARCA REAL vs PLACEHOLDER — antes de usar un nombre de negocio en un prompt de landing hay que verificar si es la marca definitiva o un nombre provisional, y decirlo en voz alta marcandolo como [PLACEHOLDER]. Casos verificados: 'Avicola Buenavista' en fable 5/pollo-landing es un NOMBRE PROVISIONAL — la marca definitiva esta bloqueada en el dueno (fable 5/pollo-landing/memory/pollo-landing/brief.md:17, PEND-001); presentarlo como definitivo seria inventar. En cambio 'Villa Broaster' SI es un cliente real (asadero/broaster-app/app/admin/page.tsx:17). Regla general derivada: toda afirmacion de hecho que entre en un prompt (producto, modulos, precios, sedes, clientes) va con su origen archivo:linea, y lo que no se puede citar se entrega como HUECO EXPLICITO para que lo llene el dueno — nunca se rellena con algo verosimil.",
+      "context": "Sembrada al crear el agente landing-prompter (2026-08-16). Ambas citas comprobadas en disco en esa fecha; reverificar si los proyectos cambian de marca.",
+      "source": "verificacion directa de fuentes 2026-08-16"
+    },
+    {
+      "id": "KN-002",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-19T00:00:00.000Z",
+      "updated": "2026-08-19T00:00:00.000Z",
+      "dependencies": [],
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "fact": "V1 NO BASTO Y SE SABE POR QUE (placita, 2026-08-16 -> 2026-08-19). El prompt v1 de la portada de Mercaplaza estaba bien investigado (negocio con origenes, registro de venta correcto, cero datos inventados) y aun asi el dueno volvio a pedir exactamente lo mismo tres dias despues: \"un prompt para un diseno de landing con animaciones, mejores colores, mas llamativa\". CAUSA: v1 trataba los tres ejes que al dueno le importan como ADJETIVOS y no como especificaciones — decia \"que tenga movimiento\", \"la paleta ya esta decidida en el codigo, usala tal cual\" y \"producto protagonista\". Un encargo asi se cumple sin cambiar nada. LO QUE SI ES ACCIONABLE, y es lo que lleva v2: (1) ANIMACION = inventario cerrado y numerado, cada entrada con elemento, gesto, disparador (carga/scroll/tap/cambio de estado), duracion en ms y curva, mas presupuesto de rendimiento y lista de propiedades prohibidas de animar; (2) COLOR = tabla de los tokens REALES con archivo:linea y contraste CALCULADO contra el fondo, senalando cuales fallan, mas la paleta nueva en hex con su ratio medido; (3) IMPACTO = medidas del pliegue tomadas del build real (alto de cada seccion, y de la primera tarjeta pedible, tamano de la fruta mas grande) y metas numericas de a donde tiene que llegar cada una. Regla derivada: en una landing, \"especifico\" quiere decir NUMEROS — ms, hex, ratio de contraste y pixeles de scroll —; si el prompt se puede cumplir sin cambiar una linea, no era un prompt.",
+      "context": "Escrito al entregar placita-mercaplaza-v2.md. La medicion base de la portada al 2026-08-19 (390x844): documento 3616 px, heroe 963 px, primera tarjeta pedible en y=1994 (2,4 pantallas), fruta mas grande del pliegue 104 px, 14 elementos animados, 7 con will-change permanente.",
+      "source": "peticion del dueno 2026-08-19 + medicion directa del build de C:UsersKalelplacita"
+    },
+    {
+      "id": "KN-003",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-19T00:00:00.000Z",
+      "updated": "2026-08-19T00:00:00.000Z",
+      "dependencies": [],
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "fact": "DOS TRAMPAS DE EDGE HEADLESS EN ESTA MAQUINA, verificadas el 2026-08-19, que invalidan la forma ingenua de sacar capturas. (1) ANCHO: msedge --headless=new --window-size=390,844 --screenshot NO da un viewport de 390 px; medido con una pagina sonda que imprime innerWidth, el viewport real queda en 492x752 y el PNG sale RECORTADO a 390 — o sea, la captura muestra un layout ancho cortado, no lo que ve un celular. El minimo no baja de 492 px ni con --headless=old ni con --force-device-scale-factor=1 (el alto si obedece: window-size 288x936 dio 492x844). (2) MOVIMIENTO: Edge headless reporta prefers-reduced-motion: reduce POR DEFECTO — matchMedia lo confirma —, asi que toda captura simple sale SIN animacion y no sirve ni para aprobar el movimiento ni para probar el respaldo de accesibilidad. RECETA CORRECTA, sin dependencias (Node 24 trae WebSocket global): levantar Edge con --remote-debugging-port=9222, abrir el WebSocket de /json/list y llamar por CDP a Emulation.setDeviceMetricsOverride {width,height,deviceScaleFactor:1,mobile:true}, Emulation.setEmulatedMedia {features:[{name:\"prefers-reduced-motion\",value:\"no-preference\"}]}, Page.navigate, Runtime.evaluate para medir y Page.captureScreenshot. Con eso se miden alturas reales y se cuentan animaciones vivas.",
+      "context": "Aplicable a cualquier QA visual de landing en esta maquina, no solo a placita. Edge 151.0.4129.93, Windows 10, Node v24.16.0.",
+      "source": "medicion propia 2026-08-19 (pagina sonda innerWidth + CDP)"
+    },
+    {
+      "id": "KN-004",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-19T00:00:00.000Z",
+      "updated": "2026-08-19T00:00:00.000Z",
+      "dependencies": [],
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Current",
+      "fact": "ANTES DE CAMBIAR UN COLOR DE LA LANDING, HAY QUE GREPEAR QUIEN MAS LO USA. En placita los tokens de fruta viven en :root de app/globals.css:261-270 y los consume tambien el INTERIOR de la app (components/hub/zonas.ts:205,260,296,306,346 y app/(app)/pulpas/page.tsx:61-65); y las paletas por producto de components/landing/catalogo-datos.ts las importan app/(app)/principal/page.tsx:45-46 y components/hub/frutas.tsx:20-21. Subirles saturacion \"para que la portada venda\" repintaria pantallas de trabajo que se rigen por el manifiesto — justo lo que POL-001 separa. Solucion correcta: tokens NUEVOS con alcance de portada (una clase .portada en el <main> de app/catalogo/page.tsx) y trabajar sobre las clases que si son exclusivas de la landing (.chip, .tarjeta-fruta, .toldo, .franja, .marquesina, .flota, verificadas como de uso unico en components/landing/*). Regla general: en un repo donde la landing y la app comparten hoja de estilos, un cambio de paleta es un cambio de alcance, no de gusto.",
+      "context": "Descubierto auditando el eje COLOR para el prompt v2 de la placita (2026-08-19).",
+      "source": "grep directo sobre C:UsersKalelplacita"
+    },
+    {
+      "id": "PEND-001",
+      "type": "Pending",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-19T00:00:00.000Z",
+      "updated": "2026-08-19T00:00:00.000Z",
+      "dependencies": [
+        "KN-002"
+      ],
+      "impact": "High",
+      "priority": "High",
+      "status": "Ready",
+      "task": "Recoger el veredicto del dueno sobre ORION/prompts-landing/placita-mercaplaza-v2.md (entregado 2026-08-19) y escribirlo aqui: que le gusto, que rechazo y POR QUE. En particular: si los tres ejes (inventario de animacion, paleta de dos rampas con contraste medido, metas numericas de pliegue) fueron suficientes esta vez, o si volvio a pedir MAS — y en ese caso, que palabra uso.",
+      "reason": "Sin veredicto no hay leccion: un prompt entregado no es un prompt aprobado, y sembrar aqui una hipotesis propia contaminaria todos los prompts futuros. KN-002 solo registra por que v1 no basto, que eso si esta pagado con la peticion repetida del dueno.",
+      "source": "entrega 2026-08-19"
+    }
+  ],
+  "archives": [],
+  "lastAmmRun": "2026-08-19T00:00:00.000Z",
+  "version": 2
+}
