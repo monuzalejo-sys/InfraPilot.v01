@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Recurse \"C:\\\\Users\\\\Kalel\\\\infrapilot-ai\" | Where-Object { !$_.PSIsContainer } | Select-Object FullName | Sort-Object FullName)",
+      "PowerShell(Get-ChildItem -Recurse \"C:\\\\Users\\\\Kalel\\\\src\" | Where-Object { !$_.PSIsContainer } | Select-Object FullName | Sort-Object FullName)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\Kalel\" -Name | Where-Object { $_ -notmatch \"^\\(3D|Contacts|Desktop|Documents|Downloads|Favorites|Links|Music|OneDrive|Pictures|Saved|Searches|Videos|Zomboid|\\\\.ms-ad\\)$\" })",
+      "PowerShell(npm *)",
+      "PowerShell($path = \"C:\\\\Users\\\\Kalel\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Kalel\\\\600bee7d-9d74-403b-b4fe-e57967a4112c\\\\tasks\\\\bvkp1vwe2.output\"; if \\(Test-Path $path\\) { \\(Get-Item $path\\).Length; Get-Content $path -Raw | Select-Object -Last 1 } else { \"FILE NOT FOUND\" })",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\Kalel\\\\infrapilot-backend\" -Recurse | Where-Object { -not $_.PSIsContainer -and $_.FullName -notmatch \"node_modules\" } | Select-Object FullName | Sort-Object FullName)",
+      "PowerShell(Set-Location \"C:\\\\Users\\\\Kalel\\\\infrapilot-backend\"; npx nest build 2>&1; Write-Host \"EXIT: $LASTEXITCODE\")",
+      "PowerShell(Set-Location *)",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\Kalel\\\\web-agent-leader\\\\output\")",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\Kalel\\\\AIER\")",
+      "PowerShell(head -20)",
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Kalel\\\\Documents\\\\memoria\\\\aprendizajes\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Kalel\\\\Documents\\\\memoria\\\\recordatorios\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Kalel\\\\Documents\\\\memoria\\\\avance-diario\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Kalel\\\\ORION\\\\RFC\")",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\Kalel\\\\ORION\" -Recurse | Select-Object FullName, @{N=\"KB\";E={[math]::Round\\($_.Length/1KB, 1\\)}})",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\Kalel\" -Name | Where-Object { $_ -ne \"ORION\" })",
+      "PowerShell(& \"C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe\" --version)",
+      "PowerShell(git config --global user.name)",
+      "PowerShell(git config --global user.email)",
+      "PowerShell(git config --global --list)",
+      "PowerShell(code --list-extensions 2>$null)"
+    ]
+  }
+}

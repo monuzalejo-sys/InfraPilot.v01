@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "wrd",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["wrd-serve.mjs", "4181"],
+      "port": 4181
+    },
+    {
+      "name": "broaster-app",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd /d C:\\Users\\Kalel\\asadero\\broaster-app && npx next dev -p 3200"],
+      "port": 3200
+    },
+    {
+      "name": "villa-app",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd /d C:\\Users\\Kalel\\asadero\\villa-app && npx next dev -p 3201"],
+      "port": 3201
+    },
+    {
+      "name": "placita",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "C:\\Users\\Kalel\\placita\\iniciar-mercaplaza.bat"],
+      "port": 3300
+    }
+  ]
+}
