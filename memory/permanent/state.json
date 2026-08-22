@@ -1,6 +1,6 @@
 {
   "projectId": "_permanent",
-  "snapshotDate": "2026-08-01T00:00:00.000Z",
+  "snapshotDate": "2026-08-21T00:00:00.000Z",
   "objects": [
     {
       "id": "KN-001",
@@ -88,9 +88,86 @@
       "dependencies": [],
       "fact": "CLASE DE BUG RECURRENTE — DOS FUENTES DE VERDAD: cuando un flujo de alta (registro, onboarding, creacion) PERSISTE una entidad en un sitio y otra pantalla la LEE de otro, la entidad existe pero es invisible, y el sintoma tipico es 'no hay X registrados' justo despues de haber creado X. Paso literal en estanco-contable con las sucursales (ver KN-012 alli). REGLA: al construir cualquier alta, comprobar explicitamente que la pantalla que consume esa entidad lee del MISMO sitio donde el alta escribe. Es barato de verificar y deja al usuario encerrado fuera de su propia app si se escapa.",
       "context": "Generalizado desde el bug de locales de estanco-contable, reportado por el dueno 2026-08-01."
+    },
+    {
+      "id": "KN-007",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-08T00:00:00.000Z",
+      "updated": "2026-08-08T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "VERIFICAR UI EN EL NAVEGADOR EMBEBIDO con el pane oculto (usuario ausente): las acciones del computer tool (click, screenshot) se cuelgan/timeout porque la pagina no compone frames. Lo que SI funciona sin pane visible: get_page_text, read_page, form_input (maneja inputs controlados de React), y javascript_tool con boton.click() nativo + esperas. Para llenar inputs React NO sirve el setter nativo via Object.getOwnPropertyDescriptor (Illegal invocation en el sandbox del tool) — usar form_input. Un builder ya perdio tiempo con esto (S6 broaster 2026-08-08); el orquestador completo el e2e con esta combinacion.",
+      "context": "Descubierto verificando el flujo de pedido de broaster-app 2026-08-08."
+    },
+    {
+      "id": "KN-008",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-10T00:00:00.000Z",
+      "updated": "2026-08-10T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-007"
+      ],
+      "fact": "VERDAD DE TERRENO VISUAL/CSS = EDGE HEADLESS, NO el navegador embebido. Amplia KN-007: el pane embebido no solo cuelga screenshots con el pane oculto, sino que ADEMAS reporta mal getComputedStyle(...).visibility y element.checkVisibility({visibilityProperty:true}) — un visibility:hidden real (incluso !important o inline) puede reportarse como 'visible', llevando a diagnosticar mal un CSS que en realidad funciona. Fiables en el pane: .hidden (propiedad/atributo), checkVisibility para display, y display:none. NO fiables: 'visibility' computada y screenshots. Para confirmar de verdad como se ve algo: Edge headless a PNG y leer el PNG — & 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe' --headless=new --disable-gpu --hide-scrollbars --window-size=390,780 --virtual-time-budget=6000 --user-data-dir=<perfil-fresco-en-scratchpad> --screenshot=<out.png> <url>. Perfil fresco = localStorage limpio (util para probar primeras visitas). Edge ya estaba confirmado para PDF (KN-004).",
+      "context": "WRD sesion 4 (2026-08-10): el pane afirmaba que <main> con .wrd-cargando (visibility:hidden) seguia visible; Edge headless probo que el cloak funcionaba (pantalla negra + solo el gate). Se perdieron iteraciones confiando en el pane."
+    },
+    {
+      "id": "KN-009",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-19T00:00:00.000Z",
+      "updated": "2026-08-19T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "KN-008"
+      ],
+      "fact": "EDGE HEADLESS TIENE PISO DE VIEWPORT ~480-500px: con --window-size mas angosto (p.ej. 390) el PNG sale de 390px pero el LAYOUT se calcula a ~480px+, asi que todo se ve corrido/recortado a la derecha aunque la pagina este bien. NO sirve para verificar layout movil <480px. Para movil: (1) asegurar <meta name=viewport> en la pagina, y (2) verificar overflow con JS en el pane embebido (resize_window preset mobile + document.documentElement.scrollWidth vs clientWidth), que funciona con el pane oculto. Ademas Edge headless falla intermitentemente sin escribir el PNG (LoadEnclaveImageW error 577 en stderr es ruido, no la causa) — reintentar con --user-data-dir fresco suele bastar.",
+      "context": "Descubierto 2026-08-19 verificando la propuesta de orama: el PNG a 390px mostraba todo recortado; el pane a <759px confirmo scrollWidth==clientWidth (sin overflow real)."
+    },
+    {
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-21T00:00:00.000Z",
+      "updated": "2026-08-21T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "status": "Current",
+      "id": "KN-010",
+      "impact": "High",
+      "priority": "High",
+      "dependencies": [
+        "KN-008",
+        "KN-009"
+      ],
+      "fact": "HERRAMIENTA DE QA VISUAL: C:/Users/Kalel/ORION/tools/edge-cdp.mjs (creada y validada 2026-08-21) empaqueta la receta CDP (landings KN-003): node edge-cdp.mjs --url <archivo|url> --width 390 --height 844 --mobile --shot out.png [--full] [--eval \"<js>\"] [--reduce] [--wait ms]. Lanza Edge headless con --remote-debugging-port, emula el viewport REAL (innerWidth 390 de verdad, no el piso de ~492 de --screenshot), pone prefers-reduced-motion en no-preference (las animaciones corren), navega y devuelve JSON con scrollWidth/clientWidth/overflowX/scrollHeight, getAnimations().length, fuentes cargadas, titulo, consola y excepciones, mas la captura PNG. Sin dependencias (Node 24 trae fetch y WebSocket). Es la verdad de terreno para QA movil y de movimiento; --screenshot a secas queda solo para capturas rapidas de escritorio.",
+      "context": "Probada contra fable 5/orama/propuesta-orama.html: 390x390 sin overflow, 6 animaciones vivas, 3 fuentes, consola limpia, PNG fiel."
+    },
+    {
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-21T00:00:00.000Z",
+      "updated": "2026-08-21T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "status": "Current",
+      "id": "KN-011",
+      "impact": "Medium",
+      "priority": "High",
+      "dependencies": [],
+      "fact": "LIMITE DEL TOOL BASH EN ESTA MAQUINA: un comando de mas de ~8 KB se TRUNCA (limite de linea de comandos de Windows al pasar por bash -c) — un heredoc de ~150 lineas fallo con unexpected EOF while looking for matching quote en la linea 145 y NO creo el archivo. Ademas el wrapper colapsa doble backslash en uno solo. Regla: archivos nuevos grandes o con backslashes se escriben con Write/Edit; los comandos Bash se mantienen cortos (<~5 KB) y sin depender de backslashes literales.",
+      "context": "Pagado 2026-08-21 escribiendo edge-cdp.mjs por heredoc; el mismo heredoc corto si funcionaba."
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-07-03T00:00:00.000Z",
-  "version": 3
+  "lastAmmRun": "2026-08-10T00:00:00.000Z",
+  "version": 7
 }
