@@ -1,6 +1,6 @@
 {
   "projectId": "landings",
-  "snapshotDate": "2026-08-19T00:00:00.000Z",
+  "snapshotDate": "2026-08-21T00:00:00.000Z",
   "objects": [
     {
       "id": "POL-001",
@@ -94,9 +94,70 @@
       "task": "Recoger el veredicto del dueno sobre ORION/prompts-landing/placita-mercaplaza-v2.md (entregado 2026-08-19) y escribirlo aqui: que le gusto, que rechazo y POR QUE. En particular: si los tres ejes (inventario de animacion, paleta de dos rampas con contraste medido, metas numericas de pliegue) fueron suficientes esta vez, o si volvio a pedir MAS — y en ese caso, que palabra uso.",
       "reason": "Sin veredicto no hay leccion: un prompt entregado no es un prompt aprobado, y sembrar aqui una hipotesis propia contaminaria todos los prompts futuros. KN-002 solo registra por que v1 no basto, que eso si esta pagado con la peticion repetida del dueno.",
       "source": "entrega 2026-08-19"
+    },
+    {
+      "id": "POL-002",
+      "type": "Policy",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-21T00:00:00.000Z",
+      "updated": "2026-08-21T00:00:00.000Z",
+      "dependencies": ["KN-001"],
+      "impact": "High",
+      "priority": "High",
+      "status": "Active",
+      "rule": "DATOS DEMO AUTORIZADOS != HUECOS, y se marcan DOS VECES. Cuando el dueno autoriza explicitamente inventar contenido para una maqueta de venta (el 2026-08-21, para la demo de Orama: casas, precios, ubicaciones, fotos), ese contenido NO se entrega como hueco: se especifica completo y concreto en el prompt, porque una demo con huecos no vende. Pero la autorizacion no borra el riesgo de KN-001, solo lo desplaza: el peligro deja de ser 'el dueno se entera tarde' y pasa a ser 'el CLIENTE FINAL cree que ya subimos su inventario'. Por eso la marca de ficticio va en DOS sitios: (a) encabezando la seccion del prompt, entre corchetes y con fecha de la autorizacion, y (b) VISIBLE EN LA PAGINA ENTREGADA (cinta al pie del listado, mas una marca 'Demo - sin funcionalidad real' en cada pantalla), nunca en sr-only ni display:none. Y la frontera se mantiene: lo autorizado es el CATALOGO; lo que sigue siendo del cliente real y no esta en fuentes (telefono, direccion, ciudad de operacion, horario, nombres de asesores) sigue siendo HUECO visible aunque el resto sea inventado.",
+      "scope": "Toda maqueta/demo que la agencia le muestre a un cliente antes de contratar. No aplica a landings de produccion, donde no hay dato inventado de ninguna clase.",
+      "context": "Encargo de la demo de Orama, 2026-08-21: el dueno autorizo el catalogo ficticio en la misma frase en que mantuvo la marca como real y fija. Dos regimenes de verdad conviviendo en un mismo archivo obligan a senalizar cual es cual dentro del producto, no solo en el brief.",
+      "source": "instruccion del dueno 2026-08-21 (encargo orama-demo)"
+    },
+    {
+      "id": "KN-005",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-21T00:00:00.000Z",
+      "updated": "2026-08-21T00:00:00.000Z",
+      "dependencies": ["KN-002"],
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "fact": "EXISTE UNA PLANTILLA DE CALIDAD DEL DUENO PARA LOGINS, y se hereda ARQUITECTURA, no NUMEROS. Vive en C:\\Users\\Kalel\\ORION\\prompts-landing\\plantillas\\login-video-pixel-locked.md (entregada por el dueno el 2026-08-21 como estandar). Lo reutilizable en cualquier proyecto son sus secciones 0, 2, 5, 6 y 7: archivo unico autocontenido sin build ni CDN; media hero con poster base64 para que el primer pintado nunca sea un hueco; tokens declarados en :root con valores explicitos; motor responsive de TRES modos por JS (land / tabport / phone) con clearInline() obligatorio al cambiar de modo (sin el, los inline styles del modo saliente quedan latchados y el layout solo se arregla al recargar); y entrada WAAPI que corre UNA sola vez, con pre-paint guard 'entry-pending' puesto desde un script en <head> ANTES de la hoja de estilos y liberacion de seguridad a 3500 ms (eso es toda la historia sin-JS: no se pone <noscript>). Lo que NO se hereda son sus valores: tokens tipo --hl1-fs:69.14px, los delays de su timeline y el video del halcon pertenecen al diseno 'Signal' y hay que recalibrarlos al proyecto. Ademas su modo escalado solo sirve para composiciones de pantalla completa tipo login: en un catalogo con scroll, escalar el viewport vuelve el texto ilegible, asi que ahi se usa maquetacion de flujo (grid + clamp).",
+      "context": "Aplicado al escribir ORION/prompts-landing/orama-demo.md (2026-08-21): se heredaron las cinco piezas de arquitectura y se recalibro todo lo numerico al marco 1440x900 de Orama.",
+      "source": "lectura directa de la plantilla + encargo del dueno 2026-08-21"
+    },
+    {
+      "id": "KN-006",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-21T00:00:00.000Z",
+      "updated": "2026-08-21T00:00:00.000Z",
+      "dependencies": ["KN-002"],
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Current",
+      "fact": "CONTRASTES MEDIDOS DE LA PALETA ORAMA (WCAG 2.1, calculados 2026-08-21, no estimados). Sobre Tinta #0F2E36: Cal #F4EDDF 12.31 / Ambar #FFB648 8.22 / verde WhatsApp #2ED96E 7.69 / Cal-dim #A9C3C9 7.74 / Teja #E2734B 4.64. Sobre el cielo #0A2129: Cal 14.28, Ambar 9.53, Teja 5.38. Sobre la superficie elevada #153B45: Cal 10.34, Ambar 6.90, Cal-dim 6.50. Sobre papel #F6EFE1: tinta-papel #16323A 11.83, tinta-papel-2 #5B7078 4.55 (limite: solo >=14px). DOS TRAMPAS: (1) Teja #E2734B sobre papel #F6EFE1 da 2.70 y FALLA — es justo la combinacion que pide el instinto para una insignia 'EN VENTA', y hay que resolverla con Teja de FONDO y texto oscuro (#2A1206 sobre Teja ~7.0) o con una variante de servicio #B5522E para texto naranja sobre papel; (2) Teja sobre Tinta queda en 4.64, valido para texto corriente pero sin margen, asi que en titulares grandes va bien y en texto pequeno no. El 'azul oscuro' que le llama la atencion al dueno es exactamente la Tinta #0F2E36 de marca: no hay que buscar otro, y ademas es petroleo profundo, no un azul electrico, asi que no choca con la prohibicion del manifiesto.",
+      "context": "Calculado para el prompt orama-demo.md. La paleta viene de fable 5/orama/memory/orama/brief.md:10-14 (DEC-001) y sus derivados de superficie de fable 5/orama/propuesta-orama.html:8-24.",
+      "source": "calculo propio de luminancia relativa 2026-08-21"
+    },
+    {
+      "id": "PEND-002",
+      "type": "Pending",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-21T00:00:00.000Z",
+      "updated": "2026-08-21T00:00:00.000Z",
+      "dependencies": ["KN-005", "POL-002"],
+      "impact": "High",
+      "priority": "High",
+      "status": "Ready",
+      "task": "Recoger el veredicto sobre ORION/prompts-landing/orama-demo.md (entregado 2026-08-21) en sus DOS niveles y escribirlo aqui con su causa. Nivel 1, el dueno: si el prompt produjo a la primera una demo que considera llamativa, y en particular si el 3D de CSS (maqueta con caras y ventanas en arco atada al deslizamiento) le parecio suficiente o pidio algo mas fuerte. Nivel 2, el cliente Orama en la reunion: que pantalla lo convencio, si pregunto por el login delante del catalogo (HUECO 6) y si el catalogo ficticio se leyo como ficticio o hubo que aclararlo.",
+      "reason": "Es el primer prompt que combina la plantilla de login del dueno (KN-005) con datos demo autorizados (POL-002) y con 3D sin dependencias; ninguna de las tres cosas tiene aun veredicto pagado. Sembrar ahora que 'funciono' seria una hipotesis contaminando los prompts siguientes.",
+      "source": "entrega 2026-08-21"
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-08-19T00:00:00.000Z",
-  "version": 2
+  "lastAmmRun": "2026-08-21T00:00:00.000Z",
+  "version": 3
 }
