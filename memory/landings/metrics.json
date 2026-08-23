@@ -1,6 +1,6 @@
 {
   "projectId": "landings",
-  "sessionCount": 1,
+  "sessionCount": 2,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
@@ -13,6 +13,20 @@
       "objectsMerged": 0,
       "objectsArchived": 0,
       "note": "Prompt v2 de la portada de placita: ejes animacion/color/impacto especificados con numeros medidos."
+    },
+    {
+      "sessionId": "session-2026-08-23-biblioteca-referencias",
+      "runId": "landings-biblioteca-referencias",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-23T03:30:00.000Z",
+      "completedAt": "2026-08-23T03:30:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [],
+      "notes": "Biblioteca prompts-landing/referencias (_INDEX, _PLANTILLA, ficha 01 TOONHUB) + seccion 2b y apartados 11-12 en el agente landing-prompter + POL-003. Inline, sin spawns."
     }
   ]
 }
