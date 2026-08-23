@@ -88,4 +88,4 @@ Outer `<div>` has `backgroundColor: IMAGES[activeIndex].bg`, transition `backgro
 ## Historial de uso
 | Fecha | Proyecto | Combinada con | Veredicto del dueño | Por qué |
 |---|---|---|---|---|
-| 2026-08-23 | villa-broaster (PEND-009) | — (aún sin prompt) | pendiente | — |
+| 2026-08-23 | villa-broaster · prompt v2 (`ORION/prompts-landing/villa-app-villa-broaster-v2.md`) — zona **HÉROE** | fichas 02 (promo que se arma) y 03 (cierre con foco) | **pendiente** (se anota por canal: móvil / escritorio) | Se tomaron los 4 roles por índice, la transición única de 650 ms, el fondo que toma el color del producto activo y el texto fantasma. Adaptación móvil: swipe + flechas de 44 px, disco central de 300 px (no scale 1.68), párrafo escondido, `@property --brasa` para poder transicionar el color. Las 5 fotos reales van sobre un "plato" crema porque llegan en PNG sin alfa. |

@@ -107,4 +107,4 @@ Apply:
 ## Historial de uso
 | Fecha | Proyecto | Combinada con | Veredicto del dueño | Por qué |
 |---|---|---|---|---|
-| 2026-08-23 | — (fichada, sin usar) | — | — | — |
+| 2026-08-23 | villa-broaster · prompt v2 — zona **CIERRE** | fichas 01 (héroe) y 02 (promo) | **pendiente** (por canal) | Se tomó la máscara radial que sigue al dedo, pero **sin segunda imagen**: no hay pares de fotos por producto y no se inventan assets, así que el foco *calienta* la misma (fuera `brightness(.35) saturate(.5)`, dentro `1.15`). Radio 150 px (no 260), arranca visible sobre el producto, `touch-action:none` solo dentro de la pieza, y orbita sola a los 3 s sin toque. |

@@ -478,4 +478,4 @@ Under `prefers-reduced-motion`, scroll smoothing and pointer parallax are bypass
 ## Historial de uso
 | Fecha | Proyecto | Combinada con | Veredicto del dueño | Por qué |
 |---|---|---|---|---|
-| 2026-08-23 | — (fichada, sin usar) | — | — | — |
+| 2026-08-23 | villa-broaster · prompt v2 — zona **PROMO/CARTA** | fichas 01 (héroe) y 03 (cierre) | **pendiente** (por canal) | Solo DOS mecanismos: "dato grande + una línea" (2 sedes · $0 por internet) y las capas contra-escaladas, movidas del rail de scroll al **interior de la tarjeta de promo de 272 px**: al tocarla, las fotos de lo que incluye vuelan y arman el plan. El rail de 3700 px y el parallax de puntero se descartaron por móvil. |

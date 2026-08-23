@@ -1,6 +1,6 @@
 {
   "projectId": "landings",
-  "snapshotDate": "2026-08-23T03:30:00.000Z",
+  "snapshotDate": "2026-08-23T05:10:00.000Z",
   "objects": [
     {
       "id": "POL-001",
@@ -182,9 +182,26 @@
       "rule": "BIBLIOTECA DE REFERENCIAS + COMBINACION + MOVIL (pedido del dueno 2026-08-23: 'te voy a dar varias referencias para que empieces a combinarlas... que el agente comience a aprender con los resultados y cada vez haga mejores combinaciones... que tambien aprenda a adaptar esas combinaciones para movil, que es uno de nuestros canales principales'). (1) Toda referencia que entregue el dueno se FICHA en C:/Users/Kalel/ORION/prompts-landing/referencias/NN-slug.md (plantilla _PLANTILLA.md) y se indexa en _INDEX.md ANTES de usarla; se copian MECANISMOS (composicion, movimiento, uso del color, jerarquia), nunca marca/textos/imagenes/datos. (2) Por landing se combinan 2-3 fichas, una por zona (hero / producto / cierre), cada mecanismo justificado en terminos de venta; el prompt lleva apartados 11 'Referencias combinadas' y 12 'Adaptacion movil'. (3) MOVIL es canal principal: toda combinacion trae su version 390px explicita (apilar/esconder, swipe en vez de hover, tap >=40px, 100dvh, imagenes <=150KB con alfa, prefers-reduced-motion con fallback) y se mide con Edge headless por CDP; una referencia de escritorio que no se adapta sin perder su gracia no se usa. (4) El veredicto se registra POR CANAL (movil vs escritorio) con su causa, y se actualizan la columna Resultados del indice y el Historial de cada ficha: asi la siguiente combinacion parte de lo que funciono.",
       "context": "Primera ficha: 01-hero-carrusel-figuras-toonhub.md (hero a pantalla completa con carrusel de figuras por roles, fondo que cambia de color, texto fantasma gigante; destino villa-broaster PEND-009 portada movil). Aun sin veredicto: no hay resultados que sembrar.",
       "scope": "Toda landing/portada publica de cualquier proyecto del dueno. NO aplica al interior de las apps (POS, dashboards, modulos), donde el manifiesto se sigue al pie de la letra."
+    },
+    {
+      "id": "PEND-003",
+      "type": "Pending",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-23T05:10:00.000Z",
+      "updated": "2026-08-23T05:10:00.000Z",
+      "dependencies": [
+        "POL-003"
+      ],
+      "impact": "High",
+      "priority": "High",
+      "status": "Ready",
+      "task": "Recoger el veredicto del dueno sobre ORION/prompts-landing/villa-app-villa-broaster-v2.md (entregado 2026-08-23, con la carpeta prommter/proyectos/villa-broaster/docs/claude-design) y escribirlo aqui POR CANAL, movil y escritorio por separado, con su causa. Preguntas concretas: (1) la combinacion 01 hero carrusel + 02 promo que se arma dentro de la tarjeta + 03 foco que calienta, le parecio la sorpresa que pidio o volvio a pedir MAS, y con que palabra; (2) el hero sobre plato crema (porque las 9 fotos llegan en PNG RGB SIN alfa) se leyo como objeto fisico o como parche; (3) las 4 fotos reservadas por no tener producto en la carta, le parecio prudencia o le parecio que se desperdicio material; (4) la cinta visible de Carta de EJEMPLO le estorbo. Al registrarlo, actualizar la columna Resultados de referencias/_INDEX.md y el Historial de uso de las fichas 01, 02 y 03.",
+      "reason": "Es la primera landing que combina TRES fichas de la biblioteca (POL-003) y la primera con fotos de producto reales del cliente. Ninguna de las dos cosas tiene veredicto pagado: sembrar ahora que la combinacion funciono seria una hipotesis contaminando todas las combinaciones futuras, que es justo lo que POL-003 quiere evitar.",
+      "source": "entrega 2026-08-23 (pedido del dueno: rediseno completo que sorprenda, sin salirse del PLAN-EQUIPO)"
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-08-23T03:30:00.000Z",
-  "version": 4
+  "lastAmmRun": "2026-08-23T05:10:00.000Z",
+  "version": 5
 }
