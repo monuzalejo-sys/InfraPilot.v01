@@ -29,10 +29,20 @@ mkdirSync(vaultDir, { recursive: true })
 // limpieza: el vault es 100% generado
 for (const f of readdirSync(vaultDir)) if (f.endsWith(".md")) unlinkSync(join(vaultDir, f))
 
-// título humano por tipo de payload
-const titleOf = (o) =>
-  (o.title ?? o.fact ?? o.task ?? o.constraint ?? o.rule ?? o.risk ?? o.component ?? o.milestone ?? o.metric ?? "")
-    .replace(/\s+/g, " ").slice(0, 80)
+/* Título humano por tipo de payload. Corta en frontera de palabra y prefiere
+   terminar en la primera frase: el título es lo que se ve en el grafo y en el
+   buscador de Obsidian, y un corte a media palabra ("BARRIDO QA 2026-08-23:
+   ambas apps sanas (68 tests, 48") vuelve la bóveda ilegible de un vistazo. */
+const titleOf = (o) => {
+  const bruto = (o.title ?? o.fact ?? o.task ?? o.constraint ?? o.rule ?? o.risk ?? o.component ?? o.milestone ?? o.metric ?? "")
+    .replace(/\s+/g, " ").trim()
+  if (bruto.length <= 90) return bruto
+  const punto = bruto.slice(0, 90).search(/[.:;](\s|$)/)
+  if (punto > 35) return bruto.slice(0, punto)
+  const corte = bruto.slice(0, 90)
+  const esp = corte.lastIndexOf(" ")
+  return (esp > 45 ? corte.slice(0, esp) : corte) + "…"
+}
 
 // backlinks: quién depende de cada objeto
 const backlinks = {}
