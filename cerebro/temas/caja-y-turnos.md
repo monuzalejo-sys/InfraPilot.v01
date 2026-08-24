@@ -96,7 +96,22 @@ qué: *"en el pico de almuerzo deslizar es perder venta"*
 9. **Los pagos suman exacto o no hay venta.** En mixto se teclea una mitad y la
    otra se autocompleta: *"la cajera no hace la resta con un cliente enfrente y
    la suma no puede quedar mal"* (`placita .../cobro.tsx:32-42`).
-10. **Protege la regla con el test que la rompe**: orden tomada en el turno A y
+10. **Toda función que el dueño pidió por su nombre necesita una puerta
+    VISIBLE — un atajo de teclado no es una puerta, es el acelerador de quien
+    ya sabe que la función existe.** Los gastos de caja estaban completos y
+    desplegados desde el commit `f718df8` (motivo, cantidad, medio de pago,
+    descuento del cierre), pero su única entrada era `Escape → G`; en una
+    pantalla táctil ese atajo **no existe**, así que el dueño volvió a pedir
+    "los gastos" con las mismas palabras un día después, y costó una
+    re-petición y una sesión entera de trabajo que ya estaba hecho. La
+    corrección (commit `1b0475c`, 2026-08-24) no fue nueva funcionalidad: fue
+    convertir un `<span>` inerte en un botón siempre visible, **también con
+    cero gastos** —justo cuando hace falta la primera vez— con la misma guarda
+    que el atajo (caja ya cerrada = deshabilitado), y el atajo `[G]` se dejó
+    funcionando igual para quien ya lo usa
+    (`app/(app)/ventas/cabecera-caja.tsx` `PastillaGastos`, comentario de
+    cabecera; `app/(app)/ventas/page.tsx:1031-1038`, la guarda compartida).
+11. **Protege la regla con el test que la rompe**: orden tomada en el turno A y
     cobrada tras abrir el turno B **cuenta en B**; dos aperturas simultáneas en
     la misma sede, solo una gana; cerrar es idempotente y no se reabre
     (`T-03:19-22`, `arroces cierre.ts:370-378`).
@@ -162,6 +177,12 @@ qué: *"en el pico de almuerzo deslizar es perder venta"*
   el cuadre del cajón no es la ganancia y no hay base inicial.
 - `C:\Users\Kalel\prommter\proyectos\placita\app\(app)\ventas\cobro.tsx:4-42`,
   `cierre-caja.tsx:5-33`, `page.tsx:30-73` y `:174`.
+- Commit `1b0475c` (2026-08-24) — la pastilla de gastos pasó de `<span>` inerte
+  a botón siempre visible con la misma guarda que el atajo `[G]`:
+  `app\(app)\ventas\cabecera-caja.tsx` (`PastillaGastos`) y
+  `app\(app)\ventas\page.tsx:1031-1038`. La funcionalidad completa ya existía
+  desde el commit `f718df8`; el dueño la volvió a pedir por su nombre porque su
+  única puerta era un atajo de teclado invisible en pantalla táctil.
 - `C:\Users\Kalel\prommter\proyectos\villa-broaster\docs\BASES-CAJA.md` — qué se
   adopta de la placita (9-19), qué no (21-31), el hallazgo clave (33-39), el
   diseño de `TurnoCaja` (46-56) y las condiciones de éxito (79-81);

@@ -83,7 +83,18 @@ le pregunta primero de quién es este equipo.
    suelto: si aparece un campo `stock` o `agotados` persistido, está mal"*
    (`placita/lib/types.ts:17-31`). El estanco dice lo mismo en una línea: *"stock
    SIEMPRE derivado de movimientos"* (`estanco-contable/DEC-001`). Ver
-   [[TEMA-invariantes-contables]] para el detalle contable de esa frontera.
+   [[TEMA-invariantes-contables]] para el detalle contable de esa frontera. **La
+   misma regla aplica a un ESTADO, no solo a un total.** Cuando la placita
+   necesitó representar "producto sin precio todavía puesto", la tentación era
+   un campo nuevo (`sinPrecio: boolean`) que alguien olvidaría sincronizar con
+   la compra real. Se resolvió al revés: la compra en **cero** ES el hecho, y
+   `sinPrecio(precio)` (`lib/dominio/precios.ts:97`) lo lee de ahí — *"Estado
+   derivado, sin campo ni bandera nuevos, así que no puede quedar
+   inconsistente"* (commit `1b0475c`, 2026-08-24). El efecto también se deriva
+   solo: en cuanto se teclea la compra, el producto entra a la caja sin que
+   nadie active nada a mano, porque `productosOperativos`
+   (`components/store.tsx:856`) filtra por el mismo estado en cada lectura, no
+   por un interruptor que alguien tenga que voltear.
 2. **Los derivados se calculan en cada llamada, no se cachean.** *"Todo se lee
    del store VIVO en cada llamada — nada de cachear un resumen viejo"*
    (`wrd/sistema/js/contable.js:27-28`).
@@ -291,7 +302,10 @@ le pregunta primero de quién es este equipo.
   catálogo es una proyección derivada y no viaja por el outbox. `DEC-009` — canal
   de pedidos server-side aislado del kardex, *"Pedido ≠ hecho contable"*.
   `DEC-022` — el eje de unidades vive en `Movimiento`, no en `Lote` (bug
-  financiero real; detalle en [[TEMA-invariantes-contables]]). `RSK-004` (Open) —
+  financiero real; detalle en [[TEMA-invariantes-contables]]). Commit `1b0475c`
+  (2026-08-24) — `sinPrecio` derivado de la compra en cero en vez de una
+  bandera nueva (`lib/dominio/precios.ts:97`,
+  `components/store.tsx:856`). `RSK-004` (Open) —
   outbox de pruebas en el navegador de desarrollo.
 - `wrd/DEC-009` — la landing dejó de sembrar y quedó de solo lectura; catálogo,
   precio y stock se editan únicamente desde `wrd/sistema/`. `DEC-008` —

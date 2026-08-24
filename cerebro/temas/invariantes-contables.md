@@ -68,6 +68,29 @@ compartiendo un `state.json` lo **corrompen**, y por eso se les prohibió escrib
 (`infrapilot/RSK-003`, Permanent). La mitigación registrada es la misma que la del
 mostrador: serializar, o que escriba uno solo.
 
+**El mismo consecutivo repetido tiene una TERCERA forma de aparecer, y no es una
+carrera entre procesos: es un bucle de React leyendo su propia ref.** En la
+placita, un alta masiva de 67 productos (commit `1b0475c`, 2026-08-24) casi se
+implementó como `for (const item of faltantes) crearProducto(item)`, y
+`crearProducto` saca el código nuevo mirando `datosRef.current.productos`
+(`components/store.tsx:3103`) — que dentro de un mismo *tick* de React **no se
+ha actualizado todavía**, así que las 67 llamadas verían el mismo arreglo de
+partida y le repartirían el mismo código (`"P01"`) a tres productos distintos.
+Con `unique(empresa_id, codigo)` en Supabase, la nube rechaza la **tabla
+entera** al sincronizar y la caja se queda diciendo *"faltan 67 por subir"* sin
+explicar nada — la misma familia de síntoma silencioso que ya medían
+`placita/KN-043` y `KN-044` (colisión de código offline). La corrección no fue
+"tener más cuidado dentro del bucle": fue dejar de iterar. Los códigos se
+acumulan en una lista **local** a medida que se generan —cada llamada a
+`generarCodigo` recibe los códigos ya repartidos en esta misma pasada, no solo
+los que ya estaban en disco (`components/store.tsx:3170-3186`)— y los 67
+productos entran en **UN solo `aplicar`**: un render, un delta
+(`components/store.tsx:3144-3156`, comentario de cabecera). **Regla general:
+cualquier acción que derive un identificador único a partir de un estado de
+React leído por referencia (`xRef.current`, o el `state` capturado por
+closure) no se puede llamar en bucle síncrono** — hay que acumular en una
+variable local del propio bucle y aplicar el lote entero de una vez.
+
 **Y lo pagó un día que empezaba en UTC.** Una venta de las 11 p.m. en Bogotá caía
 al día siguiente: *"la factura aparecía en la lista pero la cabecera del día
 marcaba cero"*, justo en las horas de más venta (`estanco-contable/KN-005`,
@@ -88,7 +111,26 @@ zona `America/Bogota`, una sola definición de "qué día es" para todo el siste
 2. **Lo anulado se cuenta aparte y NO resta.** Canceladas con su `perdidoCop`
    (*"NO se suma a nada: se mira"*) y gastos anulados con su `montoCop`
    (`contabilidad.ts:692-724`). *"Perder una venta no es lo mismo que gastar
-   plata"* (`wrd sistema/js/contable.js:22-23`).
+   plata"* (`wrd sistema/js/contable.js:22-23`). La misma regla vale para
+   **catálogo eliminado**, no solo para documentos anulados: en la placita
+   borrar un producto no borra sus lotes —el kardex y los recibos no pueden
+   quedar huérfanos (`placita/DEC-008`)— y el 2026-08-24 el dueño borró **todo**
+   su catálogo mientras el reporte le seguía mostrando ~$800.000 de inventario,
+   porque `valorInventario` recorría los lotes sin fijarse si el producto seguía
+   vigente. La cifra que se le muestra al lado de la tabla de saldos tiene que
+   usar el **mismo filtro de vigencia** que esa tabla: *"El número de arriba
+   tiene que poder mirarse contra la lista de al lado sin contradecirla"*
+   (`lib/dominio/contabilidad.ts:895-903`). La corrección es una función nueva,
+   `valorInventarioVigente` (filtra por `producto.eliminadoEn === undefined`,
+   `:905-923`), no un parche sobre la vieja —que se conserva para pedir el
+   corte histórico de un día—, y lo que queda en lotes de productos borrados
+   **no desaparece en silencio**: se cuenta aparte en
+   `valorInventarioEliminado` y solo se muestra si es mayor que cero
+   (`:925-943`). Regresión clavada con el caso exacto del dueño: *"borrar TODO
+   el catálogo da $0, aunque `valorInventario` (el de siempre) siga sumando la
+   mercancía fantasma"* (`lib/dominio/contabilidad.test.ts:639-641`). **Un
+   total derivado que no comparte el filtro de vigencia de la lista que
+   acompaña no es un número: es una sospecha.**
 3. **No hay "desanular".** Un gasto ya anulado no se vuelve a anular y una orden
    cancelada no resucita: si el cliente vuelve, es una orden nueva
    (`contabilidad.ts:458-467`, `:320-332`). Anular sí es **idempotente**: anular
@@ -296,7 +338,15 @@ placita, donde un gasto mal digitado no tiene salida (ver Huecos).
   papel. `placita/KN-039` — agrupar por `puestoId`, no por el prefijo del número.
   `placita/KN-028` — E2E de 4 facturas reales que cuadra al peso. `placita/KN-038` —
   con cola pendiente no se baja nada. `placita/KN-001` — por qué la placita no es el
-  estanco.
+  estanco. `placita/KN-043` y `KN-044` — colisión de código offline por dos cajas
+  generando el mismo consecutivo local; familia de bug del mismo síntoma
+  (rechazo silencioso por restricción única) que la ref-en-bucle de abajo.
+  Commit `1b0475c` (2026-08-24) — alta masiva de 67 productos: el bucle sobre
+  `crearProducto` habría repartido el mismo código por leer `datosRef.current`
+  sin actualizar dentro del tick (`components/store.tsx:3103`, `:3144-3186`); y
+  el inventario en $800.000 con el catálogo vacío
+  (`lib/dominio/contabilidad.ts:895-943`, regresión en
+  `lib/dominio/contabilidad.test.ts:639-641`).
 - `villa-broaster/KN-007` — dominio de gastos (`anulado`, sin borrado físico),
   `netoCop`, desglose por canal obligatorio, 60 tests. `villa-broaster/KN-009` — si
   la UI promete un número, el servidor debe honrar ese número.

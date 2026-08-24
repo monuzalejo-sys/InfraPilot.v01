@@ -63,6 +63,14 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
    sin incógnitas) = todo inline, 0 spawns. Small (2-4 archivos) = build inline o UN
    builder + verificador spawneado. Substantial (multipaso, transversal o de riesgo) =
    pipeline completo. Ante la duda, **empieza abajo**: un FAIL escala solo.
+   **Segundo criterio, independiente del tamaño: si el orquestador YA tiene el
+   archivo grande leído en su propio contexto, edítalo inline en vez de
+   delegar** — un subagente arranca en blanco y tendría que releer el archivo
+   entero para poder tocarlo, que es exactamente el costo que el gate de
+   ceremonia quiere evitar. Delegar es para lo que empieza de cero, no para lo
+   que el orquestador ya trae cargado (placita, commit `1b0475c`, 2026-08-24:
+   edición sobre `components/store.tsx`, ~4.500 líneas ya leídas por el
+   orquestador, hecha inline a propósito).
 2. **Rúbrica por dificultad** (`SKILL.md` §1b, líneas 86-106): trivial→`haiku`,
    normal→`sonnet`, hard→`opus`. Techo opus, piso haiku (`infrapilot/DEC-004`). El
    analista puntúa cada sub-objetivo y **los builders van uno por paso**, así que una
@@ -95,7 +103,13 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
    para una dirección de arte (4 direcciones + 2 jurados + redactor + 3 verificadores
    adversariales + corrector) = **1.083.934 tokens en una sola fila**; **sesión de 35
    spawns** (wrd, tienda gamificada) = **3.543.447 tokens**, de los que ~592k se perdieron
-   en muertes de sesión.
+   en muertes de sesión. **Sesión pequeña con calibración limpia** (placita, commit
+   `1b0475c`, 2026-08-24: surtido masivo + gasto de un toque + inventario
+   vigente) = 5 spawns, **todos `sonnet`, todos PASS a la primera, cero ciclos
+   de arreglo**: 2 de dominio+tests (71.631 y 77.138 tokens), 2 de pantalla
+   (73.784 y 110.862) y 1 de verificación de 10 condiciones (106.904). Sirve
+   como el caso límpio contra el que medir: cuando `sonnet` no falla ni una vez
+   en una tanda de 5, no hay señal para subir a `opus` en ese tipo de trabajo.
 6. **Regla dura del tier barato**: haiku sí para código mecánico contra spec; haiku **no**
    para datos semilla con invariantes cruzadas, copy público, metadata/keywords o cualquier
    texto que tenga que ser **verdad**. Si igual lo usas ahí, audita su salida con grep
@@ -197,7 +211,11 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
   `infrapilot/session-2026-08-16-001` (18 spawns, ~1,39M, 0 muertes; 8 prompts de landing =
   664.950), `villa-broaster/session-2026-08-24-prompt-v3-landing` (panel de 11 agentes,
   1.083.934), `placita/session-2026-08-08-pos-plano-tareas` (build:visual opus `fail`,
-  283.543).
+  283.543), `placita` commit `1b0475c` (2026-08-24, surtido+gasto+inventario: 5
+  spawns, todos `sonnet`, todos `ok` a la primera — 71.631, 77.138, 73.784,
+  110.862, 106.904 — medición del orquestador, pendiente de reflejarse en
+  `placita/metrics.json`; y la edición inline sobre `components/store.tsx`
+  [~4.500 líneas] hecha sin spawn por ya estar leído).
 
 ## Enlaces
 

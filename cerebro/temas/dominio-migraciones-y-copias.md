@@ -185,6 +185,30 @@ reconstruir un mes después (`placita lib/persistencia.ts:242-270`).
      `:55-61`). **El código compila y pasa sus tests igual con el supuesto
      equivocado adentro.**
 
+8. **Relajar una validación del dominio obliga a barrer TODOS sus llamadores,
+   no solo el punto donde se relajó.** Es el mismo principio del punto 6
+   (perseguir hasta el costo, cazar a todos los lectores), aplicado a un
+   invariante en vez de a un eje de medida nuevo. En la placita, permitir
+   precio de compra en **cero** ("todavía sin precio", ver
+   [[TEMA-donde-vive-el-dato]]) se hizo cambiando `validarCompraPositiva` por
+   `validarCompraNoNegativa` en el punto de alta
+   (`lib/dominio/precios.ts:39-45`) — pero `margenEfectivoPct`, que **divide
+   por la compra**, siguió llamando a la validación estricta
+   (`lib/dominio/precios.ts:84-85`) porque nadie la tocó. El resultado: una
+   celda de margen sin precio guardado tumbaba la fila **entera** del
+   inventario, y no lo encontró quien relajó la validación — lo encontró un
+   builder distinto, construyendo la columna encima en el mismo commit
+   (`app/(app)/inventario/componentes/lista-productos.tsx:517-534`, comentario
+   *"`margenEfectivoPct` exige compra > 0 (dividir por cero no es…)"*). La
+   corrección no cambió el invariante de `margenEfectivoPct` —sigue exigiendo
+   compra positiva, porque no hay margen honesto que devolver sobre un precio
+   que no existe— sino que hizo que la pantalla dijera **"—"** en vez de
+   reventar cuando `sinPrecio` es cierto. **El grep que hay que correr antes
+   de dar por buena una validación relajada es de los LLAMADORES de la función
+   estricta, no de la función misma**: si alguno sigue asumiendo el invariante
+   viejo, hay que decidir por cada uno si absorbe el caso nuevo o lo declara
+   explícitamente fuera de su dominio (commit `1b0475c`, 2026-08-24).
+
 ## Cuándo NO aplica
 
 - **Antes del primer usuario real, la migración es ceremonia.** Si borrar y
@@ -257,7 +281,11 @@ reconstruir un mes después (`placita lib/persistencia.ts:242-270`).
   verificado en vivo, migración v6→v7 + SQL. `placita/PEND-020` (a/b/c) y
   `placita/PEND-016` — los lectores del eje viejo que quedaron. `placita/DEC-015` —
   v4→v5 y la tabla que NO se dropea. `placita/KN-006` — seed con invariantes
-  cruzadas generado con haiku; solo lo cazó el e2e.
+  cruzadas generado con haiku; solo lo cazó el e2e. Commit `1b0475c`
+  (2026-08-24) — relajar `validarCompraPositiva` a `validarCompraNoNegativa`
+  sin barrer `margenEfectivoPct` tumbaba la fila del inventario:
+  `lib/dominio/precios.ts:39-45` y `:84-85`,
+  `app/(app)/inventario/componentes/lista-productos.tsx:517-534`.
 - `arroces/KN-001` (**Permanent**) — auditar los supuestos temporales al portar un
   módulo de dominio. `arroces/DEC-001` — calcado del estanco, 38/38 self-tests.
   `arroces/DEC-002` — el pedido nace sin pagos; `cobradoEn` se sella al cobrar.
