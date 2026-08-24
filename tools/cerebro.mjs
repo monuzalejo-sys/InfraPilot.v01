@@ -230,6 +230,57 @@ function construirIndice() {
     })
   }
 
+  /* PUNTEROS A DOCUMENTOS. La memoria guarda lecciones; la doctrina larga vive
+     en archivos (RFCs, prompts de diseño, bases de caja, tarjetas de trabajo) y
+     el cerebro no podía responder "¿dónde está escrito esto?". Se indexan solo
+     como PUNTEROS —título, encabezados y primer párrafo— y con peso bajo: si se
+     metiera un prompt de 100 KB entero, cada búsqueda devolvería fragmentos de
+     prompt en lugar de la respuesta curada. El puntero orienta; el tema responde. */
+  const cfgDocs = join(CEREBRO, "documentos.json")
+  if (existsSync(cfgDocs)) {
+    let cfg
+    try { cfg = JSON.parse(readFileSync(cfgDocs, "utf8")) } catch { cfg = null }
+    for (const entrada of cfg?.documentos ?? []) {
+      const archivos = []
+      try {
+        if (!existsSync(entrada.ruta)) continue
+        if (statSync(entrada.ruta).isDirectory()) {
+          for (const f of readdirSync(entrada.ruta)) {
+            if ((entrada.extensiones ?? [".md"]).some((e) => f.endsWith(e))) archivos.push(join(entrada.ruta, f))
+          }
+        } else archivos.push(entrada.ruta)
+      } catch { continue }
+      for (const ruta of archivos) {
+        let raw
+        try { raw = readFileSync(ruta, "utf8") } catch { continue }
+        const nombre = ruta.split(/[\\/]/).pop()
+        const h1 = raw.match(/^#\s+(.+)$/m)?.[1] ?? nombre.replace(/\.md$/, "")
+        const encabezados = (raw.match(/^#{2,3}\s+(.+)$/gm) ?? []).map((h) => h.replace(/^#+\s*/, "")).slice(0, 25)
+        // primer párrafo real: se saltan frontmatter, citas y encabezados
+        const cuerpo = raw.replace(/^---[\s\S]*?---/, "").split(/\r?\n/)
+        let primero = ""
+        for (const l of cuerpo) {
+          const t = l.trim()
+          if (!t || t.startsWith("#") || t.startsWith(">") || t.startsWith("|") || t.startsWith("```")) continue
+          primero = t
+          break
+        }
+        docs.push({
+          clase: "documento",
+          clave: `doc/${nombre}`,
+          proyecto: "",
+          id: nombre,
+          tipo: "Documento",
+          estado: "Current",
+          titulo: h1,
+          texto: [entrada.rol, h1, encabezados.join(" · "), primero].filter(Boolean).join(" \n "),
+          actualizado: "",
+          fuente: ruta,
+        })
+      }
+    }
+  }
+
   const temas = []
   if (existsSync(TEMAS_DIR)) {
     for (const f of readdirSync(TEMAS_DIR).filter((x) => x.endsWith(".md"))) {
@@ -332,6 +383,9 @@ function buscar(pregunta, { n = 8, proyecto = null, soloTemas = false } = {}) {
     if (score <= 0) continue
     // un tema es una respuesta ya curada: vale más que el objeto crudo del que salió
     if (d.clase === "tema") score *= 2.1
+    // un documento solo orienta ("está escrito en tal archivo"): nunca debe
+    // desplazar a un tema ni a una lección con evidencia
+    if (d.clase === "documento") score *= 0.55
     score *= PESO_TIPO[d.tipo] ?? 1
     score *= PESO_ESTADO[d.estado] ?? 1
     res.push({ ...d, score })
@@ -360,7 +414,9 @@ if (cmd === "indexar") {
   else {
     if (!r.resultados.length) { console.log(`sin resultados para "${pregunta}". El cerebro NO sabe de esto: dilo así en vez de improvisar.`); }
     for (const x of r.resultados) {
-      const cab = x.clase === "tema" ? `TEMA ${x.id}` : `${x.proyecto}/${x.id} · ${x.tipo}${x.estado && x.estado !== "Current" && x.estado !== "Active" && x.estado !== "Accepted" ? " (" + x.estado + ")" : ""}`
+      const cab = x.clase === "tema" ? `TEMA ${x.id}`
+        : x.clase === "documento" ? `DOCUMENTO ${x.id}`
+        : `${x.proyecto}/${x.id} · ${x.tipo}${x.estado && x.estado !== "Current" && x.estado !== "Active" && x.estado !== "Accepted" ? " (" + x.estado + ")" : ""}`
       console.log(`\n[${x.score.toFixed(2)}] ${cab}\n  ${x.titulo}`)
       if (x.respuesta) console.log(`  → ${recorta(x.respuesta, 400)}`)
       else console.log(`  ${recorta(x.texto, 320)}`)
@@ -379,7 +435,12 @@ if (cmd === "indexar") {
   console.log(`CEREBRO ORION — ${idx.N} documentos`)
   console.log(`  temas curados: ${temas.length}`)
   console.log(`  objetos de memoria: ${objetos.length} en ${idx.proyectos.length} proyectos`)
-  const pobres = objetos.filter((o) => (o.texto || "").trim().length < 120)
+  /* Un Pending o un Roadmap corto es correcto ("Definir el costo de domicilio
+     por zona" no necesita más). Solo se señalan como pobres los tipos que
+     PROMETEN sustancia: si una Knowledge cabe en dos líneas, o no se entendió
+     o no valía la pena guardarla. */
+  const CON_SUSTANCIA = new Set(["Knowledge", "Decision", "Policy", "Constraint", "Architecture", "Risk"])
+  const pobres = objetos.filter((o) => CON_SUSTANCIA.has(o.tipo) && (o.texto || "").trim().length < 120)
   console.log(`  objetos pobres (<120 caracteres, candidatos a curar o archivar): ${pobres.length}`)
   if (pobres.length) for (const p of pobres.slice(0, 12)) console.log(`     ${p.clave} — ${recorta(p.titulo, 60) || "(sin título)"}`)
   // cobertura: ¿qué proyectos no están citados por ningún tema?

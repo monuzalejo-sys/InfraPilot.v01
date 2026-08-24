@@ -1,0 +1,41 @@
+{
+  "_por_que": "Los objetos de memoria son las lecciones; los DOCUMENTOS son la doctrina larga (RFCs, prompts, bases de diseño, tarjetas de trabajo). El cerebro los indexa como PUNTEROS —título, encabezados y primer párrafo— no como texto completo: si se metiera un prompt de 100 KB entero, cada búsqueda devolvería fragmentos de prompt en vez de la respuesta curada. Un puntero responde '¿dónde está escrito esto?', que es justo lo que la memoria no puede responder.",
+  "_como_se_amplia": "Agrega una entrada con su ruta (archivo o carpeta), qué extensiones tomar y qué ROL cumple. El rol entra al texto indexado, así que descríbelo como lo buscaría alguien.",
+  "documentos": [
+    {
+      "ruta": "C:\\Users\\Kalel\\ORION\\RFC",
+      "extensiones": [".md"],
+      "rol": "RFC normativo del estándar ORION: define formalmente el modelo de objetos, los contratos de comportamiento, el protocolo del ciclo de vida, la economía de contexto, la escalabilidad y el cumplimiento"
+    },
+    {
+      "ruta": "C:\\Users\\Kalel\\ORION\\ORION_STANDARD.md",
+      "extensiones": [".md"],
+      "rol": "el estándar ORION completo, documento maestro del runtime cognitivo"
+    },
+    {
+      "ruta": "C:\\Users\\Kalel\\ORION\\prompts-landing",
+      "extensiones": [".md"],
+      "rol": "prompt de diseño entregable: el encargo con el que un generador construye la página pública de un proyecto, con sus datos citados, su dirección de arte y sus criterios de aceptación"
+    },
+    {
+      "ruta": "C:\\Users\\Kalel\\ORION\\prompts-landing\\referencias",
+      "extensiones": [".md"],
+      "rol": "ficha de referencia visual: el mecanismo reutilizable de una referencia, qué no se copia de ella, su traducción al negocio y el veredicto que recibió"
+    },
+    {
+      "ruta": "C:\\Users\\Kalel\\prommter\\proyectos\\villa-broaster\\docs\\BASES-CAJA.md",
+      "extensiones": [".md"],
+      "rol": "bases aprobadas del módulo de caja: qué se adopta de Mercaplaza, qué no y por qué, y el hallazgo de que el turno de caja se diseña desde cero"
+    },
+    {
+      "ruta": "C:\\Users\\Kalel\\prommter\\proyectos\\villa-broaster\\tareas",
+      "extensiones": [".md"],
+      "rol": "tarjeta de trabajo de un equipo humano: objetivo, archivos que se tocan y cuáles no, criterios de aceptación verificables y qué se aprende con ella"
+    },
+    {
+      "ruta": "C:\\Users\\Kalel\\prommter\\proyectos\\villa-broaster\\PLAN-EQUIPO.md",
+      "extensiones": [".md"],
+      "rol": "plan de trabajo de un equipo: qué falta para entregar, quién responde por cada entrega, cómo se trabaja y el camino de cada persona"
+    }
+  ]
+}
