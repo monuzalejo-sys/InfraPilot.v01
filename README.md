@@ -73,10 +73,46 @@ Two more local (non-submodule) artifacts support the runtime:
   node tools/validate-memory.mjs memory/infrapilot
   ```
 
+## 4. El cerebro (`cerebro/`)
+
+La memoria por proyecto resuelve *recordar*; el cerebro resuelve **responder**.
+Con 11 memorias y ~275 objetos, el conocimiento existía pero era incontestable:
+para saber si algo ya se había aprendido había que abrir once `state.json`, y
+un agente que tiene que abrir once archivos, en la práctica no los abre —
+contesta de memoria y se inventa la mitad.
+
+- [`cerebro/temas/`](cerebro/temas/) — **la fuente de verdad de la capa
+  transversal**. Un archivo por tema, y un tema es una *respuesta curada*: qué
+  hacer (imperativo, 3-6 líneas), qué fallo lo pagó, cómo se aplica, cuándo NO
+  aplica, y la evidencia citable (`proyecto/ID`, `archivo:línea`, mediciones).
+  Su valor es que cruza proyectos: una regla pagada en la arrocera decide en el
+  asadero. Formato en [`_PLANTILLA-TEMA.md`](cerebro/_PLANTILLA-TEMA.md);
+  ejemplar a imitar: `temas/generadores-de-diseno.md`.
+- [`tools/cerebro.mjs`](tools/cerebro.mjs) — recuperación BM25 sin dependencias
+  sobre **todas** las memorias (descubiertas solas) más las métricas de
+  `metrics.json` sintetizadas por proyecto, más los temas. Cuesta ~0, así que un
+  agente puede preguntar varias veces por turno:
+
+  ```
+  node tools/cerebro.mjs buscar "la plata de que turno es si cobro despues"
+  node tools/cerebro.mjs probar     # prueba de regresión con preguntas reales
+  node tools/cerebro.mjs estado     # temas, objetos pobres y huecos
+  ```
+
+- [`cerebro/preguntas-de-prueba.md`](cerebro/preguntas-de-prueba.md) — la
+  prueba de regresión. No mide si el cerebro *sabe mucho*, mide si **responde a
+  cómo se pregunta de verdad**: un tema impecable con alias malos falla aquí, y
+  debe fallar, porque nadie lo encontraría nunca.
+
+Lo consumen el skill `orion-cerebro` (responder una pregunta con cita), el
+agente `orion-harvester` (alimentarlo sin duplicar ni escribir basura) y la
+fase 1 del skill `orion` (consultar antes de analizar).
+
 ## How the pieces relate
 
 ```
 ORION_STANDARD.md + RFC/           <- defines the standard (what "compliant" means)
+cerebro/ + tools/cerebro.mjs       <- la capa que RESPONDE cruzando todas las memorias
 Skills/autonomous-memory-manager/  <- defines AMM, the memory sub-skill of the standard
 runtime/                            <- implements the standard for Claude Code (local mirror)
 memory/infrapilot/                  <- runtime's persisted state for this project (local)
