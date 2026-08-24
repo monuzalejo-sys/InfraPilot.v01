@@ -94,9 +94,17 @@ a leer: imperativo, 3 a 6 líneas, sin hedging.
 
 ```bash
 node C:\Users\Kalel\ORION\tools\cerebro.mjs indexar
+node C:\Users\Kalel\ORION\tools\cerebro.mjs citas    # ninguna cita puede apuntar al vacío
+node C:\Users\Kalel\ORION\tools\cerebro.mjs probar   # ¿sigue respondiendo a las preguntas reales?
 node C:\Users\Kalel\ORION\tools\cerebro.mjs estado
 node C:\Users\Kalel\ORION\tools\cerebro.mjs exportar
 ```
+
+`citas` es tu red de seguridad y **tiene que salir en cero rotas**: comprueba
+que cada `proyecto/ID` que escribiste existe de verdad. Si sale una rota, la
+escribiste mal o te la inventaste; en ambos casos se corrige antes de reportar,
+nunca después. `probar` no puede bajar respecto a como estaba: si bajó, tu tema
+nuevo le está robando preguntas a otro y hay que separar los alias.
 
 Y **comprueba tu propio trabajo**: busca la pregunta que tu tema nuevo debería
 responder y confirma que el tema sale primero. Si no sale, tus `alias` están mal —

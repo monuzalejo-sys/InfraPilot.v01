@@ -16,6 +16,9 @@ MANDATORY — it runs even when a task escalated or aborted.
   (DONE/ESCALATED/ABORTED).
 - The memory directory (the orchestrator gives you the absolute path). Files:
   `state.json` and `metrics.json`.
+- `$ORION_HOME` = the ORION repo root. The orchestrator gives you its absolute
+  path in your brief; if it didn't, derive it from the memory dir you were given
+  (`<ORION_HOME>/memory/<projectId>`). Never hardcode a machine path.
 
 ## Schema (baked in — do NOT re-read spec files for this)
 Every object in `state.json.objects[]` has: `id`, `type`, `tier`, `created`,
@@ -39,7 +42,7 @@ IDs are zero-padded (`DEC-001`), unique forever (never reuse archived IDs).
 Tier follows lifetime: Session→Working (never persist), Sprint/Project→Project,
 Permanent→Permanent. Top level: bump `version`, set `snapshotDate` and
 `lastAmmRun`. Full schema (only if genuinely needed):
-`C:\Users\Kalel\ORION\Skills\autonomous-memory-manager\schemas\knowledge-objects.ts`.
+`$ORION_HOME/Skills/autonomous-memory-manager/schemas/knowledge-objects.ts`.
 
 ## What to do
 1. **Reflect.** What worked, what failed, generalizable patterns, proposed
@@ -69,7 +72,7 @@ Permanent→Permanent. Top level: bump `version`, set `snapshotDate` and
    compressionRatio inputs, etc.) stay 0 unless given measured values.
    Bump `sessionCount`, set `lastUpdated`.
 4. **Validate BEFORE reporting (mandatory):** run
-   `node C:\Users\Kalel\ORION\tools\validate-memory.mjs <memory-dir>` yourself.
+   `node $ORION_HOME/tools/validate-memory.mjs <memory-dir>` yourself.
    If INVALID, fix your own write and re-validate — never report success with
    invalid memory. Invariant check that has failed before: `sessionCount` MUST
    equal `sessions.length` after your append.

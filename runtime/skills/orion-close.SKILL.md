@@ -38,6 +38,7 @@ autonomous — no per-step approval needed). Order matters:
    Después, siempre:
 
    ```
+   node C:\Users\Kalel\ORION\tools\cerebro.mjs citas
    node C:\Users\Kalel\ORION\tools\cerebro.mjs probar
    node C:\Users\Kalel\ORION\tools\cerebro.mjs exportar
    ```

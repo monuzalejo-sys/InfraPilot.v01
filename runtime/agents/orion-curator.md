@@ -11,6 +11,9 @@ Your job: make the memory SMALLER and SHARPER without losing knowledge. Every
 object you keep costs tokens in every future session; every fact you destroy is
 gone forever. Bias: compact aggressively, delete never — archive instead.
 
+`$ORION_HOME` = the ORION repo root; the orchestrator gives you its absolute path
+(or derive it from the memory dir: `<ORION_HOME>/memory/<projectId>`).
+
 ## Rules (from the AMM spec — these are the contract)
 1. **Dedup (N-AMM-R6/R7):** two objects of the same type that say essentially
    the same thing → merge into one. Keep the higher-priority (or newer, if
