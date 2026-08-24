@@ -1,8 +1,8 @@
 ---
 slug: invariantes-contables
 titulo: Las reglas del dinero que no se rompen (y por qué existen)
-alias: [invariante, invariantes, invariantes contables, regla, reglas, regla de negocio, reglas de negocio, reglas del dinero, reglas de contabilidad, contabilidad, contable, sistema contable, dinero, plata, borrar, borrado, borrarlo, no se puede borrar, eliminar, eliminado, eliminacion, delete, soft delete, borrado blando, borrar un gasto, borrar una factura, eliminar una factura, borrar una venta, eliminar una venta, anular, anularlo, anulacion, anulado, anulada, cancelar, cancelado, cancelada, basurero, papelera, purga, congelado, congelada, congelar, precio congelado, linea congelada, lineas congeladas, historico, historial, auditoria, auditable, trazabilidad, quien lo hizo, responsable, hecho, hechos, derivado, derivados, saldo, saldos, stock, kardex, movimiento, movimientos, total, total de ventas, gran total, cifra total, neto, netocop, desglose, desglosado, desglosar, canal, mostrador, domicilio, sede, sedes, local, locales, gasto, gastos, venta, ventas, factura, facturas, recibo, orden, ordenes, pedido, consecutivo, numeracion, numero de factura, redondeo, centavos, cop, pesos, entero, enteros, gramos, merma, devolucion, devoluciones, nota de credito, descuadre, cuadre, conciliar, concurrencia, carrera, condicion de carrera, dos procesos, dos escritores, un solo escritor, escritor unico, mismo json, escribir el mismo archivo, json corrupto, se corrompio, corrompio, corrompido, json corrompido, archivo corrompido, corromper, se daño el json, escritura atomica, tmp rename, cola, cola de un carril, serializado, lock, caja, cajero, arqueo, dia negocio, jornada contable]
-preguntas: ["por que no se puede borrar un gasto", "que reglas de contabilidad no se pueden romper", "por que no hay un total de ventas a secas", "que pasa si dos procesos escriben el mismo json", "¿por qué no puedo eliminar una factura o una venta?", "¿por qué el precio de la orden no cambia si cambio el catálogo?", "¿el stock se guarda o se calcula?", "¿qué invariantes debe respetar un sistema contable de la casa?"]
+alias: [invariante, invariantes, invariantes contables, regla, reglas, regla de negocio, reglas de negocio, reglas del dinero, reglas de contabilidad, contabilidad, contable, sistema contable, dinero, plata, borrar, borrado, borrarlo, no se puede borrar, eliminar, eliminado, eliminacion, eliminar factura, verbo destructivo, via destructiva, borrado fisico, borrado duro, hard delete, delete, sin delete, sin policy de delete, grant de delete, reutiliza el consecutivo, reutilizar consecutivo, dian, factura dian, factura electronica, facturacion electronica, comprobante interno, comprobante de venta, documento interno, proveedor tecnologico autorizado, soft delete, borrado blando, borrar un gasto, borrar una factura, eliminar una factura, borrar una venta, eliminar una venta, anular, anularlo, anulacion, anulado, anulada, cancelar, cancelado, cancelada, basurero, papelera, purga, congelado, congelada, congelar, precio congelado, linea congelada, lineas congeladas, historico, historial, auditoria, auditable, trazabilidad, quien lo hizo, responsable, hecho, hechos, derivado, derivados, saldo, saldos, stock, kardex, movimiento, movimientos, total, total de ventas, gran total, cifra total, neto, netocop, desglose, desglosado, desglosar, canal, mostrador, domicilio, sede, sedes, local, locales, gasto, gastos, venta, ventas, factura, facturas, recibo, orden, ordenes, pedido, consecutivo, numeracion, numero de factura, redondeo, centavos, cop, pesos, entero, enteros, gramos, merma, devolucion, devoluciones, nota de credito, descuadre, cuadre, conciliar, concurrencia, carrera, condicion de carrera, dos procesos, dos escritores, un solo escritor, escritor unico, mismo json, escribir el mismo archivo, json corrupto, se corrompio, corrompio, corrompido, json corrompido, archivo corrompido, corromper, se daño el json, escritura atomica, tmp rename, cola, cola de un carril, serializado, lock, caja, cajero, arqueo, dia negocio, jornada contable]
+preguntas: ["por que no se puede borrar un gasto", "que reglas de contabilidad no se pueden romper", "por que no hay un total de ventas a secas", "que pasa si dos procesos escriben el mismo json", "¿por qué no puedo eliminar una factura o una venta?", "¿por qué el precio de la orden no cambia si cambio el catálogo?", "¿el stock se guarda o se calcula?", "¿qué invariantes debe respetar un sistema contable de la casa?", "en un sistema si deja eliminar y en el otro no, ¿cual esta bien?", "¿emito factura DIAN o comprobante interno de venta?", "¿puedo dejar el verbo eliminar en el producto?"]
 proyectos: [villa-broaster, estanco-contable, placita, arroces, wrd, infrapilot]
 confianza: alta
 actualizado: 2026-08-24
@@ -22,7 +22,10 @@ resumen, el neto, calculada a partir de ese desglose. **Dinero y peso en enteros
 con UN redondeo al final.** Y **un solo escritor por archivo**: leer→decidir→
 escribir serializado dentro de un proceso y escritura atómica (`.tmp` + `rename`);
 dos procesos contra el mismo JSON no se arreglan con cuidado, se arreglan
-poniéndole un dueño único.
+poniéndole un dueño único. Todo lo anterior vale con **una contradicción
+abierta**: que exista o no un verbo destructivo en el producto depende de si el
+documento es **factura DIAN o comprobante interno**, y esa decisión es del dueño,
+no del código, y sigue pendiente desde julio.
 
 ## Por qué (qué lo pagó)
 
@@ -77,8 +80,11 @@ zona `America/Bogota`, una sola definición de "qué día es" para todo el siste
    `anulada` + `anuladaEn`; gasto → `anulado`; producto → `eliminadoEn`. El
    documento sigue listado y auditable (`contabilidad.ts:17-19` y `:458-467`,
    `estanco facturacion.ts:26-33`, `placita/DEC-008`). En SQL se sella igual:
-   la tabla de gastos de wrd no tiene política de DELETE **a propósito**
-   (`wrd/setup/schema.sql:509-512`).
+   la tabla de gastos de wrd no tiene política de DELETE **a propósito** y el
+   grant es `select, insert, update` con la nota *"nada de 'delete' para nadie:
+   un gasto se anula, no se borra"* (`wrd/setup/schema.sql:509-512` y `:566-570`,
+   verificado 2026-08-24). Que ese verbo exista o no es **la única contradicción
+   viva del tema**: ver *La contradicción abierta*, más abajo.
 2. **Lo anulado se cuenta aparte y NO resta.** Canceladas con su `perdidoCop`
    (*"NO se suma a nada: se mira"*) y gastos anulados con su `montoCop`
    (`contabilidad.ts:692-724`). *"Perder una venta no es lo mismo que gastar
@@ -168,13 +174,20 @@ zona `America/Bogota`, una sola definición de "qué día es" para todo el siste
   salida, jamás al precio de venta** —*"reingresar al precio de venta infla el
   inventario con el margen"*— y perteneciente a la jornada de HOY, no a la de la
   factura (`estanco lib/dominio/devolucion.ts:4-10`, `:19-32`, `:34-39`).
-- **Sí existe una vía destructiva, y está acotada.** En el estanco ELIMINAR es
-  destructiva y **reutiliza el consecutivo**; por eso los ids llevan sello base36 de
-  la fecha, para que no colisionen (`estanco-contable/KN-004`,
-  `facturacion.ts:70-73`). En la placita el borrado va al basurero, que se purga
-  automáticamente **2 horas después del cierre de caja** —y mientras el día no
-  tenga `CierreCaja`, sus registros se conservan siempre, *"no hay cierre del que
-  contar las horas"* (`lib/dominio/basurero.ts:17-23`).
+- **Sí existe una vía destructiva, y está MENOS acotada de lo que decía esta
+  línea.** *(Corregido el 2026-08-24 leyendo el código: antes aquí decía "y está
+  acotada". Se deja constancia porque la diferencia es lo que decide si el verbo
+  se puede copiar.)* En el estanco ELIMINAR es destructiva y **reutiliza el
+  consecutivo** —por eso los ids llevan sello base36 de la fecha, para que no
+  colisionen (`estanco-contable/KN-004`, `facturacion.ts:70-73`)— y además **no
+  deja rastro**: saca del arreglo la factura y todos sus movimientos de kardex, y
+  el proyecto no tiene basurero ni módulo de auditoría donde caiga el hecho
+  (`estanco components/store.tsx:561-573`). Lo único que la acota es el rol: solo
+  el dueño (`:563`). En la placita, en cambio, el borrado va al basurero, que se
+  purga automáticamente **2 horas después del cierre de caja** —y mientras el día
+  no tenga `CierreCaja`, sus registros se conservan siempre, *"no hay cierre del
+  que contar las horas"* (`lib/dominio/basurero.ts:17-23`). Las dos posturas
+  enteras y la decisión que las reconcilia: *La contradicción abierta*, abajo.
 - **La cola de un carril NO protege entre procesos.** Sirve dentro de UN proceso
   Node: *"Dos procesos contra la misma carpeta sí necesitarían un lock de archivo —
   y cuando eso haga falta será porque ya toca el almacén centralizado"*
@@ -194,6 +207,78 @@ zona `America/Bogota`, una sola definición de "qué día es" para todo el siste
 - **Un gasto no tiene canal**, así que `gastosCop` **sí** es un número solo: la
   prohibición del total a secas aplica a lo que tiene desglose natural, no a todo
   (`contabilidad.ts:707-710`).
+
+## La contradicción abierta: borrar un documento
+
+Dos productos de la casa que le venden **al mismo tipo de negocio colombiano**
+sostienen lo contrario sobre el mismo verbo. Aquí no se fusionan, porque lo que
+los separa no es una preferencia técnica: es una pregunta de negocio que el dueño
+todavía no ha contestado.
+
+**Postura A — el estanco deja borrar, y borra de verdad.** Tiene tres verbos
+separados: anular (conserva el documento), editar (emite solo deltas) y
+**eliminar**, que es destructivo. Verificado leyendo el código el 2026-08-24, no
+la memoria: `eliminarFactura` saca del arreglo la factura **y también todos sus
+movimientos de kardex**, sin dejar registro de quién ni de qué
+(`estanco components/store.tsx:561-573`); solo lo puede hacer `rol === "dueno"`
+(`:563`); no hay basurero ni auditoría donde caiga el hecho. Y el consecutivo
+**sí** se reutiliza —ahora se sabe por qué exactamente—: se calcula contando las
+facturas que quedan, `facturas.filter((f) => f.localId === localFactura).length
++ 1` (`store.tsx:498`), así que borrar la última hace que la siguiente vuelva a
+sacar ese mismo número. El dominio ya lo daba por hecho: los ids llevan sello
+base36 de la fecha porque *"el sello evita colisiones si un consecutivo se
+reutiliza"* (`facturacion.ts:70-73`). **Su condición:** que el documento sea un
+**comprobante interno**. Si ese número no se lo reclama nadie fuera del local,
+borrar un tecleo del dueño es una corrección, no un fraude.
+
+**Postura B — wrd le quitó el verbo al servidor.** La API contable expone
+`registrarGasto`, `anularGasto` y `listarGastos`, y nada más
+(`wrd sistema/js/contable.js:369-375`). Lo importante es que la prohibición **no
+vive en el JS**: la tabla de gastos no tiene política de DELETE *"a propósito —
+un gasto no se borra desde el sitio, se anula"* (`wrd setup/schema.sql:509-512`)
+y el grant es `select, insert, update` con la nota *"nada de 'delete' para
+nadie"* (`:566-570`). **Su condición:** que la regla tenga que sobrevivir a la
+próxima pantalla que alguien escriba sin haber leído esto. Una regla que vive
+solo en el cliente la salta el primer formulario nuevo; quitado el privilegio, no
+se puede olvidar (`wrd/DEC-006`).
+
+**Lo que las reconcilia es una decisión de negocio, no de código — y sigue
+pendiente.** La pregunta es una sola: **¿el documento que emite el sistema es una
+factura electrónica validada por la DIAN, o un comprobante interno de venta?**
+Está abierta en **tres memorias a la vez** y no se mueve desde julio:
+`estanco-contable/PEND-009` (creada 2026-07-27, Ready — *"hoy el sistema emite un
+documento interno… es requisito legal para muchos comercios en Colombia y
+condiciona el precio del software"*), `villa-broaster/PEND-001` (2026-08-01,
+**Blocked**, y aclara que aplica **por cliente**, no por producto: dos locales
+del mismo dueño pueden caer en lados distintos del umbral) y `placita/PEND-010`
+(2026-08-06: la sección DIAN del producto **es un stub** esperando que el dueño
+elija proveedor). En el estanco la decisión está metida dentro de la etapa
+"producto vendible" (`estanco-contable/ROAD-006`).
+
+Qué pasa en cada rama, para que el día que se responda no haya que discutirlo:
+
+- **Si es comprobante interno**, la postura del estanco es legítima —pero con dos
+  condiciones que hoy **no** cumple: dejar rastro de quién borró y qué, y no
+  reutilizar el número. Esa forma ya está resuelta al lado: el basurero de la
+  placita guarda `personaId`, descripción congelada y `autorizadoConPin`
+  (`placita lib/auditoria.ts:7-23`, `lib/dominio/basurero.ts:1-16`).
+- **Si es factura DIAN**, el verbo destructivo **desaparece del producto**: no se
+  reutilizan consecutivos, no se elimina nada, y "anular" deja de ser un estado
+  interno para volverse una **nota de crédito ante la autoridad**. También esa
+  pieza está escrita ya, aunque hoy solo se use para devoluciones de mercancía
+  (`estanco lib/dominio/devolucion.ts:1-39`).
+
+**Mientras nadie decide, la única mitigación acordada por escrito es
+arquitectónica**, y está en villa-broaster: construir el comprobante interno
+primero, *"con el modulo de facturacion detras de una interfaz para enchufar un
+proveedor DIAN despues sin rehacer"* (`villa-broaster/PEND-001`, acordado
+2026-08-08). No resuelve la contradicción; evita pagarla dos veces.
+
+**Hasta entonces, no copies el verbo de un producto al otro.** Llevar `eliminar`
+del estanco a algo que mañana emita factura DIAN es rehacer el módulo de
+facturación entero; llevar el candado de wrd a un producto de comprobante interno
+le quita al dueño su única forma de corregir un tecleo — y eso ya duele en la
+placita, donde un gasto mal digitado no tiene salida (ver Huecos).
 
 ## Evidencia
 
@@ -223,8 +308,15 @@ zona `America/Bogota`, una sola definición de "qué día es" para todo el siste
   `cobradoEn`. `arroces/KN-001` (Permanent) — auditar los supuestos temporales al
   portar un módulo de dominio entre negocios.
 - `wrd/DEC-006` — patrón contable de la casa: desglose siempre, neto como única
-  cifra total, cancelados aparte, gastos que se anulan. `wrd/DEC-010` — mensajes de
-  error de stock **congelados e idénticos** entre demo y SQL.
+  cifra total, cancelados aparte, gastos que se anulan **y el candado en el
+  servidor, no en el JS**. `wrd/DEC-010` — mensajes de error de stock **congelados
+  e idénticos** entre demo y SQL.
+- **La decisión DIAN, abierta en tres memorias y sin moverse desde julio**:
+  `estanco-contable/PEND-009` (2026-07-27, Ready, *"condiciona el precio del
+  software"*), `villa-broaster/PEND-001` (2026-08-01, **Blocked**, aplica por
+  cliente, con la mitigación arquitectónica acordada el 2026-08-08) y
+  `placita/PEND-010` (2026-08-06, la sección es un stub). `estanco-contable/ROAD-006`
+  la mete dentro de la etapa "producto vendible".
 - `infrapilot/RSK-003` (Permanent, Open) — 8 agentes en paralelo sobre el mismo
   `state.json` lo corrompen; mitigación: serializar o un solo escritor.
   `prommter/PEND-002` — una curación se dejó sin hacer **a propósito** para evitar
@@ -247,9 +339,16 @@ zona `America/Bogota`, una sola definición de "qué día es" para todo el siste
     `lib\dominio\gastos.ts:6-32`; `lib\dominio\basurero.ts:1-28`;
     `lib\auditoria.ts:1-26`.
   - `prommter\proyectos\estanco-contable\lib\dominio\facturacion.ts:1-77` (congelado,
-    cuadre que lanza, anulación sellada, descuadre que grita, ids con sello) y
-    `:215-237` `anularFactura`; `lib\dominio\devolucion.ts:1-39`.
-  - `fable 5\wrd\sistema\js\contable.js:18-36`; `fable 5\wrd\setup\schema.sql:509-512`.
+    cuadre que lanza, anulación sellada, descuadre que grita, ids con sello `70-73`)
+    y `:215-237` `anularFactura`; `lib\dominio\devolucion.ts:1-39`.
+  - `...\estanco-contable\components\store.tsx:498` — el consecutivo se calcula
+    contando (`filter(...).length + 1`), que es **el mecanismo exacto** por el que
+    borrar reutiliza el número; `:561-573` — `eliminarFactura` destructivo, sin
+    rastro, solo dueño.
+  - `fable 5\wrd\sistema\js\contable.js:18-36` (el patrón contable de la casa
+    escrito en la cabecera) y `:369-375` (la API pública **no tiene** verbo de
+    borrado); `fable 5\wrd\setup\schema.sql:376-384` (columna `anulado`),
+    `:509-512` (sin policy de DELETE) y `:566-570` (el grant sin `delete`).
 
 ### Huecos (lo que el corpus NO respalda todavía)
 
@@ -270,6 +369,11 @@ zona `America/Bogota`, una sola definición de "qué día es" para todo el siste
   archivo, ni almacén Supabase implementado, ni una medición de dos instancias
   escribiendo la misma carpeta `data/`. Hoy la garantía es **operativa** (desplegar
   una sola instancia), no técnica.
+- **De la DIAN hay tres pendientes y CERO conocimiento.** Nadie ha escrito qué
+  exige la norma, desde qué umbral obliga, qué proveedor autorizado se usaría ni
+  cuánto cuesta integrarlo. Lo que este tema documenta es **la forma de la
+  decisión y sus dos ramas**, no la respuesta — y la respuesta no sale del código:
+  sale del dueño.
 - **No hay nada sobre períodos contables cerrados** (bloquear ediciones de meses ya
   reportados), **ni sobre IVA/impuestos**, **ni sobre asientos de doble partida**.
   Ningún proyecto lo modela. Si un cliente lo pide, es diseño nuevo, no copia.

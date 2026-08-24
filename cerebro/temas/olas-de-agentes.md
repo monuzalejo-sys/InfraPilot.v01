@@ -1,9 +1,9 @@
 ---
 slug: olas-de-agentes
 titulo: Repartir trabajo entre agentes en paralelo sin colisiones ni pérdidas
-alias: [ola, olas, ola de agentes, olas de agentes, agentes en paralelo, varios agentes, repartir trabajo, dividir el trabajo, dividir la tarea, partir la tarea, parto la tarea, en cuantos pedazos, pedazos, trozos, trocear, partir en pedazos, granularidad, un builder por paso, por pasos, tamano del encargo, equipo de agentes, paralelo, paralelizar, paralelismo, builder, builders, subagente, subagentes, spawn, spawns, wave, wave.json, manifiesto de ola, colision, colisiones, conflicto de archivos, pisarse, se pisan, muerte de agente, agente muerto, se murio, se murieron, se cayo, se cayeron, limite de sesion, infra-death, infra death, reanudar, reanudacion, recuperar ola, recuperacion de ola, respawn, relanzar, orquestador, orquestrador, contratos, ownership, propiedad de archivos, SendMessage, trabajo perdido]
-preguntas: ["¿por qué se me murieron los agentes a mitad de la ola?", "¿cómo reparto el trabajo entre varios agentes?", "¿cómo lanzo varios builders sin que se pisen los archivos?", "¿qué hago si un builder se cayó a mitad del trabajo?", "¿cómo recupero una ola que murió?", "¿cuántos agentes puedo lanzar a la vez?"]
-proyectos: [infrapilot, estanco-contable, villa-broaster, wrd, placita, landings]
+alias: [ola, olas, ola de agentes, olas de agentes, agentes en paralelo, varios agentes, repartir trabajo, dividir el trabajo, dividir la tarea, partir la tarea, parto la tarea, en cuantos pedazos, pedazos, trozos, trocear, partir en pedazos, granularidad, un builder por paso, por pasos, tamano del encargo, equipo de agentes, paralelo, paralelizar, paralelismo, builder, builders, subagente, subagentes, spawn, spawns, wave, wave.json, manifiesto de ola, colision, colisiones, conflicto de archivos, pisarse, se pisan, muerte de agente, agente muerto, se murio, se murieron, se cayo, se cayeron, limite de sesion, infra-death, infra death, reanudar, reanudacion, recuperar ola, recuperacion de ola, respawn, relanzar, orquestador, orquestrador, contratos, ownership, propiedad de archivos, SendMessage, trabajo perdido, se me murio un agente, se me murio un builder, se me murio el agente, murio a mitad, checklist de rescate, rescate de ola, protocolo de muerte, que hago si se muere un agente, audita el disco, auditar el disco, antes de relanzar, mirar el disco, stub de 0 bytes, 0 bytes, archivo vacio, archivo en cero, tamano en disco, reporte vacio, reporte truncado, no es fallo del modelo, no lo cuentes como fallo, senal de capacidad, infraDeath, INFRA_DEATH, sufijo de fase, arqueologia, trabajo huerfano, delta, respawn estrecho, siembra en disco, sembrar datos, fixture sembrado, qa reanudable, resumeFromRunId]
+preguntas: ["¿por qué se me murieron los agentes a mitad de la ola?", "¿cómo reparto el trabajo entre varios agentes?", "¿cómo lanzo varios builders sin que se pisen los archivos?", "¿qué hago si un builder se cayó a mitad del trabajo?", "¿cómo recupero una ola que murió?", "¿cuántos agentes puedo lanzar a la vez?", "se me murió un agente, ¿qué hago?", "¿qué reviso antes de relanzar un builder muerto?", "el agente dijo que arrancó pero no veo nada en disco, ¿entregó o no?", "¿cómo anoto una muerte por límite de sesión sin que cuente como fallo del modelo?"]
+proyectos: [infrapilot, estanco-contable, villa-broaster, wrd, placita, orama, landings]
 confianza: alta
 actualizado: 2026-08-24
 ---
@@ -95,7 +95,9 @@ barato que comentar/descomentar imports** (`villa-broaster/KN-006`).
    *antes* de lanzar los dependientes; fallar rápido en el paso 1 es mucho más barato
    que descubrirlo tras el paso 5 (`ORION/runtime/skills/orion.SKILL.md:208-212`).
 
-**Cuando uno cae (protocolo de recuperación, en este orden):**
+**Cuando uno cae (protocolo de recuperación, en este orden):** resumen; el
+procedimiento completo, con el comando de cada paso, está abajo en
+*[Se me murió un agente](#se-me-murió-un-agente-checklist-de-rescate-los-tres-remedios-unidos)*.
 
 8. **No relances nada todavía.** Primero `git status` + `git log` — puede estar todo
    commiteado (`placita/KN-041`).
@@ -122,6 +124,181 @@ barato que comentar/descomentar imports** (`villa-broaster/KN-006`).
 15. **Solo el orquestador escribe la memoria**, después de recolectar los veredictos
     (`infrapilot/RSK-003`).
 16. Borra `wave.json` (`ORION/runtime/skills/orion-close.SKILL.md:31`).
+
+## Se me murió un agente: checklist de rescate (los tres remedios, unidos)
+
+Esto es **lo que más se repite en todo el ecosistema**: ocho lecciones en seis
+proyectos —placita, infrapilot, estanco-contable, wrd, villa-broaster y orama—
+dicen la misma frase con palabras distintas (*"el agente muerto ya escribió;
+audita el disco antes de relanzar, y no lo cuentes como fallo del modelo"*) y se
+pagó al menos seis veces (`_permanent/KN-014`). Nunca fue por no saberlo: los
+**tres remedios vivían en tres memorias distintas** —`git log` en placita, el
+**tamaño del archivo en disco** en wrd, el **manifiesto de ola escrito antes de
+los spawns** en infrapilot— y el procedimiento correcto es la **unión de los
+tres**. Aquí está unida. Se corre **en orden**: cada paso ve un modo de muerte
+que el anterior no puede ver.
+
+**0 · El único paso que va ANTES de la muerte: deja el manifiesto escrito.**
+Antes del segundo spawn, no después. Sin él, todo lo que sigue es arqueología a
+mano; con él, hasta *otra sesión* puede rescatar la ola.
+
+```jsonc
+// memory/<projectId>/wave.json  — efímero, gitignored, se borra al cerrar
+{ "startedAt": "2026-08-24T02:30:00.000Z", "objective": "...",
+  "steps": [{ "step": "P1 ...", "model": "opus", "owns": ["ruta/a.ts"],
+              "contract": "1 línea de aceptación", "status": "spawned" }] }
+```
+
+Es la mejora #1 de la v3 y nació justamente de las muertes (`infrapilot/DEC-008`);
+el esquema y el momento de escribirlo están en
+`ORION/runtime/skills/orion.SKILL.md:198-206`, y ya está ignorado por git en
+`ORION/.gitignore:7` (`memory/*/wave.json`). **Verificado con código, no de
+memoria:** el mecanismo está vivo ahora mismo —
+`C:\Users\Kalel\ORION\memory\permanent\wave.json` existe con 3 pasos en estados
+`done` / `en curso` / `pendiente`.
+
+**1 · No relances. Lee el manifiesto y saca la lista de lo que ese agente decía
+poseer.**
+
+```bash
+cat "C:/Users/Kalel/ORION/memory/<proj>/wave.json"     # Bash
+type C:\Users\Kalel\ORION\memory\<proj>\wave.json      # PowerShell
+```
+
+Si aparece un `wave.json` al arrancar una sesión, **la sesión anterior murió a
+mitad de ola** y ese archivo es el mapa: builders → archivos → contrato
+(`ORION/runtime/skills/orion.SKILL.md:46-49`). Si no lo hay, la lista de
+propiedad está en el brief que le mandaste; recupérala antes de seguir.
+
+**2 · Remedio de placita — mira git ANTES de reconstruir nada.**
+
+```bash
+cd <repo> && git status --porcelain && git log --oneline -10 --stat
+```
+
+Un builder "muerto a mitad de tarea" puede haber **commiteado todo** justo antes
+de caer: pasó en la corrida de gastos + cierre de caja (`placita/KN-041`).
+**Verificado con código hoy, no citado de memoria:** el commit `f718df8` existe
+en el repo de placita —*"Gastos con motivo y cantidad + cierre de caja que cuenta
+plata"*, 19 archivos tocados, incluidos `cierre-caja.tsx` (278 líneas) y
+`gastos.ts` + sus tests. Reconstruir eso a ciegas habría sido gasto puro.
+
+**3 · Remedio de wrd — el TAMAÑO en disco, archivo por archivo. `started` no es
+`aterrizó`.**
+
+```bash
+cd <repo> && ls -l <los archivos que decía poseer>                       # Bash
+Get-ChildItem -Recurse <carpetas> | Select-Object Length,FullName        # PowerShell
+```
+
+Git no ve al builder que no commitea, así que el paso 2 no basta. **Un archivo de
+0 bytes significa que el builder reportó que empezó y no persistió nada:
+trátalo como NO hecho** (`wrd/KN-005`). Si no lo miras, planificas la ola
+siguiente sobre archivos que no existen. **Verificado con código hoy:** en
+`C:\Users\Kalel\fable 5\wrd\sistema\` siguen en **0 bytes** `js/datos.js`,
+`js/vista-pedidos.js`, `js/vista-catalogo.js`, `js/vista-contable.js`,
+`js/vista-socios.js`, `js/vista-datos.js` y `css/sistema.css` —siete— mientras
+`js/app.js` (16.518 b) y `js/acceso.js` (6.189 b) sí aterrizaron; sigue abierto
+como `wrd/PEND-006`. Excepción: si **tú** creaste stubs a propósito para reservar
+rutas, anótalo o vas a relanzar builders que ya terminaron.
+
+**4 · Que el archivo pese no quiere decir que la función esté. Grep de señales +
+compilar.**
+
+```bash
+cd <repo> && npx tsc --noEmit && npm run build
+grep -n "<símbolo exportado que ese paso prometía>" <archivo esperado>
+```
+
+El protocolo de estanco es literalmente *auditar disco (grep de señales por
+archivo) + `tsc` + build* antes de re-spawnear (`estanco-contable/KN-009`).
+**Audita de verdad, uno por uno:** en la ola del 29-jul los **4 de 4** muertos
+habían entregado, pero en la del 30-jul **2 de 6 no escribieron ni una línea** —y
+uno de esos dos, el *store hub* G1, **bloqueaba 5 páginas**. Asumir "siempre
+entregan" deja un hueco invisible.
+
+**5 · Verifica el artefacto tú mismo. Lo que muere casi siempre es la
+autoverificación, no la entrega.**
+
+```bash
+node C:\Users\Kalel\ORION\tools\edge-cdp.mjs --url <url> --mobile --eval "<comprobación>"
+```
+
+En estanco lo que se cae es la fase de auto-verificación en navegador, no el
+código (`estanco-contable/KN-009`). En orama el `verify` murió por límite de
+sesión y el orquestador **cerró la verificación inline con `edge-cdp`, 12/12
+PASS**, sin re-spawnear nada (`orama/metrics.json`, nota del spawn `verify`).
+Y ojo con el falso positivo inverso: **un reporte vacío o truncado no es una
+muerte** — hubo un builder que terminó bien en disco y devolvió
+*"leaving the build running in background"*; relanzarlo habría duplicado trabajo
+terminado (`infrapilot/KN-018`).
+
+**6 · Recién ahora decides, y por agente, no por ola.**
+
+| Lo que encontraste | Qué se hace | Quién lo pagó |
+|---|---|---|
+| Commiteado / completo en disco y verificado | **Nada.** Márcalo `done` y sigue | `placita/KN-041`, `estanco-contable/KN-009` |
+| Falta poco y es pequeño | Termina el **delta inline** en el orquestador | `infrapilot/KN-018` |
+| Falta trabajo real y el transcript vive | **`SendMessage` sobre el mismo agente**, no un spawn nuevo | `villa-broaster/KN-014`, `villa-broaster/KN-011` |
+| El transcript se perdió | Re-spawn **estrecho, solo a los archivos que faltan** — nunca la tarea ancha original | `infrapilot/KN-018` |
+| 0 bytes / no escribió nada | Relanzar completo, y esta vez el brief ordena *"escribí el archivo PRIMERO, después refinalo"* | `wrd/KN-005` |
+
+Villa reanudó así **4 builders muertos a la vez** por límite de sesión, sin
+re-pagar el trabajo (`villa-broaster/KN-014`). Lo que abarata la reanudación es
+haber **sembrado en disco** antes: en un QA de 8+ pasos, la orden `L1-0001`, el
+gasto `G1-0001` y el producto sembrados sobrevivieron a dos muertes del verifier
+y evitaron repetir clics y navegación (`villa-broaster/KN-011`). Una excepción
+dura: si el agente pudo dejar el sistema **inconsistente** —migración a medias,
+escrituras a base de datos, algo publicado— revertir es más seguro que "terminar
+el delta" (`infrapilot/KN-018`).
+
+**7 · Anótalo como evento de INFRAESTRUCTURA. Una muerte por límite de sesión NO
+es un fallo de capacidad del modelo y no puede contarse como tal.**
+
+No es una cortesía al modelo: es que **contarla como fallo corrompe la
+calibración con la que eliges modelo la próxima vez**. Los cuatro builders de
+villa murieron *porque cuatro procesos en paralelo comparten la misma cuota y
+alcanzaron el timeout simultáneamente* — los modelos no fallaron nada
+(`villa-broaster/KN-014`, `wrd/KN-005`, `infrapilot/KN-018`).
+
+La forma correcta es **la unión de las dos convenciones que hoy existen sueltas**,
+y hay una razón medida para hacer las dos cosas:
+
+```jsonc
+{ "phase": "build:page:infra-death",   // ← sufijo: lo SEPARA en la tabla de calibración
+  "model": "sonnet", "verdict": "fail", // el validador solo acepta ok|fail|escalate
+  "tokens": 0, "infraDeath": true,
+  "note": "[INFRA_DEATH: límite de sesión, NO señal de capacidad] entregado en disco, verificado por el orquestador" }
+```
+
+**Verificado con código, y es el hallazgo que decide cuál convención vale:** el
+agregador del propio cerebro agrupa por `phase|model` y cuenta como *fallida*
+cualquier salida con verdict `fail` o `escalate`, **sin mirar jamás el campo
+`infraDeath` ni la nota** (`ORION/tools/cerebro.mjs:203-211`). Consecuencia
+medida sobre las memorias reales:
+
+- **estanco-contable**, que marca con el campo: `build:page`/sonnet se lee hoy
+  como **4 fallidas de 10**; descontando las 4 infra-deaths es **0 de 6**.
+  `build:visual`/opus se lee **4 de 7**; real, **1 de 4**.
+- **wrd**, que sufija la fase: las muertes salen en filas propias
+  (`build:page:infra-death|opus`, `build:api:infra-death|opus`) y **no ensucian**
+  la fila de `build:page|opus`.
+
+Es decir: **el sufijo en `phase` es lo único que hoy protege la calibración**; el
+campo y la nota sirven para auditar después. Pon los dos.
+
+**8 · Cierra la ola en el manifiesto.** Actualiza el `status` de cada paso
+mientras aterrizan y **borra `wave.json`** al terminar
+(`ORION/runtime/skills/orion.SKILL.md:198-206`,
+`ORION/runtime/skills/orion-close.SKILL.md:31`). Un `wave.json` viejo que
+sobrevive le miente a la próxima sesión, que creerá que hay una ola muerta que
+rescatar.
+
+**Lo que este checklist NO promete.** No promete que el trabajo esté: promete que
+lo vas a saber **antes** de gastar en relanzarlo. La tasa medida de "murió pero
+entregó" va de **4 de 4** (estanco, 29-jul) a **4 de 6** (estanco, 30-jul) a
+**0 de 7 archivos** (wrd, sesión 7): por eso el paso 3 y el paso 4 no son
+opcionales ni intercambiables.
 
 ## Cuándo NO aplica
 
@@ -162,6 +339,20 @@ barato que comentar/descomentar imports** (`villa-broaster/KN-006`).
 - `wrd/KN-005` — `wave.json` + commits tempranos + `resumeFromRunId` + verificar
   **tamaño en disco** (stub de 0 bytes); ~592k tokens perdidos en infra-deaths;
   convención `phase:infra-death`.
+- `wrd/PEND-006` — la ola C que nunca se lanzó: los 7 stubs de 0 bytes siguen ahí,
+  con el contenido exacto para relanzarla sin arqueología.
+- `villa-broaster/KN-011` — sembrar la evidencia en disco antes de un QA largo lo
+  hace reanudable; el verifier sobrevivió 2 muertes por `SendMessage`.
+- `orama/metrics.json` — spawn `verify`/sonnet, verdict `escalate`, 0 tokens, nota
+  *"muerte de infraestructura: límite de sesión; no es señal de capacidad;
+  verificación completada inline por orquestador con edge-cdp (12/12 PASS)"*. Es el
+  sexto proyecto que paga la misma lección, y una **tercera** forma de anotarla.
+- `_permanent/KN-014` — la regla que explica por qué se pagó seis veces: si una
+  lección se paga en un SEGUNDO proyecto deja de ser del proyecto y sube a
+  `permanent`. Este checklist es su primera aplicación.
+- `ORION/tools/cerebro.mjs:203-211` — el agregador cuenta `fail`/`escalate` como
+  fallo agrupando por `phase|model` y **nunca** lee `infraDeath` ni la nota: por eso
+  el sufijo en la fase es la única marca que protege la calibración.
 
 **Reparto sin colisiones**
 - `estanco-contable/KN-001` — pre-materializar tipos + seed + `globals.css`: 0 TODOs, 0 fix-cycles.
@@ -188,6 +379,18 @@ fallo normal o no entraron:
   sin tokens** (`build:page`/sonnet ×2, `build:visual`/opus ×2) — son exactamente las
   4 muertes que narra `estanco-contable/KN-009`, contadas hoy como fallo de capacidad
   del modelo.
+  **CORRECCIÓN (2026-08-24, comprobada abriendo el archivo):** decir que estanco no
+  las marcó era falso. Esas 4 —y otras 6 de la sesión del 30-jul, **10 en total**—
+  sí llevan `infraDeath: true` y la nota `[INFRA_DEATH: limite diario, NO senal de
+  capacidad]`. El problema es otro y es peor: **la marca no sirve de nada porque
+  nadie la lee.** El agregador (`ORION/tools/cerebro.mjs:203-211`) agrupa por
+  `phase|model` y cuenta `fail`/`escalate` como fallo **sin mirar el campo ni la
+  nota**, así que `build:page`/sonnet aparece con 4 fallos de 10 cuando su fallo real
+  es 0 de 6, y `build:visual`/opus con 4 de 7 cuando es 1 de 4. Lo que separa de
+  verdad es **el sufijo en `phase`** (wrd: `build:page:infra-death|opus` sale en su
+  propia fila y deja limpia la de `build:page|opus`). El sesgo a la baja de la
+  calibración de estanco sigue siendo real; lo que cambia es el arreglo: **no basta
+  con anotar `infraDeath`, hay que sufijar la fase** — ver el paso 7 del checklist.
 - `infrapilot/metrics.json`, sesión 2026-07-05: 3 `escalate` con **793, 269 y 7
   tokens** — las 3 muertes de `infrapilot/KN-018`. *Un spawn con tokens de dos o tres
   cifras no trabajó: murió.* Sirve como detector.
