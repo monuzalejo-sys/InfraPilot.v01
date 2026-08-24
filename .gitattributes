@@ -1,0 +1,19 @@
+# Finales de línea deterministas: el índice guarda LF, el checkout usa lo
+# nativo de la plataforma. Sin esto, git visto desde Linux (p. ej. el puente de
+# Cowork) marca archivos CRLF completos como "modificados" sin cambio real.
+* text=auto
+
+# Scripts que Windows debe ver con CRLF sí o sí
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+# Binarios: nunca tocar
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.woff binary
+*.woff2 binary
