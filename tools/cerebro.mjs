@@ -544,6 +544,23 @@ if (cmd === "indexar") {
     if (t.proyectos?.length) lineas.push("", "Pagado en: " + t.proyectos.join(", "))
     lineas.push("")
   }
+  /* Vista inversa: desde un proyecto, qué temas lo tocan. Es la que cierra el
+     grafo — sin ella la bóveda vuelve a leerse por silos, que es justo lo que
+     se estaba arreglando. */
+  lineas.push("## Qué temas tocan cada proyecto", "")
+  const porProyecto = new Map()
+  for (const t of temas) for (const p of t.proyectos ?? []) {
+    const k = String(p).trim()
+    if (!k) continue
+    if (!porProyecto.has(k)) porProyecto.set(k, [])
+    porProyecto.get(k).push(t)
+  }
+  for (const p of idx.proyectos.sort((a, b) => b.objetos - a.objetos)) {
+    const suyos = porProyecto.get(p.proyecto) ?? []
+    lineas.push(`- **${p.proyecto}** — ${suyos.length ? suyos.map((t) => `[[TEMA-${t.slug}]]`).join(" · ") : "_sin ningún tema todavía: su conocimiento sigue encerrado_"}`)
+  }
+  lineas.push("")
+
   lineas.push("## Memorias que alimentan el cerebro", "")
   for (const p of idx.proyectos.sort((a, b) => b.objetos - a.objetos)) lineas.push(`- **${p.proyecto}** — ${p.objetos} objetos (v${p.version}) → \`Proyectos/${p.proyecto}/_INDEX.md\``)
   lineas.push("", "## Cómo se consulta", "", "```bash", 'node C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs buscar "tu pregunta"', "```", "")
