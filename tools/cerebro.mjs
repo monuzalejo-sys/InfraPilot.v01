@@ -387,6 +387,39 @@ if (cmd === "indexar") {
   console.log(`  proyectos sin ningún tema transversal: ${sinTema.length ? sinTema.join(", ") : "ninguno ✔"}`)
   const alias = temas.flatMap((t) => (t.texto.match(/\S+/g) || []).length)
   console.log(`  índice generado: ${idx.generado}`)
+} else if (cmd === "probar") {
+  /* Prueba de regresión del cerebro. No mide si "sabe mucho": mide si
+     RESPONDE a cómo se pregunta de verdad. Un tema perfecto con alias malos
+     falla aquí, y debe fallar: nadie lo va a encontrar nunca. */
+  const archivo = flag("archivo", join(CEREBRO, "preguntas-de-prueba.md"))
+  if (!existsSync(archivo)) { console.error(`no existe ${archivo}`); process.exit(1) }
+  const crudo = readFileSync(archivo, "utf8")
+  // solo la sección "## Preguntas": la prosa de arriba también usa "=>" al
+  // explicar el formato, y sin este corte la explicación se probaba a sí misma
+  const casos = (crudo.split(/^##\s*Preguntas\s*$/m)[1] ?? crudo)
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l.includes("=>") && !l.startsWith("#") && !l.startsWith("<!--"))
+    .map((l) => { const [q, esperado] = l.split("=>"); return { q: q.trim(), esperado: esperado.trim() } })
+  let ok = 0
+  const fallos = []
+  for (const c of casos) {
+    const r = buscar(c.q, { n: 3 })
+    const top = r.resultados[0]
+    const acierta = top && (top.id === c.esperado || top.clave === c.esperado || String(top.clave).endsWith("/" + c.esperado))
+    const enTop3 = r.resultados.some((x) => x.id === c.esperado || x.clave === c.esperado)
+    if (acierta) ok++
+    else fallos.push({ ...c, top: top ? `${top.clave} (${top.score.toFixed(1)})` : "sin resultado", enTop3 })
+  }
+  const pct = Math.round((ok / Math.max(casos.length, 1)) * 100)
+  console.log(`PRUEBA DEL CEREBRO: ${ok}/${casos.length} preguntas responden con lo esperado (${pct}%)\n`)
+  for (const f of fallos) {
+    console.log(`  ✗ "${f.q}"`)
+    console.log(`     esperaba: ${f.esperado}${f.enTop3 ? " (está en el top 3, pero no primero: sube sus alias)" : "  ← NO EXISTE o es invisible: hay que cosecharlo"}`)
+    console.log(`     devolvió: ${f.top}`)
+  }
+  if (!fallos.length) console.log("  todo verde.")
+  process.exitCode = fallos.length ? 1 : 0
 } else if (cmd === "exportar") {
   const idx = construirIndiceYGuardar()
   const destino = flag("destino", "C:\\Users\\Kalel\\ORION-Vault\\Cerebro")
