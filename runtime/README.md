@@ -1,62 +1,107 @@
-# ORION Runtime — Claude Code operationalization
+# ORION Runtime — operacionalización para Claude
 
-This directory version-controls how the ORION standard is actually *run* on
-this machine via Claude Code. These files are **copies for the repo**; the
-**operative** copies (the ones Claude Code loads) live outside the repo at:
+Este directorio versiona cómo se *corre* el estándar ORION. Es la FUENTE
+CANÓNICA: 7 agentes de fase (uno por etapa del ciclo RFC-0003), 2 agentes de
+conocimiento (landing-prompter, que escribe prompts de diseño y aprende de los
+veredictos; orion-harvester, que alimenta el cerebro) y 6 skills.
 
-- Skills: `~/.claude/skills/orion*/SKILL.md` → `/orion <task>` (main lifecycle),
-  `/orion-status` (session-start briefing), `/orion-close` (session close +
-  memory curation), `/orion-validate` (memory compliance check)
-- Agents: `~/.claude/agents/orion-*.md`      → spawned by the skills per phase
+## Instalación — un solo comando
 
-If you edit a file here, mirror the change to the operative location (and
-vice-versa), then restart Claude Code — skills and agents are loaded at
-session start, so new/edited definitions only take effect after a restart.
+```
+node tools/instalar-orion.mjs
+```
 
-## The runtime model
+Escribe las copias operativas donde Claude Code realmente las carga:
 
-The main Claude Code conversation acts as the ORION **Runtime / orchestrator**.
-Each lifecycle phase (RFC-0003) maps to one behavioral contract (RFC-0002) and
-one dedicated subagent:
+- `~/.claude/skills/<nombre>/SKILL.md`  ← `runtime/skills/<nombre>.SKILL.md`
+- `~/.claude/agents/<nombre>.md`        ← `runtime/agents/<nombre>.md`
 
-| Phase       | Contract                | Agent            | Tools |
-|-------------|-------------------------|------------------|-------|
-| ANALYZING   | orion:analysis:v1       | orion-analyst    | read-only |
-| PLANNING    | orion:planning:v1       | orion-planner    | read-only |
-| BUILDING    | orion:build:v1          | orion-builder    | full (1 per step, parallel where independent) |
-| VERIFYING   | orion:verification:v1   | orion-verifier   | read + run tests (no edits) |
-| FIXING      | orion:fix:v1            | orion-fixer      | edits only the artifacts a QAReport names |
-| REFLECTING  | orion:reflection:v1 + orion:memory:v1 | orion-reflector | writes memory/*.json |
-| (curation)  | AMM SPECIFICATION §5-§7 | orion-curator    | dedupes/archives/compacts memory/*.json |
+Es idempotente y no borra nada: si un archivo cambia, guarda un `.bak` al lado
+(ignorados por git) y verifica al final que los archivos quedaron en disco y
+que su frontmatter parsea. Otras banderas:
 
-Reflection/memory is persisted under `../memory/<projectId>/state.json` and
-`metrics.json` following the AMM knowledge-object schema
-(`../Skills/autonomous-memory-manager/schemas/`). Memory files are validated
-with `node ../tools/validate-memory.mjs <memory-dir>` after every reflection
-and at session close; the reflector also records `modelOutcomes`
-({phase, model, verdict}) per run, which future runs read to calibrate model
-choice (the RFC-0004 ADAPTIVE strategy implemented without token metering).
-Context economy is enforced through minimum-privilege briefs (the orchestrator
-reads memory/conventions once and excerpts into each agent brief) and hard
-output caps in every agent definition.
+| Bandera | Efecto |
+|---|---|
+| `--check` | muestra qué haría, sin escribir |
+| `--sync-repo <ruta>` | además refresca `<ruta>/runtime/` desde el contenido embebido |
+| `--repo-only <ruta>` | SOLO refresca `<ruta>/runtime/`, no toca `~/.claude` |
+| `--home <ruta>` | usa otra carpeta en vez de `~/.claude` |
 
-## Model policy — adaptive by difficulty (ceiling: Opus)
+**Después de instalar hay que reiniciar Claude Code**: las skills y los agentes
+se cargan al arrancar la sesión.
 
-The orchestrator picks each agent's model by difficulty, passed via the Agent
-tool's `model` param (overrides frontmatter):
+## Cowork / app de escritorio
 
-| Difficulty | Model  | Examples |
+Cowork no lee `~/.claude`. Ahí el runtime se instala como plugin: mismo
+contenido, empaquetado en `orion.plugin` (manifiesto + `skills/<n>/SKILL.md` +
+`agents/*.md`). Se instala desde el chat con el botón del archivo.
+
+Los dos destinos salen del MISMO contenido, así que no hay dos verdades: se
+edita aquí y se reinstala.
+
+## `ORION_HOME` — rutas portables
+
+Ninguna skill trae rutas absolutas de máquina en sus instrucciones. Cada una
+resuelve `ORION_HOME` (la raíz que contiene `ORION_STANDARD.md`, `RFC/`,
+`tools/`, `memory/`) así:
+
+1. Variable de entorno `ORION_HOME`.
+2. El ancestro más cercano del directorio de trabajo con `ORION_STANDARD.md`.
+3. Por defecto: `C:\Users\Kalel\ORION`.
+
+Y adapta cómo lee según el entorno, porque no es el mismo acceso:
+
+| Entorno | Acceso a ORION_HOME |
+|---|---|
+| Claude Code (terminal) | `Bash` / `Read` directo |
+| Cowork en la nube | puente del escritorio: `device_bash` con `~/mnt/ORION`; el `Bash` del contenedor NO ve la carpeta |
+| Cowork en tu computador | carpeta montada localmente |
+
+## El modelo de runtime
+
+La conversación principal actúa como Runtime/orquestador de ORION. Cada fase
+del ciclo (RFC-0003) mapea a un contrato de comportamiento (RFC-0002) y a un
+subagente dedicado:
+
+| Fase        | Contrato                | Agente           | Herramientas |
+|-------------|-------------------------|------------------|-----------|
+| ANALYZING   | orion:analysis:v1       | orion-analyst    | solo lectura |
+| PLANNING    | orion:planning:v1       | orion-planner    | solo lectura |
+| BUILDING    | orion:build:v1          | orion-builder    | completas (1 por paso, paralelo si son independientes) |
+| VERIFYING   | orion:verification:v1   | orion-verifier   | lectura + correr tests (sin editar) |
+| FIXING      | orion:fix:v1            | orion-fixer      | solo los artefactos que nombra el QAReport |
+| REFLECTING  | orion:reflection:v1 + orion:memory:v1 | orion-reflector | escribe memory/*.json |
+| (curación)  | AMM SPECIFICATION §5-§7 | orion-curator    | dedupe/archiva/compacta memory/*.json |
+
+La reflexión/memoria se persiste en `../memory/<projectId>/state.json` y
+`metrics.json` según el esquema de objetos AMM
+(`../Skills/autonomous-memory-manager/schemas/`). Los archivos de memoria se
+validan con `node ../tools/validate-memory.mjs <memory-dir>` después de cada
+reflexión y en el cierre de sesión; el reflector además registra
+`modelOutcomes` ({phase, model, verdict}) por corrida, que las corridas futuras
+leen para calibrar la elección de modelo (la estrategia ADAPTIVE de RFC-0004
+implementada sin medición de tokens). La economía de contexto se impone con
+briefs de mínimo privilegio (el orquestador lee memoria/convenciones una vez y
+extracta hacia cada brief) y topes duros de salida en cada agente.
+
+## Política de modelo — adaptativa por dificultad (techo: Opus)
+
+El orquestador elige el modelo de cada agente por dificultad, pasándolo en el
+parámetro `model` de la herramienta Agent (sobrescribe el frontmatter):
+
+| Dificultad | Modelo | Ejemplos |
 |-----------|--------|----------|
-| Trivial   | haiku  | rename/format, config value, small static component, persist memory JSON |
-| Normal    | sonnet | CRUD endpoint, wire form↔API, stateful component, most analysis/planning/QA |
-| Hard      | opus   | schema+RLS design, subtle debugging, new-module architecture, security-sensitive |
+| Trivial   | haiku  | renombrar/formatear, valor de config, componente estático pequeño, persistir JSON de memoria |
+| Normal    | sonnet | endpoint CRUD, conectar formulario↔API, componente con estado, la mayoría de análisis/planeación/QA |
+| Hard      | opus   | diseño de esquema+RLS, debugging sutil, arquitectura de módulo nuevo, sensible a seguridad |
 
-The `orion-analyst` rates difficulty per sub-objective/step; those ratings drive
-the model for each builder/verifier/fixer. Builders run one-per-step, so a
-single plan can mix a haiku step and an opus step in parallel. Agent frontmatter
-carries a safe default (sonnet; reflector haiku) so a naive spawn never inherits
-the main conversation's model. There is no live token metering in this
-environment — model choice is the actual cost lever.
+El `orion-analyst` califica dificultad por sub-objetivo/paso; esas
+calificaciones eligen el modelo de cada builder/verifier/fixer. Los builders
+corren uno por paso, así que un mismo plan puede mezclar un paso haiku y uno
+opus en paralelo. El frontmatter de cada agente lleva un default seguro
+(sonnet; reflector haiku) para que un spawn ingenuo nunca herede el modelo de la
+conversación principal. En este entorno no hay medición de tokens en vivo — la
+elección de modelo es la palanca de costo real.
 
-Note: there is no always-on daemon. The system runs when `/orion` is invoked in
-a conversation; the orchestrator plays the runtime role for that task.
+Nota: no hay demonio siempre encendido. El sistema corre cuando se invoca
+`/orion` en una conversación; el orquestador hace de runtime para esa tarea.

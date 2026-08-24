@@ -55,7 +55,7 @@ Changes to the app are made and versioned in that external repo, not here.
 
 [`runtime/`](runtime/README.md) version-controls how ORION is actually *run*
 on this machine via Claude Code: 7 phase agents (one per RFC-0003 lifecycle
-stage) and 4 skills. These are **repo mirrors** — the *operative* copies that
+stage), 2 knowledge agents (`landing-prompter`, `orion-harvester`) and 6 skills. These are **repo mirrors** — the *operative* copies that
 Claude Code actually loads live outside this repo, under `~/.claude/`. See
 [`runtime/README.md`](runtime/README.md) for the full mapping between
 lifecycle phases, contracts, and agents, and for the mirror/sync convention.
