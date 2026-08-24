@@ -1,6 +1,6 @@
 {
   "projectId": "_permanent",
-  "snapshotDate": "2026-08-24T09:45:00.000Z",
+  "snapshotDate": "2026-08-24T10:00:00.000Z",
   "objects": [
     {
       "id": "KN-001",
@@ -248,9 +248,25 @@
       "fact": "`verdict: ok` EN LAS METRICAS MIDE QUE EL SPAWN ATERRIZO, NO QUE ACERTO — y por eso hoy NO existe medicion de defectos por tier. Al agregar las 280 filas `modelOutcomes` de las 11 memorias (32,7 millones de tokens) la tasa de fallo sale casi identica entre modelos: haiku 1/24, sonnet 6/149, opus 3/101. Pero al abrir las 24 filas no-ok, 19 son MUERTES DE SESION (infra, no capacidad), una es un verificador haciendo bien su trabajo, y en todo el corpus queda UN SOLO fallo de capacidad real (placita build:visual opus, 283.543 tokens) cuya causa fue el insumo. Mientras tanto los tres desastres documentados de haiku —seed corrupto, la ciudad 'Rionegro' inventada en keywords SEO, y el genero equivocado en documentos publicos— figuran los tres como `ok`, porque el spawn termino. CONSECUENCIA PRACTICA: no uses la tasa de fallo de `modelOutcomes` para decidir tier, no dice nada. Para que empiece a decir algo hay que registrar el veredicto DEL VERIFICADOR sobre el trabajo (aterrizo / acerto / hubo que corregirlo), separar las muertes de infraestructura en su propio campo, y contar los defectos hallados despues.",
       "context": "Hallado el 2026-08-24 al escribir el tema `modelos-y-costos`, agregando a mano los metrics.json de las 11 memorias. Segundo hueco de la misma medicion: ninguna memoria registra precio por token, asi que 'costo' en todo el ecosistema significa tokens, nunca dinero. Contra-dato util: en placita, sonnet gasto MAS que opus en la misma fase (build:page 256k vs 224k), asi que 'el barato sale mas barato' tampoco se sostiene solo.",
       "source": "session 2026-08-24, tema modelos-y-costos"
+    },
+    {
+      "id": "PEND-001",
+      "type": "Pending",
+      "tier": "Permanent",
+      "created": "2026-08-24T10:00:00.000Z",
+      "updated": "2026-08-24T10:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Ready",
+      "dependencies": [
+        "KN-012"
+      ],
+      "task": "HUECOS DEL ECOSISTEMA hallados al leer las 11 memorias juntas el 2026-08-24: areas donde hay trabajo real y CERO conocimiento persistido. En orden de riesgo: (1) FACTURACION DIAN Y LEGALIDAD COLOMBIANA — condiciona el modelo de anulacion de cuatro productos y hasta el precio del software; la decision lleva abierta desde julio en tres memorias (estanco-contable/PEND-009, villa-broaster/PEND-001, placita/PEND-010) y no hay una sola leccion. (2) DESPLIEGUE, HOSTING Y RESPALDO — diez proyectos, uno solo en produccion, y ni una leccion de deploy, dominio, backup, ni de que pasa cuando el local se queda sin internet. (3) PRECIO Y CONTRATO — se vende software a negocios reales y solo hay dos lecciones (mensualidad con permanencia, piloto a mano); nada de cuanto vale cada producto ni que pasa si el cliente deja de pagar. (4) SOPORTE Y OPERACION POST-ENTREGA — placita esta EN PRODUCCION con el dueno usandola y no hay conocimiento de soporte, capacitacion ni respaldo (el PIN 0000 vigente semanas es el sintoma). (5) USUARIOS REALES — hay reglas disenadas PARA la cajera pero ninguna leccion de haberla OBSERVADO usando el sistema: todo el QA es de agente. (6) WHATSAPP — canal real de al menos tres negocios, cero lecciones. (7) DATOS PERSONALES — se guardan telefonos de clientes reales sin una linea sobre habeas data ni la ley 1581, en Colombia.",
+      "reason": "Un hueco de conocimiento no duele hasta que alguien decide sin el. Estos siete estan ordenados por lo que costaria equivocarse: el primero tiene implicacion legal y de precio, el ultimo tambien. Cada vez que se trabaje en uno de estos frentes, cosechar la leccion aunque parezca obvia — hoy no existe ninguna."
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-08-24T09:45:00.000Z",
-  "version": 9
+  "lastAmmRun": "2026-08-24T10:00:00.000Z",
+  "version": 10
 }

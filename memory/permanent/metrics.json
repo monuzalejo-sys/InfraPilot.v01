@@ -1,10 +1,68 @@
 {
   "projectId": "_permanent",
-  "sessionCount": 0,
+  "sessionCount": 1,
   "totalContextSaved": 0,
-  "avgCompressionRatio": 1.0,
+  "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-07-02T05:45:00.000Z",
-  "sessions": []
+  "lastUpdated": "2026-08-24T10:00:00.000Z",
+  "sessions": [
+    {
+      "sessionId": "session-2026-08-24-el-cerebro",
+      "runId": "orion-permanent-el-cerebro",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-24T02:30:00.000Z",
+      "completedAt": "2026-08-24T10:00:00.000Z",
+      "objectsCreated": 6,
+      "objectsMerged": 2,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "build:lib",
+          "model": "fable-5-inline",
+          "verdict": "ok",
+          "tokens": 0,
+          "measurement_mode": "UNMETERED"
+        },
+        {
+          "phase": "analysis",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 1145142,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 1674196,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 747868,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 462842,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 109347,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "BLOQUE 'EL CEREBRO': la boveda pasa de espejo pasivo a capa que responde. Construido tools/cerebro.mjs (indexar/buscar/tema/probar/citas/estado/exportar; BM25 sin dependencias sobre 11 memorias + metricas + documentos de doctrina), 17 temas transversales, prueba de regresion 3/46 -> 46/46, verificador de citas 786/0 rotas, agente orion-harvester, skill orion-cerebro, y cableado en orion (fase 1), orion-close y orion-status. 34 agentes en 5 olas, ~4,14 M tokens medidos. Dos hallazgos accionables aplicados en otras memorias: infrapilot/KN-035 (desbloqueo de un supuesto falso de casi un mes) y wrd/RSK-004 (misma clase de bug temporal que arroces ya pago). Un agente encontro un bug en la propia herramienta: el agregador contaba las muertes de sesion como fallos del modelo; corregido."
+    }
+  ]
 }
