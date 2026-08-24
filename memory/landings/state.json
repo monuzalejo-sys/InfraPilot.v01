@@ -1,6 +1,6 @@
 {
   "projectId": "landings",
-  "snapshotDate": "2026-08-23T05:10:00.000Z",
+  "snapshotDate": "2026-08-23T22:40:00.000Z",
   "objects": [
     {
       "id": "POL-001",
@@ -189,19 +189,112 @@
       "tier": "Project",
       "lifetime": "Project",
       "created": "2026-08-23T05:10:00.000Z",
-      "updated": "2026-08-23T05:10:00.000Z",
+      "updated": "2026-08-23T22:40:00.000Z",
       "dependencies": [
         "POL-003"
       ],
       "impact": "High",
       "priority": "High",
-      "status": "Ready",
+      "status": "Done",
+      "resolution": "VEREDICTO RECOGIDO 2026-08-23, NEGATIVO SOBRE EL RESULTADO (no sobre los datos). Palabras del dueno viendo lo que produjo Claude Design: 'esto es lo que lleva de landing, quiero mejor fondo, animaciones mas vivas y llamativas, todo se ve muy generico, apagado, hazlo divertido, llamativo, que de gusto verlo, dame un prompt que de verdad me sorprenda, no eso'. CANAL: revisado en MOVIL (capturas 390x844); no hubo revision de escritorio, asi que no hay veredicto de escritorio y no se inventa. CAUSA (verificada en el entregable): (1) el zip trae un design system ajeno _ds/modernist-<uuid>/ (readme: 'flat, architectural and set entirely in Archivo', fondo claro #f3f2f2, radio 0, 'print photographs in black and white') que gano sobre la direccion oscura del prompt: la portada salio crema — background:radial-gradient(130% 100% at 50% 16%, #fffaf2 0%, #f7ece1 ...) — el texto fantasma BROASTER quedo rosa palido sobre crema (casi invisible) y la cadena '--brasa' NO aparece ni una vez en el HTML entregado; el propio modelo se documento la decision en un comentario CSS: 'tinta #141414 / hueso #f7ece1 = 15.83 (portada clara)'. (2) document.getAnimations() = 1 en toda la pagina: el inventario A1-A10 no sobrevivio; el lienzo .dc.html (x-dc + bindings {{ }} + support.js) es de artboards estaticos. Los mecanismos por gesto SI estaban escritos en el markup (mask-image: radial-gradient(circle 150px at var(--fx) var(--fy)) con brightness(1.15); estado promoArmada), pero en un lienzo quieto son invisibles: el dueno revisa PNG. (3) La carta quedo en formato lista de app de domicilios con circulos de iniciales Co/Fa/Be: competente y aburrida. LO QUE SI SOBREVIVIO Y NO FUE CRITICADO: paleta oscura en la carta, precios en naranja, cinta EJEMPLO (3 apariciones), 'dato grande' 2 sedes / $0, y las 9 fotos procesadas a webp 160/420/900 con pesos correctos (max 136 KB). Las cuatro preguntas del task quedaron sin responder por separado (2 plato crema, 3 fotos reservadas, 4 cinta EJEMPLO): el dueno no las menciono; se registran como no contestadas, no como aprobadas. Lecciones pagadas derivadas: KN-007, KN-008, KN-009 y POL-004. Sucesor: villa-app-villa-broaster-v3.md (PEND-004).",
       "task": "Recoger el veredicto del dueno sobre ORION/prompts-landing/villa-app-villa-broaster-v2.md (entregado 2026-08-23, con la carpeta prommter/proyectos/villa-broaster/docs/claude-design) y escribirlo aqui POR CANAL, movil y escritorio por separado, con su causa. Preguntas concretas: (1) la combinacion 01 hero carrusel + 02 promo que se arma dentro de la tarjeta + 03 foco que calienta, le parecio la sorpresa que pidio o volvio a pedir MAS, y con que palabra; (2) el hero sobre plato crema (porque las 9 fotos llegan en PNG RGB SIN alfa) se leyo como objeto fisico o como parche; (3) las 4 fotos reservadas por no tener producto en la carta, le parecio prudencia o le parecio que se desperdicio material; (4) la cinta visible de Carta de EJEMPLO le estorbo. Al registrarlo, actualizar la columna Resultados de referencias/_INDEX.md y el Historial de uso de las fichas 01, 02 y 03.",
       "reason": "Es la primera landing que combina TRES fichas de la biblioteca (POL-003) y la primera con fotos de producto reales del cliente. Ninguna de las dos cosas tiene veredicto pagado: sembrar ahora que la combinacion funciono seria una hipotesis contaminando todas las combinaciones futuras, que es justo lo que POL-003 quiere evitar.",
       "source": "entrega 2026-08-23 (pedido del dueno: rediseno completo que sorprenda, sin salirse del PLAN-EQUIPO)"
+    },
+    {
+      "id": "KN-007",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-23T22:40:00.000Z",
+      "updated": "2026-08-23T22:40:00.000Z",
+      "dependencies": [
+        "PEND-003"
+      ],
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Current",
+      "fact": "CLAUDE DESIGN ANCLA UN DESIGN SYSTEM GENERICO SI EL PROMPT NO SE LO PROHIBE, Y ESE DS LE GANA A LA DIRECCION DE ARTE DEL PROMPT. Verificado el 2026-08-23 con el entregable del v2 de Villa Broaster: el zip trae la carpeta _ds/modernist-<uuid>/ (readme.md, styles.css, theme.json, _adherence.oxlintrc.json) cuyo manual dice literalmente 'Modernist is flat, architectural and set entirely in Archivo: a near-mono red on white... zero corner radius and strong 2px rules', 'A light ground (--color-bg #f3f2f2)', 'Do not round a corner anywhere', 'Print photographs in black and white with the .grayscale wrapper' y 'Use Lucide icons'. Resultado medido sobre el HTML entregado: la portada quedo CLARA (background:radial-gradient(130% 100% at 50% 16%, #fffaf2 0%, #f7ece1 ...)) aunque el prompt v2 especificaba radial oscuro con --brasa; grep de '--brasa' en el entregable = 0 apariciones; el texto fantasma BROASTER quedo rosa palido sobre crema. El modelo hasta se justifico en un comentario CSS propio: 'tinta #141414 / hueso #f7ece1 = 15.83 (portada clara)'. CONTRAMEDIDA OBLIGATORIA en todo prompt para Claude Design (apartado 'ARMADURA CONTRA EL MEDIO', va ARRIBA, antes de los datos): (a) 'no uses, no adjuntes y no derives de ningun design system predefinido (Modernist ni ninguno); si tu flujo va a anclar uno, cancelalo'; (b) 'todos los tokens salen de ESTE prompt'; (c) prohibiciones concretas que peleen una por una con el DS que suele anclar: nada de fondo blanco/crema a pantalla completa, radios 18-24 px (no 0), fotos NUNCA en blanco y negro ni desaturadas, tipografia display con caracter (no Archivo plano), iconos SVG inline (no libreria); (d) un criterio de aceptacion que se pueda medir: 'el entregable no contiene carpeta _ds/ ni <link> a styles.css externo, y el fondo de la primera pantalla tiene luminancia < 0.06'.",
+      "context": "Pagada con el rechazo del dueno del 2026-08-23 ('todo se ve muy generico, apagado'). Aplica a cualquier prompt dirigido a Claude Design, no solo a Villa Broaster: el medio tiene un sesgo por DS claro/plano que un prompt bien escrito pero silencioso no vence.",
+      "source": "inspeccion directa del zip entregado (_ds/modernist-aef7c589.../readme.md + 'Vitrina Villa Broaster.dc.html') 2026-08-23"
+    },
+    {
+      "id": "KN-008",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-23T22:40:00.000Z",
+      "updated": "2026-08-23T22:40:00.000Z",
+      "dependencies": [
+        "PEND-003",
+        "KN-002"
+      ],
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Current",
+      "fact": "EL LIENZO DE CLAUDE DESIGN ES ESTATICO: PEDIRLE COREOGRAFIA ES PEDIRLE AL MEDIO ALGO QUE NO MUESTRA. Medido el 2026-08-23 sobre el entregable del v2: document.getAnimations() = 1 en TODA la pagina, pese a que el prompt llevaba el inventario A1-A10 con ms y curvas (KN-002 exigia justo eso). El formato es .dc.html (<x-dc>, bindings {{ }} y support.js): artboards, no una app corriendo. Y lo grave es que el codigo SI estaba escrito — en el HTML hay mask-image: radial-gradient(circle 150px at var(--fx,50%) var(--fy,42%)) con filter:brightness(1.15) y un estado promoArmada —, pero un mecanismo cuyo valor entero es un GESTO (spotlight con el dedo, promo que se arma al tocar, carrusel de 650 ms) es INVISIBLE cuando el dueno revisa capturas quietas. CORRECCION, que no es bajar la ambicion sino partirla en dos: (1) el prompt le pide al lienzo MOVIMIENTO CONGELADO — que cada pantalla se VEA en movimiento estando quieta: producto inclinado 8-12 grados saliendose del encuadre con sombra proyectada, particulas/migas suspendidas, la promo dibujada en su estado intermedio con las piezas en vuelo, el elemento siguiente asomando cortado por el borde, el foco YA puesto sobre el producto con su halo caliente visible; (2) la coreografia real (elemento, disparador, ms, curva, presupuesto, propiedades prohibidas) baja a un ANEXO final rotulado 'para la fase de codigo, NO para el lienzo', que es donde sirve porque ahi si corre. Regla derivada: antes de especificar movimiento hay que preguntarse en que medio se va a revisar; si el revisor ve PNG, el movimiento tiene que estar en la composicion.",
+      "context": "Complementa KN-002 (animacion como inventario numerado) delimitando su alcance: el inventario sigue siendo obligatorio, pero va al anexo cuando el destinatario es un lienzo de artboards. Verificar el mismo punto si el dueno cambia de herramienta (v0, Lovable, Figma Make): la pregunta es siempre 'este medio ejecuta JS y muestra transiciones al revisor?'.",
+      "source": "medicion del orquestador (getAnimations=1) + lectura del .dc.html entregado 2026-08-23"
+    },
+    {
+      "id": "KN-009",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-23T22:40:00.000Z",
+      "updated": "2026-08-23T22:40:00.000Z",
+      "dependencies": [
+        "PEND-003",
+        "POL-001"
+      ],
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Current",
+      "fact": "EN COMIDA, LA PORTADA CLARA MATA EL HAMBRE: LA DIRECCION BRASA/OSCURO ES OBLIGATORIA DE PUNTA A PUNTA. El 2026-08-23, con la portada de Villa Broaster en crema y la carta en oscuro, el dueno rechazo el conjunto con 'quiero mejor fondo... todo se ve muy generico, apagado, hazlo divertido, llamativo, que de gusto verlo'. La primera palabra del reclamo es FONDO: es lo primero que se juzga en una portada de comida, antes que la tipografia y antes que el copy. Traduccion operativa de sus tres adjetivos, para no volver a tratarlos como gusto: 'apagado' = fondo claro y plano donde la comida no brilla -> noche #0a0a0a con radiales calidas (rojo/naranja/amarillo brasa) por seccion y por producto, mas grano, mas vineta, mas halo detras del producto; 'generico' = layout de app de domicilios estandar (lista de filas con circulo de inicial a la izquierda, chips arriba, todo centrado y simetrico) -> composicion de cartel: producto GIGANTE en diagonal saliendose del encuadre, display condensada llena, numeros de precio enormes en amarillo brasa, etiquetas tipo sticker rotadas, CTA gordo con sombra dura; 'que de gusto verlo' = que haya algo que mirar en cada pantalla, no solo algo que leer. IMPORTANTE PARA NO SOBRECORREGIR: el crema #f7ece1 NO se prohibe, se degrada de rol — deja de ser fondo de pantalla y queda como tinta de texto y como 'plato' bajo la foto (las fotos llegan en PNG sin alfa y sobre negro se verian como recortes sucios). Y lo que el dueno NO critico se conserva: paleta oscura de la carta, precios en naranja, cinta EJEMPLO visible, dato grande '2 sedes / $0'.",
+      "context": "Pagada con el segundo rechazo seguido en el mismo proyecto (v2, 2026-08-23). Es la version 'comida' de POL-001: la landing vende, pero ademas en comida el vehiculo del deseo es la luz calida sobre el producto en un fondo oscuro. No extrapolar a otros rubros sin veredicto (una inmobiliaria o un SaaS pueden querer claro).",
+      "source": "veredicto del dueno 2026-08-23 + capturas cap-top.png / cap-carta.png (390x844) del entregable v2"
+    },
+    {
+      "id": "POL-004",
+      "type": "Policy",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-23T22:40:00.000Z",
+      "updated": "2026-08-23T22:40:00.000Z",
+      "dependencies": [
+        "KN-007",
+        "KN-008"
+      ],
+      "impact": "High",
+      "priority": "High",
+      "status": "Active",
+      "rule": "TODO PROMPT DIRIGIDO A UN GENERADOR DE DISENO (Claude Design y equivalentes) LLEVA DOS PIEZAS FIJAS ADEMAS DE LOS 12 APARTADOS. (1) 'ARMADURA CONTRA EL MEDIO', colocada ARRIBA del todo, antes de los datos: prohibicion explicita de anclar/adjuntar/derivar cualquier design system predefinido, orden de derivar todos los tokens del propio prompt, y la lista de contra-defaults del medio (fondo claro, radio 0, fotos en blanco y negro, tipografia neutra, libreria de iconos). Se escribe en imperativo y con criterio medible, no como preferencia. (2) 'ANEXO — COREOGRAFIA PARA LA FASE DE CODIGO': el inventario numerado de animaciones sale del cuerpo del prompt y baja al anexo, rotulado como NO exigible al lienzo; en el cuerpo se pide en su lugar MOVIMIENTO CONGELADO (la pantalla se ve viva estando quieta). Ademas, el veredicto se sigue registrando por canal (POL-003) y se anota si el medio respeto o no la armadura, porque eso se acumula por herramienta.",
+      "scope": "Prompts cuyo destinatario es un generador visual que devuelve artboards/capturas. NO aplica a prompts para fase de codigo (Claude Code sobre el repo), donde la coreografia va en el cuerpo y si es exigible.",
+      "context": "Pagada con el rechazo del v2 de Villa Broaster (2026-08-23): el prompt estaba bien investigado y aun asi el medio impuso un DS claro/plano y devolvio artboards con getAnimations()=1.",
+      "source": "veredicto del dueno 2026-08-23 + KN-007 / KN-008"
+    },
+    {
+      "id": "PEND-004",
+      "type": "Pending",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-23T22:40:00.000Z",
+      "updated": "2026-08-23T22:40:00.000Z",
+      "dependencies": [
+        "KN-007",
+        "KN-008",
+        "KN-009",
+        "POL-004"
+      ],
+      "impact": "High",
+      "priority": "High",
+      "status": "Ready",
+      "task": "Recoger el veredicto del dueno sobre ORION/prompts-landing/villa-app-villa-broaster-v3.md (entregado 2026-08-23) y escribirlo aqui con su causa y por canal. Preguntas concretas: (1) la ARMADURA se respeto: el zip trae carpeta _ds/? el fondo de la portada es oscuro? las fotos salieron a color? los radios son 18-24? (2) el MOVIMIENTO CONGELADO (presa gigante en diagonal saliendose del encuadre, migas suspendidas, promo dibujada a medio armar, disco siguiente cortado por el borde, sticker 'SALIENDO AHORA') basto para que dejara de decir 'estatico/apagado', o volvio a pedir animacion de verdad — y en ese caso hay que llevarlo a la fase de codigo, no a otro prompt de lienzo; (3) que palabra uso esta vez: si repite 'generico' el problema sigue siendo composicion, si dice otra cosa hay leccion nueva; (4) si el registro de cartel de feria (display enorme, stickers rotados, precios amarillos gigantes) le parecio divertido o le parecio gritado/barato — esa frontera todavia no tiene veredicto.",
+      "reason": "Es el primer prompt que aplica POL-004 (armadura + anexo de coreografia) y el primero que apuesta por el registro de cartel. Ninguna de las dos cosas esta pagada: sembrar ahora que funciono seria hipotesis contaminando los prompts siguientes, y la frontera entre 'divertido' y 'gritado' solo la fija el dueno.",
+      "source": "entrega 2026-08-23 (v3, tras el rechazo del v2)"
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-08-23T05:10:00.000Z",
-  "version": 5
+  "lastAmmRun": "2026-08-23T22:40:00.000Z",
+  "version": 6
 }

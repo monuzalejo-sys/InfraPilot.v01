@@ -1,11 +1,11 @@
 {
   "projectId": "landings",
-  "sessionCount": 2,
+  "sessionCount": 3,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-08-19T00:00:00.000Z",
+  "lastUpdated": "2026-08-23T22:55:00.000Z",
   "sessions": [
     {
       "completedAt": "2026-08-19T00:00:00.000Z",
@@ -27,6 +27,20 @@
       "fixCycles": 0,
       "modelOutcomes": [],
       "notes": "Biblioteca prompts-landing/referencias (_INDEX, _PLANTILLA, ficha 01 TOONHUB) + seccion 2b y apartados 11-12 en el agente landing-prompter + POL-003. Inline, sin spawns."
+    },
+    {
+      "sessionId": "session-2026-08-23-villa-v2-veredicto-y-v3",
+      "runId": "landings-villa-broaster-v3",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-23T22:10:00.000Z",
+      "completedAt": "2026-08-23T22:55:00.000Z",
+      "objectsCreated": 5,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [],
+      "notes": "Veredicto NEGATIVO del dueno sobre el resultado del v2 de Villa Broaster (generico/apagado/estatico): PEND-003 cerrado con causa verificada en el entregable (DS Modernist anclado, portada crema, getAnimations=1). Lecciones pagadas KN-007/008/009 + POL-004 (armadura contra el medio + anexo de coreografia). Escrito villa-app-villa-broaster-v3.md y actualizados referencias/_INDEX.md y fichas 01/02/03."
     }
   ]
 }
