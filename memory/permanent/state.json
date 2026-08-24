@@ -1,6 +1,6 @@
 {
   "projectId": "_permanent",
-  "snapshotDate": "2026-08-21T00:00:00.000Z",
+  "snapshotDate": "2026-08-24T09:00:00.000Z",
   "objects": [
     {
       "id": "KN-001",
@@ -165,9 +165,75 @@
       "dependencies": [],
       "fact": "LIMITE DEL TOOL BASH EN ESTA MAQUINA: un comando de mas de ~8 KB se TRUNCA (limite de linea de comandos de Windows al pasar por bash -c) — un heredoc de ~150 lineas fallo con unexpected EOF while looking for matching quote en la linea 145 y NO creo el archivo. Ademas el wrapper colapsa doble backslash en uno solo. Regla: archivos nuevos grandes o con backslashes se escriben con Write/Edit; los comandos Bash se mantienen cortos (<~5 KB) y sin depender de backslashes literales.",
       "context": "Pagado 2026-08-21 escribiendo edge-cdp.mjs por heredoc; el mismo heredoc corto si funcionaba."
+    },
+    {
+      "id": "KN-012",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-24T09:00:00.000Z",
+      "updated": "2026-08-24T09:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "EXISTE UN CEREBRO TRANSVERSAL Y SE CONSULTA ANTES DE PENSAR. `node C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs buscar \"<pregunta>\"` responde con lo que YA sabe el ecosistema (11 memorias, ~275 objetos, sus metricas de costo por modelo, los documentos de doctrina y los temas curados) y devuelve la cita de donde salio cada cosa. Comandos: buscar, tema <slug>, probar (prueba de regresion), citas (verifica que ninguna cita este inventada), estado (huecos), exportar (vista de la boveda), indexar. Cuesta ~0 y se reindexa solo cuando algo cambia, asi que se llama varias veces por turno sin pensarlo. La FUENTE DE VERDAD de la capa transversal son los archivos de C:\\Users\\Kalel\\ORION\\cerebro\\temas\\; la boveda (ORION-Vault\\Cerebro) es una vista regenerable. Lo consumen el skill orion-cerebro (responder con cita), el agente orion-harvester (alimentarlo) y la fase 1 del skill orion (consultar antes de analizar).",
+      "context": "Construido la noche del 2026-08-24. Antes de esto la boveda era un espejo pasivo: una nota por objeto, aislada por proyecto, y para saber si algo ya se habia aprendido habia que abrir once state.json — que en la practica nadie abria.",
+      "source": "session 2026-08-24 bloque EL CEREBRO"
+    },
+    {
+      "id": "KN-013",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-24T09:00:00.000Z",
+      "updated": "2026-08-24T09:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-012"
+      ],
+      "fact": "LA PRUEBA DE REGRESION DEL CEREBRO ES LA METRICA DE SI EL ECOSISTEMA APRENDE O SOLO ACUMULA. `cerebro.mjs probar` corre las preguntas de C:\\Users\\Kalel\\ORION\\cerebro\\preguntas-de-prueba.md —escritas como las hace el dueno, informales y sin tildes— y exige que el tema correcto salga PRIMERO. No mide cuanto sabe el cerebro: mide si responde a como se pregunta de verdad. Un tema impecable con alias malos falla ahi, y debe fallar, porque nadie lo encontraria nunca. Se corre en cada cierre de sesion y NO puede bajar: si bajo, algo se rompio o un tema nuevo le esta robando preguntas a otro. Medicion inicial 3/26 (12%) con cero temas; 26/26 (100%) con 12 temas escritos, la misma noche.",
+      "context": "El complemento es `cerebro.mjs citas`, que verifica mecanicamente que cada proyecto/ID citado exista: 454 citas comprobadas y 0 rotas en los 12 primeros temas. La promesa de 'nada inventado' no se sostiene a mano cuando hay docenas de citas.",
+      "source": "session 2026-08-24 bloque EL CEREBRO"
+    },
+    {
+      "id": "KN-014",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-24T09:00:00.000Z",
+      "updated": "2026-08-24T09:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Current",
+      "dependencies": [
+        "KN-012"
+      ],
+      "fact": "SI UNA LECCION SE PAGA EN UN SEGUNDO PROYECTO, DEJA DE SER DEL PROYECTO Y SUBE A PERMANENT. La promocion manual llega tarde y por eso cada proyecto vuelve a pagar la misma leccion: al leer las 11 memorias juntas aparecieron 8 lecciones en 6 proyectos diciendo lo mismo ('el agente muerto ya escribio: audita el disco antes de relanzar'), 5 midiendo lo mismo sobre capturas por CDP en 4 proyectos, y 8 sobre no inventar datos en 6 proyectos. El caso mas caro medido: infrapilot escribio el 2026-07-28 que en esta maquina no se podian probar migraciones SQL, y estanco-contable demostro lo contrario el 2026-07-29 con embedded-postgres validando 37/37 — infrapilot quedo trabado casi un mes con la solucion escrita al lado, en otra memoria.",
+      "context": "Es la razon de ser del cerebro y tambien su primera cosecha. Regla operativa: al cerrar, si la leccion de la sesion ya existe en OTRA memoria, no se duplica: se promueve a permanent o se escribe como tema transversal, y las dos memorias apuntan ahi.",
+      "source": "diagnostico transversal 2026-08-24 (ORION/cerebro/diagnostico-del-ecosistema.md)"
+    },
+    {
+      "id": "KN-015",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-24T09:00:00.000Z",
+      "updated": "2026-08-24T09:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-012"
+      ],
+      "fact": "EN LA MEMORIA, SEPARA LA REGLA DE LA COORDENADA: la regla no caduca, la coordenada si. Con los proyectos repartidos en tres raices (ORION\\, prommter\\proyectos\\, fable 5\\), la evidencia archivo:linea envejece mas rapido de lo que se cura: pollo-landing apunta a una carpeta que ya no existe, estanco dice que fechaNegocio vive en facturacion.ts cuando se movio a jornada.ts, y landings avisa que sus propios numeros de linea se desplazaron. Al escribir conocimiento, enuncia la regla de forma que sobreviva sola y trata la ruta como una pista que hay que RE-VERIFICAR en el momento de citarla, no como un hecho.",
+      "context": "Hallado al cruzar las 11 memorias el 2026-08-24. Es tambien por que el verificador de citas (`cerebro.mjs citas`) comprueba proyecto/ID —que es estable— y no rutas de archivo.",
+      "source": "diagnostico transversal 2026-08-24"
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-08-10T00:00:00.000Z",
-  "version": 7
+  "lastAmmRun": "2026-08-24T09:00:00.000Z",
+  "version": 8
 }
