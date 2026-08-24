@@ -49,6 +49,23 @@ this skill exists so the user doesn't have to babysit every phase.
   work directly, re-spawn only what's genuinely missing), then delete it.
 - Also read `C:\Users\Kalel\ORION\memory\permanent\state.json` — machine-level
   facts shared across ALL projects (a handful of objects, one cheap read).
+- PREGÚNTALE AL CEREBRO ANTES DE ANALIZAR. El conocimiento del ecosistema
+  entero (270+ objetos de 10 memorias + los temas curados) se consulta en
+  milisegundos y cuesta ~0:
+
+  ```bash
+  node C:\Users\Kalel\ORION\tools\cerebro.mjs buscar "<el objetivo de la tarea>" --n 8
+  ```
+
+  Hazlo SIEMPRE, con el objetivo tal como lo escribió el usuario, y otra vez
+  con los términos del dominio (caja, turno, roles, landing, despliegue…).
+  Un TEMA que salga arriba es una respuesta ya curada: ábrelo con
+  `cerebro.mjs tema <slug>` y trátalo como restricción del run, no como
+  sugerencia — se pagó con un fallo real. Si lo que vas a hacer contradice un
+  tema, dilo antes de construir. Los resultados relevantes se EXCERPTAN a los
+  briefs de los agentes (nadie más vuelve a buscar). Si el cerebro no sabe
+  nada del tema, dilo: es un hueco, y al cerrar se cosecha con
+  `orion-harvester`.
 
 Each phase below maps to an ORION behavioral contract (RFC-0002) and has a
 dedicated subagent. You (the main conversation) are the RUNTIME/orchestrator:
@@ -221,6 +238,12 @@ the absolute memory dir path. Reflection is MANDATORY on every terminal path,
 including ESCALATED/ABORTED.
 
 Afterwards:
+- Si el run produjo una lección que serviría en OTRO proyecto (algo falló, algo
+  se midió, el dueño rechazó algo), lanza `orion-harvester` con esa lección: la
+  busca en el cerebro, refuerza si ya existe y escribe un tema nuevo solo si
+  pasa su puerta de calidad. Es lo que hace que la bóveda crezca sola en vez de
+  quedarse como espejo del último run. Lo que solo vale dentro del proyecto se
+  queda como objeto de su memoria — no todo merece un tema.
 - If the reflector ends with `CURATION RECOMMENDED`, spawn `orion-curator`
   (haiku) on the memory dir — it dedupes, archives expired objects, and keeps
   state.json cheap to load.
