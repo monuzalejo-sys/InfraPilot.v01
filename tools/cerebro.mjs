@@ -183,6 +183,31 @@ function construirIndice() {
       })
     }
   }
+  /* LO ARCHIVADO SIGUE SIENDO CONOCIMIENTO. Curar saca el objeto de
+     `objects[]` y lo deja en `archives[]` con su motivo y una nota — placita
+     tiene 32 así. Si el cerebro solo mirara `objects[]`, cada curación le
+     borraría memoria: dejaría de saber qué se descartó y por qué, que es
+     justo lo que evita volver a proponerlo. Se indexan con peso bajo (están
+     superados, no vigentes) pero se indexan. */
+  for (const m of memorias) {
+    for (const a of m.state.archives || []) {
+      const nota = [a.note, a.reason].filter(Boolean).join(" · ")
+      if (!nota) continue
+      docs.push({
+        clase: "archivado",
+        clave: `${m.proyecto}/${a.archivedId}`,
+        proyecto: m.proyecto,
+        id: a.archivedId,
+        tipo: a.archivedType || "Archivado",
+        estado: "Archived",
+        titulo: `[archivado ${a.reason || ""}] ${String(a.note || "").replace(/\s+/g, " ").slice(0, 90)}`,
+        texto: `Objeto ${a.archivedId} archivado el ${a.archivedAt || "?"} por: ${a.reason || "sin motivo"}. ${nota}`,
+        actualizado: a.archivedAt || "",
+        fuente: join(m.dir, "state.json"),
+      })
+    }
+  }
+
   /* Las métricas son conocimiento, no contabilidad: ahí está medido qué
      modelo falló en qué fase y cuánto costó. Sin esto, "¿me conviene opus
      para un builder visual?" no tiene respuesta en el cerebro aunque el dato
@@ -510,18 +535,25 @@ if (cmd === "indexar") {
      una afirmación sin respaldo dentro de la fuente que se usa para decidir. */
   const idx = cargarIndice()
   const claves = new Set(idx.docs.filter((d) => d.clase === "objeto").map((d) => d.clave))
+  // Un objeto archivado NO es una cita rota: existe, está registrado en
+  // `archives[]` con su motivo, y sigue siendo comprobable. Solo se avisa,
+  // para que quien lea el tema sepa que está citando algo superado.
+  const archivadas = new Set(idx.docs.filter((d) => d.clase === "archivado").map((d) => d.clave))
   const proyectos = new Set(idx.proyectos.map((p) => p.proyecto))
   const slugs = new Set(idx.docs.filter((d) => d.clase === "tema").map((d) => d.id))
   if (!existsSync(TEMAS_DIR)) { console.log("no hay temas todavía"); process.exit(0) }
   let totales = 0, rotas = 0
+  const avisosGlobales = []
   for (const f of readdirSync(TEMAS_DIR).filter((x) => x.endsWith(".md"))) {
     const raw = readFileSync(join(TEMAS_DIR, f), "utf8")
     const malas = []
+    const avisos = []
     // citas a objetos de memoria: proyecto/ID-000
     for (const m of raw.matchAll(/\b([a-z_][a-z0-9-]{2,24})\/([A-Z]{2,6}-\d{2,3})\b/g)) {
       const [cita, proyecto, id] = [m[0], m[1], m[2]]
       totales++
       if (!proyectos.has(proyecto)) { malas.push(`${cita} — el proyecto "${proyecto}" no existe`); rotas++ }
+      else if (archivadas.has(`${proyecto}/${id}`)) avisos.push(`${cita} — está ARCHIVADO (sigue verificable, pero es conocimiento superado: revisa si el tema debe decirlo)`)
       else if (!claves.has(`${proyecto}/${id}`)) { malas.push(`${cita} — el proyecto existe pero no tiene ese objeto`); rotas++ }
     }
     // enlaces a otros temas: [[TEMA-slug]]
