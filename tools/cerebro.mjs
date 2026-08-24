@@ -482,6 +482,41 @@ if (cmd === "indexar") {
   }
   if (!fallos.length) console.log("  todo verde.")
   process.exitCode = fallos.length ? 1 : 0
+} else if (cmd === "citas") {
+  /* La promesa entera del cerebro es que cada afirmación se puede comprobar
+     abriendo algo. Esa promesa no se puede sostener a mano: un tema cita 15
+     objetos y hay una docena de temas. Aquí se verifica mecánicamente que cada
+     `proyecto/ID` citado EXISTE de verdad. Una cita rota no es un detalle: es
+     una afirmación sin respaldo dentro de la fuente que se usa para decidir. */
+  const idx = cargarIndice()
+  const claves = new Set(idx.docs.filter((d) => d.clase === "objeto").map((d) => d.clave))
+  const proyectos = new Set(idx.proyectos.map((p) => p.proyecto))
+  const slugs = new Set(idx.docs.filter((d) => d.clase === "tema").map((d) => d.id))
+  if (!existsSync(TEMAS_DIR)) { console.log("no hay temas todavía"); process.exit(0) }
+  let totales = 0, rotas = 0
+  for (const f of readdirSync(TEMAS_DIR).filter((x) => x.endsWith(".md"))) {
+    const raw = readFileSync(join(TEMAS_DIR, f), "utf8")
+    const malas = []
+    // citas a objetos de memoria: proyecto/ID-000
+    for (const m of raw.matchAll(/\b([a-z_][a-z0-9-]{2,24})\/([A-Z]{2,6}-\d{2,3})\b/g)) {
+      const [cita, proyecto, id] = [m[0], m[1], m[2]]
+      totales++
+      if (!proyectos.has(proyecto)) { malas.push(`${cita} — el proyecto "${proyecto}" no existe`); rotas++ }
+      else if (!claves.has(`${proyecto}/${id}`)) { malas.push(`${cita} — el proyecto existe pero no tiene ese objeto`); rotas++ }
+    }
+    // enlaces a otros temas: [[TEMA-slug]]
+    for (const m of raw.matchAll(/\[\[TEMA-([a-z0-9-]+)\]\]/g)) {
+      totales++
+      if (!slugs.has(m[1])) { malas.push(`[[TEMA-${m[1]}]] — ese tema no existe (¿aún no escrito?)`); rotas++ }
+    }
+    if (malas.length) {
+      console.log(`\n✗ ${f}`)
+      for (const x of malas) console.log(`    ${x}`)
+    }
+  }
+  console.log(`\n${totales} citas verificadas · ${rotas} rotas · ${totales - rotas} comprobables`)
+  if (!rotas) console.log("todas las citas apuntan a algo que existe.")
+  process.exitCode = rotas ? 1 : 0
 } else if (cmd === "exportar") {
   const idx = construirIndiceYGuardar()
   const destino = flag("destino", "C:\\Users\\Kalel\\ORION-Vault\\Cerebro")
