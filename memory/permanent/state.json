@@ -250,6 +250,23 @@
       "source": "session 2026-08-24, tema modelos-y-costos"
     },
     {
+      "id": "KN-017",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-24T11:00:00.000Z",
+      "updated": "2026-08-24T11:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-016"
+      ],
+      "fact": "UN AGREGADOR QUE 'CORRE Y DEVUELVE RESULTADOS' NO ESTA VERIFICADO: hay que comprobarlo contra un caso con respuesta conocida a mano, igual que cualquier otro trabajo. El sintetizador de costos de `cerebro.mjs` (escrito por el orquestador la misma noche de KN-012..KN-016) se dio por bueno porque indexaba, buscaba y devolvia resultados con forma correcta -- nadie lo comparo contra un numero calculado a mano. Horas despues, un agente que escribia el tema `modelos-y-costos` SI cruzo el agregado contra el `metrics.json` crudo de estanco-contable y encontro que mentia: contaba muertes por limite de sesion como fallos del modelo porque el ecosistema las marca de DOS formas que el agregador no leia ninguna: campo `infraDeath: true` (estanco-contable, 10 filas en modelOutcomes) y sufijo `:infra-death` en el nombre de la fase (wrd, 2 filas). Con el bug, `build:page` con sonnet en estanco-contable salia '4 fallidas de 10'; la cifra real es 6 corridas juzgables con 0 fallidas (verificado en `C:\\Users\\Kalel\\prommter\\proyectos\\estanco-contable\\memory\\estanco-contable\\metrics.json`, filas con `infraDeath: true` en build:page/sonnet). Corregido en `C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs` (busca `infraDeath === true || porSufijo`), que ahora reconoce las dos convenciones y aparta las muertes en su propio conteo (`a.infra`) en vez de sumarlas a `a.mal`.",
+      "context": "Medicion adicional al cruzar las 11 memorias por la convencion: SOLO estanco-contable usa el campo (10 filas) y SOLO wrd usa el sufijo (2 filas, mas ~5 muertes mas mencionadas solo en la nota de sesion sin fila alguna en modelOutcomes -- `wrd/metrics.json` linea 174). infrapilot no usa ninguna de las dos: su nota de sesion narra una tercera convencion de facto ('verdict: escalate, tokens: 0 por convencion') que nunca aparece como campo ni sufijo inspeccionable -- invisible para cualquier lector que no abra la prosa. placita y villa-broaster documentan muertes de sesion en sus notas (villa-broaster: '4 muertes por limite de sesion reanudadas por SendMessage'; placita: el builder de gastos+cierre 'muerto' que en realidad termino antes de morir) sin marcar NINGUNA fila de modelOutcomes de ninguna forma. Osea: 3 memorias (infrapilot, placita, villa-broaster) tienen muertes documentadas sin marca estructurada, y de esas 3 solo infrapilot deja rastro de una convencion propia, solo en prosa. RECOMENDACION PARA SESIONES FUTURAS: usa el campo `infraDeath: true` sobre la fila de `modelOutcomes`, no el sufijo -- ya es la convencion mayoritaria (10 filas contra 2) y no obliga a nadie a hacer cirugia de texto sobre el nombre de la fase para recuperarla despues. El sufijo sigue siendo leido por compatibilidad, pero no se recomienda para filas nuevas.",
+      "source": "session 2026-08-24, hallado escribiendo el tema modelos-y-costos, corregido en cerebro.mjs"
+    },
+    {
       "id": "PEND-001",
       "type": "Pending",
       "tier": "Permanent",

@@ -101,10 +101,16 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
    texto que tenga que ser **verdad**. Si igual lo usas ahí, audita su salida con grep
    contra la fuente de datos real — "barato de auditar, caro de no verlo"
    (`villa-broaster/KN-008`).
-7. **Registra el veredicto sin contaminar la señal**: una muerte por límite de sesión se
-   anota con `verdict: fail` pero **sufijando la fase** (`build:page:infra-death`), porque
-   el validador no acepta otro valor y sin el sufijo el infra-death se cuenta como fallo
-   del modelo la próxima vez que calibres (`wrd/KN-005`).
+7. **Registra el veredicto sin contaminar la señal, y usa el campo, no el sufijo.** Una
+   muerte por límite de sesión se anota con `verdict: fail` **y `infraDeath: true` en esa
+   fila de `modelOutcomes`** — es la convención que hay que fijar hacia adelante: ya es
+   mayoritaria (10 filas en estanco-contable contra 2 sufijadas en wrd) y no obliga a
+   deshacer texto del nombre de la fase para recuperarla después. El sufijo
+   `build:page:infra-death` (`wrd/KN-005`) se sigue leyendo por compatibilidad, pero no se
+   recomienda para filas nuevas. **Sin marca de ningún tipo, la muerte desaparece**: tres
+   memorias (infrapilot, placita, villa-broaster) documentan muertes de sesión solo en la
+   nota de la sesión y CERO filas de `modelOutcomes` las señalan — invisibles para
+   cualquier lectura que no sea la prosa completa (`_permanent/KN-017`).
 8. **Antes de re-spawnear a un muerto, mira el disco.** El código del builder normalmente
    ya está escrito; lo que muere es su auto-verificación. En estanco-contable murieron 4
    builders y los 4 habían entregado (`estanco-contable/KN-009`); en placita el builder
@@ -159,6 +165,10 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
   entregado; revisar disco/git antes de reconstruir.
 - `wrd/KN-005` — convención `fase:infra-death` para no confundir muerte con fallo;
   ~592k tokens perdidos en cortes en una sola sesión.
+- `_permanent/KN-017` — el agregador de costos de `cerebro.mjs` no leía ninguna de las
+  dos convenciones y contaba muertes como fallos; corregido, y hallazgo de que 3
+  memorias no marcan la muerte de ninguna forma. Regla hacia adelante: usar el campo
+  `infraDeath: true`, no el sufijo.
 - `wrd/KN-004` — ronda adversarial opus en trabajo security-sensitive: verifier sonnet
   FAIL + 2 adversarios opus (94.008 + 125.667 tokens) → 16 hallazgos, PIN de admin filtrado.
 - `placita/KN-006` — seed generado con haiku, invariante cruzada rota, detectada solo por

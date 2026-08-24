@@ -1,9 +1,9 @@
 ---
 slug: que-es-estar-verificado
 titulo: Qué significa que algo "ya quedó": la definición de hecho
-alias: [ya quedo, ya quedó, quedo listo, quedo bien, ya esta, ya está, esta listo, listo, terminado, terminada, terminar, estar terminado, esta terminado, cuando esta terminado, que es estar terminado, cuando doy por terminada una tarea, terminado de verdad, acabado, hecho, done, definicion de hecho, definicion de terminado, criterio de aceptacion, criterios de aceptacion, cuando digo que esta listo, dar por bueno, dar por buena, dar por hecho, declarar listo, decir que funciona, compila, compilo, compilar, compilar no es funcionar, basta con compilar, no basta con compilar, corre pero no sirve, funciona pero no hace nada, arranca pero, typecheck, type check, tsc, tsc --noEmit, strict, tsconfig, tsconfig ad-hoc, build, build verde, pasa el build, todo verde, en verde, tests en verde, pasan los tests, self-tests, self tests, selftests, unitarios, tests unitarios, smoke, smokes, camino feliz, e2e, E2E, prueba e2e, punta a punta, de punta a punta, prueba de punta a punta, ejercitar, probar de verdad, qa, QA, qa de agente, reviso, revisar, revision, revisar el trabajo de un agente, reviso el trabajo de un agente, como reviso el trabajo de un agente, revisar el trabajo del agente, revisar lo que hizo el agente, revisar lo que entrego el agente, recibir el trabajo de un agente, auditar el trabajo de un agente, calificar el trabajo de un agente, aprobar el trabajo de un agente, revisar entrega de agente, revisar builder, revisar al builder, revisar subagente, agente, agentes, subagente, builder, builders, el agente dice que quedo, el agente dice que ya quedo, confiar en el agente, confiar en lo que dice el agente, le creo al agente, verifier, verificador, verificacion, verificado, no verificado, QAReport, PASS, FAIL, adversarial, refutador, refutadores, romper el gating, seguridad, auth, admin, RLS, seed, seed limpio, con seed, sin seed, empresa nueva, cuenta nueva, base vacia, catalogo vacio, estado sucio, e2e sucio, datos viejos, datos de la version anterior, version anterior, VERSION_DATOS, migracion, middleware, proxy, PUBLIC_PATHS, curl, sw.js, manifest, webhook, 307, porcentaje, porcentaje de avance, avance, cuanto llevamos, quien califica, quien pone el porcentaje, juez, juez externo, autorreportado, se califica solo, falso positivo, falsos positivos, verde mentiroso]
-preguntas: ["como se si algo quedo bien", "que es estar terminado", "basta con que compile", "como reviso el trabajo de un agente", "el build paso verde, ya puedo decir que funciona?", "que pruebo antes de decirle al dueño que quedo listo?", "los tests pasan pero el bug salio en produccion, que me falto probar?", "quien pone el porcentaje de avance?", "mi typecheck da errores y el del proyecto no, a cual le creo?", "hice login y panel de admin, con el verifier normal basta?"]
-proyectos: [estanco-contable, arroces, placita, infrapilot, wrd, villa-broaster]
+alias: [ya quedo, ya quedó, quedo listo, quedo bien, ya esta, ya está, esta listo, listo, terminado, terminada, terminar, estar terminado, esta terminado, cuando esta terminado, que es estar terminado, cuando doy por terminada una tarea, terminado de verdad, acabado, hecho, done, definicion de hecho, definicion de terminado, criterio de aceptacion, criterios de aceptacion, cuando digo que esta listo, dar por bueno, dar por buena, dar por hecho, declarar listo, decir que funciona, compila, compilo, compilar, compilar no es funcionar, basta con compilar, no basta con compilar, corre pero no sirve, funciona pero no hace nada, arranca pero, typecheck, type check, tsc, tsc --noEmit, strict, tsconfig, tsconfig ad-hoc, build, build verde, pasa el build, todo verde, en verde, tests en verde, pasan los tests, self-tests, self tests, selftests, unitarios, tests unitarios, smoke, smokes, camino feliz, e2e, E2E, prueba e2e, punta a punta, de punta a punta, prueba de punta a punta, ejercitar, probar de verdad, qa, QA, qa de agente, reviso, revisar, revision, revisar el trabajo de un agente, reviso el trabajo de un agente, como reviso el trabajo de un agente, revisar el trabajo del agente, revisar lo que hizo el agente, revisar lo que entrego el agente, recibir el trabajo de un agente, auditar el trabajo de un agente, calificar el trabajo de un agente, aprobar el trabajo de un agente, revisar entrega de agente, revisar builder, revisar al builder, revisar subagente, agente, agentes, subagente, builder, builders, el agente dice que quedo, el agente dice que ya quedo, confiar en el agente, confiar en lo que dice el agente, le creo al agente, verifier, verificador, verificacion, verificado, no verificado, QAReport, PASS, FAIL, adversarial, refutador, refutadores, romper el gating, seguridad, auth, admin, RLS, seed, seed limpio, con seed, sin seed, empresa nueva, cuenta nueva, base vacia, catalogo vacio, estado sucio, e2e sucio, datos viejos, datos de la version anterior, version anterior, VERSION_DATOS, migracion, middleware, proxy, PUBLIC_PATHS, curl, sw.js, manifest, webhook, 307, porcentaje, porcentaje de avance, avance, cuanto llevamos, quien califica, quien pone el porcentaje, juez, juez externo, autorreportado, se califica solo, falso positivo, falsos positivos, verde mentiroso, agregador, agregadores, sintetizador, agregado, agregar metricas, herramienta de medicion, herramienta de agregacion, script de metricas, dashboard, panel de costos, numero mentiroso, verificar un agregador, como verifico un script que suma numeros, el script corrio pero el numero esta mal, cruzar contra el numero real, caso con respuesta conocida, spot check, muestra de control]
+preguntas: ["como se si algo quedo bien", "que es estar terminado", "basta con que compile", "como reviso el trabajo de un agente", "el build paso verde, ya puedo decir que funciona?", "que pruebo antes de decirle al dueño que quedo listo?", "los tests pasan pero el bug salio en produccion, que me falto probar?", "quien pone el porcentaje de avance?", "mi typecheck da errores y el del proyecto no, a cual le creo?", "hice login y panel de admin, con el verifier normal basta?", "escribi un script que suma metricas de varios proyectos, ya quedo?", "como se si mi agregador de costos esta calculando bien?"]
+proyectos: [estanco-contable, arroces, placita, infrapilot, wrd, villa-broaster, _permanent]
 confianza: alta
 actualizado: 2026-08-24
 ---
@@ -75,6 +75,22 @@ dentro del código — algo que ningún test de comportamiento iba a mirar
 (`wrd/KN-004`). Los números están en la métrica: `verification/sonnet fail 51 161 tok`,
 seguido de `adversarial/opus 94 008` y `adversarial/opus 125 667`
 (`wrd/memory/wrd/metrics.json:123-125`), y los 16/16 confirmados y arreglados.
+
+**Y lo pagó una herramienta que agrega, no una que construye — el peldaño 1 también
+miente ahí.** El sintetizador de costos de `cerebro.mjs` indexaba, buscaba y devolvía
+resultados con forma correcta, y se dio por bueno por eso: **"corre"**. Nadie lo cruzó
+contra un número calculado a mano hasta que un agente, escribiendo el tema
+`modelos-y-costos`, abrió el `metrics.json` crudo de estanco-contable y encontró que el
+agregado **mentía**: contaba muertes por límite de sesión como fallos del modelo porque
+el ecosistema las marca de dos formas que el agregador no leía ninguna (campo
+`infraDeath: true` en estanco-contable, sufijo `:infra-death` en la fase en wrd) — con el
+bug, `build:page` con sonnet salía *"4 fallidas de 10"*; la cifra real es 6 corridas
+juzgables con 0 fallidas (`_permanent/KN-017`). Para un builder de UI, "corre" es
+obviamente el peldaño 1 y nadie lo confundiría con estar probado; para un **agregador
+cuyo producto es un número**, "corre y el número tiene forma de número" se siente como
+el peldaño 2 y no lo es — el número puede estar sistemáticamente mal y seguir pareciendo
+razonable. Un agregador se verifica igual que cualquier otro trabajo: contra **un caso
+con la respuesta ya calculada a mano**, no contra si terminó sin excepción.
 
 **De ahí sale la regla del juez.** El proyecto de Villa Broaster pidió literalmente el
 2026-08-22: *"me gusto el porcentaje; tu vas a ser juez del avance"*, y la decisión que
@@ -152,6 +168,11 @@ responde la del siguiente. Di en voz alta en cuál estás.
 9. **Escribe el veredicto con su número y su condición**, no con adjetivos. Cómo se saca
    ese número en esta máquina —captura, medición, PDF, `curl`— es
    [[TEMA-verificar-con-evidencia]].
+10. **Un agregador o sintetizador se verifica con un caso de respuesta conocida, no con
+    "corrió y devolvió algo".** Antes de dar por bueno un script que suma, cuenta o
+    calcula sobre datos de varios sitios, elige a mano UN caso pequeño, calcula tú el
+    resultado leyendo la fuente cruda, y compara. "Corre sin excepción" es el peldaño 1
+    (`_permanent/KN-017`) aunque el resultado tenga forma de número razonable.
 
 ## Cuándo NO aplica
 
@@ -230,6 +251,16 @@ responde la del siguiente. Di en voz alta en cuál estás.
   PIN de admin filtrado en un comentario doctest.
 - `C:\Users\Kalel\fable 5\wrd\memory\wrd\metrics.json:123-125` — `verification/sonnet
   fail 51161` → `adversarial/opus 94008` → `adversarial/opus 125667`.
+
+**"Corre" también miente en agregadores**
+- `_permanent/KN-017` — el sintetizador de costos de `cerebro.mjs` indexaba y buscaba
+  bien y aun así contaba muertes de sesión como fallos del modelo; `build:page`/sonnet
+  en estanco-contable salía "4 fallidas de 10" cuando son 6 juzgables y 0 fallidas.
+  Encontrado cruzando el agregado contra `estanco-contable/memory/estanco-contable/metrics.json`
+  a mano, no por el autor del agregador.
+- `C:\Users\Kalel\ORION\tools\cerebro.mjs` (función que arma `docs` de clase `metrica`,
+  ~línea 204-218) — el fix reconoce campo `infraDeath: true` y sufijo `:infra-death` y
+  aparta las muertes en su propio conteo en vez de sumarlas a `fail`.
 
 **Falsos positivos del verificador**
 - `estanco-contable/KN-011` (Permanent) — tsconfig ad-hoc sin `strict` inventa `TS2339`

@@ -113,9 +113,17 @@ procedimiento completo, con el comando de cada paso, está abajo en
 12. **Un reporte vacío o truncado no es una muerte**: hubo un builder que terminó bien
     en disco y devolvió un informe truncado. Verifica el artefacto antes de concluir
     nada (`infrapilot/KN-018`).
-13. **Anótalo como evento de infraestructura, no como fallo del modelo**: la convención
-    es `verdict: fail` con la fase sufijada `:infra-death` (ej. `build:page:infra-death`),
-    porque el validador de `metrics.json` solo acepta `ok|fail|escalate` (`wrd/KN-005`).
+13. **Anótalo como evento de infraestructura, no como fallo del modelo, y usa el campo
+    hacia adelante**: `verdict: fail` **con `infraDeath: true` en esa fila** (el validador
+    de `metrics.json` solo acepta `ok|fail|escalate`, así que el verdict sigue siendo
+    `fail`, lo que cambia es que se marca aparte). El sufijo en la fase
+    (`build:page:infra-death`, `wrd/KN-005`) fue la primera convención y se sigue leyendo,
+    pero **no la repitas en filas nuevas**: obliga a deshacer el sufijo para recuperar la
+    fase real, y un agregador que solo conoce una de las dos convenciones cuenta la
+    muerte como fallo del modelo sin que nadie lo note — le pasó al propio agregador de
+    costos del cerebro (`_permanent/KN-017`). **Y si no marcas la fila de ninguna forma,
+    la muerte desaparece de toda medición futura**, aunque la cuentes en la nota de la
+    sesión: es lo que pasó en tres memorias de este mismo corpus.
 
 **Al cerrar la ola:**
 
