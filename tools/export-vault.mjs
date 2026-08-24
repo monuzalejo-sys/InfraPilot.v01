@@ -48,7 +48,27 @@ sys += copyIf(join(root, "Skills", "autonomous-memory-manager", "README.md"),
 //   node tools/export-vault.mjs <destino> C:/ruta/otro-repo/memory/<projectId>
 // Sin esto, un proyecto fuera de ORION queda invisible en el vault.
 const memRoot = join(root, "memory")
-const externas = process.argv.slice(3).filter((p) => existsSync(join(p, "state.json")))
+
+/* DESCUBRIMIENTO AUTOMÁTICO de memorias que viven fuera de ORION.
+   Antes había que pasarlas a mano como argumentos, y bastaba olvidar una para
+   que ese proyecto quedara invisible en la bóveda: así fue como la vista de
+   villa-broaster y placita se quedó semanas atrás de su memoria real. Ahora se
+   barren las raíces conocidas y entra todo lo que tenga state.json; los
+   argumentos extra siguen funcionando para casos sueltos. */
+const RAICES_EXTERNAS = ["C:\\Users\\Kalel\\prommter\\proyectos", "C:\\Users\\Kalel\\fable 5"]
+const descubiertas = []
+for (const raiz of RAICES_EXTERNAS) {
+  if (!existsSync(raiz)) continue
+  for (const entrada of readdirSync(raiz)) {
+    const mem = join(raiz, entrada, "memory")
+    if (!existsSync(mem)) continue
+    for (const sub of readdirSync(mem)) {
+      const d = join(mem, sub)
+      try { if (statSync(d).isDirectory() && existsSync(join(d, "state.json"))) descubiertas.push(d) } catch {}
+    }
+  }
+}
+const externas = [...new Set([...descubiertas, ...process.argv.slice(3)])].filter((p) => existsSync(join(p, "state.json")))
 const internas = readdirSync(memRoot)
   .map((proj) => join(memRoot, proj))
   .filter((d) => statSync(d).isDirectory() && existsSync(join(d, "state.json")))
@@ -70,11 +90,35 @@ for (const mdir of [...internas, ...externas]) {
   proyectos.push({ proj, objetos: st.objects.length, version: st.version })
 }
 
+// ── 2b. Cerebro: la capa transversal, que es la que se consulta ────
+// Los proyectos de arriba son el archivo; el cerebro es la respuesta. Se
+// exporta después de las memorias porque su índice se reconstruye leyéndolas.
+let temasExportados = 0
+try {
+  const cerebroTool = join(root, "tools", "cerebro.mjs")
+  if (existsSync(cerebroTool)) {
+    execFileSync("node", [cerebroTool, "exportar", "--destino", join(dest, "Cerebro")], { stdio: "inherit" })
+    const dirTemas = join(root, "cerebro", "temas")
+    if (existsSync(dirTemas)) temasExportados = readdirSync(dirTemas).filter((f) => f.endsWith(".md")).length
+  }
+} catch (e) {
+  console.error(`  aviso: el cerebro no se pudo exportar (${e.message})`)
+}
+
 // ── 3. Portada ─────────────────────────────────────────────────────
 const inicio = [
   "# ORION — Vault del ecosistema", "",
   `Exportado: ${new Date().toISOString()}. REGENERABLE — no editar aquí lo que`,
   "quieras conservar: la fuente de verdad es el repo ORION (state.json +", "docs).", "",
+  "## Empieza aquí — el cerebro", "",
+  `- [[_CEREBRO]] — la capa transversal: ${temasExportados} temas curados que responden preguntas`,
+  "  cruzando los proyectos. Una lección pagada en un negocio sirve en los otros.",
+  "- Para preguntarle en vez de navegar:", "",
+  "  ```bash",
+  '  node C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs buscar "tu pregunta"',
+  "  ```", "",
+  "  Devuelve el tema o los objetos que responden, con la cita de dónde salió cada uno.",
+  "  El skill `orion-cerebro` hace eso mismo dentro de una conversación.", "",
   "## Sistema", "",
   "- [[ORION_STANDARD]] — el estándar",
   "- Carpeta `Sistema/RFC/` — los RFCs normativos",
