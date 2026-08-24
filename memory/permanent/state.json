@@ -1,6 +1,6 @@
 {
   "projectId": "_permanent",
-  "snapshotDate": "2026-08-24T10:00:00.000Z",
+  "snapshotDate": "2026-08-24T11:00:00.000Z",
   "objects": [
     {
       "id": "KN-001",
@@ -281,9 +281,23 @@
       ],
       "task": "HUECOS DEL ECOSISTEMA hallados al leer las 11 memorias juntas el 2026-08-24: areas donde hay trabajo real y CERO conocimiento persistido. En orden de riesgo: (1) FACTURACION DIAN Y LEGALIDAD COLOMBIANA — condiciona el modelo de anulacion de cuatro productos y hasta el precio del software; la decision lleva abierta desde julio en tres memorias (estanco-contable/PEND-009, villa-broaster/PEND-001, placita/PEND-010) y no hay una sola leccion. (2) DESPLIEGUE, HOSTING Y RESPALDO — diez proyectos, uno solo en produccion, y ni una leccion de deploy, dominio, backup, ni de que pasa cuando el local se queda sin internet. (3) PRECIO Y CONTRATO — se vende software a negocios reales y solo hay dos lecciones (mensualidad con permanencia, piloto a mano); nada de cuanto vale cada producto ni que pasa si el cliente deja de pagar. (4) SOPORTE Y OPERACION POST-ENTREGA — placita esta EN PRODUCCION con el dueno usandola y no hay conocimiento de soporte, capacitacion ni respaldo (el PIN 0000 vigente semanas es el sintoma). (5) USUARIOS REALES — hay reglas disenadas PARA la cajera pero ninguna leccion de haberla OBSERVADO usando el sistema: todo el QA es de agente. (6) WHATSAPP — canal real de al menos tres negocios, cero lecciones. (7) DATOS PERSONALES — se guardan telefonos de clientes reales sin una linea sobre habeas data ni la ley 1581, en Colombia.",
       "reason": "Un hueco de conocimiento no duele hasta que alguien decide sin el. Estos siete estan ordenados por lo que costaria equivocarse: el primero tiene implicacion legal y de precio, el ultimo tambien. Cada vez que se trabaje en uno de estos frentes, cosechar la leccion aunque parezca obvia — hoy no existe ninguna."
+    },
+    {
+      "id": "PEND-002",
+      "type": "Pending",
+      "tier": "Permanent",
+      "created": "2026-08-24T11:00:00.000Z",
+      "updated": "2026-08-24T11:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Ready",
+      "dependencies": [],
+      "task": "La skill `orion` NO le dice a sus builders que carguen la skill `estudio-diseno` (el manifiesto visual de la casa) cuando el paso que les toca es de UI. Verificado el 2026-08-24: grep de 'estudio-diseno' en C:\\Users\\Kalel\\.claude\\skills\\orion\\SKILL.md devuelve 0 apariciones, mientras la skill sí nombra `code-review` y `run` como opcionales. Un subagente arranca sin el contexto de la conversación, así que si el brief no lo apunta al manifiesto, diseña con su promedio — que es exactamente el fallo que ya se pagó con una landing rechazada (ver el tema `generadores-de-diseno` del cerebro: lo que salva no es prohibir, es RELLENAR el hueco con tus tokens). ARREGLO: en la fase BUILDING de la skill `orion`, una línea que obligue a incluir en el brief de todo builder con trabajo visual (a) que cargue `estudio-diseno`, y (b) los tokens concretos del proyecto con sus contrastes ya calculados, no la referencia al archivo. Recordar que el espejo canónico es ORION\\runtime\\skills\\orion.SKILL.md y que después hay que correr node tools/generar-instalador.mjs.",
+      "reason": "Hallado en conversación al contar cuántas skills usa ORION. Es barato de arreglar (una línea) y ataca la causa raíz de un fallo ya pagado: el ejecutor barato rellena con su promedio el hueco que le dejes en el encargo."
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-08-24T10:00:00.000Z",
-  "version": 10
+  "lastAmmRun": "2026-08-24T11:00:00.000Z",
+  "version": 11
 }
