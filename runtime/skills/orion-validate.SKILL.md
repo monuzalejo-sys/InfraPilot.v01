@@ -1,30 +1,45 @@
 ---
-name: "orion-validate"
-description: "Validates an ORION project memory (state.json/metrics.json) against the AMM schema using the local validator script, reports errors/warnings, and repairs schema violations on request. Use when the user asks to validate/check ORION memory, suspects memory corruption, or after manual edits to state.json."
+name: orion-validate
+description: "Valida una memoria de proyecto ORION (state.json/metrics.json) contra el esquema AMM usando el validador local, reporta errores y advertencias, y repara violaciones de esquema si se le pide. Usar cuando el usuario pide validar o revisar la memoria ORION, sospecha corrupción de memoria, o después de ediciones manuales a state.json."
 ---
 
-# ORION Validate — memory compliance check
+# ORION Validate — chequeo de conformidad de memoria
 
-The executable form of ORION's "compliance is testable, not assertable"
-(RFC-0006) for memory files.
+La forma ejecutable del principio ORION "la conformidad se prueba, no se
+afirma" (RFC-0006) aplicada a los archivos de memoria.
 
-1. Determine the memory dir: `<outermost-repo-root>/memory/<projectId>/`
-   (default for this machine: `C:\Users\Kalel\ORION\memory\infrapilot`; if the
-   user names another project, use its dir).
-2. Run `node C:\Users\Kalel\ORION\tools\validate-memory.mjs <memory-dir>`.
-   That one command is the whole check — do not re-verify its findings by
-   re-reading the files unless you're about to repair.
-3. **VALID:** report the summary line + any warnings, and what they mean
-   (e.g. "archivable objects → run /orion-close when convenient"). Done.
-4. **INVALID:** list each error with a one-line explanation. Then repair:
-   - Mechanical fixes (wrong tier for a lifetime, bad timestamp format,
-     missing payload field recoverable from context) — fix directly with
-     surgical edits, bump `version`, set `updated` on touched objects.
-   - Semantic conflicts (duplicate IDs with different content, dependencies
-     on objects that never existed) — show the user the conflict and ask
-     which side wins before touching it.
-   Re-run the validator until VALID.
-5. If the script itself is missing or crashes, say exactly that and offer to
-   restore it from git history — don't hand-validate 20 objects by eye.
+## 0. Entorno y rutas
 
-Report in the user's language. Keep it ≤20 lines.
+`ORION_HOME` = raíz del repo ORION (contiene `ORION_STANDARD.md`, `tools/`,
+`memory/`). Resuélvelo así: variable de entorno `ORION_HOME` → el ancestro más
+cercano que contenga `ORION_STANDARD.md` → por defecto en esta máquina
+`C:\Users\Kalel\ORION`. En Claude Code usas `Bash`/`Read` directo; en Cowork en
+la nube la carpeta llega por el puente del escritorio
+(`mcp__remote-devices__device_bash`, con `ORION_HOME=~/mnt/ORION`) y el `Bash`
+del contenedor **NO** la ve. Verifica con un listado barato antes de asumir una
+ruta.
+
+## Procedimiento
+
+1. Determina el directorio de memoria: `$ORION_HOME/memory/<projectId>/`
+   (por defecto en esta máquina `$ORION_HOME/memory/infrapilot`; si el usuario
+   nombra otro proyecto, usa su directorio).
+2. Corre `node $ORION_HOME/tools/validate-memory.mjs <memory-dir>`. Ese único
+   comando es todo el chequeo — no re-verifiques sus hallazgos releyendo los
+   archivos salvo que estés a punto de reparar.
+3. **VALID:** reporta la línea de resumen + cualquier advertencia, y qué
+   significan (p. ej. "objetos archivables → corre /orion-close cuando
+   convenga"). Listo.
+4. **INVALID:** lista cada error con una explicación de una línea. Luego repara:
+   - Arreglos mecánicos (tier equivocado para un lifetime, formato de timestamp
+     malo, campo de payload faltante recuperable del contexto) — arregla directo
+     con ediciones quirúrgicas, sube `version`, pon `updated` en los objetos
+     tocados.
+   - Conflictos semánticos (ids duplicados con contenido distinto, dependencias
+     sobre objetos que nunca existieron) — muéstrale el conflicto al usuario y
+     pregunta cuál lado gana antes de tocar nada.
+   Re-corre el validador hasta que quede VALID.
+5. Si el script mismo falta o revienta, dilo exactamente así y ofrece
+   restaurarlo del historial de git — no valides 20 objetos a ojo.
+
+Reporta en el idioma del usuario. Máximo 20 líneas.

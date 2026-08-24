@@ -26,6 +26,14 @@ READ-ONLY skill: no agents, no edits, minimal tokens.
      state version.
    - If the validator warned about archivable objects or size, mention that a
      `/orion-close` (curation) is due.
+3b. **El cerebro, en una línea.** Corre
+   `node C:\Users\Kalel\ORION\tools\cerebro.mjs estado` e incluye una sola
+   línea: cuántos temas hay, cuántos objetos indexa y qué proyectos siguen sin
+   ningún tema transversal. Si el proyecto que se va a trabajar aparece ahí, es
+   señal de que su conocimiento está encerrado y no le sirve a nadie más.
+   Y si el usuario pregunta algo concreto en vez de pedir estado, no recites la
+   memoria: usa el skill `orion-cerebro`, que responde con cita.
+
 4. End with a short recommendation: the 1-3 highest-value next tasks, derived
    from open Pending priorities and the user's known goals — each phrased so
    the user can reply `/orion <task>` to launch it.

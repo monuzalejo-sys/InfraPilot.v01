@@ -1,5 +1,5 @@
 ---
-name: "estudio-diseno"
+name: estudio-diseno
 description: "Sistema de diseño 'El estudio del ingeniero moderno' — manifiesto visual del usuario para InfraPilot y productos afines. Usar SIEMPRE que se diseñe o rediseñe UI (landing, dashboard, componentes): paleta cálida exacta, tipografía con aire, componentes como objetos físicos, botones-herramienta, composición editorial, IA como compañero silencioso. Incluye las prohibiciones explícitas del usuario."
 ---
 
@@ -31,6 +31,16 @@ cepillado, planos sobre una mesa, una pantalla impecablemente organizada.
 
 PROHIBIDO: azules eléctricos, morados, neones, gradientes tecnológicos.
 El color funcional (ok/warn/error) aparece SOLO donde comunica estado.
+
+> **Valores exactos: `app/globals.css` manda (KN-029).** Los hex de arriba son
+> el manifiesto — la referencia de intención y temperatura. Los tokens que
+> InfraPilot tiene realmente implementados han derivado (`--paper: #f6f3ed`,
+> `--rail: #232019`, `--ink: #1b1a17`, `--muted: #8a857c`, `--card: #fbfaf7`,
+> `--ok: #5b7a5e`, `--warn: #a8623b`). Si necesitas un valor literal —
+> `theme_color` de un manifest PWA, un SVG, un correo — **lee
+> `app/globals.css` y usa ese**. Esta skill manda en composición, metáfora y
+> prohibiciones; globals.css manda en hex. Si de verdad hay que reunificarlos,
+> es una decisión del usuario, no un arreglo silencioso de builder.
 
 ## Tipografía
 

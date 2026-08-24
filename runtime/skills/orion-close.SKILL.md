@@ -29,6 +29,24 @@ autonomous — no per-step approval needed). Order matters:
    The vault is a one-way human-browsable VIEW of state.json; manual edits
    there are input for the next curation, never synced back automatically.
    Also delete `<memory-dir>/wave.json` if present and its wave is complete.
+3c. **Alimenta el cerebro.** El cierre es el único momento en que se sabe qué
+   dejó la sesión. Si hubo una lección que serviría en OTRO proyecto (algo
+   falló, algo se midió, el dueño rechazó algo), lanza `orion-harvester` con
+   esa lección: busca primero en el cerebro, refuerza si ya existe y escribe un
+   tema nuevo solo si pasa su puerta de calidad. Lo que solo vale dentro del
+   proyecto se queda como objeto de su memoria — no todo merece un tema.
+   Después, siempre:
+
+   ```
+   node C:\Users\Kalel\ORION\tools\cerebro.mjs probar
+   node C:\Users\Kalel\ORION\tools\cerebro.mjs exportar
+   ```
+
+   La prueba dice si el cerebro sigue respondiendo a las preguntas reales; si
+   bajó respecto al cierre anterior, algo se rompió y se arregla antes de
+   cerrar. Reporta el puntaje: es la métrica de si el ecosistema está
+   aprendiendo o solo acumulando.
+
 4. **Commit** the memory changes in the repo that holds them (for InfraPilot:
    the parent repo `C:\Users\Kalel\ORION`, InfraPilot.v01) with a message like
    `orion: session close — memory curation (vN)`. Do NOT push — remind the
