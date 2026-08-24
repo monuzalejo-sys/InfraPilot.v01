@@ -1,6 +1,6 @@
 {
   "projectId": "_permanent",
-  "snapshotDate": "2026-08-24T09:00:00.000Z",
+  "snapshotDate": "2026-08-24T09:45:00.000Z",
   "objects": [
     {
       "id": "KN-001",
@@ -231,9 +231,26 @@
       "fact": "EN LA MEMORIA, SEPARA LA REGLA DE LA COORDENADA: la regla no caduca, la coordenada si. Con los proyectos repartidos en tres raices (ORION\\, prommter\\proyectos\\, fable 5\\), la evidencia archivo:linea envejece mas rapido de lo que se cura: pollo-landing apunta a una carpeta que ya no existe, estanco dice que fechaNegocio vive en facturacion.ts cuando se movio a jornada.ts, y landings avisa que sus propios numeros de linea se desplazaron. Al escribir conocimiento, enuncia la regla de forma que sobreviva sola y trata la ruta como una pista que hay que RE-VERIFICAR en el momento de citarla, no como un hecho.",
       "context": "Hallado al cruzar las 11 memorias el 2026-08-24. Es tambien por que el verificador de citas (`cerebro.mjs citas`) comprueba proyecto/ID —que es estable— y no rutas de archivo.",
       "source": "diagnostico transversal 2026-08-24"
+    },
+    {
+      "id": "KN-016",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-24T09:45:00.000Z",
+      "updated": "2026-08-24T09:45:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-013"
+      ],
+      "fact": "`verdict: ok` EN LAS METRICAS MIDE QUE EL SPAWN ATERRIZO, NO QUE ACERTO — y por eso hoy NO existe medicion de defectos por tier. Al agregar las 280 filas `modelOutcomes` de las 11 memorias (32,7 millones de tokens) la tasa de fallo sale casi identica entre modelos: haiku 1/24, sonnet 6/149, opus 3/101. Pero al abrir las 24 filas no-ok, 19 son MUERTES DE SESION (infra, no capacidad), una es un verificador haciendo bien su trabajo, y en todo el corpus queda UN SOLO fallo de capacidad real (placita build:visual opus, 283.543 tokens) cuya causa fue el insumo. Mientras tanto los tres desastres documentados de haiku —seed corrupto, la ciudad 'Rionegro' inventada en keywords SEO, y el genero equivocado en documentos publicos— figuran los tres como `ok`, porque el spawn termino. CONSECUENCIA PRACTICA: no uses la tasa de fallo de `modelOutcomes` para decidir tier, no dice nada. Para que empiece a decir algo hay que registrar el veredicto DEL VERIFICADOR sobre el trabajo (aterrizo / acerto / hubo que corregirlo), separar las muertes de infraestructura en su propio campo, y contar los defectos hallados despues.",
+      "context": "Hallado el 2026-08-24 al escribir el tema `modelos-y-costos`, agregando a mano los metrics.json de las 11 memorias. Segundo hueco de la misma medicion: ninguna memoria registra precio por token, asi que 'costo' en todo el ecosistema significa tokens, nunca dinero. Contra-dato util: en placita, sonnet gasto MAS que opus en la misma fase (build:page 256k vs 224k), asi que 'el barato sale mas barato' tampoco se sostiene solo.",
+      "source": "session 2026-08-24, tema modelos-y-costos"
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-08-24T09:00:00.000Z",
-  "version": 8
+  "lastAmmRun": "2026-08-24T09:45:00.000Z",
+  "version": 9
 }
