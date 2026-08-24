@@ -1,0 +1,113 @@
+{
+ "tema": {
+  "slug": "permisos-y-equipo",
+  "titulo": "Permisos y equipo: quién puede tocar qué",
+  "preguntas": [
+   "como evito que un cajero se resetee el pin del dueño?",
+   "el gate de la demo se puede saltar por consola, eso importa?",
+   "donde guardo la clave de supabase, la puedo poner en el repo?",
+   "entra alguien nuevo al proyecto, como evito que dañe el trabajo del otro?",
+   "termine algo pero el dueño dijo que no lo suba todavia, donde lo dejo?"
+  ],
+  "alias": [
+   "roles",
+   "permisos",
+   "rol dueño",
+   "cajero",
+   "rls",
+   "gate",
+   "gating",
+   "admin",
+   "pin",
+   "escalada de privilegios",
+   "service_role",
+   "anon key",
+   "clave publicable",
+   "env.local",
+   "secretos",
+   "repos separados",
+   "subtree split",
+   "equipo",
+   "junior",
+   "rama feature",
+   "stash",
+   "main protegida"
+  ],
+  "leccionesIncluidas": [
+   "El rol se lee de la fila que devuelve el servidor, nunca del cuerpo de la peticion",
+   "Todo gate que vive en el cliente es decoración; escribí la barrera real en el servidor y decilo en voz alta",
+   "La clave publicable va al .env.local; la service_role no se pide, ni se pega, ni se guarda",
+   "Con un equipo de niveles distintos, la separación tiene que ser física, no una convención de carpetas",
+   "Código terminado que no fue aprobado va a rama feature/*, nunca a stash"
+  ],
+  "proyectos": [
+   "placita",
+   "wrd",
+   "permanent",
+   "villa-broaster"
+  ],
+  "valor": 8
+ },
+ "lecciones": [
+  {
+   "titulo": "El rol se lee de la fila que devuelve el servidor, nunca del cuerpo de la peticion",
+   "respuestaCorta": "Toda mutacion administrativa lleva doble candado: la credencial de la operacion (header) MAS el PIN o clave del dueno verificado por el servidor; y el rol se toma de la fila que devuelve esa verificacion, jamas del body. Sin la comprobacion de rol server-side, cualquier cajero con la caja abierta puede resetear el PIN del dueno.",
+   "porQue": "Es el patron que quedo escrito como reutilizable en las rutas de personas de placita, despues de detectar que sin la lectura server-side del rol habia escalada de privilegios directa. Cuando hubo que romper el candado (la ruta que ENTREGA la clave de caja no puede exigir esa misma clave), no se quito: se sustituyo por PIN + comprobacion de rol dueno en el servidor.",
+   "evidencia": "placita/KN-021 ('PATRON DE SEGURIDAD REUTILIZABLE -- doble candado... leyendo rol=dueno y activo=true de la fila que devuelve la propia RPC, NUNCA del cuerpo de la peticion'; app/api/personas/*, commit e485a78); placita/DEC-021 (/api/clave-caja: patron de sesion SIN el gate x-clave-caja, protegido por verificar_pin + comprobacion server-side de rol); placita/KN-024 (el login verifica el PIN contra la RPC verificar_pin en Postgres, bcrypt).",
+   "cuandoAplica": "Cualquier ruta que cree, desactive o cambie credenciales de personas, puestos o configuracion, en un sistema con mas de un rol (dueno / cajero / trabajador).",
+   "cuandoNO": "Sistemas de un solo usuario, o donde el servidor ya deriva la identidad de una sesion firmada: ahi el segundo factor es friccion sin ganancia. No lo confundas con pedir el PIN dos veces por gusto.",
+   "temaTentativo": "seguridad de roles",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "Placita (Mercaplaza) es el POS + inventa"
+  },
+  {
+   "titulo": "Todo gate que vive en el cliente es decoración; escribí la barrera real en el servidor y decilo en voz alta",
+   "respuestaCorta": "Asumí que cualquiera abre la consola y se pone el rol que quiera. El gate del navegador sirve para la experiencia, nunca para proteger datos: la barrera real son las políticas del servidor (en WRD, RLS con una función es_admin() security definer). Ponelo por escrito en las instrucciones del dueño — 'en modo demo esto es decorativo, no lo publiques con datos reales' — y no metas nunca el hash de una credencial en un archivo que sirve el sitio: si el secreto tiene 10.000 combinaciones, ya está roto antes de publicar.",
+   "porQue": "WRD arrancó en modo demo con todo el gating de membresía, rangos y premium viviendo en JS y localStorage: bypasseable desde la consola en un segundo. Y los hashes de los dos admins están embebidos en data.js, que el navegador descarga entero — contra un PIN de 4 dígitos eso es fuerza bruta offline trivial. El mismo principio se aplicó al gating por dispositivo: se implementó en el render Y otra vez dentro de la función de registro (defensa en profundidad), y aun así se documentó como UX, porque el servidor no puede saber desde qué aparato le hablan.",
+   "evidencia": "state.json RSK-003 (gating decorativo en modo demo), RSK-002 + PEND-004 (PINs de 4 dígitos vs hash público), DEC-007 ('Es gating de UX — la barrera real de datos sigue siendo RLS'). Los hashes públicos: C:\\Users\\Kalel\\fable 5\\wrd\\data.js:86-87. La barrera real: C:\\Users\\Kalel\\fable 5\\wrd\\setup\\schema.sql:153-162 (función es_admin() security definer) y :405-530 (policies por tabla). Doble chequeo del gate de dispositivo: js/gate-ui.js:538 (al pintar) + js/auth.js:583 (al registrar).",
+   "cuandoAplica": "Cualquier app con roles, niveles, planes o contenido gated, y en especial cualquier modo demo/offline que después va a tener backend real.",
+   "cuandoNO": "No es excusa para no hacer el gate de cliente: sin él la experiencia es mala. Y si el proyecto de verdad no tiene nada que proteger (una demo sin datos ajenos), no gastes en RLS — pero entonces decí explícitamente que no hay barrera.",
+   "temaTentativo": "seguridad cliente-servidor",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "WRD es la tienda de dulcería del dueño: "
+  },
+  {
+   "titulo": "La clave publicable va al .env.local; la service_role no se pide, ni se pega, ni se guarda",
+   "respuestaCorta": "Clasifica la clave antes de tocarla. Las publicables (sb_publishable_ / anon) son publicas por diseno porque viajan en el bundle del navegador: pueden vivir en .env.local gitignoreado sin drama. La secreta (service_role) nunca se le pide al usuario, ni se pega en el chat, ni se escribe en memoria commiteada: siempre es re-leible desde el dashboard del proveedor, asi que no existe razon legitima para copiarla.",
+   "porQue": "Regla fijada al cerrar la sesion del 2026-07-03: se registro el proyecto en memoria pero la clave cruda se dejo solo en .env.local, deliberadamente fuera de lo que se commitea. Distinguir los dos tipos evita a la vez la paranoia inutil con la publicable y el desastre con la secreta.",
+   "evidencia": "permanent/KN-003. La clave publicable de infrapilot esta en infrapilot-app/.env.local (gitignored) y es re-leible desde Supabase Dashboard -> Project Settings -> API; el ref del proyecto quedo en memoria, la clave no.",
+   "cuandoAplica": "Al conectar cualquier backend con dos niveles de clave (Supabase, Stripe, Firebase) y al decidir que entra en memoria o en un repo.",
+   "cuandoNO": "No confundas 'publicable' con 'sin riesgo': una anon key sin RLS bien configurado expone la base entera. La clave es publica por diseno; lo que protege es la politica de acceso, asi que publicarla nunca sustituye revisar RLS.",
+   "temaTentativo": "claves y secretos",
+   "transversal": 8,
+   "confianza": "media (politica registrada, no un incidente)",
+   "_proy": "permanent es la memoria de hechos de la "
+  },
+  {
+   "titulo": "Con un equipo de niveles distintos, la separación tiene que ser física, no una convención de carpetas",
+   "respuestaCorta": "Si alguien junior no debe poder romper el trabajo de alguien senior, dales repos y procesos distintos que se hablen por HTTP, no carpetas en el mismo repo con un acuerdo de no tocarse. Usa git subtree split para partir: conserva la historia y las rutas locales quedan intactas, así que la separación no cuesta nada. Cada mitad se verifica sola con su propio comando como puerta de PR.",
+   "porQue": "Petición literal del dueño: 'no quiero que el diseñador de landing pueda dañar el trabajo del programador'. El criterio que salió fue 'no bloquear a un rol por el trabajo del otro': sistema y vitrina comparten cero archivos en disco y se comunican por proxy HTTP. Se verificó de punta a punta que la separación no rompía nada: una orden creada desde la vitrina apareció con el mismo número y total en el sistema contable.",
+   "evidencia": "villa-broaster/DEC-009 (tres repos por rol; subtree split preservó 9 commits del sistema y 4 de la vitrina; rutas locales y launch.json intactos); DEC-007 (vitrina stateless, /api/* → :3200 por rewrite; cross-flow verificado con la orden L1-0001); PEND-004 (activación: main protegida, invitación por rol, npm run verificar como puerta de PR); QA 8/8 PASS en el pivote y 7/7 en la separación",
+   "cuandoAplica": "Cuando entra gente nueva o de menor experiencia a un proyecto en producción, o cuando dos disciplinas (diseño y backend) van a iterar a ritmos distintos sobre el mismo producto.",
+   "cuandoNO": "Si trabajas solo o con un par de la misma vara, tres repos es burocracia pura: te obliga a coordinar despliegues y a mantener contratos que no necesitas. Tampoco lo hagas si las dos mitades comparten estado real y no solo datos por HTTP.",
+   "temaTentativo": "arquitectura de equipo",
+   "transversal": 8,
+   "confianza": "media",
+   "_proy": "villa-broaster es el cliente real más ma"
+  },
+  {
+   "titulo": "Código terminado que no fue aprobado va a rama feature/*, nunca a stash",
+   "respuestaCorta": "Si terminas algo y el dueño dice 'todavía no', haz commit en una rama feature/ y súbela. No stash, no árbol sucio, no comentar el código. Main queda limpio, el trabajo no se pierde, y cuando lo autoricen entra por PR con su QA propio en vez de reconstruirse.",
+   "porQue": "T-11 (usuarios, roles y puestos) quedó completo y en verde — 107 tests, e2e del admin OK — justo cuando llegó la orden literal 'no quiero que hagas nada de código aún, quiero los planes'. La rama lo preservó intacto durante días sin ensuciar main ni bloquear los runs siguientes, que siguieron trabajando encima sin conflicto.",
+   "evidencia": "villa-broaster/KN-014 punto 2 y PEND-007 (feature/roles-puestos, commit f064c81, 107 tests verde, pausado por orden explícita); verificado en disco: `git branch -a` en broaster-app lista feature/roles-puestos junto a main, con los archivos de usuarios presentes solo en la rama",
+   "cuandoAplica": "Cualquier trabajo terminado que el cliente, el dueño o la prioridad del momento manden pausar. También cuando terminas algo grande y sabes que la revisión va a tardar.",
+   "cuandoNO": "No sirve para trabajo a medias que nadie va a retomar: eso es basura con nombre bonito, bórralo. Y si la rama va a vivir semanas sobre un archivo que otros están moviendo, el rebase futuro puede costar más que rehacerlo — evalúa antes de aparcarla.",
+   "temaTentativo": "git",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "villa-broaster es el cliente real más ma"
+  }
+ ]
+}

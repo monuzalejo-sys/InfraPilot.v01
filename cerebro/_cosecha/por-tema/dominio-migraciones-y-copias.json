@@ -1,0 +1,143 @@
+{
+ "tema": {
+  "slug": "dominio-migraciones-y-copias",
+  "titulo": "Cambiar o copiar el dominio: migraciones, unidades y módulos del hermano",
+  "preguntas": [
+   "agregue un campo obligatorio y se cayo la pagina en produccion, que paso?",
+   "como pruebo una migracion de supabase si aca no hay docker ni psql?",
+   "puedo desplegar si el cliente todavia no ha corrido la migracion?",
+   "voy a copiar el modulo de caja del estanco al asadero, que le reviso antes?",
+   "empezamos a vender por unidad ademas de por peso, que se me rompe?",
+   "el sql lo revise y se ve bien, ya cuenta como probado?"
+  ],
+  "alias": [
+   "migracion",
+   "migraciones",
+   "sql",
+   "supabase",
+   "esquema",
+   "rls",
+   "trigger",
+   "version de datos",
+   "VERSION_DATOS",
+   "bump",
+   "postgres embebido",
+   "embedded-postgres",
+   "idempotente",
+   "503",
+   "MIGRATION_REQUIRED",
+   "banner",
+   "portar modulo",
+   "proyecto hermano",
+   "calcar",
+   "contrato de tipos",
+   "supuestos temporales",
+   "unidades",
+   "kilos",
+   "costo por unidad"
+  ],
+  "leccionesIncluidas": [
+   "Cambio de forma en datos guardados = subir la version y escribir la migracion en el MISMO commit",
+   "SQL revisado no es SQL ejecutado",
+   "Las migraciones SQL SI se prueban en esta maquina: Postgres embebido en el scratchpad",
+   "Deja que el código vaya por delante del esquema, pero que lo diga con su propio código de error",
+   "Al agregar un segundo eje de medida, persiguelo hasta el costo: un $0 no rompe nada, solo miente",
+   "Antes de diseñar un módulo nuevo, saca del proyecto hermano una lista explícita de qué adoptar y qué NO",
+   "Al portar un módulo probado a otro negocio, copia el contrato campo por campo y audita sus supuestos temporales ANTES de correrlo"
+  ],
+  "proyectos": [
+   "placita",
+   "infrapilot",
+   "estanco-contable",
+   "arroces",
+   "villa-broaster"
+  ],
+  "valor": 9
+ },
+ "lecciones": [
+  {
+   "titulo": "Cambio de forma en datos guardados = subir la version y escribir la migracion en el MISMO commit",
+   "respuestaCorta": "Si agregas o cambias un campo obligatorio de algo ya guardado (localStorage, JSON, tabla), sube VERSION_DATOS y escribe la migracion en el mismo cambio, nunca 'despues'. Que la pantalla nombre POR SU NOMBRE la migracion que falta en vez de fallar callada, y que la cola de subida reintente sola hasta que exista. Si hay varias migraciones, fija y comunica el ORDEN.",
+   "porQue": "Un campo nuevo obligatorio sin bump de version tumbo la pagina de productos en produccion (undefined.toFixed) con los datos que el dueno ya tenia en su navegador: el typecheck no ve datos viejos y el QA de los builders solo probo con seed limpio; fue la SEGUNDA vez de esa misma clase de bug en el proyecto. Para diagnosticar el 'undefined.X' en vivo sirvio la trampa Object.defineProperty sobre el prototipo, que captura el objeto exacto que falla. Despues se estandarizo al reves: migraciones numeradas por fecha, orden obligatorio y aviso en pantalla.",
+   "evidencia": "placita/KN-009 ('todo cambio de forma en datos persistidos = bump de VERSION_DATOS + MIGRACIONES en el MISMO cambio'; 'el QA de cambios de contrato debe probar con un sobre de datos de la version ANTERIOR'); placita/KN-040 (orden critico: supabase/migraciones/2026-08-21-gastos-y-cierre.sql ANTES de 2026-08-22-unidades.sql; aviso verificado en vivo: 'FALTA APLICAR LA MIGRACION 2026-08-21'; el outbox reintenta solo, nada se pierde); placita/DEC-022 (migracion v6->v7) y DEC-015 (v4->v5).",
+   "cuandoAplica": "Cualquier app con estado persistido en el cliente o esquema en base de datos que ya tiene usuarios reales usandola.",
+   "cuandoNO": "Antes del primer usuario real, cuando borrar y resembrar es gratis: ahi la migracion es ceremonia. Y si el dato viejo es descartable por naturaleza (cache), documenta que se descarta en vez de migrarlo.",
+   "temaTentativo": "migraciones de datos",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "Placita (Mercaplaza) es el POS + inventa"
+  },
+  {
+   "titulo": "SQL revisado no es SQL ejecutado",
+   "respuestaCorta": "Una migración que solo se leyó no está probada, por muy limpia que se vea. Aplícala primero en un proyecto desechable, córrela DOS veces para comprobar que es idempotente, y solo entonces tócale la base real. Mientras no se haya ejecutado, dila en voz alta como \"sin ejecutar\", nunca como \"lista\".",
+   "porQue": "RSK-001: 003_organizations.sql (233 líneas, RLS con helpers security-definer y trigger de bootstrap de dueño) pasó la verificación por lectura de código y nunca se ejecutó, porque en esta máquina no hay psql, ni Supabase CLI, ni Docker. La consecuencia se puede medir en calendario: /organizaciones y /perfil llevan devolviendo 503 desde el 2026-07-28 y la Etapa 5 completa sigue trabada.",
+   "evidencia": "infrapilot/RSK-001 (con la mitigación ya escrita: desechable primero, correr dos veces, luego producción), infrapilot/ROAD-005 (In-Progress desde 2026-07-28, bloqueado) e infrapilot/PEND-016 (personalización del hub, bloqueada por lo mismo). Archivo: supabase/migrations/003_organizations.sql en C:\\Users\\Kalel\\ORION\\infrapilot-app\\.",
+   "cuandoAplica": "Toda migración de esquema, trigger o política RLS. Y en general a cualquier artefacto cuya única verificación fue \"lo leí y se ve bien\": scripts de borrado, cron jobs, reglas de facturación.",
+   "cuandoNO": "En una base local desechable puedes correr directo — esa base ES el desechable. Lo que no admite excusa es saltárselo contra datos reales de un negocio.",
+   "temaTentativo": "migraciones",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "InfraPilot AI es un SaaS de herramientas"
+  },
+  {
+   "titulo": "Las migraciones SQL SI se prueban en esta maquina: Postgres embebido en el scratchpad",
+   "respuestaCorta": "Antes de dar por buena una migracion, correla de verdad: npm i embedded-postgres levanta un PostgreSQL real en el scratchpad, aplicas el .sql y verificas con asserts en node (idempotencia al aplicarla dos veces, triggers, RLS). No hace falta Docker ni tocar el Supabase del cliente. Si un agente te entrega SQL 'revisado a ojo', mandalo a ejecutarlo.",
+   "porQue": "El supuesto previo del ecosistema era que el SQL no se podia verificar sin Supabase o Docker, asi que las migraciones se entregaban sin ejecutar. Un builder invalido el supuesto validando 001_rol_actual.sql con 37/37 asserts, cubriendo idempotencia y el bloqueo de escalada de rol — justo el tipo de logica (trigger + SECURITY DEFINER) donde un error se descubre en produccion.",
+   "evidencia": "estanco-contable/KN-008 (Knowledge Permanent, 2026-07-29, PostgreSQL 18.4). metrics.json session-2026-07-29-estanco, phase build:infra (opus, 100.828 tokens), nota '001_rol_actual.sql, 37/37 en Postgres real embebido'. El archivo existe y contiene lo verificado: supabase/migrations/001_rol_actual.sql:134 (create or replace function public.usuarios_bloquear_escalada), :241 (revoke execute ... from public), :260 (create trigger trg_usuarios_bloquear_escalada). KN-008 dice explicitamente que aplica a cualquier proyecto de esta maquina, incluida la migracion 003 de infrapilot. Nota: embedded-postgres NO esta en package.json — se instala ad-hoc en el scratchpad, no ensucia el proyecto.",
+   "cuandoAplica": "Cualquier proyecto de esta maquina con migraciones Postgres/Supabase: RLS, triggers, constraints, backfills, funciones SECURITY DEFINER.",
+   "cuandoNO": "No prueba lo que solo existe en Supabase (auth.uid(), politicas que dependen del JWT, extensiones propietarias): eso se stubbea con una funcion falsa o se acepta como no verificado. Tampoco sustituye probar el ORDEN de las migraciones sobre un dump con datos reales.",
+   "temaTentativo": "verificacion de migraciones",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "estanco-contable es el SaaS de facturaci"
+  },
+  {
+   "titulo": "Deja que el código vaya por delante del esquema, pero que lo diga con su propio código de error",
+   "respuestaCorta": "Cuando publiques una función que necesita una migración que aún no ha corrido, detecta en la ruta API el error de tabla inexistente (Postgres 42P01, o mensaje que contenga \"does not exist\" o \"schema cache\") y responde 503 con un código explícito tipo MIGRATION_002_REQUIRED; que el cliente lo cace y muestre un banner claro. Así despliegas sin romper la app y sin que nadie tenga que adivinar qué pasa.",
+   "porQue": "KN-022: el patrón se estableció para 002_suppliers_quotes y permitió publicar /proveedores y la comparativa de precios (commit 131040f) con la migración todavía pendiente del usuario, degradando con banner en vez de reventar. Y se reutilizó tal cual en la 003 — organizaciones y perfil degradan hoy mismo por el mismo mecanismo — que es la prueba de que aguanta la segunda vez.",
+   "evidencia": "infrapilot/KN-022 (commit 131040f: app/api/*, components/migration-notice.tsx, supabase/migrations/002_suppliers_quotes.sql), infrapilot/PEND-015 (banner MIGRATION_002_REQUIRED activo esperando al usuario) e infrapilot/RSK-001 + ROAD-005 (mismo mecanismo aplicado a 003).",
+   "cuandoAplica": "Cualquier app cuyas migraciones aplique otra persona, o en un momento distinto al del deploy — que es exactamente el caso de todos los proyectos con Supabase administrado a mano.",
+   "cuandoNO": "Si la migración la aplica el propio despliegue (CI con migrate automático y rollback), el banner es complejidad muerta: ahí falla el deploy y ya está.",
+   "temaTentativo": "migraciones",
+   "transversal": 7,
+   "confianza": "alta",
+   "_proy": "InfraPilot AI es un SaaS de herramientas"
+  },
+  {
+   "titulo": "Al agregar un segundo eje de medida, persiguelo hasta el costo: un $0 no rompe nada, solo miente",
+   "respuestaCorta": "Si un producto pasa a venderse en otra unidad (unidades ademas de peso), el eje nuevo vive en el MOVIMIENTO, no en el lote, y el lote lleva su propio costo por unidad: nunca recicles el costo del eje viejo. Despues caza uno por uno a TODOS los lectores del eje anterior: ficha, resumen y pronostico siguieron leyendo gramos y mostrando ceros.",
+   "porQue": "Todo producto vendido por unidad reportaba costo de ventas $0. Nada fallaba ni tumbaba nada: los balances simplemente le inflaban al dueno la ganancia bruta. Tras el fix, una venta de $20.000 mostro ganancia bruta real de $4.000. Y aun asi quedaron tres lectores del eje viejo: la ficha del POS decia 'sin piso' con stock real, el resumen de bodega contaba 0 kg y el consejero seguia calculando en gramos.",
+   "evidencia": "placita/DEC-022 ('el eje unidades vive en MOVIMIENTO, no en Lote'; Lote.costoPorUnidadCop propio, 'nunca se recicla costoPorKiloCop del modo peso'; FEFO por unidades; migracion v6->v7 + supabase/migraciones/2026-08-22-unidades.sql; verificado en vivo: ganancia bruta $4.000 sobre precio $20.000); placita/PEND-020 a/b/c (los tres lectores del eje viejo que quedaron); placita/PEND-016 (agotados.ts sigue en gramos).",
+   "cuandoAplica": "Cuando un catalogo empieza a mezclar unidades de medida: peso y unidad, presas y libras, bultos y kilos, hora y tarifa fija.",
+   "cuandoNO": "Si el negocio de verdad solo tiene una unidad, no agregues el eje 'por si acaso': dos ejes duplican para siempre los lectores que hay que mantener sincronizados.",
+   "temaTentativo": "costos y unidades",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "Placita (Mercaplaza) es el POS + inventa"
+  },
+  {
+   "titulo": "Antes de diseñar un módulo nuevo, saca del proyecto hermano una lista explícita de qué adoptar y qué NO",
+   "respuestaCorta": "Cuando vayas a construir algo que ya existe parecido en otro proyecto tuyo, dedica una fase de análisis a producir dos listas nombradas: lo que se copia y lo que deliberadamente no. Escríbelas en un documento de bases con commit propio antes de tocar código. Lo más valioso suele ser descubrir que el hermano NO resolvió una pieza: eso te avisa que la vas a diseñar desde cero y que no hay referencia donde apoyarte.",
+   "porQue": "Para el módulo de Caja se analizó placita (que está en producción) y salieron listas concretas: adoptar cobro-en-bloque, grilla sin scroll y módulo puro; NO adoptar báscula, multi-factura ni PIN. Y el hallazgo que cambió el plan: placita no tiene turnos de caja porque ahí venta y cobro son un solo acto, así que TurnoCaja no tenía de dónde copiarse y hubo que diseñarlo desde cero apoyándose en la regla de otro proyecto (la plata pertenece al turno del cobro, aprendida en la arrocera).",
+   "evidencia": "villa-broaster/PEND-006 (plan de 5 pasos con blast radius marcado por paso; 'Hallazgo del analisis: placita NO tiene turnos de caja — TurnoCaja se disena desde cero aqui'); entregable docs/BASES-CAJA.md, commit a5686c1; metrics session-2026-08-20-bases-caja (fase analysis sonnet, 98.166 tokens medidos, run de diseño sin build)",
+   "cuandoAplica": "Al arrancar cualquier módulo que huela a 'esto ya lo hice en otro cliente': caja, inventario, roles, facturación, notificaciones.",
+   "cuandoNO": "No lo hagas si el proyecto hermano está en un rubro con reglas de negocio incompatibles: copiar por parecido superficial es peor que empezar limpio. Y no conviertas el análisis en un run entero si el módulo es pequeño; la lista debe caber en una página.",
+   "temaTentativo": "diseño de módulos",
+   "transversal": 8,
+   "confianza": "media",
+   "_proy": "villa-broaster es el cliente real más ma"
+  },
+  {
+   "titulo": "Al portar un módulo probado a otro negocio, copia el contrato campo por campo y audita sus supuestos temporales ANTES de correrlo",
+   "respuestaCorta": "Antes de reusar un módulo de dominio de un proyecto hermano, haz dos cosas por escrito: (1) reproduce el contrato de tipos campo por campo y anota la lista corta de renombres deliberados; (2) lista los supuestos IMPLÍCITOS del hermano —sobre todo los temporales: cuándo nace el documento vs. cuándo entra la plata, quién es dueño del registro, qué cuenta como \"un día\"— y verifica uno por uno contra el negocio nuevo. El código compila y pasa sus tests igual con el supuesto equivocado adentro.",
+   "porQue": "`cierre.ts` se portó del estanco, donde facturar y cobrar son el mismo instante, y llegó a un restaurante donde no lo son: el supuesto viajó escondido en el código y nadie lo vio hasta el E2E. La parte que SÍ se hizo por escrito (el contrato heredado con sus 3 adaptaciones documentadas) no dio ningún problema.",
+   "evidencia": "arroces/KN-001 (\"CLASE DE BUG al portar módulos de dominio entre negocios distintos: auditar los SUPUESTOS TEMPORALES implícitos\"). Código: C:\\Users\\Kalel\\prommter\\proyectos\\arroces\\lib\\types.ts:15-24 (contrato heredado del estanco campo por campo + las 3 adaptaciones: Factura→Pedido, localId→sucursalId, sin empresaId); C:\\Users\\Kalel\\prommter\\proyectos\\arroces\\lib\\dominio\\cierre.ts:30-44 y :55-61 (nota de alcance de jornada.ts). metrics.json: 1 solo ciclo de fix pese a portar 2 módulos completos.",
+   "cuandoAplica": "Cada vez que se calca stack y dominio de un hermano probado — que es la práctica por defecto del ecosistema (DEC-001): estanco→arroces, arroces→villa-broaster, etc.",
+   "cuandoNO": "No lo uses de excusa para reescribir desde cero: calcar sigue siendo lo correcto (38/38 self-tests y un solo fix), la auditoría es un checklist de 15 minutos, no un rediseño. Y no aplica a utilidades sin semántica de negocio (formateo, helpers de UI): ahí no hay supuestos que auditar.",
+   "temaTentativo": "portar dominio",
+   "transversal": 10,
+   "confianza": "alta",
+   "_proy": "arroces (Super Arroz del Norte) es la we"
+  }
+ ]
+}

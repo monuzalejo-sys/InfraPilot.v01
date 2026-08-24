@@ -1,0 +1,127 @@
+{
+ "tema": {
+  "slug": "pantalla-publica",
+  "titulo": "La pantalla pública: qué vende, qué pide y cómo se ve",
+  "preguntas": [
+   "el dueño dice que la landing esta muy apagada y generica, que le cambio?",
+   "la landing puede usar el mismo estilo del sistema por dentro?",
+   "cuantos campos le pido en el formulario de captacion?",
+   "me pasaron una referencia de diseño, como la uso sin copiarla?",
+   "puedo subirle el color a los tokens pa que la portada venda mas?",
+   "el cliente rechazo el diseño, rehago todo o solo lo que critico?"
+  ],
+  "alias": [
+   "landing",
+   "portada",
+   "vitrina",
+   "pagina publica",
+   "minimalista",
+   "apagado",
+   "generico",
+   "llamativa",
+   "manifiesto",
+   "registro visual",
+   "referencias",
+   "fichas",
+   "mecanismo",
+   "movil 390",
+   "formulario",
+   "campos",
+   "captacion",
+   "conversion",
+   "tokens compartidos",
+   "globals.css",
+   "grep consumidores",
+   "rechazo"
+  ],
+  "leccionesIncluidas": [
+   "El registro lo decide quién mira la pantalla: trabajador adentro = calma, cliente afuera = venta",
+   "Traduce la queja en especificación, y no toques lo que no criticaron",
+   "Las referencias se fichan por MECANISMO, se combinan una por zona, y su resultado se anota por canal",
+   "Cambiar un color compartido es un cambio de alcance, no de gusto: grepea quién más lo consume",
+   "Pide solo los campos que usarás en el siguiente contacto; el resto se pregunta cuando ya hay relación",
+   "Que cada campo del formulario le devuelva algo al usuario en el instante en que lo responde"
+  ],
+  "proyectos": [
+   "landings",
+   "placita",
+   "villa-broaster",
+   "pollo-landing"
+  ],
+  "valor": 8
+ },
+ "lecciones": [
+  {
+   "titulo": "El registro lo decide quién mira la pantalla: trabajador adentro = calma, cliente afuera = venta",
+   "respuestaCorta": "No apliques el manifiesto minimalista del 'estudio del ingeniero moderno' a una portada pública: ahí el trabajo es vender. En landing va producto protagonista, color y movimiento con gusto (cálida de base + acentos del propio producto), interactividad real y cero fotos de stock. Adentro de la app (POS, dashboards, módulos) el manifiesto se sigue al pie de la letra. Lo único que no cambia nunca en ninguno de los dos registros: nada de azules eléctricos, morados, neones ni gradientes tecnológicos.",
+   "porQue": "El 2026-08-05 el dueño rechazó textualmente la landing de la placita: 'la landing que haces es una basura... muy minimalista... quiero que esta landing sea más interactiva, más llamativa, es para vender frutas'. Aplicar el manifiesto de interior a una portada la hace ver vacía y pobre.",
+   "evidencia": "landings/POL-001 en C:\\Users\\Kalel\\ORION\\memory\\landings\\state.json (cita textual del rechazo del 2026-08-05); confirmada en el brief de pollo-landing y reafirmada como regla 3 de combinación en C:\\Users\\Kalel\\ORION\\prompts-landing\\referencias\\_INDEX.md.",
+   "cuandoAplica": "Cualquier pantalla pública de cualquier proyecto: portada, landing, vitrina, demo comercial, página de producto.",
+   "cuandoNO": "Nunca hacia adentro: en el POS de la placita, el módulo contable del estanco o un dashboard de InfraPilot, subir saturación y movimiento estorba al que trabaja ocho horas ahí. Y no confundir 'vender' con romper las prohibiciones cromáticas: siguen vigentes en la landing.",
+   "temaTentativo": "dirección de arte",
+   "transversal": 10,
+   "confianza": "alta",
+   "_proy": "landings no es un producto: es la memori"
+  },
+  {
+   "titulo": "Traduce la queja en especificación, y no toques lo que no criticaron",
+   "respuestaCorta": "Cuando te rechacen con adjetivos, tradúcelos antes de rehacer: 'apagado' suele significar fondo claro y plano donde el producto no brilla; 'genérico' suele significar layout estándar de app (lista de filas con círculo de inicial, chips arriba, todo centrado y simétrico); 'que dé gusto verlo' significa que haya algo que MIRAR en cada pantalla, no solo algo que leer. Y no sobrecorrijas: conserva explícitamente todo lo que no fue criticado, y degrada de rol lo que estorbaba en vez de prohibirlo (el crema que fallaba como fondo de pantalla siguió sirviendo como tinta y como 'plato' bajo la foto). En comida además la dirección oscura no es opcional: fondo noche con radiales cálidas por sección, grano, viñeta y halo detrás del producto, porque la primera palabra del reclamo fue 'fondo'.",
+   "porQue": "Con la portada en crema y la carta en oscuro, el dueño rechazó el conjunto con 'quiero mejor fondo... todo se ve muy genérico, apagado, hazlo divertido, llamativo, que dé gusto verlo'. Tratar esos adjetivos como gusto lleva a rehacer al azar; traducirlos deja una lista de cambios verificables. Lo que sí sobrevivió y por tanto no debía tocarse: paleta oscura de la carta, precios en naranja, cinta EJEMPLO y el dato grande '2 sedes / $0'.",
+   "evidencia": "landings/KN-009 y la resolución de landings/PEND-003 en C:\\Users\\Kalel\\ORION\\memory\\landings\\state.json (veredicto del 2026-08-23 + capturas cap-top.png / cap-carta.png a 390x844); las 9 fotos de producto llegan en PNG sin alfa — verificado en disco: C:\\Users\\Kalel\\prommter\\proyectos\\villa-broaster\\docs\\claude-design\\assets\\ (ala-apanada, arepa, contra-muslo, filete de cerdo, filete de pollo, muslo, papa horneada, papas fritas, pechuga).",
+   "cuandoAplica": "Cualquier iteración tras un rechazo por impresión, en cualquier proyecto. La parte del fondo oscuro aplica a comida y bebida, donde el vehículo del deseo es luz cálida sobre el producto.",
+   "cuandoNO": "No extrapoles el fondo oscuro a otros rubros sin veredicto: una inmobiliaria o un SaaS pueden querer claro (en Orama el propio dueño eligió tinta profunda pero con superficies de papel). Y ojo con la frontera aún sin veredicto entre 'divertido' y 'gritado/barato' del registro de cartel de feria: eso todavía no está pagado (landings/PEND-004).",
+   "temaTentativo": "dirección de arte",
+   "transversal": 7,
+   "confianza": "alta",
+   "_proy": "landings no es un producto: es la memori"
+  },
+  {
+   "titulo": "Las referencias se fichan por MECANISMO, se combinan una por zona, y su resultado se anota por canal",
+   "respuestaCorta": "Cuando te den una referencia visual, fíchala antes de usarla: qué mecanismo aporta (composición, movimiento, uso del color, jerarquía) y qué NO se copia (marca, textos, imágenes, datos ajenos). Combina 2-3 fichas por landing, una por zona (hero / producto / cierre) y nunca tres peleando por la misma sección, justificando cada mecanismo en términos de venta. Toda combinación trae su versión móvil explícita a 390 px (apilar o esconder, swipe en vez de hover, tap ≥40 px, 100dvh, imágenes ≤150 KB, fallback de prefers-reduced-motion), y el veredicto se registra por canal, móvil y escritorio por separado: si nadie miró escritorio, no inventes un veredicto de escritorio.",
+   "porQue": "El dueño lo pidió así para que el agente 'aprenda con los resultados y cada vez haga mejores combinaciones', siendo móvil uno de sus canales principales. El método ya se pagó a sí mismo: al llegar el rechazo del v2, la tabla de resultados pudo separar qué mecanismo no se ejecutó (fondo por producto), cuál quedó invisible (foco por gesto) y cuál sobrevivió (dato grande) en vez de descartar las tres fichas juntas.",
+   "evidencia": "landings/POL-003 en C:\\Users\\Kalel\\ORION\\memory\\landings\\state.json (cita textual del pedido del 2026-08-23); biblioteca verificada en disco: C:\\Users\\Kalel\\ORION\\prompts-landing\\referencias\\ con _INDEX.md, _PLANTILLA.md y las fichas 01-hero-carrusel-figuras-toonhub.md, 02-scroll-cinematografico-capas-mostar.md, 03-hero-spotlight-revela-segunda-imagen-lithos.md, cada una con su columna Resultados ya poblada por canal.",
+   "cuandoAplica": "Cualquier trabajo visual que parta de referencias externas, y cualquier proceso donde quieras que los aciertos se acumulen en vez de reinventarse cada encargo.",
+   "cuandoNO": "Si la referencia de escritorio pierde su gracia al adaptarse a 390 px, no se usa — no la fuerces. Y no fiches el contenido ajeno (marca, copy, fotos): eso no es referencia, es copia.",
+   "temaTentativo": "método de trabajo",
+   "transversal": 8,
+   "confianza": "media",
+   "_proy": "landings no es un producto: es la memori"
+  },
+  {
+   "titulo": "Cambiar un color compartido es un cambio de alcance, no de gusto: grepea quién más lo consume",
+   "respuestaCorta": "Antes de tocar un token de color, grepea quién lo importa. Si la landing y el interior de la app comparten hoja de estilos, subirle saturación 'para que la portada venda' te repinta pantallas de trabajo que se rigen por el manifiesto. Crea tokens NUEVOS con alcance de portada (una clase contenedora en el <main> de la página pública) y trabaja solo sobre las clases que verificaste como exclusivas de la landing.",
+   "porQue": "Auditando el eje color de la portada de Mercaplaza apareció que los tokens de fruta de :root los consumía también el interior de la app (el hub de zonas y la página de pulpas), y que las paletas por producto del catálogo de landing las importaban dos pantallas internas. El cambio 'de portada' habría cruzado la frontera que separa el registro de venta del registro de trabajo.",
+   "evidencia": "landings/KN-004 en C:\\Users\\Kalel\\ORION\\memory\\landings\\state.json: tokens en app/globals.css:261-270 consumidos por components/hub/zonas.ts:205,260,296,306,346 y app/(app)/pulpas/page.tsx:61-65; components/landing/catalogo-datos.ts importado por app/(app)/principal/page.tsx:45-46 y components/hub/frutas.tsx:20-21. Verificado hoy: el repo vive en C:\\Users\\Kalel\\prommter\\proyectos\\placita y esas líneas YA se desplazaron por un refactor posterior (globals.css:278-282 es ahora un comentario de limpieza), así que reejecuta el grep antes de usarlas — el patrón sigue en pie, los números de línea no.",
+   "cuandoAplica": "Todo repo donde la landing y la aplicación comparten globals.css, tokens o archivos de datos; y en general antes de tocar cualquier constante compartida por dos audiencias distintas.",
+   "cuandoNO": "No hace falta si la landing es un archivo autocontenido separado del app (el caso de las demos y de la plantilla de login), ni cuando el token es de uso único y el grep lo confirma.",
+   "temaTentativo": "arquitectura front",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "landings no es un producto: es la memori"
+  },
+  {
+   "titulo": "Pide solo los campos que usarás en el siguiente contacto; el resto se pregunta cuando ya hay relación",
+   "respuestaCorta": "En un formulario de captación B2B quédate con cuatro: quién es, qué tipo de negocio, por dónde le escribes y cuánto mueve. NIT, ciudad, correo Y teléfono a la vez, lista de productos y comentarios los pides después, cuando ya te compró — igual salen en la primera llamada. Y pide UN canal de contacto, no dos: radio WhatsApp/Correo con un solo campo que cambia label, placeholder, teclado y validación según el canal elegido.",
+   "porQue": "La v1 pedía 8 campos (ficha comercial: razón social, NIT, tipo, contacto, teléfono, email, ciudad, productos, volumen) y el dueño la rechazó de frente. DEC-002 la reemplazó por 4 obligatorios con el objetivo explícito: 'fidelizar al maximo — pedir solo lo necesario para reenviar incentivos por el canal preferido y saber que volumen maneja'. El costo del rechazo ya está pagado; no hay que repetirlo en la próxima landing.",
+   "evidencia": "pollo-landing/DEC-001 (8 campos) superseded por DEC-002 (4 campos). Código: index.html:486-535 son los cuatro campos completos (negocio, tipo, canal, volumen) e index.html:507-519 + :623-638 el canal único dinámico (label, placeholder, inputmode y mensaje de error cambian al elegir WhatsApp o Correo; validación distinta en :653-659). Medición indirecta en metrics.json: sesión 2026-08-08 'validacion bloquea envio vacio 8/8 campos' vs sesión 2026-08-09 'envio vacio marca 4 campos sin guardar'.",
+   "cuandoAplica": "Cualquier formulario cuyo objetivo sea que el negocio te CONTACTE después (captación, lista de espera, programa de clientes, cotización).",
+   "cuandoNO": "No aplica a altas que sí necesitan el dato para operar: facturación electrónica (NIT obligatorio), despacho (dirección), o cumplimiento legal. Ahí el campo no es opcional aunque duela la conversión — pero entonces pídelo en un segundo paso, después de que ya dijo que sí.",
+   "temaTentativo": "formularios",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "pollo-landing es la landing B2B de un ma"
+  },
+  {
+   "titulo": "Que cada campo del formulario le devuelva algo al usuario en el instante en que lo responde",
+   "respuestaCorta": "Convierte el campo que te sirve a TI en un campo que le sirve a ÉL. Al elegir volumen, muéstrale en el acto a qué nivel de beneficio aplica; guarda ese resultado junto al registro; y en la pantalla de éxito repítelo con su nombre y su canal, no un 'gracias' genérico. El dato de segmentación deja de ser un peaje y pasa a ser la recompensa por llenarlo.",
+   "porQue": "DEC-002 reorientó el formulario a fidelización: el volumen no solo se guarda, dispara un promo-hint visible al instante que le dice al cliente qué se ganó. Es el mecanismo que justifica pedir el único campo que un negocio podría no querer contestar (cuánto mueve al mes).",
+   "evidencia": "pollo-landing/DEC-002 ('se muestra AL INSTANTE al elegir volumen (promo-hint) y se guarda en el registro (campo promo)'). Código: index.html:640-651 (listener change → pinta el beneficio), :531-534 (el bloque promo-hint con check verde), :682 (el promo viaja dentro del registro), :697-700 (mensaje de éxito: '¡Bienvenido, X! Sus incentivos llegarán por WhatsApp al … Su nivel: …'). Verificado en navegador, metrics.json sesión 2026-08-09T20:20: 'promo-hint instantaneo, alta WhatsApp y alta Correo persisten con promo'.",
+   "cuandoAplica": "Cualquier campo de segmentación que el usuario podría percibir como intrusivo: volumen, presupuesto, tamaño de empresa, frecuencia de compra.",
+   "cuandoNO": "Si el beneficio que muestras no está aprobado por el dueño o no es sostenible, la inmediatez juega en contra: prometes en pantalla algo que después toca desdecir por WhatsApp. Primero la aprobación (lección PROMOS), después el feedback instantáneo.",
+   "temaTentativo": "formularios",
+   "transversal": 8,
+   "confianza": "media",
+   "_proy": "pollo-landing es la landing B2B de un ma"
+  }
+ ]
+}

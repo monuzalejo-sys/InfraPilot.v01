@@ -1,0 +1,128 @@
+{
+ "tema": {
+  "slug": "que-es-estar-verificado",
+  "titulo": "Qué cuenta como verificado: compilar no es funcionar",
+  "preguntas": [
+   "el build paso verde, ya puedo decir que funciona?",
+   "que pruebo antes de decirle al dueño que quedo listo?",
+   "los tests pasan pero el bug salio en produccion, que me falto probar?",
+   "hice login y panel de admin, con el verifier normal basta?",
+   "mi typecheck da errores y el del proyecto no, a cual le creo?",
+   "por que el bug del turno no lo agarro ningun test?"
+  ],
+  "alias": [
+   "verificar",
+   "verificado",
+   "qa",
+   "e2e",
+   "tsc",
+   "typecheck",
+   "build verde",
+   "self-tests",
+   "seed limpio",
+   "empresa nueva",
+   "datos viejos",
+   "estado sucio",
+   "middleware",
+   "curl",
+   "PUBLIC_PATHS",
+   "adversarial",
+   "refutador",
+   "seguridad",
+   "falso positivo",
+   "strict",
+   "compilar no es funcionar",
+   "cronologia"
+  ],
+  "leccionesIncluidas": [
+   "Compilar no es funcionar, y el gesto de verificacion depende de lo que pruebas",
+   "Verde en tsc + self-tests no prueba cronología: el bug de turno solo aparece cruzando la frontera en un E2E",
+   "Prueba vacio, sucio y viejo: el seed limpio es el unico estado que nunca existe en produccion",
+   "El build verde no cubre lo que intercepta el middleware",
+   "Si el área es de seguridad, el verifier no alcanza: sumá refutadores dedicados",
+   "Un tsconfig ad-hoc sin strict inventa errores en codigo correcto"
+  ],
+  "proyectos": [
+   "estanco-contable",
+   "arroces",
+   "placita",
+   "infrapilot",
+   "wrd"
+  ],
+  "valor": 9
+ },
+ "lecciones": [
+  {
+   "titulo": "Compilar no es funcionar, y el gesto de verificacion depende de lo que pruebas",
+   "respuestaCorta": "tsc exit 0 y 'el codigo aterrizo en disco' no son evidencia de que funciona: no lo reportes como hecho ni lo escribas asi en la memoria. Y usa el gesto correcto: para probar una MUTACION navega por los enlaces de la app (recargar remonta el provider y ya no estas probando la mutacion); para probar PERSISTENCIA si hay que recargar con F5 y confirmar que el dato y el stock siguen ahi.",
+   "porQue": "La persistencia del store se dio por lista con 12 referencias a localStorage y tsc en 0, pero el builder murio por limite justo antes de la prueba de recarga; semanas despues sigue sin correrse y nadie puede afirmar que funciona. Antes habia pasado lo contrario: verificar mutaciones recargando escondia que el store NO persistia y que un F5 borraba las ventas.",
+   "evidencia": "estanco-contable/PEND-016 (Ready, High, 2026-08-01; su reason dice literalmente 'el codigo compila pero compilar no es funcionar'). estanco-contable/KN-010 (bug descubierto 2026-07-30, arreglado en la ola S1, actualizado 2026-08-03: 'la prueba de recarga de punta a punta NO se ha corrido todavia'). PEND-017 es el mismo patron para el flujo registro->vinculo: 'tsc da exit 0 pero la prueba en navegador quedo a medias'.",
+   "cuandoAplica": "Al declarar 'listo' cualquier tarea de UI con estado, y sobre todo al persistir el estado del proyecto en memoria: distingue 'escrito y typechequeado' de 'ejercitado'.",
+   "cuandoNO": "En cambios puramente de tipos o refactors sin comportamiento nuevo, tsc + build SI es la verificacion proporcional; no montes un E2E para renombrar un simbolo o mover un archivo.",
+   "temaTentativo": "verificacion",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "estanco-contable es el SaaS de facturaci"
+  },
+  {
+   "titulo": "Verde en tsc + self-tests no prueba cronología: el bug de turno solo aparece cruzando la frontera en un E2E",
+   "respuestaCorta": "No des por verificado un módulo de caja/turnos porque compile y pase sus self-tests: aquí pasaron 38/38 con el bug adentro. La prueba que sí lo encuentra es un E2E que CRUZA la frontera: toma un pedido antes de abrir el turno, abre caja, cóbralo dentro, cierra y exige que el arqueo cuadre exacto. Gasta ahí el presupuesto de verificación, no en más tests unitarios.",
+   "porQue": "KN-001 lo dice literal: el bug no fue de capacidad del modelo, el builder compiló y pasó sus self-tests; lo reveló únicamente la verificación E2E en navegador. Los self-tests de cierre (6/6) probaban el módulo consigo mismo, no el flujo pedir→panel→caja→cierre.",
+   "evidencia": "arroces/KN-001 (\"solo lo reveló la verificación E2E en navegador, no el tsc ni los self-tests unitarios\"); brief.md:8-12 (38/38: carta 6/6, pagos 8/8, cierre 6/6, pedido 18/18) y brief.md:22 (QAReport estático 10/10 + E2E completo, persistencia tras F5); metrics.json sessions[0].fixCycles=1, fase \"verify\" ok y fase \"fix\" ok.",
+   "cuandoAplica": "Verificar dominio con estado que cambia de dueño en el tiempo: turnos, cortes de caja, inventario, cierres contables, facturación por periodo.",
+   "cuandoNO": "Módulos puros sin cronología (cálculo de carta/precios, formateo, validaciones de un solo instante): ahí los self-tests sí bastan y montar E2E es desperdicio de tiempo y tokens.",
+   "temaTentativo": "verificación",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "arroces (Super Arroz del Norte) es la we"
+  },
+  {
+   "titulo": "Prueba vacio, sucio y viejo: el seed limpio es el unico estado que nunca existe en produccion",
+   "respuestaCorta": "Antes de decir 'funciona', corre tres caminos ademas del seed: empresa NUEVA con catalogo y proveedores vacios, base SUCIA con restos de otra empresa, y datos guardados de la VERSION ANTERIOR del software. Los tres cazaron bugs que ni los tests unitarios ni el e2e con seed vieron.",
+   "porQue": "(1) crearProveedor existia en el store sin ninguna UI que lo llamara: una empresa nueva en la nube no podia registrar mercancia JAMAS porque el recibo de bodega exige proveedor; el seed lo escondia porque siempre traia proveedores precargados. (2) Un e2e con estado sucio (empresa vieja emp-placita) descubrio que el outbox subia un empresa_id ajeno y Supabase respondia 500 por RLS. (3) Un campo nuevo obligatorio tumbo la pagina de productos en produccion con los datos v2 del navegador del dueno, mientras dev funcionaba con datos frescos.",
+   "evidencia": "placita/KN-026 ('al probar que algo esta totalmente funcional hay que probar el CAMINO DE EMPRESA NUEVA (catalogo/proveedores vacios), no solo el camino con seed', commit 956d15e); placita/KN-018 ('LECCION: e2e sucio > e2e limpio; necesario como caso', fix resolverTransicionEmpresa, commit dc9d079); placita/KN-009 (bug cazado en produccion 2026-08-07, undefined.toFixed con datos v2).",
+   "cuandoAplica": "Al cerrar cualquier funcionalidad que toque datos persistidos, multi-tenant, o instalaciones nuevas de un producto que ya tiene clientes.",
+   "cuandoNO": "En un prototipo desechable o una demo donde el seed ES el producto. Y el e2e sucio nunca contra la base real del negocio: hazlo contra copia o con el candado de red cerrado.",
+   "temaTentativo": "qa",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "Placita (Mercaplaza) es el POS + inventa"
+  },
+  {
+   "titulo": "El build verde no cubre lo que intercepta el middleware",
+   "respuestaCorta": "Después de añadir cualquier cosa que el navegador o un tercero pida SIN sesión (assets de PWA, webhooks, .well-known, callbacks de pago), haz una petición real contra el servidor corriendo y mira el código de estado. Que compile y que cada builder valide su pieza aislada no dice nada sobre las rutas que el middleware secuestra.",
+   "porQue": "KN-028: proxy.ts redirigía /sw.js y /manifest.webmanifest a /login con un 307, porque ninguna de las dos estaba en PUBLIC_PATHS. El build pasó limpio, cada builder verificó lo suyo, y el fallo solo apareció haciendo curl contra el dev server — lo cazó el verificador en vivo, no tsc ni el build.",
+   "evidencia": "infrapilot/KN-028. Arreglo en C:\\Users\\Kalel\\ORION\\infrapilot-app\\proxy.ts:4-8 — el comentario explica el porqué y PUBLIC_PATHS = [\"/\", \"/login\", \"/register\", \"/sw.js\", \"/manifest.webmanifest\"]; la comprobación vive en :40 (isPublic).",
+   "cuandoAplica": "PWAs, webhooks entrantes, callbacks de OAuth o de pasarela de pago, sitemaps y robots, cualquier app con middleware de autenticación delante.",
+   "cuandoNO": "No lo generalices a \"todo hay que probarlo con curl\". La regla es específica de rutas que pide un tercero sin cookie de sesión; para flujos autenticados el navegador real sigue siendo el test.",
+   "temaTentativo": "verificación",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "InfraPilot AI es un SaaS de herramientas"
+  },
+  {
+   "titulo": "Si el área es de seguridad, el verifier no alcanza: sumá refutadores dedicados",
+   "respuestaCorta": "Cuando lo construido toca auth, admin, permisos o RLS, después del verifier normal lanzá 1-2 adversarios en paralelo cuyo único encargo sea romper el gating y encontrar credenciales — modelo fuerte, y NUNCA el mismo agente que verificó. Encargales áreas separadas (uno el SQL/permisos, otro el gating de la app) y pediles hallazgos con archivo:línea. No des el trabajo por bueno hasta que los adversarios vuelvan.",
+   "porQue": "En WRD el verifier ya había dado FAIL, pero los smokes automatizados solo prueban que el camino feliz funciona; no intentan romperlo. Los dos adversarios encontraron 16 hallazgos que los smokes no vieron nunca, incluido un PIN de admin real filtrado en un comentario tipo doctest dentro del código — algo que ningún test de comportamiento iba a mirar jamás.",
+   "evidencia": "state.json KN-004 (wrd). metrics.json sesión 3, líneas 123-125: {phase verification, sonnet, verdict fail, 51161 tok} seguido de {adversarial, opus, 94008 tok} y {adversarial, opus, 125667 tok}; 16/16 hallazgos confirmados y luego arreglados (nota de sesión, metrics.json:90).",
+   "cuandoAplica": "Auth, paneles de administración, RLS/políticas de base de datos, manejo de credenciales, cualquier cosa donde 'funciona' y 'es seguro' no son la misma pregunta.",
+   "cuandoNO": "Trabajo cosmético o de contenido sin superficie de datos. Y no lo uses como sustituto del verifier normal: el adversarial encuentra lo que el verifier no busca, no lo que el verifier ya cubre.",
+   "temaTentativo": "verificacion adversarial",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "WRD es la tienda de dulcería del dueño: "
+  },
+  {
+   "titulo": "Un tsconfig ad-hoc sin strict inventa errores en codigo correcto",
+   "respuestaCorta": "Si vas a chequear tipos con una config propia fuera del proyecto, hereda o replica strict: true. Sin strict se apaga strictNullChecks, TypeScript deja de estrechar uniones discriminadas y te reporta TS2339 'Property X does not exist' sobre codigo que esta perfecto. Ante una discrepancia entre tu chequeo y el del proyecto, gana el tsc del proyecto.",
+   "porQue": "Paso con lib/dominio/devolucion.ts durante un check funcional: una config suelta reporto 2 errores que el tsc del proyecto (strict) no ve, y el codigo estaba bien. Un agente con prisa 'corrige' esos falsos positivos y ensucia dominio que ya estaba probado.",
+   "evidencia": "estanco-contable/KN-011 (Knowledge Permanent, 2026-07-30, 'falso positivo detectado y corregido durante el check funcional'). El modulo senalado quedo con self-test 5/5: metrics.json session-2026-07-30-e2, phase build:lib opus, nota 'devolucion 5/5'. El chequeo canonico del proyecto esta declarado en package.json como \"typecheck\": \"tsc --noEmit\".",
+   "cuandoAplica": "Verificar un archivo aislado, un subagente que typechequea su propia entrega, o cualquier chequeo que no sea el script del proyecto.",
+   "cuandoNO": "Si lo que quieres es medir cuanto se rompe al ENDURECER la config (migrar un proyecto legacy a strict), entonces la config distinta es justamente el punto — pero ahi los errores son deuda a pagar, no falsos positivos que ignorar.",
+   "temaTentativo": "typescript",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "estanco-contable es el SaaS de facturaci"
+  }
+ ]
+}

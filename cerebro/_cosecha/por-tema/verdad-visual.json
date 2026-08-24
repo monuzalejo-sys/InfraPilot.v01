@@ -1,0 +1,170 @@
+{
+ "tema": {
+  "slug": "verdad-visual",
+  "titulo": "Verdad visual: cómo se mide una pantalla en esta máquina",
+  "preguntas": [
+   "como veo de verdad si la pagina se ve bien en celular?",
+   "el screenshot me sale cortado a 390, esta roto el diseño o es la herramienta?",
+   "el navegador me dice que el elemento es visible pero no se ve, que pasa?",
+   "como pruebo un formulario si el usuario no esta mirando la pantalla?",
+   "por que mi clase propia le gana a la utility de tailwind?",
+   "el teclado del pin no responde a los clicks del agente, esta malo el componente?"
+  ],
+  "alias": [
+   "edge-cdp",
+   "cdp",
+   "headless",
+   "screenshot",
+   "captura",
+   "390",
+   "viewport",
+   "movil",
+   "responsive",
+   "overflow",
+   "scrollWidth",
+   "scrollX",
+   "getBoundingClientRect",
+   "visibility",
+   "hidden",
+   "cloak",
+   "prefers-reduced-motion",
+   "pane",
+   "navegador embebido",
+   "read_page",
+   "form_input",
+   "css compilado",
+   "especificidad",
+   "qa visual"
+  ],
+  "leccionesIncluidas": [
+   "Para verdad visual usá Edge headless por CDP; el panel embebido miente en visibility",
+   "Edge headless miente en ancho y en movimiento: usa CDP o tus capturas de móvil no valen",
+   "Nunca verifiques visual con `msedge --headless --screenshot`: miente el ancho y apaga las animaciones",
+   "Para QA movil usa edge-cdp.mjs; --screenshot miente por debajo de ~480px",
+   "El pane embebido miente sobre visibility: renderiza headless antes de tocar el CSS",
+   "Con el usuario ausente, maneja el navegador con read_page y form_input, no con clicks",
+   "Verifica la UI contra el artefacto compilado y las posiciones reales, no contra tu markup",
+   "Al verificar UI por navegador, espera entre pulsaciones y mide el estado real",
+   "Lo que el JS decide ocultar, el CSS lo tiene que garantizar"
+  ],
+  "proyectos": [
+   "wrd",
+   "landings",
+   "orama",
+   "permanent",
+   "placita",
+   "estanco-contable"
+  ],
+  "valor": 8
+ },
+ "lecciones": [
+  {
+   "titulo": "Para verdad visual usá Edge headless por CDP; el panel embebido miente en visibility",
+   "respuestaCorta": "No decidas nada visual con el navegador embebido en esta máquina: no compone frames (los screenshots fallan) y reporta 'visible' un elemento con visibility:hidden !important. Usá C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs, o Edge con --remote-debugging-port=9222 + Emulation.setDeviceMetricsOverride y setEmulatedMedia para desactivar prefers-reduced-motion. Si usás Edge headless simple, compensá el ancho por la escala de Windows al 125% (--window-size=488 para ver 390 lógicos) o vas a ver desbordes que no existen. Lo que SÍ podés creerle al panel: getBoundingClientRect y .hidden/checkVisibility para display.",
+   "porQue": "Se perdieron varias iteraciones creyéndole al panel que el cloak de arranque no funcionaba; Edge headless demostró que funcionaba perfecto. Después, una captura a 390 mostró la tarjeta del gate cortada por la derecha cuando la geometría real la daba contenida — pero esa MISMA captura compensada reveló un bug visual de verdad (input[type=password] sin width:100%), así que las capturas sirven, siempre que el ancho esté compensado.",
+   "evidencia": "state.json KN-006 (el panel no compone frames y miente en visibility) y KN-008 (recorte por escala de Windows 125%; --force-device-scale-factor=1 no lo corrige). La receta ya codificada como criterio de aceptación: docs\\LANDING-PROMPT.md:612-640, con 8 medidas numéricas de meta (viewport exacto 390, scrollWidth<=390, héroe<=420px, logo<=260px, animaciones vivas<=8) y dos capturas por página, una con movimiento y otra en reduce.",
+   "cuandoAplica": "Cualquier verificación visual, de layout responsive o de animación en esta máquina, propia o delegada a un subagente.",
+   "cuandoNO": "Para leer texto, estructura o el árbol de accesibilidad el panel embebido es más barato y sirve. No montes CDP para confirmar que un título dice lo que dice.",
+   "temaTentativo": "qa visual",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "WRD es la tienda de dulcería del dueño: "
+  },
+  {
+   "titulo": "Edge headless miente en ancho y en movimiento: usa CDP o tus capturas de móvil no valen",
+   "respuestaCorta": "No apruebes un diseño móvil con msedge --headless --window-size=390,844 --screenshot: el viewport real no baja de 492 px y el PNG sale recortado a 390, así que estás mirando un layout ancho cortado, no un celular; y Edge headless reporta prefers-reduced-motion: reduce por defecto, así que la captura sale sin animación. Levanta Edge con --remote-debugging-port=9222 y por CDP llama Emulation.setDeviceMetricsOverride {width,height,deviceScaleFactor:1,mobile:true}, Emulation.setEmulatedMedia con prefers-reduced-motion en no-preference, Page.navigate, Runtime.evaluate para medir y Page.captureScreenshot. Node 24 trae WebSocket global: no necesitas instalar nada.",
+   "porQue": "Se midió con una página sonda que imprime innerWidth: el viewport real quedó en 492x752 con window-size 390x844, y el mínimo no bajó de 492 ni con --headless=old ni con --force-device-scale-factor=1 (el alto sí obedece: 288x936 dio 492x844). matchMedia confirmó el reduced-motion por defecto. Con la receta ingenua no puedes ni aprobar el movimiento ni probar el respaldo de accesibilidad.",
+   "evidencia": "landings/KN-003 en C:\\Users\\Kalel\\ORION\\memory\\landings\\state.json (medición propia del 2026-08-19 en Edge 151.0.4129.93, Windows 10, Node v24.16.0); el mismo camino CDP es el que produjo la medición getAnimations()=1 y las capturas 390x844 del veredicto de Villa Broaster (landings/PEND-003, landings/KN-009).",
+   "cuandoAplica": "Cualquier QA visual o medición de página en esta máquina, sea landing, app o demo — no solo landings.",
+   "cuandoNO": "Si cambias de máquina, de navegador o de versión de Edge, reverifica con la página sonda antes de confiar en los números: la trampa es de esta combinación concreta, no una ley del universo.",
+   "temaTentativo": "qa visual",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "landings no es un producto: es la memori"
+  },
+  {
+   "titulo": "Nunca verifiques visual con `msedge --headless --screenshot`: miente el ancho y apaga las animaciones",
+   "respuestaCorta": "Para QA visual en esta máquina, levanta Edge con --remote-debugging-port=9222 y habla CDP: Emulation.setDeviceMetricsOverride {width,height,deviceScaleFactor:1,mobile:true}, Emulation.setEmulatedMedia prefers-reduced-motion:no-preference, Page.navigate, Runtime.evaluate para medir y Page.captureScreenshot. Node 24 ya trae WebSocket global: cero dependencias. Un `--headless=new --window-size=390,844 --screenshot` a secas te devuelve un viewport de 492px y recorta el PNG, y sale sin animación porque Edge headless reporta reduce por defecto — es decir, aprobarías una página que en el móvil real está rota.",
+   "porQue": "Se midió: el screenshot simple daba 492px en vez de 390px y capturaba la página congelada. Todo el veredicto PASS 12/12 de la propuesta y del plan de servicio se sostiene sobre la ruta CDP, no sobre capturas.",
+   "evidencia": "orama/KN-003 (verificación PASS 12/12, 390×844, contrastes ≥5,72) y orama/KN-002; C:/Users/Kalel/ORION/prompts-landing/orama-demo.md:473-475 (§11, receta CDP completa con los números de la falla); C:/Users/Kalel/prommter/proyectos/orama/memory/orama/metrics.json sessions[1] (verify completada inline con edge-cdp)",
+   "cuandoAplica": "Cualquier verificación visual, responsive o de animación de una página en Windows: landings, propuestas HTML, demos, dashboards.",
+   "cuandoNO": "Si solo necesitas leer texto o estructura del DOM basta Runtime.evaluate o un fetch; y si la página es estática sin animación ni breakpoints móviles, el costo del CDP no se paga.",
+   "temaTentativo": "verificacion visual",
+   "transversal": 10,
+   "confianza": "alta",
+   "_proy": "Orama Inmobiliaria (Popayán) es un clien"
+  },
+  {
+   "titulo": "Para QA movil usa edge-cdp.mjs; --screenshot miente por debajo de ~480px",
+   "respuestaCorta": "Verifica cualquier layout movil con: node C:/Users/Kalel/ORION/tools/edge-cdp.mjs --url <archivo|url> --width 390 --height 844 --mobile --shot out.png. Emula el viewport REAL por CDP y devuelve JSON con scrollWidth/clientWidth/overflowX, animaciones vivas, fuentes cargadas, consola y excepciones. NO uses 'msedge --headless --screenshot' para anchos <480px: el PNG sale de 390 pero el layout se calcula a ~480+, todo se ve corrido y vas a 'arreglar' un diseno que estaba bien.",
+   "porQue": "Pagado el 2026-08-19 verificando la propuesta de orama: el PNG a 390px mostraba todo recortado mientras el pane confirmaba scrollWidth==clientWidth, o sea sin overflow real. El 2026-08-21 se empaqueto la receta CDP en una herramienta sin dependencias para no volver a pagarlo.",
+   "evidencia": "permanent/KN-009 (el piso de viewport) y KN-010 (la herramienta). Verificado hoy: C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs existe, con los flags documentados en las lineas 6-7 y la emulacion real en la linea 108 (Emulation.setDeviceMetricsOverride con mobile). Validada contra fable 5/orama/propuesta-orama.html: 390px sin overflow, 6 animaciones vivas, 3 fuentes, consola limpia.",
+   "cuandoAplica": "Antes de dar por buena cualquier vista movil, y siempre que el encargo incluya movimiento: el flag --reduce te deja comprobar tambien como se ve sin animaciones.",
+   "cuandoNO": "Para una captura rapida de escritorio, --screenshot a secas basta y es mas corto. Y si Edge falla intermitentemente sin escribir el PNG, el 'LoadEnclaveImageW error 577' en stderr es ruido, no la causa: reintenta con --user-data-dir fresco.",
+   "temaTentativo": "qa visual",
+   "transversal": 9,
+   "confianza": "alta (se pago con un fallo y se midio)",
+   "_proy": "permanent es la memoria de hechos de la "
+  },
+  {
+   "titulo": "El pane embebido miente sobre visibility: renderiza headless antes de tocar el CSS",
+   "respuestaCorta": "No diagnostiques CSS con getComputedStyle(...).visibility ni con checkVisibility({visibilityProperty:true}) en el navegador embebido: un visibility:hidden real —incluso !important o inline— se reporta como 'visible'. Del pane fiate solo de .hidden (propiedad/atributo), de display y de display:none. Para saber como se ve algo de verdad, renderizalo headless y lee el PNG.",
+   "porQue": "En WRD sesion 4 (2026-08-10) el pane afirmaba que <main> con .wrd-cargando seguia visible; Edge headless probo que el cloak funcionaba (pantalla negra y solo el gate). Se perdieron iteraciones arreglando un CSS que nunca estuvo roto: el falso negativo cuesta mas que el bug.",
+   "evidencia": "permanent/KN-008 (depende de KN-007). Proyecto de origen: C:\\Users\\Kalel\\fable 5\\wrd\\memory\\wrd\\state.json.",
+   "cuandoAplica": "Siempre que un elemento 'deberia estar oculto y parece que no', y en general antes de reescribir CSS basandote en lo que reporta una herramienta en vez de en un render.",
+   "cuandoNO": "Con el pane visible y el usuario presente, los screenshots del computer tool si componen y sirven. La desconfianza es especifica de la propiedad 'visibility' y del pane oculto, no del pane entero.",
+   "temaTentativo": "qa visual",
+   "transversal": 9,
+   "confianza": "alta (se pago con un fallo)",
+   "_proy": "permanent es la memoria de hechos de la "
+  },
+  {
+   "titulo": "Con el usuario ausente, maneja el navegador con read_page y form_input, no con clicks",
+   "respuestaCorta": "Si el pane del navegador esta oculto (usuario ausente), las acciones del computer tool —click, screenshot— se cuelgan o dan timeout porque la pagina no compone frames. Usa get_page_text, read_page, form_input y javascript_tool con boton.click() nativo mas esperas explicitas. Para inputs controlados de React usa form_input: el setter nativo via Object.getOwnPropertyDescriptor lanza 'Illegal invocation' en el sandbox del tool.",
+   "porQue": "Un builder perdio tiempo con esto en la sesion S6 de broaster (2026-08-08) intentando clicks contra un pane oculto; el orquestador completo el e2e del flujo de pedido con la combinacion de arriba.",
+   "evidencia": "permanent/KN-007 (es la base sobre la que se construyo KN-008).",
+   "cuandoAplica": "En toda verificacion e2e automatica, que por definicion corre sin nadie mirando.",
+   "cuandoNO": "Con el pane visible y el usuario presente, los clicks y los screenshots funcionan y son mas directos que scriptear JS. No conviertas la excepcion en la forma por defecto de manejar el navegador.",
+   "temaTentativo": "navegador embebido",
+   "transversal": 8,
+   "confianza": "alta (se pago con tiempo perdido)",
+   "_proy": "permanent es la memoria de hechos de la "
+  },
+  {
+   "titulo": "Verifica la UI contra el artefacto compilado y las posiciones reales, no contra tu markup",
+   "respuestaCorta": "Para el orden visual en movil lee las posiciones Y de getBoundingClientRect, no el orden del DOM (el CSS order engana a cualquiera que lea el markup). Para el bamboleo horizontal usa scrollTo(5,0) y lee scrollX, no scrollWidth (los fixed inset-x-0 dan falsos ~3px). Y si mezclas Tailwind con clases propias, abre el CSS compilado: las tuyas van despues y le ganan a las utilities.",
+   "porQue": "Todo se pago en la misma pasada responsive: el desborde a 473px lo causaba un <p> con shrink-0 en una fila flex con hermanos flex-1 min-w-0 (shrink-0 nunca cede espacio aunque sus hermanos si puedan encogerse); las tallas compactas tuvieron que ser clases propias porque las utilities perdian por orden en el CSS final; y el layout se midio en pantallas reales en vez de asumirlo.",
+   "evidencia": "placita/KN-036 (commit a17fd2d: 'el orden visual real en movil se verifica por POSICIONES Y de getBoundingClientRect, no por el indice de texto en el DOM'; 'el bamboleo se prueba con scrollTo(5,0) y leyendo scrollX, no con scrollWidth'; campos <16px hacen que iOS Safari haga zoom al enfocar); placita/KN-031 (commit d5641c5: 'en el CSS compilado final, .campo y .herramienta van DESPUES de las utilities de Tailwind y les ganan por especificidad'; medido 1366x768 = 768/768 y 1280x800 = 800/800 sin scroll).",
+   "cuandoAplica": "Cualquier verificacion visual de una web o app, en movil y en pantallas de trabajo fijas (cajas, kioscos, monitores del local).",
+   "cuandoNO": "En un prototipo que nadie va a operar, medir al pixel es tiempo perdido. Y si el proyecto no mezcla utilities con CSS propio, la trampa de especificidad no existe.",
+   "temaTentativo": "qa visual",
+   "transversal": 7,
+   "confianza": "alta",
+   "_proy": "Placita (Mercaplaza) es el POS + inventa"
+  },
+  {
+   "titulo": "Al verificar UI por navegador, espera entre pulsaciones y mide el estado real",
+   "respuestaCorta": "Si automatizas un teclado o un formulario React, mete 150-200 ms de espera entre cada click y vuelve a LEER el estado real (por ejemplo cuantos puntos del PIN hay), no lo asumas. Los clicks JS sincronos en rafaga no dejan re-renderizar —todos los handlers ven el mismo estado inicial— y las coordenadas cacheadas de un ref se desplazan en cuanto aparece un mensaje de error. Ante un 'bug' asi, sospecha primero del metodo de prueba.",
+   "porQue": "Un falso positivo de bug costo varios intentos verificando el teclado del PIN del estanco: el componente estaba correcto y lo roto era la forma de probarlo. Sin esta regla, un agente 'arregla' codigo sano y mete el bug de verdad.",
+   "evidencia": "estanco-contable/KN-003 (Knowledge Permanent, incidente de verificacion 2026-07-07 en el teclado del PIN de components/app-shell.tsx / gate de rol de DEC-002; el objeto dice explicitamente 'el componente estaba correcto').",
+   "cuandoAplica": "Toda verificacion de UI conducida por un agente: teclados numericos, PINs, formularios paso a paso, listas que se reordenan, confirmaciones visuales efimeras (flashes, toasts).",
+   "cuandoNO": "No metas el retardo por tecla en inputs de texto normales donde puedes escribir la cadena completa de un golpe: ahi solo alarga la corrida. Y si la app expone estado observable (localStorage, un data-* en el DOM), leerlo es mejor evidencia que esperar mas tiempo.",
+   "temaTentativo": "verificacion",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "estanco-contable es el SaaS de facturaci"
+  },
+  {
+   "titulo": "Lo que el JS decide ocultar, el CSS lo tiene que garantizar",
+   "respuestaCorta": "Dos líneas que te ahorran una tanda de bugs de 'se ve lo que no debía'. Uno: en el reset global poné [hidden]{display:none!important} — sin el !important, cualquier regla de autor que fije un display explícito empata en especificidad con la del navegador y deja visible lo que el JS marcó como oculto. Dos: si el sitio tiene puerta, en el <head> y antes de pintar agregá una clase de cloak al <html> que oculte todo menos la puerta, quitala recién cuando decidiste la sesión, y ponele un failsafe con setTimeout por si el JS nunca carga.",
+   "porQue": "El dueño reportó 'errores en el arranque'. Eran dos cosas: en conexiones lentas y visitas repetidas se veía la tienda y el contenido premium un instante antes de que bajara la puerta, y el campo de referido se colaba en la primera pantalla pese a estar marcado hidden por JS — junto con 4 elementos del modal que ya habían tenido el mismo problema antes. Ninguno de los dos era un bug de lógica; los dos eran el CSS ganándole en silencio a la intención del JS.",
+   "evidencia": "state.json KN-007 (wrd). Verificado en el repo: C:\\Users\\Kalel\\fable 5\\wrd\\css\\base.css:167-174 (la regla con su comentario explicando el empate de especificidad) y :257-270 (cloak .wrd-cargando ocultando .top/#countdown/main/.pie); C:\\Users\\Kalel\\fable 5\\wrd\\index.html:25-36 (script inline que agrega la clase antes de pintar + setTimeout de 6000 ms como failsafe). Los parches que hicieron falta antes de la regla global siguen visibles en css\\modal.css:229, :263, :411, :488.",
+   "cuandoAplica": "Cualquier interfaz que oculte elementos con el atributo hidden desde JS, y cualquier sitio donde el contenido depende de una sesión que se resuelve después de la primera pintura.",
+   "cuandoNO": "Si el proyecto usa un framework que controla el montaje (no renderiza lo que no debe existir), el cloak sobra: no muestres una pantalla negra de 6 segundos para resolver un problema que no tenés.",
+   "temaTentativo": "arranque y visibilidad",
+   "transversal": 6,
+   "confianza": "alta",
+   "_proy": "WRD es la tienda de dulcería del dueño: "
+  }
+ ]
+}

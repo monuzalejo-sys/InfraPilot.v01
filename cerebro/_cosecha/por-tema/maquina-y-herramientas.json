@@ -1,0 +1,130 @@
+{
+ "tema": {
+  "slug": "maquina-y-herramientas",
+  "titulo": "Esta máquina y sus herramientas: límites y recetas",
+  "preguntas": [
+   "el heredoc me dice unexpected EOF y no crea el archivo, que paso?",
+   "el git push se queda colgado, como subo el codigo?",
+   "como genero un pdf si aca no hay python?",
+   "exporte un excel con formulas y salieron vacias, por que?",
+   "turbopack entra en panico al importar node:fs, como parto el modulo?",
+   "el script no encuentra la ruta y hay un espacio en la carpeta"
+  ],
+  "alias": [
+   "windows",
+   "bash",
+   "heredoc",
+   "Write",
+   "8kb",
+   "truncado",
+   "git push",
+   "github desktop",
+   "credential manager",
+   "pdf",
+   "edge headless",
+   "print-to-pdf",
+   "python",
+   "poppler",
+   "excel",
+   "xlsx",
+   "sheetjs",
+   "formulas",
+   "fileURLToPath",
+   "import.meta.url",
+   "espacios en la ruta",
+   "fable 5",
+   "turbopack",
+   "bundle cliente",
+   "node:fs"
+  ],
+  "leccionesIncluidas": [
+   "Archivos grandes se escriben con Write, nunca por heredoc en Bash",
+   "Commit por terminal, push por GitHub Desktop",
+   "En Windows, resuelve la carpeta del script con fileURLToPath, nunca con URL.pathname",
+   "PDF en esta maquina: HTML mas Edge headless, y verificalo parseando su estructura",
+   "Una fórmula de Excel sin su valor precalculado se pierde en silencio",
+   "Parte el módulo en dos archivos: la lógica pura y la que toca el sistema de archivos"
+  ],
+  "proyectos": [
+   "permanent",
+   "pollo-landing",
+   "infrapilot",
+   "villa-broaster"
+  ],
+  "valor": 7
+ },
+ "lecciones": [
+  {
+   "titulo": "Archivos grandes se escriben con Write, nunca por heredoc en Bash",
+   "respuestaCorta": "En esta maquina un comando Bash de mas de ~8 KB se trunca: el heredoc muere con 'unexpected EOF while looking for matching quote' y el archivo NO se crea. Escribe cualquier archivo nuevo grande (>~100 lineas) o que contenga backslashes con Write/Edit, y manten los comandos Bash por debajo de ~5 KB. Ojo tambien: el wrapper colapsa el doble backslash en uno solo.",
+   "porQue": "Se pago el 2026-08-21 escribiendo edge-cdp.mjs por heredoc: fallo en la linea 145 y no dejo archivo. El mismo heredoc, partido en trozos cortos, si funciono. El limite viene de la linea de comandos de Windows al pasar por bash -c.",
+   "evidencia": "permanent/KN-011. El archivo que finalmente se escribio con Write existe y es verificable: C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs (7310 bytes). Tambien esta consolidado en el indice de memoria del usuario como bash-tool-limits.md.",
+   "cuandoAplica": "Siempre que vayas a crear un archivo de codigo, un HTML largo o un JSON de configuracion desde el shell en esta maquina.",
+   "cuandoNO": "No traslades este miedo a Linux/macOS con shell POSIX real, donde el limite es de otro orden. Y para comandos cortos el heredoc sigue siendo la forma correcta y legible.",
+   "temaTentativo": "limites de herramientas",
+   "transversal": 10,
+   "confianza": "alta (se pago con un fallo)",
+   "_proy": "permanent es la memoria de hechos de la "
+  },
+  {
+   "titulo": "Commit por terminal, push por GitHub Desktop",
+   "respuestaCorta": "No intentes 'git push' desde la terminal en esta maquina: el Git Credential Manager abre un dialogo que falla con 'User cancelled dialog' porque no hay /dev/tty, y el push se queda colgado. Haz el commit local por terminal y el push desde GitHub Desktop, que ya esta autenticado. Aplica a todos los repos de la maquina, no a uno.",
+   "porQue": "Fallo observado y reproducido a nivel maquina. Se promovio desde la memoria de infrapilot a permanent precisamente cuando quedo claro que no era una peculiaridad de ese repo.",
+   "evidencia": "permanent/KN-001 (promovido desde infrapilot/KN-001; se mantuvo copia en infrapilot mientras su PEND-004 referenciaba la local).",
+   "cuandoAplica": "Al cerrar cualquier sesion que deba publicar codigo, y al planear automatizaciones: no disenes un paso 'push automatico' en esta maquina.",
+   "cuandoNO": "Caduca en cuanto se configure un credential helper no interactivo (PAT en el store o SSH). Si alguien lo configura, reverifica antes de seguir asumiendo que el push esta roto; y no aplica a CI, que usa token embebido.",
+   "temaTentativo": "git",
+   "transversal": 10,
+   "confianza": "alta (se pago con un fallo)",
+   "_proy": "permanent es la memoria de hechos de la "
+  },
+  {
+   "titulo": "En Windows, resuelve la carpeta del script con fileURLToPath, nunca con URL.pathname",
+   "respuestaCorta": "En cualquier .mjs que necesite conocer su propia carpeta, escribe fileURLToPath(new URL('.', import.meta.url)). Con .pathname, un espacio en la ruta (como 'fable 5' o 'Program Files') llega codificado %20 y fs no encuentra nada. El síntoma es un ENOENT que no menciona el espacio, así que se pierde tiempo buscando el archivo en el lugar equivocado en vez de mirar la resolución de la ruta.",
+   "porQue": "Quedó anotado como advertencia explícita al construir el servidor de esta landing, cuyo repo vivía bajo 'fable 5' — una carpeta con espacio, igual que casi todas las rutas de trabajo de esta máquina. El código final usa fileURLToPath desde la primera línea útil.",
+   "evidencia": "pollo-landing/KN-001, campo context: 'Ojo en Windows: para resolver rutas desde import.meta.url usar fileURLToPath, no URL.pathname (el espacio de fable 5 queda %20 y rompe la ruta)'. Código: serve.mjs:4 (import { fileURLToPath } from 'node:url') y serve.mjs:6 (const ROOT = fileURLToPath(new URL('.', import.meta.url))).",
+   "cuandoAplica": "Todo script de Node en esta máquina: las rutas de trabajo tienen espacios (fable 5, Program Files, Users\\Kalel\\ORION-Vault).",
+   "cuandoNO": "En rutas POSIX sin espacios ni caracteres que se escapen el bug no aparece — así que no des por probado el script porque corrió en Linux o en una carpeta 'limpia'; pruébalo en la ruta real de destino.",
+   "temaTentativo": "windows",
+   "transversal": 6,
+   "confianza": "media",
+   "_proy": "pollo-landing es la landing B2B de un ma"
+  },
+  {
+   "titulo": "PDF en esta maquina: HTML mas Edge headless, y verificalo parseando su estructura",
+   "respuestaCorta": "No hay Python aqui (ni python ni python3), asi que reportlab/pypdf no son opcion: no los propongas. Escribe el documento en HTML con @page y @media print y conviertelo con Edge: msedge.exe --headless --disable-gpu --no-pdf-header-footer --print-to-pdf=\"C:\\salida.pdf\" \"file:///C:/entrada.html\". Como tampoco hay poppler (Read no puede renderizar paginas de PDF), comprueba el resultado con node: que empiece por %PDF-, termine en %%EOF y contar /Type /Page.",
+   "porQue": "Verificado el 2026-08-01 generando el plan del asadero: salio un PDF de 11 paginas con tipografia y maquetacion controladas, y se confirmo integro parseando su estructura en vez de asumir que habia salido bien. El patron general: si no puedes ver el artefacto que generaste, parsea su formato; es mas barato que entregar un archivo corrupto.",
+   "evidencia": "permanent/KN-004 (generacion) y KN-005 (verificacion sin poppler). Binario confirmado hoy en C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe.",
+   "cuandoAplica": "Cualquier entregable en PDF: propuestas, planes, informes para cliente.",
+   "cuandoNO": "Si algun dia se instala Python o poppler, deja de ser la unica ruta. Y Edge no sirve para PDFs con formularios rellenables, firma digital o PDF/A: ahi hace falta otra herramienta.",
+   "temaTentativo": "documentos pdf",
+   "transversal": 9,
+   "confianza": "alta (se midio: PDF de 11 paginas)",
+   "_proy": "permanent es la memoria de hechos de la "
+  },
+  {
+   "titulo": "Una fórmula de Excel sin su valor precalculado se pierde en silencio",
+   "respuestaCorta": "Si exportas .xlsx con SheetJS/xlsx, cada celda con fórmula tiene que llevar TAMBIÉN el resultado ya calculado: {t:'n', f:'SUM(...)', v:1234}. Sin v, la librería tira la fórmula al escribir el binario y no avisa de nada. Encapsúlalo en un helper único y que todos los módulos exporten por ahí, para que nadie tenga que reaprender la trampa.",
+   "porQue": "KN-024: descubierto en ROAD-001 y verificado con una prueba de ida y vuelta (XLSX.write → XLSX.read), que confirma que las fórmulas solo sobreviven si v está presente. No es un error que salte: es pérdida de datos silenciosa, el cliente abre el Excel y ve números muertos donde esperaba una hoja editable.",
+   "evidencia": "infrapilot/KN-024. Implementación: C:\\Users\\Kalel\\ORION\\infrapilot-app\\lib\\excel-export.ts:32 — function f(formula, value, fmt) { return { t:\"n\", f: formula, v: value, z: fmt } }; el escritor genérico en :428 rellena v con el valor conocido o con evaluarFormula(). La utilidad reutilizable es crearLibroConFormulas(hojas, nombreArchivo). Aviso aparte de infrapilot/KN-017: el paquete xlsx de npm tiene vulnerabilidades altas sin fix en el registro; la versión buena es el tarball de cdn.sheetjs.com 0.20.3 y hay que instalarlo a mano.",
+   "cuandoAplica": "Cualquier proyecto que entregue Excel editable con fórmulas: contabilidad de villa-broaster, estanco, arroces, presupuestos y APUs de infrapilot.",
+   "cuandoNO": "Si el Excel es solo lectura de valores, no metas fórmulas: el par f/v añade una fuente de desincronización (fórmula que dice una cosa y valor cacheado que dice otra) a cambio de nada.",
+   "temaTentativo": "exportación excel",
+   "transversal": 7,
+   "confianza": "alta",
+   "_proy": "InfraPilot AI es un SaaS de herramientas"
+  },
+  {
+   "titulo": "Parte el módulo en dos archivos: la lógica pura y la que toca el sistema de archivos",
+   "respuestaCorta": "Cuando una lógica de servidor la vaya a importar algo del cliente (aunque sea un tipo), sepárala en dos archivos: uno puro sin imports de node, y otro que haga el trabajo de disco y criptografía. Si dejas node:fs en el archivo compartido, el bundler del cliente entra en pánico y el error que ves no menciona el archivo culpable.",
+   "porQue": "Pasó al implementar usuarios con PIN: arrastrar node:fs y scrypt al bundle del cliente hacía entrar en pánico a Turbopack. La solución fue usuarios.ts (puro, con sus tests) separado de usuarios-disco.ts (node:fs + scrypt, con sus propios tests). El mismo criterio ya sostiene todo el dominio del sistema: lib/servidor tiene la lógica pura y el almacén detrás de una interfaz.",
+   "evidencia": "villa-broaster/PEND-007 (lección técnica explícita: 'usuarios.ts (puro) separado de usuarios-disco.ts (node:fs/scrypt) para no arrastrar node:fs al bundle cliente (Turbopack entra en pánico)'); verificado en la rama feature/roles-puestos: lib/acceso/usuarios.ts, usuarios.test.ts, usuarios-disco.ts, usuarios-disco.test.ts; patrón hermano en broaster-app/lib/servidor/almacen.ts (interfaz) vs almacen-disco.ts (implementación)",
+   "cuandoAplica": "Next.js, Remix o cualquier framework con bundle compartido cliente/servidor. También al querer testear lógica de negocio sin montar un sistema de archivos temporal.",
+   "cuandoNO": "En un backend puro sin bundle de cliente, partir por partir solo duplica archivos. Y si la lógica pura es de tres líneas, la indirección cuesta más de lo que ahorra.",
+   "temaTentativo": "bundling",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "villa-broaster es el cliente real más ma"
+  }
+ ]
+}

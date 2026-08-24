@@ -1,0 +1,141 @@
+{
+ "tema": {
+  "slug": "prompts-a-generadores-de-diseno",
+  "titulo": "Encargarle diseño a un generador (y qué se hereda de una plantilla)",
+  "preguntas": [
+   "le voy a pedir una landing a claude design, que le pongo en el prompt?",
+   "por que me devolvio todo crema si le dije que la portada era oscura?",
+   "el diseño volvio sin animaciones y yo se las especifique, que hice mal?",
+   "ya me entregaron el zip, le pido los cambios al prompt o edito el archivo?",
+   "necesito 24 imagenes pal catalogo, como se las pido a chatgpt?",
+   "puedo reusar la plantilla del login pa esta otra pagina?"
+  ],
+  "alias": [
+   "claude design",
+   "generador",
+   "v0",
+   "lovable",
+   "figma make",
+   "design system",
+   "DS",
+   "armadura",
+   "prohibiciones",
+   "capitulo prohibido",
+   "artboards",
+   "movimiento congelado",
+   "animaciones",
+   "getAnimations",
+   "plantilla",
+   "boilerplate",
+   "contraste",
+   "wcag",
+   "paleta",
+   "imagenes generadas",
+   "chatgpt",
+   "galeria",
+   "regenerar",
+   "editar la salida"
+  ],
+  "leccionesIncluidas": [
+   "Al generador de diseño hay que prohibirle su design system por escrito, o su DS le gana a tu dirección de arte",
+   "Antes de especificar movimiento, pregunta en qué medio se va a revisar: si el revisor ve PNG, el movimiento va en la composición",
+   "Todo prompt necesita un capítulo PROHIBIDO numerado que cite los rechazos ya pagados",
+   "Cuando el generador de diseño entrega, el prompt murió: se edita la salida, no se regenera",
+   "Galería de imágenes generadas: un bloque autocontenido por mensaje, una sola ruta visual, cero texto en el pixel",
+   "Mide el contraste de cada par de la paleta ANTES de escribir el prompt, y entrega la variante de servicio",
+   "De una plantilla ajena se hereda la arquitectura, nunca sus números"
+  ],
+  "proyectos": [
+   "landings",
+   "orama",
+   "villa-broaster"
+  ],
+  "valor": 9
+ },
+ "lecciones": [
+  {
+   "titulo": "Al generador de diseño hay que prohibirle su design system por escrito, o su DS le gana a tu dirección de arte",
+   "respuestaCorta": "Empieza el prompt (antes de los datos) con un bloque \"Armadura contra el medio\": prohíbe en imperativo anclar, adjuntar o derivar cualquier design system predefinido, ordena que TODOS los tokens salgan de ese prompt, y pelea uno por uno los defaults del medio (nada de fondo claro a pantalla completa, radios 18-24 px y no 0, fotos a color y nunca en blanco y negro, display con carácter y no una sans neutra, SVG inline y no librería de iconos). Cierra con un criterio medible que puedas verificar al recibir: \"el entregable no trae carpeta _ds/ ni <link> a un styles.css externo, y el fondo de la primera pantalla tiene luminancia < 0.06\". Un prompt bien investigado pero silencioso sobre esto no vence al sesgo del medio.",
+   "porQue": "El v2 de Villa Broaster especificaba una portada oscura con --brasa y volvió crema: el zip traía _ds/modernist-<uuid>/ cuyo readme dice literalmente que es plano, sin radios, en Archivo, sobre fondo claro #f3f2f2 y con fotos en blanco y negro. El modelo hasta se justificó solo en un comentario CSS ('tinta #141414 / hueso #f7ece1 = 15.83 (portada clara)'). El dueño lo rechazó: 'todo se ve muy genérico, apagado'.",
+   "evidencia": "landings/KN-007 y landings/POL-004 en C:\\Users\\Kalel\\ORION\\memory\\landings\\state.json; medición registrada sobre el entregable: grep de '--brasa' = 0 apariciones, background:radial-gradient(130% 100% at 50% 16%, #fffaf2 0%, #f7ece1 ...), carpeta _ds/modernist-aef7c589.../readme.md. Aplicación verificada en disco: C:\\Users\\Kalel\\ORION\\prompts-landing\\villa-app-villa-broaster-v3.md:1174 ('ANEXO A — ARMADURA CONTRA EL MEDIO'). Regla 7 del índice: C:\\Users\\Kalel\\ORION\\prompts-landing\\referencias\\_INDEX.md.",
+   "cuandoAplica": "Todo encargo a un generador visual que devuelve artboards o capturas (Claude Design y equivalentes: v0, Lovable, Figma Make), en cualquier proyecto y cualquier rubro.",
+   "cuandoNO": "No aplica a prompts para fase de código sobre un repo propio (Claude Code), donde el design system del proyecto SÍ debe heredarse y prohibirlo sería absurdo. Tampoco cuando el DS que el medio ancla es justamente el que quieres.",
+   "temaTentativo": "generadores de diseño",
+   "transversal": 10,
+   "confianza": "alta",
+   "_proy": "landings no es un producto: es la memori"
+  },
+  {
+   "titulo": "Antes de especificar movimiento, pregunta en qué medio se va a revisar: si el revisor ve PNG, el movimiento va en la composición",
+   "respuestaCorta": "Si el destinatario es un lienzo de artboards o el revisor aprueba con capturas, pide MOVIMIENTO CONGELADO: producto inclinado 8-12 grados saliéndose del encuadre con sombra proyectada, migas o partículas suspendidas, la promo dibujada a medio armar con las piezas en vuelo, el elemento siguiente asomando cortado por el borde, el foco YA puesto sobre el producto con su halo caliente. La coreografía numerada (elemento, disparador, ms, curva, presupuesto, propiedades prohibidas) no se borra: baja a un anexo final rotulado 'para la fase de código, NO para el lienzo'. Y al elegir un mecanismo, pregúntate cómo se ve quieto: si su valor entero es un gesto, el revisor no lo va a ver.",
+   "porQue": "En el v2 de Villa Broaster document.getAnimations() dio 1 en toda la página pese a que el prompt llevaba el inventario A1-A10 con ms y curvas. Lo grave es que el CSS sí estaba escrito (mask-image: radial-gradient(circle 150px at var(--fx) var(--fy)) con brightness(1.15), estado promoArmada) y aun así fue invisible. De los tres mecanismos combinados, el único que sobrevivió sin crítica fue el 'dato grande + línea' ('2 sedes', '$0'), justamente el que no depende de gesto ni de tiempo.",
+   "evidencia": "landings/KN-008 y landings/POL-004 en C:\\Users\\Kalel\\ORION\\memory\\landings\\state.json (medición getAnimations()=1 sobre el .dc.html entregado); columna Resultados de las fichas 02 y 03 y regla 6 de combinación en C:\\Users\\Kalel\\ORION\\prompts-landing\\referencias\\_INDEX.md; anexo aplicado en C:\\Users\\Kalel\\ORION\\prompts-landing\\villa-app-villa-broaster-v3.md:10.",
+   "cuandoAplica": "Cualquier entrega que se apruebe por capturas o por artboards estáticos, y cualquier elección de mecanismo de diseño cuyo valor sea un gesto (hover, spotlight con el dedo, carrusel, scroll dirigido).",
+   "cuandoNO": "No degrades la ambición cuando el destinatario SÍ ejecuta (repo real, prototipo navegable, demo que el cliente va a tocar): ahí la coreografía va en el cuerpo del encargo y es exigible. Verifica de nuevo el punto si cambias de herramienta: la pregunta es '¿este medio corre JS y le muestra transiciones al revisor?'.",
+   "temaTentativo": "generadores de diseño",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "landings no es un producto: es la memori"
+  },
+  {
+   "titulo": "Todo prompt necesita un capítulo PROHIBIDO numerado que cite los rechazos ya pagados",
+   "respuestaCorta": "Escribe una sección '§Prohibido en este proyecto' con ítems numerados, cada uno cerrando una puerta por la que el generador ya se te escapó antes: azules eléctricos, morados, neones y gradientes tecnológicos; 'si un color no está en §5.A, no existe' (lista blanca explícita con sus excepciones nombradas); minimalismo austero, citando el rechazo textual del dueño ('muy minimalista… quiero que sea más interactiva, más llamativa'); dependencias externas, alert/confirm, console.log en el entregable; backend simulado con mentira ('Enviado correctamente'); scroll horizontal entre 320 y 1920px. Citar el rechazo textual pesa más que la regla abstracta.",
+   "porQue": "El generador de diseño ancla su propio design system genérico si el prompt no se lo prohíbe; una lista blanca de color más una lista negra numerada es lo que impide que la dirección de arte de la casa pierda contra el default del modelo. La prohibición del minimalismo se pagó con una landing rechazada en otro proyecto.",
+   "evidencia": "C:/Users/Kalel/ORION/prompts-landing/orama-demo.md:442-453 (§9, 10 prohibiciones numeradas; :444 lista blanca de color, :447 cifras sociales, :449 minimalismo con la cita del rechazo previo, :451 backend simulado con mentira, :452 scroll horizontal); orama/DEC-001 y orama/CON-001 citados dentro de la prohibición 3",
+   "cuandoAplica": "Todo encargo a un generador de diseño o a un subagente constructor que deba respetar una dirección de arte propia.",
+   "cuandoNO": "Si lo que pides es exploración de estilo a propósito, una lista negra larga te devuelve una sola idea: ahí prohíbe solo lo que es identidad de marca y deja libre el resto.",
+   "temaTentativo": "prompts de diseno",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "Orama Inmobiliaria (Popayán) es un clien"
+  },
+  {
+   "titulo": "Cuando el generador de diseño entrega, el prompt murió: se edita la salida, no se regenera",
+   "respuestaCorta": "Una vez que Claude Design (o cualquier generador) devuelve el entregable, todos los cambios siguientes se hacen SOBRE ese archivo. No vuelvas a correr el prompt: perderías los arreglos manuales ya hechos y volverías a jugar la lotería del modelo. Guarda el export original intacto en su propia carpeta (docs/claude-design-export/) como línea base, trabaja sobre una copia (docs/index.html) y deja la copia del prompt en prompts/ solo como registro histórico.",
+   "porQue": "Regla explícita del dueño al recibir el zip de la demo. Sobre esa salida ya se hicieron la relocalización a Popayán, el teléfono real, el apagado de HUECOS y el arreglo de un bug de componentDidUpdate: regenerar los borraba todos.",
+   "evidencia": "orama/KN-006 ('REGLA DEL DUENO: los cambios se hacen SOBRE esta salida (el prompt de Claude Design ya termino), no se regenera'; estructura docs/index.html + docs/support.js + docs/claude-design-export/ intacto + docs/.nojekyll); orama/PEND-004 (lista de cambios ya aplicados sobre la salida)",
+   "cuandoAplica": "Cualquier pieza salida de un generador de diseño que luego entre en mantenimiento: demos, landings, maquetas.",
+   "cuandoNO": "Si el cambio es de dirección de arte o de estructura completa (otra paleta, otra arquitectura de pantallas), sí se regenera desde el prompt actualizado: editar a mano una reestructuración sale más caro.",
+   "temaTentativo": "generadores de diseno",
+   "transversal": 8,
+   "confianza": "media",
+   "_proy": "Orama Inmobiliaria (Popayán) es un clien"
+  },
+  {
+   "titulo": "Galería de imágenes generadas: un bloque autocontenido por mensaje, una sola ruta visual, cero texto en el pixel",
+   "respuestaCorta": "Un generador conversacional de imágenes no recuerda un bloque de estilo puesto arriba: pide UNA imagen por mensaje y repite lo esencial del estilo dentro de cada bloque, con nombre de archivo exacto y tamaño, más una tabla de control con casillas para ir marcando. Elige UNA ruta visual para las 24 y no la mezcles: foto e ilustración juntas se notan a un metro y arruinan la demo. Prohíbe stock genérico y placeholders (via.placeholder, picsum, unsplash/random, que además son peticiones externas) y prohíbe texto dentro de la imagen: precios y datos van en HTML, porque si el cliente pide cambiar un precio hay que rehacer la foto.",
+   "porQue": "El prompt de imágenes está en v2 precisamente porque la versión con un bloque de estilo compartido no sobrevive a la conversación; y la regla de una sola ruta visual y de texto fuera del pixel evita rehacer la galería completa por un cambio de dato.",
+   "evidencia": "C:/Users/Kalel/prommter/proyectos/orama/prompts/imagenes-chatgpt.md:1-11 (v2: 'un bloque por imagen, autocontenido', Mensaje 0, tabla de control de 27 filas, protocolo de reintento); C:/Users/Kalel/ORION/prompts-landing/orama-demo.md:427 ('mezclar foto e ilustración se ve a un metro de distancia'), :448 (prohibición 5: stock y placeholders), :453 (prohibición 10: texto quemado en la imagen); orama/PEND-004",
+   "cuandoAplica": "Cualquier lote de imágenes pedidas a un modelo para un catálogo, landing o demo: galerías de producto, fichas, heros.",
+   "cuandoNO": "Para una sola imagen no hace falta la tabla ni repetir el estilo; y si el cliente tiene fotos reales, siempre le ganan a las generadas: no generes por generar.",
+   "temaTentativo": "generacion de imagenes",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "Orama Inmobiliaria (Popayán) es un clien"
+  },
+  {
+   "titulo": "Mide el contraste de cada par de la paleta ANTES de escribir el prompt, y entrega la variante de servicio",
+   "respuestaCorta": "Antes de que el generador toque una línea, calcula el ratio WCAG de cada combinación real que vas a usar y ponlo en una tabla dentro del prompt, con veredicto por celda. El color de acento de una marca casi nunca es legible como texto sobre el neutro claro: Teja #E2734B sobre papel #F6EFE1 da 2,70 y FALLA. No negocies la marca: define una variante de servicio (#B5522E, ratio ≥5,3) para texto, deja el color de marca solo para fondos de insignia, bordes y viñetas, y corrige la insignia (texto #2A1206 sobre Teja ≈ 7,0). Déjalo escrito: 'no lo llames Teja, es una variante de servicio'.",
+   "porQue": "El par Teja/papel se midió en 2,70 (falla) y Teja/Tinta en 4,64 (solo ≥18px o ≥14px negrita). Si no se mide antes, el generador usa el color de marca como texto corrido y la corrección llega cuando ya hay 24 tarjetas y 8 fichas hechas.",
+   "evidencia": "C:/Users/Kalel/ORION/prompts-landing/orama-demo.md:218 (§5.B 'Contraste calculado, medido, no estimado'), :233-234 (tabla con 4,64 y 2,70 FALLA), :236 (corrección de la insignia EN VENTA); orama/KN-002 ('contrastes medidos TEJA/CAL=2.70 FALLA→corrección incluida'); orama/KN-003 (entregable final con contrastes ≥5,72)",
+   "cuandoAplica": "Cualquier encargo de UI con una paleta de marca cerrada: landings, demos, propuestas, dashboards de cliente.",
+   "cuandoNO": "Si la paleta aún no está cerrada, primero ciérrala con el dueño; medir contrastes de colores que van a cambiar es trabajo tirado.",
+   "temaTentativo": "diseno accesible",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "Orama Inmobiliaria (Popayán) es un clien"
+  },
+  {
+   "titulo": "De una plantilla ajena se hereda la arquitectura, nunca sus números",
+   "respuestaCorta": "Cuando reutilices una plantilla de calidad, copia sus mecanismos y recalibra todos sus valores al proyecto nuevo. Lo heredable: archivo único autocontenido sin build ni CDN; media hero con poster base64 para que el primer pintado nunca sea un hueco; tokens declarados en :root con valores explícitos; motor responsive de tres modos por JS con un clearInline() obligatorio al cambiar de modo (sin él los inline styles del modo saliente quedan latchados y el layout solo se arregla al recargar); y entrada WAAPI que corre una sola vez, con guard 'entry-pending' puesto desde un script en <head> ANTES de la hoja de estilos y liberación de seguridad a 3500 ms. Lo NO heredable: sus tamaños tipográficos, sus delays y su media, que pertenecen a su diseño. Y su modo escalado solo sirve para composiciones de pantalla completa tipo login: en un catálogo con scroll escalar el viewport vuelve el texto ilegible, ahí va maquetación de flujo (grid + clamp).",
+   "porQue": "La plantilla de login del dueño es su estándar de calidad, y al aplicarla a Orama quedó claro qué parte viaja y qué parte no: se heredaron las cinco piezas de arquitectura y se recalibró todo lo numérico al marco 1440x900. Copiar valores como --hl1-fs:69.14px o el timeline de otra composición produce un resultado que se ve prestado.",
+   "evidencia": "landings/KN-005 en C:\\Users\\Kalel\\ORION\\memory\\landings\\state.json; plantilla verificada en disco: C:\\Users\\Kalel\\ORION\\prompts-landing\\plantillas\\login-video-pixel-locked.md (secciones 0, 2, 5, 6 y 7 son las reutilizables); aplicación en C:\\Users\\Kalel\\ORION\\prompts-landing\\orama-demo.md.",
+   "cuandoAplica": "Reutilizar cualquier plantilla, boilerplate o pieza de referencia técnica entre proyectos, sobre todo pantallas de entrada, logins y portadas autocontenidas.",
+   "cuandoNO": "No arrastres el modo escalado a páginas con scroll largo (catálogos, cartas, listados). Y esta pieza aún no tiene veredicto del dueño ni del cliente (landings/PEND-002): trátala como arquitectura probada, no como resultado aprobado.",
+   "temaTentativo": "arquitectura front",
+   "transversal": 7,
+   "confianza": "media",
+   "_proy": "landings no es un producto: es la memori"
+  }
+ ]
+}

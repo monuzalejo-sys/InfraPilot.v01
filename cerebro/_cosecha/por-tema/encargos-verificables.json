@@ -1,0 +1,122 @@
+{
+ "tema": {
+  "slug": "encargos-verificables",
+  "titulo": "Encargos que se pueden auditar: briefs, prompts y criterios medibles",
+  "preguntas": [
+   "como escribo un brief pa que el builder no se invente cosas ni reviva lo que ya borre?",
+   "le dije al agente que no tocara admin y lo toco igual, que hago?",
+   "como verifico que el subagente si cumplio lo que le pedi?",
+   "le voy a mandar esto a haiku, que le reviso cuando entregue?",
+   "el prompt quedo bonito pero se puede cumplir sin cambiar nada, esta mal?",
+   "como califico el avance del equipo sin que cada quien se ponga su propia nota?"
+  ],
+  "alias": [
+   "brief",
+   "prompt",
+   "encargo",
+   "grep negativo",
+   "copy congelado",
+   "definicion de terminado",
+   "criterios de aceptacion",
+   "checklist",
+   "verificable",
+   "delegar",
+   "haiku barato",
+   "auditar salida",
+   "rubrica",
+   "avance",
+   "juez externo",
+   "numeros en el prompt"
+  ],
+  "leccionesIncluidas": [
+   "Cerrá el brief con greps que devuelvan 0 y frases congeladas que devuelvan 1",
+   "Cierra el prompt con criterios de aceptación numerados que sean mediciones, no adjetivos",
+   "En un encargo de diseño, 'específico' quiere decir números: ms, hex, ratio de contraste y píxeles de scroll",
+   "Una prohibición a un LLM solo se cumple si la conviertes en procedimiento verificable",
+   "Todo ejecutor barato rellena el hueco que le dejes en el encargo",
+   "El porcentaje de avance lo pone un juez externo con criterio verificable, nunca el que hizo el trabajo"
+  ],
+  "proyectos": [
+   "wrd",
+   "orama",
+   "landings",
+   "infrapilot",
+   "villa-broaster"
+  ],
+  "valor": 9
+ },
+ "lecciones": [
+  {
+   "titulo": "Cerrá el brief con greps que devuelvan 0 y frases congeladas que devuelvan 1",
+   "respuestaCorta": "No escribas 'no metas nada de admin' — escribí el comando exacto que lo prueba y decí cuántas líneas debe devolver. En el brief poné dos bloques: greps negativos (cada uno debe dar 0 líneas: sin placeholders, sin superficies de admin, sin precios hardcodeados, sin cifras sociales inventadas, sin dependencias externas nuevas) y greps de copy congelado (cada frase que no se puede tocar, con su archivo, debe seguir devolviendo 1+ línea). Cerrá con una 'Definición de terminado' que sea la suma aritmética de esos números, y exigí que el builder pegue la salida. Y agregá la regla honesta: si tocaste algo congelado, va en la primera línea del reporte — esconderlo es peor que haberlo hecho.",
+   "porQue": "Un criterio opinable ('que se vea bien', 'que no tenga admin') el builder lo cumple a su manera y vos lo descubrís tres olas después. Un criterio ejecutable no se negocia: o el grep da 0 o el entregable no está. En WRD hizo falta porque la landing y el sistema comparten repo y store: sin los greps negativos, cualquier builder de la landing reintroducía una superficie administrativa o revivía el botón directo a WhatsApp que DEC-004 había eliminado a propósito.",
+   "evidencia": "C:\\Users\\Kalel\\fable 5\\wrd\\docs\\LANDING-PROMPT.md:531-558 (7 greps negativos con su meta de 0 líneas), :560-582 (13 frases de copy congelado + 1 constante nueva que debe aparecer una sola vez), :584-593 (tabla de 6 estados de datos forzables a mano), :644-656 (Definición de terminado como suma verificable + regla de confesar lo congelado). Prohibiciones numeradas con su cita de línea en :457-483.",
+   "cuandoAplica": "Cualquier brief que le entregues a un subagente o a un humano sobre un repo que ya existe, sobre todo si hay decisiones viejas que no se pueden revivir o texto aprobado por el dueño que no se puede reescribir.",
+   "cuandoNO": "En exploración o prototipos desechables, donde congelar copy y superficies mata la iteración. Tampoco congeles greps sobre código que vos mismo pediste refactorizar en esa misma ola: vas a estar peleando contra tu propio encargo.",
+   "temaTentativo": "briefs verificables",
+   "transversal": 10,
+   "confianza": "alta",
+   "_proy": "WRD es la tienda de dulcería del dueño: "
+  },
+  {
+   "titulo": "Cierra el prompt con criterios de aceptación numerados que sean mediciones, no adjetivos",
+   "respuestaCorta": "Termina cada encargo visual con una sección de criterios numerados que un verificador pueda correr 1:1, cada uno con un número duro: 'el borde inferior del botón queda en y ≤ 700px', 'scrollWidth <= innerWidth a 320/390/414/768/1024/1440/1920', 'la entrada dura entre 1700 y 1900 ms', '≥20 pares dt/dd y ningún dd vacío', 'como máximo 6 animaciones corriendo a la vez'. Nada de 'se ve bien' ni 'es responsive'. Con 23 criterios así, el prompt de Orama salió PASS 12/12 y 0 ciclos de corrección.",
+   "porQue": "Un criterio medible convierte la verificación en una comprobación mecánica que un modelo más barato puede correr sin criterio propio; un adjetivo obliga a negociar y produce ciclos de corrección. Medido una vez: 84.925 tokens de opus escribiendo el prompt + 73.949 de sonnet verificando, 0 fix cycles.",
+   "evidencia": "C:/Users/Kalel/ORION/prompts-landing/orama-demo.md:473-505 (§11, 23 criterios; ver 3, 4, 9, 14, 22); orama/KN-002 ('23 criterios aceptación… veredicto orion-verifier PASS 12/12, 0 fix cycles', costos por modelo en el campo source); orama/KN-003 (12/12 en el plan de servicio)",
+   "cuandoAplica": "Cualquier prompt de construcción que vaya a un generador de diseño o a un subagente constructor, y cualquier encargo que otro agente deba verificar.",
+   "cuandoNO": "En exploración abierta o bocetos, cuando todavía no sabes qué quieres, los criterios duros matan las opciones: primero explora, cierra la dirección y recién ahí escribe los números.",
+   "temaTentativo": "prompts de construccion",
+   "transversal": 9,
+   "confianza": "media",
+   "_proy": "Orama Inmobiliaria (Popayán) es un clien"
+  },
+  {
+   "titulo": "En un encargo de diseño, 'específico' quiere decir números: ms, hex, ratio de contraste y píxeles de scroll",
+   "respuestaCorta": "Si tu prompt se puede cumplir sin cambiar una sola línea del producto actual, no era un prompt. Convierte cada adjetivo en especificación medida: animación = inventario cerrado y numerado (elemento, gesto, disparador, duración en ms, curva, presupuesto de rendimiento, propiedades prohibidas de animar); color = tabla de los tokens REALES con archivo:línea y contraste CALCULADO, marcando cuáles fallan, más la paleta nueva en hex con su ratio medido; impacto = medidas tomadas del build real (alto de cada sección, y de scroll hasta el primer elemento accionable, tamaño del producto en el pliegue) con metas numéricas de a dónde tiene que llegar cada una.",
+   "porQue": "El prompt v1 de la portada de Mercaplaza estaba bien investigado y sin datos inventados, y aun así tres días después el dueño pidió exactamente lo mismo: 'un prompt para un diseño de landing con animaciones, mejores colores, más llamativa'. La causa fue tratar sus tres ejes como adjetivos ('que tenga movimiento', 'producto protagonista') en vez de como especificaciones.",
+   "evidencia": "landings/KN-002 en C:\\Users\\Kalel\\ORION\\memory\\landings\\state.json, con la medición base del build de placita al 2026-08-19 en 390x844: documento 3616 px, héroe 963 px, primera tarjeta pedible en y=1994 (2,4 pantallas), fruta más grande del pliegue 104 px, 14 elementos animados, 7 con will-change permanente. Entregable: C:\\Users\\Kalel\\ORION\\prompts-landing\\placita-mercaplaza-v2.md.",
+   "cuandoAplica": "Cualquier encargo a un tercero (generador, diseñador, otro agente) donde el resultado se juzgue por impresión: landings, portadas, rediseños, propuestas visuales.",
+   "cuandoNO": "No lo uses como camisa de fuerza en exploración temprana, cuando todavía estás buscando el concepto y medir un build que no existe es teatro. Y ojo: los números hacen el encargo verificable, no lo hacen bueno — el v2 de Villa Broaster tenía números y el medio igual lo ignoró (ver la lección de la armadura).",
+   "temaTentativo": "prompts de diseño",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "landings no es un producto: es la memori"
+  },
+  {
+   "titulo": "Una prohibición a un LLM solo se cumple si la conviertes en procedimiento verificable",
+   "respuestaCorta": "No le escribas al agente \"no inventes nada\". Escríbele los pasos que se pueden auditar: prohibido redactar antes de leer las fuentes, cada afirmación lleva su origen archivo:línea, lo que no tenga fuente se entrega como hueco explícito para el dueño. Si no puedes comprobar el cumplimiento leyendo su output, la regla no existe.",
+   "porQue": "DEC-011 lo dice literal como razón de diseño: una prohibición declarada no basta para que un LLM deje de rellenar huecos con verosimilitud; hay que volverla checklist obligatorio. Se construyó así el agente landing-prompter (origen por línea, marca real separada en voz alta de cualquier [PLACEHOLDER], prohibidas las cifras sociales inventadas) precisamente después de que el relleno inventado apareciera en 3 proyectos distintos.",
+   "evidencia": "infrapilot/DEC-011. Agente real en C:\\Users\\Kalel\\.claude\\agents\\landing-prompter.md (espejo en runtime/agents/), con memoria propia sembrada en C:\\Users\\Kalel\\ORION\\memory\\landings\\ (POL-001, KN-001), validada VALID. La lección que lo motiva es infrapilot/KN-033.",
+   "cuandoAplica": "Al escribir el prompt o system de cualquier agente con una restricción dura: no inventar, no borrar, no tocar cierto directorio, no publicar sin aprobación.",
+   "cuandoNO": "En tareas de una sola pasada donde tú revisas todo el output a mano: el checklist cuesta tokens y ahí el revisor humano es más barato. Y no conviertas en checklist algo que no sabes verificar — eso produce teatro de proceso sin garantía.",
+   "temaTentativo": "diseño de agentes",
+   "transversal": 9,
+   "confianza": "media",
+   "_proy": "InfraPilot AI es un SaaS de herramientas"
+  },
+  {
+   "titulo": "Todo ejecutor barato rellena el hueco que le dejes en el encargo",
+   "respuestaCorta": "Antes de mandar un encargo, cuenta lo que pides contra los datos que entregas: si pides 23 productos y solo adjuntas 10, el ejecutor inventa los 13 restantes con nombres y precios falsos. Y cuando un builder barato toque texto que leerá un humano (SEO, metadata, copy, un plan dirigido a una persona), haz grep de su salida contra la fuente de verdad del dominio ANTES del commit, buscando datos que no existan, género gramatical equivocado y variables sin expandir.",
+   "porQue": "Se pagó tres veces. Un builder haiku inventó la ciudad 'Rionegro' en las keywords SEO (trabajo técnico correcto, dato de negocio falso). Otro builder escribió en femenino el plan del diseñador de landing y dejó un archivo literal 'docs/planes$name.pdf' por una variable sin expandir. Y el prompt v2 de la landing mandaba dibujar 23 productos citando solo 10: dos de tres verificadores adversariales lo marcaron como BLOQUEA antes de ejecutar, evitando que el generador inventara 13 nombres y precios.",
+   "evidencia": "villa-broaster/KN-008 (haiku, 'Rionegro' + themeColor duplicado, 2 correcciones inline del orquestador; detectarlo costó leer 8 líneas de grep); KN-014 punto 4 y DEC-010 (género femenino al diseñador de landing, 1 corrección; residuo $name literal); PEND-009 nota 2026-08-24 (23 productos pedidos vs 10 citados, hallado por 2 de 3 verificadores); metrics session-2026-08-24-prompt-v3-landing (workflow de 11 agentes, 30 hallazgos, 20 graves corregidos)",
+   "cuandoAplica": "Siempre que delegues a un modelo más barato que tú, y siempre que escribas un brief o prompt que enumere ítems. En especial si la salida es texto público (marketing, metadata) o personalizado a una persona con nombre.",
+   "cuandoNO": "No apliques el grep exhaustivo a código puro con tests: ahí la prueba ya es la auditoría. Y no confundas esto con desconfiar del modelo barato en lo técnico — el trabajo técnico salió bien las tres veces; lo que falla es el dato de negocio.",
+   "temaTentativo": "delegación",
+   "transversal": 10,
+   "confianza": "alta",
+   "_proy": "villa-broaster es el cliente real más ma"
+  },
+  {
+   "titulo": "El porcentaje de avance lo pone un juez externo con criterio verificable, nunca el que hizo el trabajo",
+   "respuestaCorta": "Define para cada entrega un criterio que se pueda comprobar solo (tests que pasan, la pantalla abierta en el navegador, el archivo que existe, el PR mergeado) y que alguien ajeno lo califique semanalmente. El número solo sube con evidencia; el avance autorreportado no cuenta. Publica el resultado en un formato que la gente sí abra — aquí, un PDF en tamaño de celular.",
+   "porQue": "El dueño pidió literalmente que ORION fuera el juez del avance, no el equipo. Con eso, la semana 1 arrojó números incómodos pero reales (una entrega en 0, otra en 50 por estar pausada en rama, otra en 12) en vez de la niebla optimista que produce preguntarle a cada quien cómo va. La herramienta se automatizó para que el ritual no dependa de la voluntad de nadie.",
+   "evidencia": "villa-broaster/DEC-011 (rúbrica: 'el porcentaje lo asigna ORION cada viernes segun criterios VERIFICADOS (tests, navegador, archivos, PRs), nunca autorreportados; solo sube con evidencia'); docs/semanal/avance.json + plantilla.html (@page 110mm x 195mm) + generar.mjs, commit 76af678; semana 1 2026-08-22: E1 0 · E2 50 · E3 12 · E4 0 · E5 40 · E6 0 · E7 0 · E8 15, PDF de 11 páginas",
+   "cuandoAplica": "Cualquier proyecto con más de una persona ejecutando, o con un cliente que necesita ver progreso sin poder auditar el código.",
+   "cuandoNO": "No funciona si el criterio no es comprobable de forma barata: inventar métricas verificables para trabajo exploratorio o de investigación produce teatro. Y si el juez es la misma persona que ejecuta, el ritual pierde todo su valor — mejor no montarlo.",
+   "temaTentativo": "gestión de proyecto",
+   "transversal": 7,
+   "confianza": "media",
+   "_proy": "villa-broaster es el cliente real más ma"
+  }
+ ]
+}

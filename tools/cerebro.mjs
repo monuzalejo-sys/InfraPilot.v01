@@ -340,6 +340,14 @@ function cargarIndice({ reconstruirSiViejo = true } = {}) {
     if (existsSync(TEMAS_DIR)) for (const f of readdirSync(TEMAS_DIR)) {
       try { if (statSync(join(TEMAS_DIR, f)).mtimeMs > tIdx) viejo = true } catch {}
     }
+    /* También los documentos y su lista. Sin esto, agregar un documento nuevo
+       no reconstruía nada y el documento quedaba invisible para siempre — que
+       es exactamente el fallo silencioso que este cerebro existe para evitar. */
+    try { if (statSync(join(CEREBRO, "documentos.json")).mtimeMs > tIdx) viejo = true } catch {}
+    for (const d of idx.docs ?? []) {
+      if (d.clase !== "documento") continue
+      try { if (statSync(d.fuente).mtimeMs > tIdx) viejo = true } catch {}
+    }
     if (viejo) return construirIndiceYGuardar()
   }
   return idx

@@ -1,0 +1,172 @@
+{
+ "tema": {
+  "slug": "plata-turnos-y-documentos",
+  "titulo": "Plata, turnos y documentos: las reglas contables ya pagadas",
+  "preguntas": [
+   "el cierre me dice que sobra plata, por que?",
+   "las ventas del turno me salen en cero y si vendimos, que paso?",
+   "como anulo una venta sin descuadrar el dia?",
+   "el datafono cobra comision, donde guardo ese numero?",
+   "por que el reporte del dia sale en cero a las 11 de la noche?",
+   "puede el cajero bajar el inventario sin decir por que?"
+  ],
+  "alias": [
+   "caja",
+   "turno",
+   "cierre de caja",
+   "arqueo",
+   "cuadre",
+   "faltante",
+   "sobrante",
+   "cobrado",
+   "cobradoEn",
+   "jornada",
+   "zona horaria",
+   "bogota",
+   "utc",
+   "anular",
+   "anulacion",
+   "borrar",
+   "gasto",
+   "kardex",
+   "merma",
+   "comision",
+   "datafono",
+   "iva",
+   "congelar precio",
+   "consecutivo",
+   "factura",
+   "ganancia del dia",
+   "efectivo"
+  ],
+  "leccionesIncluidas": [
+   "La plata pertenece al turno en que ENTRÓ AL CAJÓN, no al que tomó el pedido",
+   "La jornada contable la define la zona horaria del negocio, no el UTC del ISO",
+   "Las fechas del negocio no son texto ni son UTC: compara por instante y calcula el día en la zona del negocio, en un solo módulo",
+   "El arqueo se diseña para no acusar a nadie: conteo a ciegas y solo efectivo en el esperado",
+   "Anular no borra: marca el documento, revierte el stock y saca el dinero por filtro de estado",
+   "Los gastos se anulan, nunca se borran — y eso se hace cumplir quitando el permiso de borrar",
+   "Congela en el documento todo número que un tercero pueda cambiar mañana",
+   "Si la interfaz promete un número, el servidor tiene que poder honrar ese número exacto",
+   "Nadie baja una cantidad sin decir por que, y quien la baja es el dueno"
+  ],
+  "proyectos": [
+   "arroces",
+   "estanco-contable",
+   "placita",
+   "villa-broaster",
+   "wrd"
+  ],
+  "valor": 10
+ },
+ "lecciones": [
+  {
+   "titulo": "La plata pertenece al turno en que ENTRÓ AL CAJÓN, no al que tomó el pedido",
+   "respuestaCorta": "Todo documento de venta lleva DOS fechas: cuándo se tomó y cuándo entró la plata (`cobradoEn`, sellado una sola vez al cobrar, en el mismo movimiento que congela los pagos). El cierre, el arqueo y \"las ventas del turno\" se filtran SIEMPRE por la fecha de cobro, nunca por la de toma. Un pedido sin cobrar no pertenece a ningún turno todavía. Si tomar y cobrar pueden caer en turnos distintos y solo guardas una fecha, ya tienes el bug.",
+   "porQue": "Bug real hallado en la verificación E2E: `pedidosDelTurno` filtraba por la fecha de TOMA, así que la plata cobrada durante el turno por pedidos tomados antes de abrir aparecía como \"sobrante\" inexplicado en el arqueo y las ventas del turno mostraban $0. Fue el único ciclo de fix de toda la corrida.",
+   "evidencia": "arroces/KN-001, DEC-002, DEC-003 (state.json). Código: C:\\Users\\Kalel\\prommter\\proyectos\\arroces\\lib\\types.ts:88-91 y :103-109 (las dos fechas y el sello); C:\\Users\\Kalel\\prommter\\proyectos\\arroces\\lib\\dominio\\cierre.ts:29-47 (\"El dinero pertenece al turno en que ENTRÓ AL CAJÓN\") y :148-162 (`if (!p.cobradoEn) return false`); C:\\Users\\Kalel\\prommter\\proyectos\\arroces\\components\\store.tsx:450 y :476 (`cobradoEn: new Date().toISOString()`); brief.md:24-25. metrics.json: fixCycles=1.",
+   "cuandoAplica": "Cualquier negocio donde tomar el pedido/prestar el servicio y cobrarlo son momentos distintos: restaurante, asadero, domicilios, plaza de mercado, taller, cuenta abierta, cualquier cosa que se pague al entregar.",
+   "cuandoNO": "Donde emitir el documento y cobrar son el mismo instante (estanco/mostrador de contado): ahí una sola fecha basta y agregar `cobradoEn` es ruido. Y OJO: para reportes de producción o demanda (qué se cocinó, a qué hora entran los pedidos) la fecha correcta sigue siendo la de la TOMA — la regla del cobro es solo para la plata.",
+   "temaTentativo": "caja y turnos",
+   "transversal": 10,
+   "confianza": "alta",
+   "_proy": "arroces (Super Arroz del Norte) es la we"
+  },
+  {
+   "titulo": "La jornada contable la define la zona horaria del negocio, no el UTC del ISO",
+   "respuestaCorta": "Nunca compares dias con fechaISO.slice(0,10). Crea UNA sola funcion fechaNegocio(fecha) con Intl en-CA y la timeZone del negocio (America/Bogota), y haz que el dominio Y la UI usen la misma; deja un self-test con una venta de las 11 p.m. En UTC-5 esa venta se va al dia siguiente y el cierre del dia marca cero justo en las horas de mas venta.",
+   "porQue": "Bug real detectado verificando en navegador a las 11:28 p.m.: la factura aparecia en la lista de ventas pero la cabecera del dia mostraba cero. El corte UTC parte la jornada de un estanco (o un asadero, o una plaza) exactamente en su pico de facturacion, asi que el numero que mira el dueno queda mal justo cuando mas importa.",
+   "evidencia": "estanco-contable/KN-005 (Knowledge Permanent, High, session 2026-07-07). Codigo: C:/Users/Kalel/prommter/proyectos/estanco-contable/lib/dominio/jornada.ts:34 (export function fechaNegocio); lib/dominio/contabilidad.ts:70 (filtro por jornada) y :198 (comentario del self-test 'Caso NOCTURNO (KN-005)'); la reusan cierre.ts:47,70 y credito.ts:49,242,274. OJO: KN-005 todavia dice que la funcion vive en facturacion.ts — se movio a jornada.ts, el objeto de memoria esta desactualizado en ese detalle.",
+   "cuandoAplica": "Cualquier POS, contable o reporte agrupado por dia en un pais con offset negativo, o en un negocio que cierra de noche: cierre de caja, ganancia del dia, corte de turno, reportes por rango, antiguedad de fiado.",
+   "cuandoNO": "Si el sistema ya guarda la jornada como campo propio decidido por el negocio (fecha_operacion escrita al cerrar caja), no derives nada de la marca de tiempo. Y si el cliente opera en varias zonas horarias, la zona es la del LOCAL, no la del servidor ni la del navegador del que mira el reporte.",
+   "temaTentativo": "jornada contable",
+   "transversal": 10,
+   "confianza": "alta",
+   "_proy": "estanco-contable es el SaaS de facturaci"
+  },
+  {
+   "titulo": "Las fechas del negocio no son texto ni son UTC: compara por instante y calcula el día en la zona del negocio, en un solo módulo",
+   "respuestaCorta": "Compara fechas por INSTANTE (ms desde epoch), nunca por el string ISO — \"...T23:00\" > \"...T2:00\" es falso como texto. Y \"qué día es\" se calcula con Intl en America/Bogota: un turno nocturno pertenece entero a la jornada en que ABRIÓ, aunque el ISO ya diga el día siguiente. Esa función vive en UN solo módulo compartido (jornada.ts); duplicarla ya causó un bug real en el hermano.",
+   "porQue": "Dos copias de \"qué día es\" causaron un bug real en estanco-contable (KN-005 de ese proyecto, citado dentro del código de arroces), y en Bogotá un turno que abre a las 7 p.m. ya cruzó la medianoche UTC a mitad de camino: mirar el ISO parte el turno en dos jornadas.",
+   "evidencia": "C:\\Users\\Kalel\\prommter\\proyectos\\arroces\\lib\\dominio\\cierre.ts:45-47 (comparación por instante, nunca por texto ISO), :49-54 (jornada por apertura + self-test \"turno nocturno\"), :55-61 (nota explícita: \"dos copias de 'qué día es' ya causó un bug real\", KN-005 del estanco), :71-83 (`FORMATO_JORNADA` con Intl y ZONA_NEGOCIO=America/Bogota), :94 (`instante()`), :381-391 (self-test \"turno nocturno pertenece entero a la jornada de Bogotá\").",
+   "cuandoAplica": "Cualquier negocio con horario que cruza medianoche o con reportes por día: asadero de noche, estanco, plaza de mercado, restaurante, arrocera.",
+   "cuandoNO": "Para métricas de demanda por hora no uses la jornada de apertura, usa el instante real. Y si el módulo es una utilidad aislada que nunca va a compartir la definición de \"día\" con otro, la regla del módulo único no aplica — pero la de comparar por instante sí, siempre.",
+   "temaTentativo": "fechas y jornada",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "arroces (Super Arroz del Norte) es la we"
+  },
+  {
+   "titulo": "El arqueo se diseña para no acusar a nadie: conteo a ciegas y solo efectivo en el esperado",
+   "respuestaCorta": "Pide el efectivo contado ANTES de mostrar el esperado: si quien cuenta ve primero el número, deja de contar y solo confirma. Y al esperado súmale únicamente base inicial + efectivo cobrado en el turno; transferencia y datáfono no dejan billetes en el cajón, y si los sumas, todo turno con datáfono muestra un faltante enorme y quien cobra carga con una culpa inventada.",
+   "porQue": "Es el diseño explícito del módulo de cierre: la diferencia negativa es faltante y la positiva también es un error de caja, así que el número solo significa algo si el conteo fue un conteo de verdad y si el esperado mide billetes, no ventas.",
+   "evidencia": "C:\\Users\\Kalel\\prommter\\proyectos\\arroces\\lib\\dominio\\cierre.ts:20-27 (\"La transferencia y el datáfono NO dejan billetes en el cajón... quien cobra cargaría con una culpa inventada\"), :164-169 (\"`efectivoContado` se pide ANTES de mostrar el esperado — si la persona ve primero el número, el conteo deja de ser un conteo\"), :179 (`efectivoEsperado = turno.baseInicial + pagos.porMetodo.efectivo`); C:\\Users\\Kalel\\prommter\\proyectos\\arroces\\app\\caja\\cierre-turno.tsx:13-18, :98, :104; C:\\Users\\Kalel\\prommter\\proyectos\\arroces\\app\\caja\\resumen-del-turno.tsx:10-14.",
+   "cuandoAplica": "Todo cierre de caja donde quien cuenta no es el dueño: restaurante, asadero, estanco, puesto de plaza.",
+   "cuandoNO": "Si el dueño cierra su propia caja, el conteo a ciegas es fricción sin control real — muéstrale todo. Y en un negocio 100% digital sin efectivo, el arqueo entero sobra.",
+   "temaTentativo": "caja y turnos",
+   "transversal": 8,
+   "confianza": "media",
+   "_proy": "arroces (Super Arroz del Norte) es la we"
+  },
+  {
+   "titulo": "Anular no borra: marca el documento, revierte el stock y saca el dinero por filtro de estado",
+   "respuestaCorta": "Para deshacer una venta, marca la factura como anulada con su fecha y emite reversos de stock; el dinero se excluye filtrando por estado, nunca restando una venta negativa. Haz la anulacion idempotente (anular dos veces no genera mas reversos) y separa tres verbos distintos: anular (conserva la historia), editar (emite solo deltas — si solo cambia el precio no hay movimiento de kardex) y eliminar (destructivo, reutiliza el consecutivo, por eso el id lleva sello de fecha).",
+   "porQue": "La ganancia del dia es el numero que mira el dueno, y una anulacion mal modelada lo falsea: se probo la alternativa de dejar la venta viva y compensarla, y descuadraba el dia. Con estado + filtro, la anulada aparece en el conteo de anuladas (auditoria) pero jamas en el dinero, y el documento nunca se pierde.",
+   "evidencia": "estanco-contable/KN-004 (Knowledge High, session 2026-07-07, commit ee6f5a7, __selfTest 6/6). Codigo: lib/dominio/facturacion.ts:215-237 (anularFactura devuelve {factura anulada, reversos}), :219 (idempotencia: si ya esta anulada devuelve reversos vacios), :249 ('una anulada nunca esta descuadrada — no debe plata'), :264 (editar devuelve deltas y no toca anuladas), :354-370 (el resumen cuenta 'anuladas' aparte y nunca las suma al total). Consecutivo por local con formato CEN-000001.",
+   "cuandoAplica": "Todo sistema con documentos consecutivos y kardex: facturacion, remisiones, comandas, notas de entrega, cierres de turno.",
+   "cuandoNO": "Si el pais exige factura electronica validada, 'anular' deja de ser un estado interno y pasa a ser una nota de credito ante la autoridad: no puedes reutilizar consecutivos ni eliminar nada, y el verbo destructivo desaparece del producto. En Colombia esto sigue sin decidirse (PEND-009: hoy el sistema emite un comprobante interno, no factura DIAN, y esa decision condiciona el precio del software).",
+   "temaTentativo": "facturacion",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "estanco-contable es el SaaS de facturaci"
+  },
+  {
+   "titulo": "Los gastos se anulan, nunca se borran — y eso se hace cumplir quitando el permiso de borrar",
+   "respuestaCorta": "En cualquier módulo contable: gasto anulado lleva una bandera y la fila se queda; el neto = ventas − gastos es la ÚNICA cifra total que mostrás; los cancelados van aparte y jamás restan; y los reportes leen siempre del store vivo, nunca de un total guardado. Lo importante: no lo dejes en la regla de negocio del cliente — en el servidor no otorgues el privilegio de delete sobre la tabla de gastos a nadie. Y todo el módulo es admin-only.",
+   "porQue": "Un gasto borrado rompe el historial del período y no deja rastro de quién lo sacó; anulado, el número cuadra y la auditoría existe. Si la regla vive solo en el JS, la primera pantalla nueva que alguien escriba la salta sin querer — quitar el grant es la única versión de la regla que no se puede olvidar. Este patrón no nació en WRD: se extrajo de estanco-contable y broaster-app y se replicó adaptado a dulcería, que es exactamente la señal de que es transversal.",
+   "evidencia": "state.json DEC-006 ('gastos se ANULAN (soft), nunca se borran; reportes leen siempre del store vivo'). Hecho cumplir en el servidor: C:\\Users\\Kalel\\fable 5\\wrd\\setup\\schema.sql:565-569 — 'grant select, insert, update on public.gastos to authenticated' y el comentario 'nada de delete para nadie: un gasto se anula, no se borra'; policies de gastos solo con es_admin() en :513-527 (select/insert/update, sin policy de delete). Columna anulado en :382.",
+   "cuandoAplica": "Todo módulo contable, de caja o de inventario en cualquiera de los negocios: estanco, asadero, arrocera, plaza, dulcería.",
+   "cuandoNO": "En datos operativos sin valor de auditoría (borradores, caché, preferencias) el soft-delete solo acumula basura. Y si el requisito legal es borrado real (datos personales a pedido del titular), la política tiene que existir aunque restringida.",
+   "temaTentativo": "patron contable",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "WRD es la tienda de dulcería del dueño: "
+  },
+  {
+   "titulo": "Congela en el documento todo número que un tercero pueda cambiar mañana",
+   "respuestaCorta": "El precio unitario se congela en la línea al tomar el pedido, y el % de comisión + la comisión en pesos se congelan en el pago al cobrar. Nunca recalcules ninguno sobre un documento ya emitido: si el banco sube la tarifa o cambia la carta, los cierres de ayer tienen que seguir cuadrando. Guarda el valor calculado, no la referencia a la tarifa vigente.",
+   "porQue": "En Colombia el datáfono cobra ~2,5-3,5% MÁS el 19% de IVA sobre esa comisión: el efectivo ronda 3,0-4,2%. Si nadie lo registra, la \"ganancia del día\" que mira el dueño miente — vender 3.000.000 por datáfono al 3,5% se lleva 105.000 pesos que no aparecen en ningún informe.",
+   "evidencia": "C:\\Users\\Kalel\\prommter\\proyectos\\arroces\\lib\\dominio\\pagos.ts:1-17 (por qué existe el módulo + \"Congelado (regla sellada)\": \"Nunca recalcules la comisión de un pago ya registrado\"), :19-22 (COP sin centavos: `Math.round` al cobrar), :70-73 (`calcularComision`); C:\\Users\\Kalel\\prommter\\proyectos\\arroces\\lib\\types.ts:122-126 (`COMISIONES_DEFECTO`, datafono 3.5 con IVA incluido) y :128-134 (`comisionPct` congelado); arroces/DEC-002 (pagos congelados al cobrar).",
+   "cuandoAplica": "Cualquier POS o sistema contable con medios de pago, o con precios que cambian con el tiempo: placita, villa-broaster, estanco, arroces.",
+   "cuandoNO": "No congeles datos que SÍ deben seguir vivos (nombre y teléfono del cliente, dirección de la sucursal, datos de contacto): ahí congelar te deja con copias rancias. La regla es solo para números que entran en una suma histórica.",
+   "temaTentativo": "pagos y comisiones",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "arroces (Super Arroz del Norte) es la we"
+  },
+  {
+   "titulo": "Si la interfaz promete un número, el servidor tiene que poder honrar ese número exacto",
+   "respuestaCorta": "No pintes un precio, un total o un descuento que el servidor no calcule igual. Aquí el servidor congela cada precio leyendo su propio catálogo y no sabe nada de rebajas: un 'antes $91.400 / ahora $79.900' de adorno haría que el carrito prometa 79.900 y la confirmación cobre 91.400. Si quieres descuento, nace en el servidor o no existe; mientras tanto, la promo vende curaduría (el plan ya armado en un toque), no rebaja.",
+   "porQue": "Es una consecuencia directa del congelado de líneas: la orden fija nombre y precio en el momento de crearse, así que cualquier número que la UI invente por su cuenta se convierte en una discrepancia visible al cliente en el checkout — el peor momento posible para perder la confianza.",
+   "evidencia": "villa-broaster/KN-009; villa-app/lib/promos.ts:10-23 (comentario del propio código: 'el cliente vería 79.900 en el carrito y 91.400 en la confirmación — cobrarle de más por culpa de un adorno'; 'el descuento de verdad tiene que nacer en el servidor, y ese día se borra este archivo'); broaster-app/lib/servidor/contabilidad.ts:232 congelarLineas y :881 sobre precios congelados",
+   "cuandoAplica": "Cualquier checkout, cotizador, calculadora de precios o pantalla que muestre un total antes de que el servidor lo confirme. También en dashboards donde el cliente calcula un agregado que el backend recalcula distinto.",
+   "cuandoNO": "No aplica a estimados declarados como tales (ETA, 'aprox.', rangos): ahí la promesa es el rango, no el número. Y si el descuento sí vive en el dominio del servidor, mostrarlo es obligatorio, no prohibido.",
+   "temaTentativo": "checkout",
+   "transversal": 9,
+   "confianza": "media",
+   "_proy": "villa-broaster es el cliente real más ma"
+  },
+  {
+   "titulo": "Nadie baja una cantidad sin decir por que, y quien la baja es el dueno",
+   "respuestaCorta": "Deja que la cantidad se edite en la misma tabla que el dueno ya mira (ese es el flujo del dia, no una seccion aparte), pero que el delta NEGATIVO exija motivo tipado de merma y quede restringido al dueno; el delta positivo abre la entrada normal con proveedor y costo. El kardex se agrega, nunca se sobrescribe: el ajuste silencioso de inventario es plata que desaparece sin responsable.",
+   "porQue": "Fue el flujo que pidio el dueno para no saltar entre inventario y bodega, y se verifico en vivo: la entrada por tabla creo un lote de 10 kg por $25.000 exactos y una merma de 8 kg descosto $20.000 con motivo. Al escribir el manual se reconfirmo que merma es solo-dueno (no trabajador) como regla de producto, no como accidente de permisos.",
+   "evidencia": "placita/DEC-019 (commit 5b7ee72: 'delta negativo exige motivo tipado de merma obligatorio (no se permite bajar cantidad sin explicar por que)'; 'El kardex append-only jamas se sobrescribe'); brief.md de placita ('Merma: motivo tipado obligatorio (solo dueno)'); placita/KN-037 (hallazgo del manual: 'Merma=solo-dueno (no trabajador)'); metrics.json sesion session-2026-08-20-inventario-tienda-movil ('entrada por tabla creo lote (10kg->$25.000 exactos), merma con motivo desconto (8kg/$20.000)').",
+   "cuandoAplica": "Inventarios de negocios con producto fisico: perecederos, licores, insumos de cocina, mercancia de bodega.",
+   "cuandoNO": "En un conteo fisico masivo (inventario anual), pedir motivo linea por linea vuelve el trabajo imposible: ahi el motivo es uno solo para toda la jornada de conteo.",
+   "temaTentativo": "inventario",
+   "transversal": 8,
+   "confianza": "media",
+   "_proy": "Placita (Mercaplaza) es el POS + inventa"
+  }
+ ]
+}

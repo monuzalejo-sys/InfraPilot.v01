@@ -1,0 +1,129 @@
+{
+ "tema": {
+  "slug": "mostrador-real",
+  "titulo": "El mostrador real: hardware, gente de afán y el mundo físico",
+  "preguntas": [
+   "la cajera teclea 500 y el precio se multiplica, como lo arreglo?",
+   "como marco la factura como impresa si la impresora se quedo sin papel?",
+   "el lector de codigo de barras necesita driver o modo escaner?",
+   "el cajero se logueo en otra caja, de que local sale el inventario?",
+   "lo puse en el manual y nadie lo hizo, que hago?",
+   "el cliente entra por el link de la otra sede y le sale la sede equivocada"
+  ],
+  "alias": [
+   "pos",
+   "punto de venta",
+   "mostrador",
+   "cajera",
+   "cajero",
+   "bascula",
+   "gramos",
+   "kilos",
+   "peso manual",
+   "impresora",
+   "papel",
+   "lector de barras",
+   "escaner",
+   "usb",
+   "hid",
+   "ean",
+   "puesto",
+   "dispositivo",
+   "vinculo",
+   "sede",
+   "sucursal",
+   "url sede",
+   "pin 0000",
+   "adopcion",
+   "paso manual"
+  ],
+  "leccionesIncluidas": [
+   "Un paso manual que depende del dueno es un paso que no ocurre: automatizalo o fuerzalo",
+   "No estampes 'hecho' un efecto del mundo fisico que tu codigo solo inicio",
+   "Valida lo que teclea la gente contra el rango fisico del negocio, no contra la unidad del campo",
+   "El origen del inventario lo manda el puesto fisico, no la persona logueada",
+   "Un solo input sirve para teclear y para escanear: el lector USB es un teclado",
+   "El estado que decide qué ve el cliente se lee de la URL primero, y si no hay, se pregunta"
+  ],
+  "proyectos": [
+   "placita",
+   "estanco-contable",
+   "villa-broaster"
+  ],
+  "valor": 9
+ },
+ "lecciones": [
+  {
+   "titulo": "Un paso manual que depende del dueno es un paso que no ocurre: automatizalo o fuerzalo",
+   "respuestaCorta": "Si una funcion necesita que el dueno configure algo a mano en cada dispositivo o cambie un valor por defecto, dala por NO adoptada. Entrega el valor solo, en el momento en que el dispositivo se da de alta, o bloquea el primer uso hasta que lo cambie. Nunca lo dejes escrito en un manual, en un aviso ni en un comentario del bootstrap.",
+   "porQue": "Dos medidas independientes en el mismo proyecto. (1) La sincronizacion multi-dispositivo estaba terminada y verificada, pero la nube seguia VACIA porque ningun dispositivo del dueno tenia escrita la clave de caja; se resolvio solo cuando la clave empezo a llegar sola al vincular el puesto, y se comprobo al dia siguiente en vivo. (2) El PIN de arranque 0000 seguia vigente semanas despues, pese a que el propio bootstrap.sql exige cambiarlo 'el primer dia', y ningun agente puede cambiarlo por el.",
+   "evidencia": "placita/KN-038 ('la nube aun esta vacia porque ninguno de los dispositivos del dueno tiene la clave puesta todavia', 2026-08-21) -> placita/DEC-021 (ruta /api/clave-caja, la clave llega automatica al vincular el puesto; verificado en vivo con prueba cruzada no planeada: el equipo del orquestador recibio solo el producto 'Mango Tommy M01' creado por el dueno desde SU dispositivo, 2026-08-22); placita/RSK-001 + placita/KN-024 (PIN 0000 de bootstrap.sql confirmado vigente 2026-08-19/20, con bloqueo de 15 min tras 5 intentos comprobado en vivo).",
+   "cuandoAplica": "Cualquier funcion cuya activacion dependa de un gesto de configuracion del usuario final: claves por dispositivo, tokens, permisos, cambio de credenciales por defecto, 'active esta opcion en ajustes'.",
+   "cuandoNO": "Cuando el paso manual ES la decision de negocio (elegir proveedor de facturacion electronica, aprobar un cobro), o cuando automatizarlo entregaria un secreto por un canal mas debil: la excepcion de DEC-021 solo se sostiene porque la entrega exige PIN de dueno verificado en el servidor.",
+   "temaTentativo": "adopcion",
+   "transversal": 10,
+   "confianza": "alta",
+   "_proy": "Placita (Mercaplaza) es el POS + inventa"
+  },
+  {
+   "titulo": "No estampes 'hecho' un efecto del mundo fisico que tu codigo solo inicio",
+   "respuestaCorta": "Marca la factura como impresa SOLO despues de que un humano responda '¿salio el papel?'; nunca al lanzar la impresion. Lo mismo con enviado, entregado o cobrado: el registro debe reflejar el mundo, no la intencion del codigo. Y si un tope de seguridad cuenta esos registros, explicalo en pantalla desde que la caja abre, no cuando el cajero ya esta trabado.",
+   "porQue": "El sistema traba la caja a las 3 facturas sin imprimir. Si impresaEn se estampaba al lanzar la impresion, una impresora sin papel producia facturas fantasma que destrababan la caja sin existir en el mundo, y quedaban en el kardex de impresion y el basurero. El e2e de navegador confirmo el contrato completo: 3 sin imprimir traban 'ni abrir cuenta ni cobrar', y solo destraban al confirmar que el papel salio.",
+   "evidencia": "placita/DEC-013 ('impresaEn solo se estampa DESPUES de que el modal ¿Salio el papel? responde Si -- nunca al solo iniciar la impresion'; F2/Cobrar mudo paso a explicar la razon y enfocar el campo de dinero; el aviso de caja trabada es visible desde el arranque); placita/DEC-005 (tope de facturas, borrar exige re-PIN del cajero, basurero purga a 2h, ninguna accion de UI destructiva inmediata); placita/KN-028 (e2e con 4 facturas reales C1-000001..4).",
+   "cuandoAplica": "Impresion, envio de mensajes, entregas, pagos externos: todo evento donde el codigo le pide algo al mundo y el mundo puede decir que no.",
+   "cuandoNO": "Cuando el proveedor devuelve un acuse verificable (webhook, ACK del datafono, respuesta de la DIAN): ese acuse sustituye la pregunta al humano, no le preguntes lo que ya sabes. Tampoco en eventos de altisima frecuencia: nadie confirma 200 veces al dia.",
+   "temaTentativo": "verdad operativa",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "Placita (Mercaplaza) es el POS + inventa"
+  },
+  {
+   "titulo": "Valida lo que teclea la gente contra el rango fisico del negocio, no contra la unidad del campo",
+   "respuestaCorta": "Si el campo dice kilos y la cajera piensa en gramos, va a escribir 500. Pon una regla que reinterprete lo fisicamente imposible: por encima del tope real del mostrador (la bascula llega a 30 kg), 500 significa 500 g y no 500 kg. Aplicala solo donde el humano teclea de afan frente al cliente, no en bodega donde 500 kg es un pedido normal.",
+   "porQue": "El dueno reporto 'el precio se multiplica': la cajera tecleaba 500 (gramos de plaza) en el campo de peso manual que parseaba KILOS, y el POS cobraba $2.100.000 por media papaya. Se reprodujo en sandbox y se corrigio con una regla de dominio, no con un mensaje de error; verificado en navegador despues del fix: '500' -> 0,5 kg -> Tomate $1.900.",
+   "evidencia": "metrics.json de placita, sesion session-2026-08-13-precio-multiplicado ('la cajera teclea 500 (gramos de plaza) en el campo de peso manual que parsea KILOS -> linea de 500 kg y total x1000'; regla nueva interpretarPesoManualMostrador en lib/pesa.ts: peso manual >= 50 kg en el POS se reinterpreta como gramos, tope bascula 30 kg, solo mostrador, bodega intacta; 452/452 tests). Fuente: C:\\Users\\Kalel\\prommter\\proyectos\\placita\\memory\\placita\\metrics.json",
+   "cuandoAplica": "Todo campo de cantidad, peso o dinero operado por una persona con prisa frente a un cliente: POS, comandas, recepcion de mercancia, pesaje.",
+   "cuandoNO": "Cuando el rango legitimo y el erroneo se solapan (una bodega o una arrocera donde 500 kg es normal): ahi reinterpretar en silencio corrompe datos y hay que preguntar en vez de adivinar.",
+   "temaTentativo": "entrada de datos",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "Placita (Mercaplaza) es el POS + inventa"
+  },
+  {
+   "titulo": "El origen del inventario lo manda el puesto fisico, no la persona logueada",
+   "respuestaCorta": "Separa dos ejes de identidad: PERSONA (sesion por turno, en sessionStorage) y PUESTO (vinculo PC->local, en localStorage, sobrevive al cierre de sesion). El localId de la factura sale del vinculo del equipo, NUNCA del perfil del usuario, porque la mercancia sale fisicamente de donde esta la caja. Solo el dueno vincula o revincula, y un PC sin vincular no factura.",
+   "porQue": "Si el localId sale del usuario, un cajero que se loguee en otra caja falsea el origen del inventario de dos locales a la vez y el kardex de ambos queda mentiroso. Es el mismo patron que 'la plata pertenece al turno del cobro': el hecho contable lo fija el lugar o el momento fisico, no quien lo tecleo.",
+   "evidencia": "estanco-contable/KN-007 (decision del dueno 2026-07-29, peticion literal de 'dos logins'). Codigo: lib/dispositivo.ts:151 (export function resolverLocalFactura(sesion)) y sus self-tests en :215 ('sin vinculo devuelve null'), :239-240 ('manda el PC, no el local de la sesion'), :245 ('vinculo de otra empresa devuelve null'), :261 (tras desvincular). Consumido en components/store.tsx:14 y app/(auth)/login/page.tsx:65. Clave del vinculo: 'estanco:dispositivo:local'.",
+   "cuandoAplica": "Multi-sede con inventario o caja por local: asaderos con 2 sedes, plazas de mercado, arroceras, cualquier POS donde el mismo empleado rota entre sucursales o donde hay varias cajas por local.",
+   "cuandoNO": "No sirve para venta movil o domicilios sin puesto fijo: ahi el origen correcto es la bodega asignada al pedido, no el dispositivo. Y en un negocio de una sola sede el doble eje es friccion pura — un solo login y listo.",
+   "temaTentativo": "multi-sede",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "estanco-contable es el SaaS de facturaci"
+  },
+  {
+   "titulo": "Un solo input sirve para teclear y para escanear: el lector USB es un teclado",
+   "respuestaCorta": "No construyas un 'modo escaner' ni pidas drivers. Un lector USB en modo HID escribe el codigo como teclado rapido y manda Enter, asi que un unico cuadro de busqueda basta: en onChange agregas si el texto coincide EXACTO con el codigo corto interno, y en submit (Enter) si parece EAN (>=8 digitos) buscas por codigo de barras. Cero configuracion para el cliente, y un flash verde de 400ms como confirmacion de que entro.",
+   "porQue": "Verificado en vivo con hardware real y ambos caminos por el mismo input: teclear 201 agrega Aguila; escanear 7702025100316 agrega Marlboro. La alternativa (un modo aparte, o pedirle al cliente que configure el lector) es friccion para una cajera y soporte para el que vende el software.",
+   "evidencia": "estanco-contable/KN-002 (Knowledge, session 2026-07-07, 'verificado en vivo'). Codigo: app/(app)/ventas/page.tsx:187-196 (onCambiarBusqueda, match exacto contra Producto.codigo) y :198-216 (onSubmitBusqueda, pareceCodigoBarras -> busca Producto.codigoBarras en :203), con el porque escrito en el comentario de :184-186; marcarEscaneado (flash 400ms) en :179-182.",
+   "cuandoAplica": "Cualquier punto de venta o toma de inventario con lector de barras USB o bluetooth en modo HID: estanco, asadero, plaza, arrocera, bodega.",
+   "cuandoNO": "No aplica a lectores en modo serie/COM ni a lectura por camara (la PWA de ROAD-005): ahi si hay un canal aparte. Y si tus codigos internos pueden llegar a 8+ digitos, el discriminador por longitud choca — usa un prefijo reservado o valida el digito de control del EAN.",
+   "temaTentativo": "punto de venta",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "estanco-contable es el SaaS de facturaci"
+  },
+  {
+   "titulo": "El estado que decide qué ve el cliente se lee de la URL primero, y si no hay, se pregunta",
+   "respuestaCorta": "Orden fijo de precedencia: URL > almacenamiento local > default. Y si después de los tres no hay una elección explícita del usuario, ábrele el selector solo, en la primera visita. Nunca dejes que un default silencioso decida por él.",
+   "porQue": "En un negocio de dos sedes, la vitrina ignoraba el parámetro ?sede= y nunca preguntaba: todos los visitantes caían en Villa del Viento, incluso los que llegaban por un enlace de la otra sede. Eso no es un detalle de UI, es el pedido llegando a la cocina equivocada. Lo halló el barrido de QA, no el usuario, de milagro.",
+   "evidencia": "villa-broaster/KN-015 (hallazgo del barrido QA 2026-08-23: 'vitrina ignoraba ?sede= y nunca preguntaba la sede (todos caian en Villa del Viento)'); corregido en villa-app/lib/carrito.ts:151-205 (leerSedeDeUrl + abrirSedesInicial); mismo run: banner de promo de una sede se mostraba con la otra sede activa (villa-app/lib/promos.ts) — queda pendiente en T-07",
+   "cuandoAplica": "Multi-sede, multi-tenant, multi-idioma, multi-moneda: cualquier cosa donde el enlace de una campaña, un QR pegado en un local o un correo deban aterrizar al usuario en el contexto correcto.",
+   "cuandoNO": "No leas de la URL lo que sea sensible o privilegiado (un rol, un id de cuenta): eso se resuelve en servidor con sesión firmada, no con query string. La regla es para contexto de presentación, no para autorización.",
+   "temaTentativo": "estado de cliente",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "villa-broaster es el cliente real más ma"
+  }
+ ]
+}

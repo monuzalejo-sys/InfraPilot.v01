@@ -1,0 +1,167 @@
+{
+ "tema": {
+  "slug": "ola-de-subagentes",
+  "titulo": "Correr una ola de subagentes: prepararla y rescatarla",
+  "preguntas": [
+   "se me murio un builder a mitad de la ola, lo relanzo o que hago?",
+   "voy a lanzar 4 builders en paralelo, que tengo que dejar listo antes pa que no se pisen?",
+   "el agente dijo que arranco pero no veo nada en disco, entrego o no entrego?",
+   "como reparto los archivos entre agentes si van a tocar el mismo html?",
+   "se cayo la sesion a mitad del qa, tengo que repetir todo?",
+   "una ola vieja habia tocado ese archivo y la nueva lo reescribio, como lo verifico?"
+  ],
+  "alias": [
+   "ola",
+   "olas",
+   "builders",
+   "subagentes",
+   "paralelo",
+   "spawn",
+   "respawn",
+   "relanzar",
+   "infra-death",
+   "muerte por limite",
+   "limite de sesion",
+   "git status",
+   "git log",
+   "0 bytes",
+   "wave.json",
+   "contratos",
+   "namespace",
+   "conflicto de archivos",
+   "orquestador",
+   "reanudar",
+   "sembrar datos",
+   "qa largo"
+  ],
+  "leccionesIncluidas": [
+   "Materializa el recurso compartido antes de soltar los builders en paralelo",
+   "Escribe los contratos en disco antes de soltar la ola de builders",
+   "El orquestador es el dueño del HTML; los builders solo tocan su namespace",
+   "Repartir archivos entre agentes protege dentro de la ola, no entre olas",
+   "Builder que parece muerto: mira git antes de reconstruir nada",
+   "Cuando un agente se muere, mira el disco antes de relanzarlo",
+   "Un agente muerto por limite casi siempre ya escribio: audita el disco antes de re-spawnear",
+   "Al reanudar tras un crash, mirá el tamaño en disco: 'started' no es 'aterrizó'",
+   "Siembra los datos en disco antes del QA largo: lo hace reanudable cuando la infraestructura se caiga"
+  ],
+  "proyectos": [
+   "placita",
+   "infrapilot",
+   "estanco-contable",
+   "wrd",
+   "villa-broaster"
+  ],
+  "valor": 9
+ },
+ "lecciones": [
+  {
+   "titulo": "Materializa el recurso compartido antes de soltar los builders en paralelo",
+   "respuestaCorta": "Antes de lanzar builders concurrentes, escribe tú mismo el archivo que todos van a tocar (tokens de diseño, tipos, schema) y decláralo INTOCABLE en cada brief, con los contratos entre ellos explícitos (qué endpoint, qué códigos de respuesta). Es más barato que dejar que cada uno lo cree y después reconciliar, y más barato que el truco de comentar/descomentar imports.",
+   "porQue": "El orquestador fijó globals.css con los tokens antes de lanzar tres builders paralelos (landing, api, pedido) y escribió el contrato HTTP del formulario contra la API de suscriptores. Resultado medido: 5 de 5 spawns de dos olas aterrizaron sin un solo conflicto de archivo y sin fix-cycles; el builder de landing verificó el contrato contra la API real del otro builder (201/409/400) en vez de asumirlo.",
+   "evidencia": "villa-broaster/KN-006 (5/5 spawns, 0 fix-cycles, QA 9/9); metrics session-2026-08-08-build-broaster-app (7 builders + analista + planner, 0 fix-cycles, 0 muertes de agentes); confirmado de nuevo en session-2026-08-20-sistema-completo (3 olas, 0 fix-cycles). KN-006 lo cruza explícitamente con KN-026 de infrapilot (contratos cruzados)",
+   "cuandoAplica": "Cualquier orquestación con dos o más agentes escribiendo en el mismo repo a la vez, y cualquier equipo humano donde varios tocan el mismo archivo de estilos o de tipos.",
+   "cuandoNO": "Si los builders trabajan en repos o carpetas que no comparten un solo archivo, pre-materializar es trabajo perdido. Tampoco sirve si el recurso compartido es justamente lo que hay que diseñar: entonces hazlo secuencial, uno lo define y los demás esperan.",
+   "temaTentativo": "orquestación paralela",
+   "transversal": 10,
+   "confianza": "alta",
+   "_proy": "villa-broaster es el cliente real más ma"
+  },
+  {
+   "titulo": "Escribe los contratos en disco antes de soltar la ola de builders",
+   "respuestaCorta": "Antes de lanzar builders en paralelo, el orquestador escribe el mismo tres archivos reales: el contrato de tipos, el seed de datos y el sistema visual (tokens CSS). Los builders codean contra archivos que existen, no contra una descripcion en el prompt, y los contratos cruzados dejan de fallar. Si te saltas esto, cada builder inventa su version y alguien reconcilia TODOs despues.",
+   "porQue": "Se midio contra la corrida anterior. Con los contratos sembrados antes: 4 builders paralelos (2 opus, 2 sonnet), 0 ciclos de fix y 0 TODOs pendientes. La ola equivalente de infrapilot sin ese paso previo dejo 2 TODOs por reconciliar. Costo medido de la ola buena: ~427k tokens.",
+   "evidencia": "estanco-contable/KN-001 (Knowledge, session 2026-07-07 run inicial). Archivos sembrados antes de la ola: lib/types.ts (contrato central, 'nadie lo redefine' segun DEC-001), lib/demo-data.ts (seed determinista), app/globals.css (tokens). Medicion: memory/estanco-contable/metrics.json, session-2026-07-07-001, modelOutcomes = 64.794 + 91.764 + 116.491 + 153.649 = 426.698 tokens, los 4 con verdict 'ok'.",
+   "cuandoAplica": "Construccion greenfield o feature grande repartida entre 2+ agentes que comparten tipos, datos de prueba o estilos. Tambien al retomar un proyecto donde varios agentes van a tocar la misma capa.",
+   "cuandoNO": "Si la tarea es de un solo agente, el paso es puro overhead. Y si el contrato de tipos es justamente la incognita que hay que resolver, congelarlo temprano te ata a un diseno equivocado: primero un spike de un agente, despues la ola.",
+   "temaTentativo": "orquestacion multiagente",
+   "transversal": 10,
+   "confianza": "alta",
+   "_proy": "estanco-contable es el SaaS de facturaci"
+  },
+  {
+   "titulo": "El orquestador es el dueño del HTML; los builders solo tocan su namespace",
+   "respuestaCorta": "Antes de lanzar la ola, escribí vos mismo los esqueletos HTML completos, inline y terminados. A cada builder paralelo dale un namespace estricto de JS y CSS y prohibile editar HTML. Si un builder necesita tocar el head (un script anti-flash, por ejemplo), es una excepción quirúrgica que aprobás una por una, no una licencia general.",
+   "porQue": "El HTML es el único archivo que todos los builders quieren tocar a la vez: es donde se cruzan estructura, clases y montaje. Si lo dejás abierto, los conflictos de archivo son inevitables y se pagan en reintentos. Con el HTML cerrado por el orquestador, 4 builders corrieron en paralelo en WRD sin un solo conflicto.",
+   "evidencia": "state.json KN-003 (wrd): '4 builders en OLA1 corrieron en paralelo sin un solo conflicto de archivos. Excepción quirúrgica: S4 con script anti-flash en head.' Confirmado en metrics.json sesión 1 (3 spawns build:visual opus + 3 build:page sonnet, todos verdict ok). La disciplina se mantuvo en el sistema separado: DEC-008 congela todas las clases con prefijo sis- antes de repartir las vistas.",
+   "cuandoAplica": "Cualquier ola de subagentes en paralelo sobre un mismo frontend o un mismo repo, con o sin build step.",
+   "cuandoNO": "Cuando el trabajo ES la estructura (un rediseño de layout, migrar el markup): ahí el HTML tiene que ser de alguien, y entonces la ola no es paralela sobre esos archivos — serializala.",
+   "temaTentativo": "olas paralelas",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "WRD es la tienda de dulcería del dueño: "
+  },
+  {
+   "titulo": "Repartir archivos entre agentes protege dentro de la ola, no entre olas",
+   "respuestaCorta": "Lleva una lista de qué archivos tocó cada ola. Cuando una ola posterior reestructure un archivo que otra anterior ya había editado, vuelve a verificar la contribución vieja: no la protege ningún reparto de propiedad. Y verifícala mirando el resultado renderizado, no el build.",
+   "porQue": "KN-031: los builders \"quips\" y \"origen-de-presupuesto\" tocaron presupuestos/page.tsx en olas distintas; el segundo reestructuró la página y las quips del primero sobrevivieron solo en la vista de detalle, no en la de listado. Se descubrió revisando el HTML prerenderizado, no compilando — el build estaba verde con la mitad del trabajo perdida.",
+   "evidencia": "infrapilot/KN-031 y su hermano infrapilot/KN-026 (el caso DENTRO de una misma ola: cuando un builder consume lo que otro produce, el consumidor deja el import comentado con TODO y el orquestador descomenta al cerrar la ola; costó un micro-fix por un import olvidado en ROAD-001). Hoy el arreglo está puesto y se puede comprobar: C:\\Users\\Kalel\\ORION\\infrapilot-app\\app\\(dashboard)\\presupuestos\\page.tsx:244 y :549 llevan <ProfesionQuips> en ambas vistas.",
+   "cuandoAplica": "Trabajo multi-ola con agentes paralelos sobre el mismo repositorio, y cualquier refactor grande que pase por encima de features recientes.",
+   "cuandoNO": "Si cada ola toca directorios de verdad disjuntos, el seguimiento sobra y solo añade burocracia.",
+   "temaTentativo": "orquestación paralela",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "InfraPilot AI es un SaaS de herramientas"
+  },
+  {
+   "titulo": "Builder que parece muerto: mira git antes de reconstruir nada",
+   "respuestaCorta": "Cuando un subagente muere por limite de sesion, corre git status y git log en su repo ANTES de relanzarlo o rehacer su trabajo: puede haber commiteado todo justo antes de caer. Reconstruir a ciegas es la forma mas cara de quemar tokens.",
+   "porQue": "En la corrida de gastos + cierre de caja, el builder parecio morir a mitad de tarea; git mostro que ya habia commiteado TODO el trabajo (f718df8) antes de que la sesion se cayera. La 'arqueologia' para reconstruirlo habria sido gasto puro. Quedo escrito como leccion de recuperacion de ola.",
+   "evidencia": "placita/KN-041 ('un builder reportado muerto por limite de sesion (infra-death) puede haber TERMINADO su trabajo antes de morir... REGLA: ante un builder muerto, revisar git status/git log ANTES de reconstruir o relanzar'; commit f718df8); metrics.json sesion session-2026-08-22-gastos-cierre-unidades ('el builder muerto por limite de sesion en realidad TERMINO todo antes de morir').",
+   "cuandoAplica": "Cualquier orquestacion con subagentes que commitean su propio trabajo, y cualquier sesion que se corta por limite.",
+   "cuandoNO": "Si el builder no commitea (trabaja solo en el arbol sucio o en memoria), git no te dira nada: ahi revisa los archivos modificados por fecha antes de concluir que no hizo nada.",
+   "temaTentativo": "orquestacion",
+   "transversal": 8,
+   "confianza": "alta",
+   "_proy": "Placita (Mercaplaza) es el POS + inventa"
+  },
+  {
+   "titulo": "Cuando un agente se muere, mira el disco antes de relanzarlo",
+   "respuestaCorta": "Ante un subagente muerto, o que devuelve un reporte vacío o truncado, no relances la misma tarea. Compara los archivos que decía tener a su cargo contra git status y el árbol real: casi siempre dejó trabajo bueno hecho. Termina el delta inline si es pequeño, o relanza un agente estrecho apuntado solo a lo que falta.",
+   "porQue": "KN-018 lo documenta con números: 3 de 10 spawns murieron a media faena en una sesión y los tres dejaron trabajo real recuperable, ninguno necesitó reinicio. El 2026-07-28 apareció un modo nuevo de muerte: un builder terminó su trabajo bien en disco pero devolvió un reporte vacío (\"leaving the build running in background\"); relanzarlo habría duplicado trabajo ya hecho. Sobre 16 sesiones medidas, 5 de 28 spawns muertos por infraestructura eran el fallo número uno del sistema.",
+   "evidencia": "infrapilot/KN-018 (fases nombradas: build:restyle-datos, build:restyle-flujo, build:ui-tokens) e infrapilot/DEC-008, mejora #1: wave.json, un manifiesto efímero de ola que se escribe ANTES de los spawns paralelos precisamente para recuperar olas muertas sin arqueología (gitignored, se borra al completar).",
+   "cuandoAplica": "Toda orquestación con subagentes paralelos de larga duración, y toda sesión que reanuda trabajo de una anterior que se cortó.",
+   "cuandoNO": "Si el agente pudo dejar el sistema a medias en un estado inconsistente — migraciones corriendo, escrituras a base de datos, publicaciones — ahí revertir es más seguro que \"terminar el delta\".",
+   "temaTentativo": "fiabilidad de agentes",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "InfraPilot AI es un SaaS de herramientas"
+  },
+  {
+   "titulo": "Un agente muerto por limite casi siempre ya escribio: audita el disco antes de re-spawnear",
+   "respuestaCorta": "Cuando un builder muere por limite diario, NO lo relances de una. Audita el disco primero (grep de senales concretas por archivo esperado) + tsc + build, y verifica tu mismo en navegador. Lo que muere suele ser la fase de auto-verificacion, no la entrega. Pero audita de verdad, archivo por archivo: hubo una corrida donde 4 de 4 habian entregado y otra donde 2 de 6 no escribieron ni una linea.",
+   "porQue": "En la ola del 29-jul los 4 builders muertos por limite (C1, C2, D1, D2) habian entregado el codigo en disco; re-spawnearlos habria duplicado trabajo y quemado mas limite del que quedaba. En la del 30-jul, 9 de 15 builders entregaron pese a 6 muertes, pero 'responsive' y 'G1 store hub' NO escribieron nada — y G1 bloqueaba 5 paginas, asi que asumir 'siempre entregan' habria dejado un hueco invisible.",
+   "evidencia": "estanco-contable/KN-009 (Knowledge Permanent, 2026-07-29). metrics.json session-2026-07-29-estanco: 4 entradas con infraDeath:true y nota '[INFRA_DEATH: limite diario, NO senal de capacidad] ... entregado en disco'. metrics.json session-2026-07-30-e2: 6 infraDeath, dos con nota explicita 'responsive NO entregado' y 'G1 store hub NO entregado - bloquea 5 paginas'. PEND-015 confirma el hueco: G1 'murio por limite sin escribir nada'.",
+   "cuandoAplica": "Orquestacion multiagente con limites de cuota; tambien tras timeouts, cortes de red o cancelaciones de un subagente.",
+   "cuandoNO": "No trates INFRA_DEATH como senal de capacidad del modelo: no escales de sonnet a opus por una muerte por cuota. Y si el builder muerto tocaba archivos compartidos (un store, un barrel de tipos), no des por buena la entrega parcial sin leer el diff: puede haber dejado el arbol a medio editar.",
+   "temaTentativo": "orquestacion multiagente",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "estanco-contable es el SaaS de facturaci"
+  },
+  {
+   "titulo": "Al reanudar tras un crash, mirá el tamaño en disco: 'started' no es 'aterrizó'",
+   "respuestaCorta": "Cuando una ola se corta por límite de sesión, no confíes en el reporte de qué builders arrancaron: listá los archivos con su tamaño. Un archivo de 0 bytes significa que el builder reportó que empezó y no persistió nada — tratalo como no hecho. Y en el brief del builder poné la orden explícita 'escribí el archivo PRIMERO, después refinalo', sobre todo si un intento anterior ya se murió sin dejar nada.",
+   "porQue": "En la sesión 7 de WRD la ola se cortó y el reporte daba varias piezas como iniciadas; en disco eran stubs de 0 bytes. Sin la verificación de tamaño, la ola siguiente se planifica sobre archivos que no existen. El prompter de la landing se murió dos veces sin persistir; solo al tercer intento, con el brief reforzado con 'escribí el archivo primero', el archivo quedó completo en disco.",
+   "evidencia": "state.json KN-005 (extendido en sesión 7) y PEND-006 ('datos.js/vistas/css hoy son stubs vacíos de 0 bytes'). Verificado ahora mismo: C:\\Users\\Kalel\\fable 5\\wrd\\sistema\\js\\datos.js, vista-pedidos.js, vista-catalogo.js, vista-contable.js, vista-socios.js, vista-datos.js y sistema/css/sistema.css están los 7 en 0 bytes, mientras app.js (16518 b) y acceso.js (6189 b) sí aterrizaron. metrics.json sesión 7 nota: '~5 infra-deaths por límite de sesión'.",
+   "cuandoAplica": "Después de cualquier corte de sesión, timeout o crash en una ola de subagentes; y como paso fijo antes de planificar la ola siguiente.",
+   "cuandoNO": "Un archivo de 0 bytes es legítimo si vos mismo creaste stubs a propósito para reservar rutas — anotalo, o vas a re-lanzar builders que ya terminaron.",
+   "temaTentativo": "recuperacion de olas",
+   "transversal": 9,
+   "confianza": "alta",
+   "_proy": "WRD es la tienda de dulcería del dueño: "
+  },
+  {
+   "titulo": "Siembra los datos en disco antes del QA largo: lo hace reanudable cuando la infraestructura se caiga",
+   "respuestaCorta": "En un QA de ocho pasos o más, crea primero los datos de prueba (una orden, un gasto, un producto) y déjalos escritos. Cuando el agente se muera a mitad, lo reanudas por mensaje sobre su propio transcript y la evidencia sembrada sigue ahí: no repites clics ni navegación. Y anota la muerte como evento de infraestructura, no como fallo del modelo — si no, terminas subiendo de modelo por una razón falsa.",
+   "porQue": "El verificador murió dos veces en una misma corrida (salida del proceso y corte transitorio de API) y en otra se cayeron cuatro builders a la vez por límite de sesión. En todos los casos la recuperación fue por SendMessage sobre el transcript persistente, y lo que hizo barata la recuperación fue que la orden L1-0001, el gasto G1-0001 y el producto sembrado seguían en disco.",
+   "evidencia": "villa-broaster/KN-011 punto B ('la SIEMBRA EN DISCO fue evidencia recuperable... en QA largo (8+ tests), sembrar fixture y limpiar al final hace el run REANUDABLE'; 'muerte de infra NO ES SEÑAL de capacidad modelo'); KN-014 punto 1 (4 builders muertos simultáneamente por límite de sesión, todos reanudados); metrics session-2026-08-20-sistema-completo ('El verifier sobrevivio 2 muertes de infra reanudado via SendMessage — no cuenta contra sonnet')",
+   "cuandoAplica": "QA extensos, migraciones, cualquier proceso automatizado largo, y al interpretar métricas de calibración de modelos.",
+   "cuandoNO": "No siembres en un entorno que sea el de producción o que comparta datos con él, y no olvides limpiar al final: los datos sembrados que sobreviven contaminan la siguiente medición y hacen cuadrar cifras que no son.",
+   "temaTentativo": "qa",
+   "transversal": 7,
+   "confianza": "alta",
+   "_proy": "villa-broaster es el cliente real más ma"
+  }
+ ]
+}
