@@ -1,11 +1,11 @@
 {
   "projectId": "infrapilot",
-  "sessionCount": 27,
+  "sessionCount": 29,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0.0033,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-07-28T20:00:00.000Z",
+  "lastUpdated": "2026-08-16T20:00:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-07-01-001",
@@ -1744,6 +1744,216 @@
         }
       },
       "notes": "AMM SESSION_CLOSE curation: archived ROAD-003/004/006 (all Done 2026-07-28, no active deps, sprint policy expire). Dedup verified across KN-014..031: all distinct patterns (React/agent-reliability/xlsx/formulas/quips/parallel-builders/incident/middleware/palette-drift/ownership-overlap). No duplicates found. ROAD-005 remains In-Progress (team accounts, blocked RSK-001). Brief.md regenerated: 6 disciplines (construcción+topografía+licitaciones+analítica+informática+eléctrica), PWA active, budgets with origen field, cross-module integrations live. Version 33→34. Active: 49→46 objects. Three user blockers noted: migración 002, migración 003 (RSK-001), GROQ_API_KEY."
+    },
+    {
+      "sessionId": "session-2026-08-16-001",
+      "runId": "orion-landing-prompter",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-16T00:00:00.000Z",
+      "completedAt": "2026-08-16T00:00:00.000Z",
+      "durationMs": 0,
+      "contextSaved": 0,
+      "compressionRatio": 1,
+      "knowledgePreservedPercent": 100,
+      "duplicateReduction": 0,
+      "estimatedTokenSavings": 0,
+      "knowledgeDensity": 0.0034,
+      "objectsCreated": 7,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "byTier": {
+        "working": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "project": {
+          "objectCount": 39,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "permanent": {
+          "objectCount": 17,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        }
+      },
+      "byType": {
+        "Decision": {
+          "count": 11,
+          "created": 1,
+          "merged": 0,
+          "archived": 0
+        },
+        "Knowledge": {
+          "count": 28,
+          "created": 3,
+          "merged": 0,
+          "archived": 0
+        },
+        "Constraint": {
+          "count": 1,
+          "created": 0,
+          "merged": 0,
+          "archived": 0
+        },
+        "Pending": {
+          "count": 10,
+          "created": 2,
+          "merged": 0,
+          "archived": 0
+        },
+        "Architecture": {
+          "count": 1,
+          "created": 0,
+          "merged": 0,
+          "archived": 0
+        },
+        "Roadmap": {
+          "count": 2,
+          "created": 0,
+          "merged": 0,
+          "archived": 0
+        },
+        "Risk": {
+          "count": 3,
+          "created": 1,
+          "merged": 0,
+          "archived": 0
+        }
+      },
+      "modelOutcomes": [
+        {
+          "phase": "build:infra",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 65831
+        },
+        {
+          "phase": "research:proyectos",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 658072
+        },
+        {
+          "phase": "build:visual:placita",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 118853
+        },
+        {
+          "phase": "build:visual:estanco-contable",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 66913
+        },
+        {
+          "phase": "build:visual:arroces",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 65412
+        },
+        {
+          "phase": "build:visual:villa-app",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 109156
+        },
+        {
+          "phase": "build:visual:pollo-landing",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 65945
+        },
+        {
+          "phase": "build:visual:wrd",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 83906
+        },
+        {
+          "phase": "build:visual:agencia",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 74959
+        },
+        {
+          "phase": "build:visual:infrapilot",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 79806
+        }
+      ],
+      "notes": "RUN landing-prompter DONE, 0 ciclos de fix, 18 spawns / 0 muertes (~1.39M tokens de subagentes). Agente nuevo landing-prompter (opus) creado y espejado (DEC-011); produce el PROMPT, no la landing. Memoria propia sembrada en ORION/memory/landings/ (POL-001, KN-001) — fuera de esta store, no tocada aquí. Vault regenerado (export-vault.mjs) con el agente en Sistema/Agents y 'landings' como proyecto navegable. 8 prompts de landing entregados (placita, estanco, arroces, villa-app, pollo, wrd, agencia, infrapilot); un 9no proyecto (broaster) investigado y correctamente excluido (redirige a /admin, sin cara pública). research:proyectos agrupa 9 spawns paralelos de investigación sin desglose individual medido (solo total real dado). Hallazgos nuevos: KN-032 (matiz de registro de DEC-010: la calma es argumento de producto cuando el comprador es el mismo usuario), KN-033 (relleno verosímil sobrevive a producción como afirmación falsa — patrón transversal en 8 proyectos), PEND-018 (testimonio inventado real y accionable en infrapilot-app/login), KN-034 (InfraPilot.v01/infrapilot-app vacío; código real vive en ORION/infrapilot-app), RSK-003 (memoria compartida se corrompe si agentes paralelos escriben aprendizaje sin serializar). PEND-019: veredicto del dueño sobre los 8 prompts sigue pendiente; landing-prompter aún no ha estrenado su mecanismo de aprendizaje. Active objects: 49→56 (>25, curación recomendada, ya lo estaba antes de este run)."
+    },
+    {
+      "sessionId": "session-2026-08-16-amm-curation",
+      "runId": "amm-curation-session-close-v36",
+      "triggeredBy": "SESSION_CLOSE",
+      "startedAt": "2026-08-16T20:00:00.000Z",
+      "completedAt": "2026-08-16T20:00:00.000Z",
+      "durationMs": 0,
+      "contextSaved": 0,
+      "compressionRatio": 1.08,
+      "knowledgePreservedPercent": 100,
+      "duplicateReduction": 0,
+      "estimatedTokenSavings": 0,
+      "knowledgeDensity": 0.0033,
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 4,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "byTier": {
+        "working": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "project": {
+          "objectCount": 20,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "permanent": {
+          "objectCount": 10,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        }
+      },
+      "byType": {
+        "Decision": {
+          "count": 11,
+          "archived": 0
+        },
+        "Knowledge": {
+          "count": 24,
+          "archived": 1
+        },
+        "Constraint": {
+          "count": 1,
+          "archived": 0
+        },
+        "Pending": {
+          "count": 10,
+          "archived": 3
+        },
+        "Architecture": {
+          "count": 1,
+          "archived": 0
+        },
+        "Roadmap": {
+          "count": 2,
+          "archived": 0
+        },
+        "Risk": {
+          "count": 3,
+          "archived": 0
+        }
+      },
+      "notes": "AMM SESSION_CLOSE curation v36: archived 4 items to reduce active object count from 56 to 52. PEND-009 (Ready, Sprint, Low impact, stray lockfile) → Expired. PEND-014 (Blocked, Sprint, Low impact, xlsx CDN vulnerability deferred) → Expired. PEND-017 (Ready, Sprint, Low impact, minor budgets API validation bug) → LowValue. KN-002 (Current, Project, Low impact, malformed path resolved in 1589f8b) → Deprecated. No duplicates found. Compacted PEND-002's reason from 327 chars to 50 words (Phase A done, Phase B local setup complete, pending Vercel vars + production verification). All objects strictly necessary for active work retained. Total id preservation: 74 before, 74 after (56 objects→52, 18 archives→22). Brief.md not regenerated (no blockers or major decisions changed)."
     }
   ]
 }
