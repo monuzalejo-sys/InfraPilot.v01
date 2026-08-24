@@ -201,10 +201,22 @@ function construirIndice() {
       corridas++
       if (s.outcome && s.outcome !== "DONE") fallos++
       for (const mo of s.modelOutcomes || []) {
-        const k = `${mo.phase}|${mo.model}`
-        const a = porClave.get(k) || { fase: mo.phase, modelo: mo.model, n: 0, tokens: 0, ok: 0, mal: 0 }
-        a.n++
+        /* UNA MUERTE DE SESION NO ES UN FALLO DEL MODELO. Si se cuentan juntas,
+           la calibracion miente: en estanco, build:page con sonnet se leia como
+           4 fallidas de 10 cuando en realidad son 0 de 6 — las otras 4 fueron
+           el limite de sesion matando spawns vivos. El ecosistema las marca de
+           dos formas incompatibles (campo `infraDeath` en estanco, sufijo
+           `:infra-death` en la fase en wrd), asi que aqui se reconocen las dos
+           y se apartan en su propia cuenta. */
+        const faseCruda = String(mo.phase || "")
+        const porSufijo = /:infra-death$/i.test(faseCruda)
+        const esInfra = mo.infraDeath === true || porSufijo
+        const fase = porSufijo ? faseCruda.replace(/:infra-death$/i, "") : faseCruda
+        const k = `${fase}|${mo.model}`
+        const a = porClave.get(k) || { fase, modelo: mo.model, n: 0, tokens: 0, ok: 0, mal: 0, infra: 0 }
         a.tokens += Number(mo.tokens) || 0
+        if (esInfra) { a.infra++; porClave.set(k, a); continue }
+        a.n++
         const v = String(mo.verdict || "").toLowerCase()
         if (v === "fail" || v === "escalate") a.mal++; else a.ok++
         porClave.set(k, a)
@@ -213,7 +225,7 @@ function construirIndice() {
     const filas = [...porClave.values()].sort((a, b) => b.n - a.n)
     if (!filas.length) continue
     const detalle = filas
-      .map((f) => `fase ${f.fase} con ${f.modelo}: ${f.n} corridas, ${f.ok} ok y ${f.mal} fallidas, ${Math.round(f.tokens / Math.max(f.n, 1) / 1000)}k tokens promedio (${Math.round(f.tokens / 1000)}k acumulados)`)
+      .map((f) => `fase ${f.fase} con ${f.modelo}: ${f.n} corridas juzgables, ${f.ok} ok y ${f.mal} fallidas${f.infra ? ` (+${f.infra} muertes de sesion, que NO cuentan como fallo del modelo)` : ""}, ${Math.round(f.tokens / Math.max(f.n + f.infra, 1) / 1000)}k tokens promedio (${Math.round(f.tokens / 1000)}k acumulados)`)
       .join("; ")
     const notas = sesiones.slice(-4).map((s) => s.notes).filter(Boolean).join(" \n ")
     docs.push({
