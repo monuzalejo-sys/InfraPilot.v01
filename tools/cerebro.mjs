@@ -35,6 +35,7 @@ const INDICE = join(CEREBRO, "indice.json")
 const RAICES = [
   join(ORION, "memory"),
   "C:\\Users\\Kalel\\prommter\\proyectos",
+  "C:\\Users\\Kalel\\prommter\\memory", // la agencia guarda su memoria en la raíz, no bajo proyectos\
   "C:\\Users\\Kalel\\fable 5",
 ]
 

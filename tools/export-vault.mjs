@@ -56,6 +56,10 @@ const memRoot = join(root, "memory")
    barren las raíces conocidas y entra todo lo que tenga state.json; los
    argumentos extra siguen funcionando para casos sueltos. */
 const RAICES_EXTERNAS = ["C:\\Users\\Kalel\\prommter\\proyectos", "C:\\Users\\Kalel\\fable 5"]
+/* La agencia guarda SU propia memoria en la raíz del repo (prommter\memory\),
+   no bajo proyectos\, así que el barrido de arriba no la ve. Se lista aparte
+   en vez de complicar el barrido: es un caso, no un patrón. */
+const MEMORIAS_SUELTAS = ["C:\\Users\\Kalel\\prommter\\memory\\prommter"]
 const descubiertas = []
 for (const raiz of RAICES_EXTERNAS) {
   if (!existsSync(raiz)) continue
@@ -68,7 +72,7 @@ for (const raiz of RAICES_EXTERNAS) {
     }
   }
 }
-const externas = [...new Set([...descubiertas, ...process.argv.slice(3)])].filter((p) => existsSync(join(p, "state.json")))
+const externas = [...new Set([...descubiertas, ...MEMORIAS_SUELTAS, ...process.argv.slice(3)])].filter((p) => existsSync(join(p, "state.json")))
 const internas = readdirSync(memRoot)
   .map((proj) => join(memRoot, proj))
   .filter((d) => statSync(d).isDirectory() && existsSync(join(d, "state.json")))
