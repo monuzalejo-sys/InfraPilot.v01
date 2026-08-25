@@ -1,8 +1,8 @@
 ---
 slug: donde-vive-el-dato
 titulo: "Dónde vive el dato: fuente única, derivados y duplicación deliberada"
-alias: [donde vive el dato, donde vive, donde se guarda, donde lo guardo, donde guardo, donde guardar, guardar, guardado, guardo, almacenar, almacenamiento, almacen, almacenes, store, stores, persistir, persistencia, persistido, persistidos, base de datos, bd, db, tabla, tablas, columna, campo, campos, fuente de verdad, fuente unica, fuente unica de verdad, unica fuente, una sola fuente, dos fuentes, dos fuentes de verdad, source of truth, single source of truth, verdad, la verdad, quien manda, dueno del dato, dueño del dato, hecho, hechos, derivado, derivados, derivar, se calcula, se guarda o se calcula, calculado, saldo, saldos, stock, el stock, stok, stoc, dnde, dnde guardo, inventario, existencias, cuantas quedan, cuanto queda, total, totales, total guardado, contador, contadores, kardex, movimiento, movimientos, lote, lotes, dato, datos, el mismo dato, dato repetido, repetido, repetir, repetida, duplicar, duplicado, duplicacion, duplicar datos, duplicar el dato, dos tablas, en dos tablas, dos sitios, en dos sitios, dos lados, en dos lados, guardarlo dos veces, dos veces, copia, copias, copiar, replica, replicar, cache, cachear, cacheado, denormalizar, desnormalizar, redundancia, redundante, offline, sin internet, sin senal, sin señal, offline first, outbox, cola, cola de subida, cola local, sincronizar, sincronizacion, sync, merge, conflicto, conflictos, pisar, se pisa, se pisan, me pisa, pisa el catalogo, la landing pisa, se sobreescriben, se borran solos, sobreescribir, sobrescribir, catalogo, catalogos, catalogo publicado, producto, productos, precio, precios, localstorage, local storage, navegador, supabase, backend, backends, monto backend, monto el backend, monto backend de una, backend de una, arranco con localstorage, arranco, arrancar, arranque, empiezo con localstorage, empiezo, empezar, necesito backend, hace falta backend, cuando monto el backend, vale la pena backend, api, nube, servidor, seed, semilla, sembrar, datos demo, demo, cuenta nueva, empresa nueva, onboarding, registro, alta, no aparece, no sale, no hay nada, listas vacias, lista vacia, aparece vacio, sale vacio, se borro, se perdio, se perdieron los datos, recargar, f5, version de datos, VERSION_DATOS, migracion, migraciones, migrar, esquema, contrato, tipos, types, helpers, capa de datos, repositorio, interfaz, almacen tras interfaz, multi sede, multisede, sucursal, sucursales, sucursalId, localId, empresaId, multi tenant, multitenant, aislamiento, tenant, escritor, escritores, un solo escritor, quien escribe, quien lee, lectora, solo lectura, read only, landing, panel, back office, backoffice, kiosko, kiosco, mostrador, concurrencia, carrera, condicion de carrera, lock, bloqueo, for update, trigger, idempotencia, idempotente, sobreventa, sobrevender]
-preguntas: ["donde guardo el stock", "puedo tener el total guardado en la tabla", "cuantas fuentes de verdad debe haber", "cuando esta bien duplicar datos", "¿el stock se guarda o se calcula?", "cree la empresa y me dice que no hay locales, donde esta el bug", "¿por qué la app dice que no hay nada si acabo de crearlo?", "puedo tener una copia local para que funcione sin internet", "arranco con localStorage o monto backend de una"]
+alias: [donde vive el dato, donde vive, donde se guarda, donde lo guardo, donde guardo, donde guardar, guardar, guardado, guardo, almacenar, almacenamiento, almacen, almacenes, store, stores, persistir, persistencia, persistido, persistidos, base de datos, bd, db, tabla, tablas, columna, campo, campos, fuente de verdad, fuente unica, fuente unica de verdad, unica fuente, una sola fuente, dos fuentes, dos fuentes de verdad, source of truth, single source of truth, verdad, la verdad, quien manda, dueno del dato, dueño del dato, hecho, hechos, derivado, derivados, derivar, se calcula, se guarda o se calcula, calculado, saldo, saldos, stock, el stock, stok, stoc, dnde, dnde guardo, inventario, existencias, cuantas quedan, cuanto queda, total, totales, total guardado, contador, contadores, kardex, movimiento, movimientos, lote, lotes, dato, datos, el mismo dato, dato repetido, repetido, repetir, repetida, duplicar, duplicado, duplicacion, duplicar datos, duplicar el dato, dos tablas, en dos tablas, dos sitios, en dos sitios, dos lados, en dos lados, guardarlo dos veces, dos veces, copia, copias, copiar, replica, replicar, cache, cachear, cacheado, denormalizar, desnormalizar, redundancia, redundante, offline, sin internet, sin senal, sin señal, offline first, outbox, cola, cola de subida, cola local, sincronizar, sincronizacion, sync, merge, conflicto, conflictos, pisar, se pisa, se pisan, me pisa, pisa el catalogo, la landing pisa, se sobreescriben, se borran solos, sobreescribir, sobrescribir, catalogo, catalogos, catalogo publicado, producto, productos, precio, precios, localstorage, local storage, navegador, supabase, backend, backends, monto backend, monto el backend, monto backend de una, backend de una, arranco con localstorage, arranco, arrancar, arranque, empiezo con localstorage, empiezo, empezar, necesito backend, hace falta backend, cuando monto el backend, vale la pena backend, api, nube, servidor, seed, semilla, sembrar, datos demo, demo, cuenta nueva, empresa nueva, onboarding, registro, alta, no aparece, no sale, no hay nada, listas vacias, lista vacia, aparece vacio, sale vacio, se borro, se perdio, se perdieron los datos, recargar, f5, version de datos, VERSION_DATOS, migracion, migraciones, migrar, esquema, contrato, tipos, types, helpers, capa de datos, repositorio, interfaz, almacen tras interfaz, multi sede, multisede, sucursal, sucursales, sucursalId, localId, empresaId, multi tenant, multitenant, aislamiento, tenant, escritor, escritores, un solo escritor, quien escribe, quien lee, lectora, solo lectura, read only, landing, panel, back office, backoffice, kiosko, kiosco, mostrador, concurrencia, carrera, condicion de carrera, lock, bloqueo, for update, trigger, idempotencia, idempotente, sobreventa, sobrevender, choque de codigo, choque de identificador, codigo unico, codigo repetido, unique constraint, restriccion unica, SQLSTATE, 23505, unique_violation, rechazo silencioso, lote rechazado, falla el lote entero, fila por fila, reintento por fila, degradar a fila, codigo libre, renombrar producto, renombrado, converger, convergencia, cola gira para siempre, sube el valor viejo, rearma la respuesta, rearmar la respuesta, contrato de respuesta, campos nuevos se pierden, dos equipos offline mismo codigo]
+preguntas: ["donde guardo el stock", "puedo tener el total guardado en la tabla", "cuantas fuentes de verdad debe haber", "cuando esta bien duplicar datos", "¿el stock se guarda o se calcula?", "cree la empresa y me dice que no hay locales, donde esta el bug", "¿por qué la app dice que no hay nada si acabo de crearlo?", "puedo tener una copia local para que funcione sin internet", "arranco con localStorage o monto backend de una", "dos cajas offline le dieron el mismo codigo a productos distintos, como lo resuelvo", "una fila mala tumba todo el lote de sincronizacion, que hago", "como detecto un choque de unique en postgres sin depender del texto del error", "el servidor cambio un dato al aceptarlo, como evito que el cliente lo vuelva a subir viejo"]
 proyectos: [placita, estanco-contable, wrd, villa-broaster, pollo-landing, arroces, _permanent]
 confianza: alta
 actualizado: 2026-08-24
@@ -73,6 +73,38 @@ RLS 500"*; el arreglo bloquea el flush hasta que `/api/arranque` confirme la
 empresa (`placita/KN-018`, commit dc9d079). La misma duplicación deliberada que
 salva la venta sin internet es la que sube datos al negocio equivocado si nadie
 le pregunta primero de quién es este equipo.
+
+**Y lo pagó, días completos, un identificador de conveniencia tratado como si
+fuera una identidad.** `productos` exige `unique (empresa_id, codigo)` y cada
+caja genera sus consecutivos **sin red** (`lib/dominio/codigos.ts`): dos cajas
+offline le dan "P01" a dos papas distintas y ninguna se entera hasta que ambas
+filas se encuentran en la nube. `/api/sincronizar` hacía **un upsert por
+tabla**, así que una sola fila chocada tumbaba las 67 del envío; el cliente
+ponía la tabla en cuarentena y la reintentaba para siempre. Medido en
+producción el 2026-08-24: `GET /api/operacion` devolvía 5 productos, **los 5
+eliminados, 0 vivos** — los borrados subían (misma fila, mismo código, no
+choca con nadie) y las altas no, durante días (`placita/DEC-025`,
+`placita/KN-043`, commits `b8dbccc`/`52b4377`). El arreglo tiene cuatro capas y
+la más barata de todas es la actitud: **un código para teclear rápido no es
+una identidad — renombrarlo es preferible a que el hecho (el producto) no
+exista.** El choque se reconoce por el **SQLSTATE `23505` + el nombre exacto
+de la restricción**, nunca por el texto del mensaje (cambia entre versiones de
+PostgREST, y confundir `productos_codigo_unico` con
+`productos_codigo_barras_unico` sería inventarse un código de barras que viene
+impreso en la bolsa) — `esChoqueUnico` en
+`lib/servidor/reintento-filas.ts`. Y la orquestación completa (67 filas, una
+choca, entran las 67 con una renombrada) vive fuera del route handler
+precisamente porque `npm test` no cubre `app/api/**`: sin eso, el arreglo que
+costó días se apoyaba solo en revisión de código (`placita/DEC-025`).
+
+**Y lo pagó un cliente que rearmaba a mano la respuesta del servidor.**
+Al ampliar el contrato de `/api/sincronizar` con dos campos nuevos
+(`rechazadasFilas`, `renombradas`), `lib/nube.ts` reconstruía el objeto de
+resultado con solo los dos campos viejos y tiraba los nuevos en el borde: las
+otras tres capas del arreglo habrían quedado **inertes y en silencio**. Lo
+encontró un builder saliéndose de su tarea para seguir el dato hasta quien lo
+consume — el borde que "solo transporta" es exactamente donde se pierde un
+contrato ampliado (`placita/KN-051`, commits `b8dbccc`/`52b4377`).
 
 ## Cómo se aplica
 
@@ -172,6 +204,18 @@ le pregunta primero de quién es este equipo.
       la venta recién cobrada de conflictos de merge"* (`placita/KN-038`,
       verificado en vivo 2026-08-21). Y no dejes volar la cola sin confirmar
       antes contra qué empresa está escribiendo (`placita/KN-018`).
+    - **Si el servidor ACEPTA una fila pero la CAMBIA, esa fila tiene que
+      SALIR de la cola y el cambio adoptarse en local SIN volver a
+      encolarlo.** Si se queda en la cola, el cliente re-sube el valor viejo,
+      el servidor lo vuelve a corregir y el sistema gira para siempre. En la
+      placita esto se resolvió con dos piezas que solo funcionan juntas:
+      `restanteTrasEnviar` (`lib/outbox.ts:380`) a las filas `renombradas` **ni
+      siquiera se les pasa** — no compiten por seguir en cola — y
+      `adoptarCodigosRenombrados` (`components/store.tsx:1916`) entra por
+      `reemplazar` (`:1592`, que **no** encola) y no por `aplicar` (que sí
+      re-subiría). Es la primera vez que este corpus resuelve un conflicto
+      cliente-servidor de verdad, aunque sea de un solo tipo —renombrado
+      autoritativo del servidor, no un merge de campos— (`placita/KN-051`).
 11. **Si la misma regla existe en los dos lados, congela el texto y hazlo
     idéntico.** En WRD el descuento de stock existe dos veces —en el store del
     navegador para la demo y en el trigger SQL para el modo real— con **las
@@ -180,7 +224,14 @@ le pregunta primero de quién es este equipo.
     `wrd/setup/schema.sql:297-300`), y el core destapa el mensaje del trigger tal
     cual (`wrd/DEC-010`). Así el QA que hiciste en demo dice algo del
     comportamiento real.
-12. **Antes del backend en la nube, monta un canal server-side de archivo.**
+12. **Al ampliar un contrato de red, sigue el dato hasta el consumidor final —
+    no confíes en que "el borde solo transporta".** Un cliente que rearma a
+    mano la respuesta del servidor (en vez de reenviar el objeto tal cual)
+    puede tirar campos nuevos en silencio y dejar inerte el resto del arreglo
+    del lado servidor (`placita/KN-051`, `lib/nube.ts`). Cuando agregues un
+    campo a una respuesta, busca **todos** los sitios que la desempaquetan a
+    mano y confirma que lo reenvían.
+13. **Antes del backend en la nube, monta un canal server-side de archivo.**
     `http.createServer` con GET/POST/DELETE `/api/<recurso>` sobre un JSON en
     `data/`, y `data/` en `.gitignore` el mismo commit —*"data de clientes reales
     nunca se commitea"* (`pollo-landing/.gitignore:1-2`). Cero dependencias,
@@ -306,7 +357,16 @@ le pregunta primero de quién es este equipo.
   (2026-08-24) — `sinPrecio` derivado de la compra en cero en vez de una
   bandera nueva (`lib/dominio/precios.ts:97`,
   `components/store.tsx:856`). `RSK-004` (Open) —
-  outbox de pruebas en el navegador de desarrollo.
+  outbox de pruebas en el navegador de desarrollo. `DEC-025` y `KN-043`
+  (commits `b8dbccc`/`52b4377`, 2026-08-24) — choque de `productos_codigo_unico`
+  entre cajas offline, medido en producción (`GET /api/operacion`: 5
+  productos, 5 eliminados, 0 vivos); degradación a fila-por-fila +
+  auto-resolución con código libre. `KN-051` — las dos trampas encontradas al
+  ampliar el contrato de `/api/sincronizar`: cliente que rearma la respuesta a
+  mano (`lib/nube.ts`) y convergencia de outbox para filas renombradas.
+  `KN-046` — familia del mismo bug evitada antes de producción: un bucle que
+  genera consecutivos leyendo `datosRef.current` reparte el MISMO código a
+  todo un lote porque la ref no se actualiza entre iteraciones síncronas.
 - `wrd/DEC-009` — la landing dejó de sembrar y quedó de solo lectura; catálogo,
   precio y stock se editan únicamente desde `wrd/sistema/`. `DEC-008` —
   separación landing/sistema, sin ningún link entre ellas; *"Restaurar backup =
@@ -341,6 +401,16 @@ le pregunta primero de quién es este equipo.
     (`delta`/`calcularDelta`, 12 colecciones).
   - `prommter\proyectos\placita\app\api\sincronizar\route.ts:84-92` (lista blanca
     y las tres tablas que quedan fuera a propósito).
+  - `prommter\proyectos\placita\lib\servidor\reintento-filas.ts` (orquestación
+    fila-por-fila, `esChoqueUnico` por SQLSTATE `23505` + nombre de
+    restricción, cabecera con el bug de producción documentado) y
+    `lib\servidor\codigo-libre.ts` (reparto del siguiente código libre,
+    acumulando los ya repartidos dentro del mismo envío).
+  - `prommter\proyectos\placita\lib\nube.ts` (el rearmado a mano que tiraba
+    campos nuevos) y `lib\outbox.ts:380` (`restanteTrasEnviar`, no recibe
+    `renombradas`).
+  - `prommter\proyectos\placita\components\store.tsx:1592`
+    (`reemplazar`, no encola), `:1916` (`adoptarCodigosRenombrados`).
   - `ORION\estancorepo\lib\auth.ts:46` (`CLAVE_ALMACEN`), `:305-321`
     (`listarLocalesEmpresa`, el bug documentado dentro del arreglo y *"al migrar
     a Supabase… la firma no cambia"*), `:323-332` (mismo patrón en
@@ -374,9 +444,13 @@ le pregunta primero de quién es este equipo.
   Ready)— y el outbox de la placita se apoya en `upsert` por `id` en vez de en
   claves de idempotencia (`lib/outbox.ts:35-40`). No hay ninguna medición de un
   reintento duplicando un documento.
-- **Nunca se ha resuelto un merge de verdad.** El corpus tiene un solo mecanismo:
-  bloquear la bajada mientras haya cola (`placita/KN-038`). No hay resolución por
-  campo, ni CRDT, ni prueba de dos cajas editando la MISMA venta a la vez.
+- **Sigue sin resolverse un merge de campos.** Lo que sí se resolvió (2026-08-24,
+  `placita/KN-051`) es un conflicto de **identidad** —dos cajas offline generan el
+  mismo código de producto— con un patrón de renombrado autoritativo del
+  servidor + adopción sin reencolar (ver punto 10). No hay resolución por
+  campo, ni CRDT, ni prueba de dos cajas editando la MISMA venta a la vez; el
+  único otro mecanismo del corpus sigue siendo bloquear la bajada mientras haya
+  cola (`placita/KN-038`).
 - **El almacén Supabase de villa-broaster no existe.** La interfaz está escrita y
   la implementación de disco funciona; la segunda implementación —la que probaría
   que la costura sirve— sigue pendiente (`villa-broaster/DEC-003`, `KN-015`).

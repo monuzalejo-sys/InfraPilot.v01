@@ -1,8 +1,8 @@
 ---
 slug: olas-de-agentes
 titulo: Repartir trabajo entre agentes en paralelo sin colisiones ni pérdidas
-alias: [ola, olas, ola de agentes, olas de agentes, agentes en paralelo, varios agentes, repartir trabajo, dividir el trabajo, dividir la tarea, partir la tarea, parto la tarea, en cuantos pedazos, pedazos, trozos, trocear, partir en pedazos, granularidad, un builder por paso, por pasos, tamano del encargo, equipo de agentes, paralelo, paralelizar, paralelismo, builder, builders, subagente, subagentes, spawn, spawns, wave, wave.json, manifiesto de ola, colision, colisiones, conflicto de archivos, pisarse, se pisan, muerte de agente, agente muerto, se murio, se murieron, se cayo, se cayeron, limite de sesion, infra-death, infra death, reanudar, reanudacion, recuperar ola, recuperacion de ola, respawn, relanzar, orquestador, orquestrador, contratos, ownership, propiedad de archivos, SendMessage, trabajo perdido, se me murio un agente, se me murio un builder, se me murio el agente, murio a mitad, checklist de rescate, rescate de ola, protocolo de muerte, que hago si se muere un agente, audita el disco, auditar el disco, antes de relanzar, mirar el disco, stub de 0 bytes, 0 bytes, archivo vacio, archivo en cero, tamano en disco, reporte vacio, reporte truncado, no es fallo del modelo, no lo cuentes como fallo, senal de capacidad, infraDeath, INFRA_DEATH, sufijo de fase, arqueologia, trabajo huerfano, delta, respawn estrecho, siembra en disco, sembrar datos, fixture sembrado, qa reanudable, resumeFromRunId]
-preguntas: ["¿por qué se me murieron los agentes a mitad de la ola?", "¿cómo reparto el trabajo entre varios agentes?", "¿cómo lanzo varios builders sin que se pisen los archivos?", "¿qué hago si un builder se cayó a mitad del trabajo?", "¿cómo recupero una ola que murió?", "¿cuántos agentes puedo lanzar a la vez?", "se me murió un agente, ¿qué hago?", "¿qué reviso antes de relanzar un builder muerto?", "el agente dijo que arrancó pero no veo nada en disco, ¿entregó o no?", "¿cómo anoto una muerte por límite de sesión sin que cuente como fallo del modelo?"]
+alias: [ola, olas, ola de agentes, olas de agentes, agentes en paralelo, varios agentes, repartir trabajo, dividir el trabajo, dividir la tarea, partir la tarea, parto la tarea, en cuantos pedazos, pedazos, trozos, trocear, partir en pedazos, granularidad, un builder por paso, por pasos, tamano del encargo, equipo de agentes, paralelo, paralelizar, paralelismo, builder, builders, subagente, subagentes, spawn, spawns, wave, wave.json, manifiesto de ola, colision, colisiones, conflicto de archivos, pisarse, se pisan, muerte de agente, agente muerto, se murio, se murieron, se cayo, se cayeron, limite de sesion, infra-death, infra death, reanudar, reanudacion, recuperar ola, recuperacion de ola, respawn, relanzar, orquestador, orquestrador, contratos, ownership, propiedad de archivos, SendMessage, trabajo perdido, se me murio un agente, se me murio un builder, se me murio el agente, murio a mitad, checklist de rescate, rescate de ola, protocolo de muerte, que hago si se muere un agente, audita el disco, auditar el disco, antes de relanzar, mirar el disco, stub de 0 bytes, 0 bytes, archivo vacio, archivo en cero, tamano en disco, reporte vacio, reporte truncado, no es fallo del modelo, no lo cuentes como fallo, senal de capacidad, infraDeath, INFRA_DEATH, sufijo de fase, arqueologia, trabajo huerfano, delta, respawn estrecho, siembra en disco, sembrar datos, fixture sembrado, qa reanudable, resumeFromRunId, HEAD, mover HEAD, checkout a mitad de sesion, cambio de rama, cambia de rama, rama se movio, rama distinta a mitad, builder en rama vieja, construyendo sobre rama vieja, git checkout, git switch, reflog, conteo de tests no cuadra, numero de tests no coincide, cifra medida que no cuadra, metrica no coincide, discrepancia de tests, señal no ruido, no es ruido]
+preguntas: ["¿por qué se me murieron los agentes a mitad de la ola?", "¿cómo reparto el trabajo entre varios agentes?", "¿cómo lanzo varios builders sin que se pisen los archivos?", "¿qué hago si un builder se cayó a mitad del trabajo?", "¿cómo recupero una ola que murió?", "¿cuántos agentes puedo lanzar a la vez?", "se me murió un agente, ¿qué hago?", "¿qué reviso antes de relanzar un builder muerto?", "el agente dijo que arrancó pero no veo nada en disco, ¿entregó o no?", "¿cómo anoto una muerte por límite de sesión sin que cuente como fallo del modelo?", "el conteo de tests no coincide con lo esperado, ¿lo ignoro?", "¿puede un subagente cambiar la rama del repo?", "¿por qué dos builders en paralelo construyeron sobre código viejo?"]
 proyectos: [infrapilot, estanco-contable, villa-broaster, wrd, placita, orama, landings]
 confianza: alta
 actualizado: 2026-08-24
@@ -64,6 +64,19 @@ al descomentar, detectado en verificación (`infrapilot/KN-026`). Villa lo zanj�
 explícitamente: **pre-materializar el recurso compartido en el orquestador es más
 barato que comentar/descomentar imports** (`villa-broaster/KN-006`).
 
+**Hay un recurso compartido que la propiedad disjunta de archivos NO cubre: la rama
+del repo.** En PLACITA (sesión 2026-08-24) la suite dio **626 tests cuando debían
+ser 644**; perseguir esos 18 destapó, por el reflog, que algo había movido HEAD
+entre `master` y `main` repetidamente **a mitad de la ola**, con dos builders
+construyendo en paralelo sin saberlo sobre la rama vieja (`placita/KN-052`). Darlo
+por bueno habría dejado todo el trabajo posterior de esos dos builders montado sobre
+código desactualizado. La causa de fondo por la que había dos ramas divergentes en
+primer lugar quedó como hipótesis sin confirmar del todo, pero la cadena de checkouts
+sí quedó registrada en el reflog (`placita/RSK-005`). **Ojo con el corolario de
+calibración**: los dos builders que trabajaron sobre la rama equivocada no
+representan un fallo de capacidad del modelo — fue el entorno moviéndoles el suelo
+por debajo, igual que un infra-death (`placita/KN-052`).
+
 ## Cómo se aplica
 
 **Antes de lanzar (esto es la mitad del trabajo):**
@@ -94,6 +107,13 @@ barato que comentar/descomentar imports** (`villa-broaster/KN-006`).
 7. **Plan de ≥3 pasos: pon checkpoints.** Verifica el paso del que dependen los demás
    *antes* de lanzar los dependientes; fallar rápido en el paso 1 es mucho más barato
    que descubrirlo tras el paso 5 (`ORION/runtime/skills/orion.SKILL.md:208-212`).
+7b. **La rama es un recurso compartido, no de un solo builder: prohíbe explícitamente
+   que un subagente mueva HEAD** (`git checkout`, `git switch`, `git stash` que cambie
+   de rama) — un `checkout` de cualquiera de ellos mueve el suelo bajo TODOS los
+   demás sin que se enteren (`placita/KN-052`, `placita/RSK-005`). Y antes de confiar en
+   **cualquier** medición agregada durante la ola (conteo de tests, de archivos, de
+   rutas), confirma en qué rama estás parado: una cifra que no coincide con lo
+   esperado es señal de que el terreno cambió, nunca ruido a ignorar.
 
 **Cuando uno cae (protocolo de recuperación, en este orden):** resumen; el
 procedimiento completo, con el comando de cada paso, está abajo en
@@ -369,6 +389,11 @@ opcionales ni intercambiables.
 - `infrapilot/KN-026` — contratos cruzados con TODO comentado: funciona, cuesta un micro-fix.
 - `infrapilot/KN-031` — el solape de propiedad ENTRE olas no lo cubre nada de lo anterior.
 - `infrapilot/RSK-003` — 8 agentes paralelos sobre el mismo `state.json` lo corrompen.
+- `placita/KN-052` — conteo de tests 626 vs 644 esperados; la discrepancia de 18 fue
+  la única pista de que HEAD se había movido entre `master`/`main` a mitad de la ola;
+  nota de calibración: no penalizar a los builders, fue el entorno.
+- `placita/RSK-005` (Open) — el repo tiene dos ramas y GitHub las tenía divergidas;
+  causa exacta de por qué algo movió HEAD a mitad de sesión, sin confirmar del todo.
 
 **El protocolo escrito (archivo:línea)**
 - `ORION/runtime/skills/orion.SKILL.md:188-196` — un builder por paso; el brief declara los archivos que posee.
