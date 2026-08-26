@@ -72,6 +72,41 @@
           "verdict": "fail",
           "tokens": 41923,
           "notes": "QA de ORION v4, 12 condiciones: 11 PASS y 1 FAIL real (deriva de orion-arquitecto tras editarlo despues del ultimo sync). Arreglado con un comando. El verificador hizo bien su trabajo."
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 238040,
+          "notes": "catalogo/accesibilidad.json - 37 arquetipos (238.040)"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 223023,
+          "notes": "catalogo/rendimiento.json - 54 arquetipos, todas las aceptaciones con numero"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 156671,
+          "notes": "catalogo/producto.json - 57 arquetipos, cero cifras de precio o de ley inventadas"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 229241,
+          "notes": "catalogo/calidad.json - 48 arquetipos"
+        },
+        {
+          "phase": "analysis",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 70629,
+          "notes": "orion-traductor sobre el mensaje dictado real: 8 entregables, 5 correcciones, 3 ejemplos separados, 3 tensiones. Una de las tensiones destapo un defecto real (KN-012)."
         }
       ]
     }

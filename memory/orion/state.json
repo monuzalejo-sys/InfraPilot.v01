@@ -1,7 +1,7 @@
 {
   "projectId": "orion",
-  "snapshotDate": "2026-08-26T08:00:00.000Z",
-  "version": 4,
+  "snapshotDate": "2026-08-26T08:40:00.000Z",
+  "version": 5,
   "lastAmmRun": "2026-08-26T06:30:00.000Z",
   "objects": [
     {
@@ -341,6 +341,39 @@
       "fact": "Un plan completo NO es un documento legible: 176 tareas son 823 lineas de PLAN.md, y 432 tareas son 1.820. Por eso `plan.mjs tanda` escribe otra cosa: el resumen del proyecto arriba y solo las N tareas siguientes detalladas abajo, cada una con su porque, sus pasos, sus archivos, sus comprobaciones y como lanzarla. Ese es el formato que se lee de verdad; PLAN.md es el archivo.",
       "context": "Peticion literal del dueno 2026-08-26: 'un plan de que vamos a hacer resumidamente y el numero de tareas abajo detalladamente'. El registro sirve a la maquina, la tanda a la persona, y ambos salen del mismo plan.json.",
       "source": "sesion 2026-08-26, tools/plan.mjs comando tanda"
+    },
+    {
+      "id": "KN-012",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-004",
+        "DEC-005"
+      ],
+      "fact": "LA TRAMPA DEL ESPEJO: consultar una vista generada no ahorra ninguna lectura, porque devuelve disfrazado de hallazgo lo que el indice ya cubria. Detectado 2026-08-26 y arreglado: el barrido de notas a mano de `cerebro.mjs ruta` excluia Cerebro/, Proyectos/ y Sistema/, pero no las carpetas que escribe baul.mjs -Planes/, Sesiones/, Encargos/-, asi que devolvia el plan de villa-broaster como si fuera una nota escrita por una persona. Comprobado en los dos sentidos tras el arreglo: ya no devuelve la vista, y sigue encontrando una nota a mano puesta en la raiz del baul.",
+      "context": "Lo encontro orion-traductor leyendo el mensaje del dueno, en su bloque de TENSIONES: 'pedir que el bibliotecario primero consulte en Obsidian solo ahorra si el baul deja de ser espejo'. Es la prueba de que la seccion de tensiones del traductor no es adorno: senalo un defecto real del sistema antes de que nadie lo tocara. Regla general: cada carpeta que una herramienta GENERE tiene que entrar a la lista de exclusion del barrido, o el barrido deja de valer.",
+      "source": "sesion 2026-08-26, orion-traductor sobre el mensaje dictado; arreglo en tools/cerebro.mjs",
+      "created": "2026-08-26T08:40:00.000Z",
+      "updated": "2026-08-26T08:40:00.000Z"
+    },
+    {
+      "id": "KN-013",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "El ENCARGO que produce orion-traductor sobre un mensaje dictado real llego a las mismas 8 entregas y a las mismas 7 asunciones por defecto que habia tomado el orquestador leyendo el mismo mensaje -sin verlas-, y ademas separo tres ejemplos que sonaban a requisito: 'orama' (proyecto inmobiliario), 'diez mejoras' y 'mil tareas para seguridad, mil para backend, mil para frontend'. Su recuento fue explicito: 30 items en el inventario de primera pasada, 8 entregables, ninguno inventado y ninguno perdido.",
+      "context": "Es la validacion del agente: dos lecturas independientes del mismo dictado convergen. Y el valor unico que aporta es lo que un lector apurado pierde -las correcciones a mitad de frase y los ejemplos-, que es exactamente el modo de fallo que motivo escribirlo.",
+      "source": "sesion 2026-08-26, memory/orion/encargos/2026-08-26-orion-v4.md",
+      "created": "2026-08-26T08:40:00.000Z",
+      "updated": "2026-08-26T08:40:00.000Z"
     }
   ],
   "archives": []
