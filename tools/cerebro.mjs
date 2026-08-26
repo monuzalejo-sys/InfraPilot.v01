@@ -680,10 +680,12 @@ if (cmd === "indexar") {
      justamente lo que ninguna otra herramienta encuentra. */
   const propias = []
   const GENERADO = /^(id:|# ORION|> ?GENERADO|Generado de state\.json)/m
-  /* `export-vault.mjs` escribe estas tres carpetas enteras: son copias de lo
-     que el índice ya cubre. Barrerlas devolvería el mismo tema dos veces y
-     ahogaría lo único que este barrido aporta — lo que escribió una persona. */
-  const GENERADAS = new Set(["Cerebro", "Proyectos", "Sistema"])
+  /* `export-vault.mjs` y `baul.mjs` escriben estas carpetas ENTERAS: son vistas
+     de lo que ya vive en el repo. Barrerlas devolvería el mismo contenido dos
+     veces disfrazado de hallazgo, y ahogaría lo único que este barrido aporta:
+     lo que escribió una persona a mano y no está en ninguna memoria.
+     Es la trampa del espejo — consultar un espejo no ahorra ninguna lectura. */
+  const GENERADAS = new Set(["Cerebro", "Proyectos", "Sistema", "Planes", "Sesiones", "Encargos"])
   const barrer = (dir, prof = 0) => {
     if (prof > 4 || !existsSync(dir)) return
     let entradas = []
