@@ -289,15 +289,18 @@ function empujar() {
       : "_Sin historial de sesiones todavía._", "",
     ...sesiones.sort((a, b) => b.tokens - a.tokens).map((s) => `- **${s.proj}** — ${s.sesiones} sesiones, ${(s.tokens / 1e6).toFixed(2)} M tokens → \`Sesiones/${s.proj}/\``),
     "",
-    encargos.length ? "## Encargos\n" : "",
-    ...encargos.map((e) => `- **${e.proj}** — ${e.encargos} encargos → \`Encargos/${e.proj}/\``),
-    encargos.length ? "" : "",
+    /* `null` marca «esta línea no va»; el filtro de abajo quita SOLO los null.
+       Filtrar las cadenas vacías se llevaba por delante las líneas en blanco
+       intencionadas, y sin ellas Markdown deja de ver las listas como listas. */
+    ...(encargos.length
+      ? ["## Encargos", "", ...encargos.map((e) => `- **${e.proj}** — ${e.encargos} encargos → \`Encargos/${e.proj}/\``), ""]
+      : []),
     "## Sistema y memorias", "",
     "- [[ORION_STANDARD]] — el estándar · `Sistema/RFC/` — los RFC normativos",
     "- `Sistema/Agents/` y `Sistema/Skills/` — el runtime tal como corre",
     "- `Proyectos/<id>/_INDEX.md` — la memoria de cada proyecto, objeto por objeto", "",
     "Abre la vista de grafo: desde un tema se ve qué tareas de qué proyectos dependen de él.", "",
-  ].filter((x) => x !== "")
+  ].filter((x) => x !== null)
   writeFileSync(join(DESTINO, "_INICIO.md"), L.join("\n") + "\n")
 
   console.log(`\nbóveda → ${DESTINO}`)
