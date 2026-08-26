@@ -640,7 +640,11 @@ function cmdValidar() {
     if (t.estado === "bloqueado" && !t.bloqueadoPor) errores.push(`${donde}: bloqueada sin decir por qué`)
     if (plan.modo === "evolucion" && !t.aceptacion?.some((a) => /regres|sigue|no rompe|intacto/i.test(a.check ?? "")))
       errores.push(`${donde}: modo evolución sin chequeo de regresión (N8-R2)`)
-    if (JSON.stringify(t).includes("{{")) errores.push(`${donde}: quedó un placeholder {{…}} sin sustituir (N8-R9)`)
+    /* Solo la sintaxis REAL de marcador. Buscar `{{` a secas daba falso
+       positivo con `style={{…}}` de JSX, que es código legítimo dentro de un
+       `porQue` — y un validador que grita en falso se deja de mirar. */
+    const sinSustituir = [...new Set(JSON.stringify(t).match(/\{\{(entidad|ruta|superficie|rol)\}\}/g) ?? [])]
+    if (sinSustituir.length) errores.push(`${donde}: quedó ${sinSustituir.join(", ")} sin sustituir (N8-R9)`)
   }
   for (const t of plan.tareas ?? []) for (const d of t.dependeDe ?? [])
     if (!ids.has(d)) errores.push(`${t.id}: depende de ${d}, que no existe`)
