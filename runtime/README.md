@@ -1,11 +1,40 @@
 # ORION Runtime — operacionalización para Claude
 
 Este directorio versiona cómo se *corre* el estándar ORION. Es la FUENTE
-CANÓNICA: 7 agentes de fase (uno por etapa del ciclo RFC-0003), 2 agentes de
-conocimiento (landing-prompter, que escribe prompts de diseño y aprende de los
-veredictos; orion-harvester, que alimenta el cerebro) y 6 skills.
+CANÓNICA: **13 agentes y 8 skills**, todos bajo el prefijo `orion-`.
 
-## Instalación — un solo comando
+| Grupo | Agentes |
+|---|---|
+| Fase (uno por etapa de RFC-0003) | `orion-analyst` · `orion-planner` · `orion-builder` · `orion-verifier` · `orion-fixer` · `orion-reflector` · `orion-curator` |
+| Entrada (entender y ubicar antes de gastar) | `orion-traductor` (idea dictada → encargo) · `orion-bibliotecario` (dónde está, en coordenadas) |
+| Diseño de trabajo | `orion-arquitecto` (estructura del código y número de tareas) · `orion-estratega` (costo, precio y nicho) |
+| Conocimiento | `orion-landing` (prompts de diseño) · `orion-harvester` (alimenta el cerebro) |
+
+Skills: `orion` (ejecutar) · `orion-plan` (planear) · `orion-baul` (pasarela a
+la bóveda) · `orion-close` (cerrar) · `orion-status` (orientarse) ·
+`orion-cerebro` (preguntar) · `orion-validate` (comprobar memoria) ·
+`orion-diseno` (sistema visual).
+
+## Una sola verdad — `runtime/` manda
+
+El runtime vive en tres sitios: aquí, en `~/.claude` (las copias que Claude
+carga) y embebido en `tools/instalar-orion.mjs` (para instalar en otra máquina).
+Mantenerlos a mano falló: el 2026-08-26 había **5 de 15 archivos distintos**, con
+deriva en las DOS direcciones —mejoras vivas que el repo no tenía y mejoras del
+repo que nunca llegaron a ejecutarse—, y correr el instalador habría revertido
+las primeras sin avisar.
+
+```
+node tools/runtime.mjs estado        # deriva a tres bandas, con fechas
+node tools/runtime.mjs sincronizar   # runtime/ → ~/.claude → payload del instalador
+node tools/runtime.mjs recoger --solo <nombre>   # rescate: ~/.claude → runtime/
+```
+
+**Mira las fechas antes de elegir**: `sincronizar` escribe desde el repo, así
+que si lo bueno está en la copia viva hay que `recoger` primero. Editar un
+agente y no sincronizar es exactamente cómo se pierde el trabajo.
+
+## Instalación en otra máquina — un solo comando
 
 ```
 node tools/instalar-orion.mjs

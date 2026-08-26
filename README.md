@@ -22,8 +22,8 @@ The normative content lives in the RFCs under [`RFC/`](RFC/):
 | [RFC-0004](RFC/RFC-0004-CONTEXT-ECONOMY.md) | Context economy |
 | [RFC-0005](RFC/RFC-0005-SCALABILITY.md) | Scalability |
 | [RFC-0006](RFC/RFC-0006-COMPLIANCE.md) | Compliance |
-
-RFC-0007 (versioning) is planned but not yet written.
+| [RFC-0007](RFC/RFC-0007-VERSIONING.md) | Versioning |
+| [RFC-0008](RFC/RFC-0008-EXECUTION-PLANS.md) | Execution plans |
 
 `ORION_STANDARD.md` itself is descriptive/overview material — read the RFCs for
 the normative definitions; this README does not duplicate either.
@@ -54,11 +54,25 @@ Changes to the app are made and versioned in that external repo, not here.
 ## 3. The runtime (operationalization)
 
 [`runtime/`](runtime/README.md) version-controls how ORION is actually *run*
-on this machine via Claude Code: 7 phase agents (one per RFC-0003 lifecycle
-stage), 2 knowledge agents (`landing-prompter`, `orion-harvester`) and 6 skills. These are **repo mirrors** — the *operative* copies that
-Claude Code actually loads live outside this repo, under `~/.claude/`. See
-[`runtime/README.md`](runtime/README.md) for the full mapping between
-lifecycle phases, contracts, and agents, and for the mirror/sync convention.
+on this machine via Claude Code: **13 agents and 8 skills**, all prefixed
+`orion-` — 7 phase agents (one per RFC-0003 lifecycle stage), 2 intake agents
+(`orion-traductor`, `orion-bibliotecario`), 2 work-design agents
+(`orion-arquitecto`, `orion-estratega`) and 2 knowledge agents
+(`orion-landing`, `orion-harvester`).
+
+`runtime/` is the **canonical source**; `~/.claude/` holds the operative copies
+Claude actually loads, and `tools/instalar-orion.mjs` embeds a third copy for
+installing on another machine. Keeping three copies in sync by hand failed —
+on 2026-08-26 five of fifteen files differed, drifting in *both* directions.
+[`tools/runtime.mjs`](tools/runtime.mjs) is now the single door:
+
+```
+node tools/runtime.mjs estado        # three-way drift, with dates
+node tools/runtime.mjs sincronizar   # runtime/ -> ~/.claude -> installer payload
+```
+
+See [`runtime/README.md`](runtime/README.md) for the full mapping between
+lifecycle phases, contracts, and agents.
 
 Two more local (non-submodule) artifacts support the runtime:
 
@@ -108,15 +122,73 @@ Lo consumen el skill `orion-cerebro` (responder una pregunta con cita), el
 agente `orion-harvester` (alimentarlo sin duplicar ni escribir basura) y la
 fase 1 del skill `orion` (consultar antes de analizar).
 
+## 5. Los planes de ejecución (`catalogo/`, `tools/plan.mjs`)
+
+La memoria resuelve *recordar*; el cerebro resuelve *responder*; el **plan**
+resuelve *qué se hace ahora y quién toca qué archivo*. Norma: [RFC-0008](RFC/RFC-0008-EXECUTION-PLANS.md).
+
+No es el plan que se le enseña al cliente —ese dice qué recibe y cuándo—, sino
+el que usa el runtime: por cada tarea, el porqué, los pasos, los archivos que
+posee en exclusiva, los criterios comprobables, la dificultad, la ceremonia y
+el presupuesto en tokens.
+
+- [`catalogo/`](catalogo/) — **arquetipos**: la tarea que cualquier proyecto de
+  cierta forma necesita en cierto nivel de madurez (N0 cimientos → N4
+  excelencia). Contestan «¿qué se me está olvidando?», que es la pregunta que
+  una conversación nunca contesta bien. Un arquetipo con `porCada: "entidad"`
+  se instancia una vez por cada entidad **real** del proyecto: por eso un
+  catálogo acotado produce un plan de cientos de tareas concretas sin inventar
+  ninguna. Formato en [`catalogo/_ESQUEMA.md`](catalogo/_ESQUEMA.md).
+- [`tools/plan.mjs`](tools/plan.mjs) — el registro. Un plan de mil tareas en
+  prosa hay que leerlo entero para usarlo; a éste se le pregunta:
+
+  ```
+  node tools/plan.mjs siguiente <plan.json>      # qué sigue, en 5 líneas
+  node tools/plan.mjs ola <plan.json> --max 4    # tareas paralelas SIN colisión de archivos
+  node tools/plan.mjs brief <plan.json> T-042    # el encargo completo, determinista, coste 0
+  node tools/plan.mjs estado <plan.json>         # avance y calibración del presupuesto
+  ```
+
+  `ola` es lo que convierte el fallo #1 medido —builders en paralelo pisándose—
+  en una propiedad **computable** del plan en vez de un juicio del orquestador.
+
+Se crean con el skill `/orion-plan`, que orquesta `orion-traductor` (entender la
+idea dictada), `orion-bibliotecario` (ubicar lo que ya se sabe),
+`orion-arquitecto` (estructura y tareas propias) y `orion-estratega` (costo,
+precio y nicho).
+
+## 6. Gasto (`tools/costos.mjs`)
+
+39,37 M de tokens de subagente medidos en 298 spawns vivían repartidos en once
+`metrics.json` y nadie los sumaba. Ahora sí:
+
+```
+node tools/costos.mjs fases    # costo por fase y tier, con el tamaño de muestra
+node tools/costos.mjs fugas    # las tres formas medidas de tirar gasto
+node tools/costos.mjs senal    # si los datos se pueden creer
+```
+
+El análisis completo y qué hacer con él: [`ECONOMIA-DE-TOKENS.md`](ECONOMIA-DE-TOKENS.md).
+
+## 7. La bóveda (`tools/baul.mjs`)
+
+`node tools/baul.mjs empujar` manda a `ORION-Vault` (Obsidian) el estándar y el
+runtime, la memoria de cada proyecto, los temas del cerebro, **los planes con
+una nota por tarea**, el historial de sesiones con lo que costó cada una, y los
+encargos — todo enlazado. Es unidireccional: el repo manda. Lo que se escriba a
+mano en Obsidian no vuelve, pero `cerebro.mjs ruta` sí lo encuentra y lo marca.
+
 ## How the pieces relate
 
 ```
 ORION_STANDARD.md + RFC/           <- defines the standard (what "compliant" means)
 cerebro/ + tools/cerebro.mjs       <- la capa que RESPONDE cruzando todas las memorias
+catalogo/ + tools/plan.mjs         <- la capa que decide QUÉ SE HACE y quién toca qué
 Skills/autonomous-memory-manager/  <- defines AMM, the memory sub-skill of the standard
-runtime/                            <- implements the standard for Claude Code (local mirror)
-memory/infrapilot/                  <- runtime's persisted state for this project (local)
-tools/validate-memory.mjs           <- checks memory/ against the AMM schema
+runtime/ + tools/runtime.mjs        <- implements the standard for Claude Code (canonical)
+memory/<proj>/                      <- state.json + metrics.json + plan.json per project
+tools/costos.mjs                    <- where the tokens actually went
+tools/baul.mjs                      <- the gateway: everything useful -> Obsidian
 InfraPilot-Blueprint-v1.md, ...      <- what the runtime is being used to build
 infrapilot-app/                     <- the product's actual code (external submodule)
 ```

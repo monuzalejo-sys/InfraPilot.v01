@@ -83,7 +83,7 @@ que es exactamente lo que corrige la ley 1 de abajo.
 **Un solo escritor a la vez.** La curación de infrapilot lleva bloqueada desde el
 2026-08-20 y fue una decisión, no un olvido: la sesión organizadora *no* la hizo
 a propósito **para evitar doble escritor** sobre un árbol sucio
-(`prommter/PEND-002`). Está medido por qué: 8 `landing-prompter` en paralelo
+(`prommter/PEND-002`). Está medido por qué: 8 `orion-landing` en paralelo
 comparten `ORION/memory/landings/state.json` y por eso se les prohibió escribir
 (`infrapilot/RSK-003`).
 

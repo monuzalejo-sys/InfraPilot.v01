@@ -334,7 +334,7 @@ opcionales ni intercambiables.
   2-4 archivos, un builder y un verificador. El pipeline completo costó **~10x** para
   un README de 91 líneas (`infrapilot/DEC-007`). Una ola tiene costo fijo de
   orquestación que solo se amortiza con trabajo de verdad — ver [[TEMA-modelos-y-costos]].
-- **Agentes que escriben su propia memoria NO se paralelizan.** Ocho `landing-prompter`
+- **Agentes que escriben su propia memoria NO se paralelizan.** Ocho `orion-landing`
   a la vez comparten `ORION/memory/landings/state.json` y lo corrompen; se les prohibió
   escribir por eso. Si hay que paralelizarlos, serializa la escritura o que solo el
   orquestador escriba (`infrapilot/RSK-003`).

@@ -20,3 +20,6 @@ superarrozrepo/
 estancorepo/
 wrdrepo/
 cerebro/indice.json
+
+# entrega intermedia del arquitecto: se consume con plan.mjs agregar y se descarta
+**/tareas-propias.json

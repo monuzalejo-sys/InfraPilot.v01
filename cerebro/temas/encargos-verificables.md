@@ -28,7 +28,7 @@ razona: *"una prohibición declarada no basta para que un LLM no rellene huecos 
 verosimilitud"* — y por eso el "sin inventar nada" del dueño se implementó como
 checklist obligatorio, no como intención. El apartado 2 del agente se llama, textual,
 **«Sin inventar nada» es un procedimiento, no una intención**
-(`C:\Users\Kalel\.claude\agents\landing-prompter.md:46`), y termina en la regla que
+(`C:\Users\Kalel\.claude\agents\orion-landing.md:46`), y termina en la regla que
 gobierna todo: *"Un prompt que no se puede verificar no sirve"* (`:124-126`). Se
 escribió después de encontrar copy inventado en 3 proyectos distintos —horario falso
 confesado en un comentario de código, producto/precio que no existía en el catálogo
@@ -217,7 +217,7 @@ en vez de la niebla optimista de preguntarle a cada quien cómo va.
   procedimiento verificable es lo que la hace cumplible run tras run".
   `infrapilot/KN-033` — el copy de relleno que llega a producción (3 proyectos).
   `infrapilot/DEC-007` — ceremonia proporcional: el pipeline completo ~10x lo inline.
-- `C:\Users\Kalel\.claude\agents\landing-prompter.md:46` (título del apartado 2),
+- `C:\Users\Kalel\.claude\agents\orion-landing.md:46` (título del apartado 2),
   `:50-70` (los 6 pasos del procedimiento; `:65` "verosímil es exactamente la forma que
   tiene una mentira útil"), `:124-126` ("Un prompt que no se puede verificar no
   sirve"), `:158-162` (qué debe traer el reporte del ejecutor).

@@ -618,11 +618,116 @@ if (cmd === "indexar") {
   lineas.push("", "## Cómo se consulta", "", "```bash", 'node C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs buscar "tu pregunta"', "```", "")
   writeFileSync(join(destino, "_CEREBRO.md"), lineas.join("\n"))
   console.log(`exportados ${temas.length} temas + _CEREBRO.md a ${destino}`)
+} else if (cmd === "ruta") {
+  /* RUTA — devuelve COORDENADAS, no texto.
+     `buscar` contesta la pregunta; `ruta` contesta *dónde está escrito*, en un
+     paquete que cabe en 25 líneas y que trae, por cada acierto, el comando
+     exacto para abrir SOLO ese trozo. Existe porque el orquestador no debería
+     leer archivos enteros para enterarse de una regla: con esto lee 30 líneas
+     acotadas en vez de 900 (RFC-0004 N4-R10, privilegio mínimo).
+     Además barre la bóveda de Obsidian buscando notas ESCRITAS A MANO, que no
+     están en ningún state.json y por tanto no las ve ninguna otra herramienta. */
+  const pregunta = args.filter((a, i) => !a.startsWith("--") && args[i - 1] !== "--n" && args[i - 1] !== "--baul").join(" ")
+  if (!pregunta) { console.error('uso: cerebro.mjs ruta "<pregunta>" [--n 6] [--baul <ruta>]'); process.exit(1) }
+  const nMax = Number(flag("n", 6))
+  const BAUL = flag("baul", join(ORION, "..", "ORION-Vault"))
+  const terminos = [...new Set((pregunta.toLowerCase().match(/[a-záéíóúüñ0-9]{4,}/g) ?? []))]
+
+  /* La línea del archivo donde más términos de la pregunta coinciden. Es lo que
+     convierte una cita de archivo en una cita de archivo:línea. */
+  const lineaDe = (archivo) => {
+    try {
+      const ls = readFileSync(archivo, "utf8").split("\n")
+      let mejor = { i: -1, hits: 0 }
+      for (let i = 0; i < ls.length; i++) {
+        const bajo = ls[i].toLowerCase()
+        const hits = terminos.filter((t) => bajo.includes(t)).length
+        if (hits > mejor.hits) mejor = { i, hits }
+      }
+      return mejor.i >= 0 ? mejor.i + 1 : null
+    } catch { return null }
+  }
+  const ventana = (archivo, linea, radio = 15) => {
+    const a = Math.max(1, linea - radio), b = linea + radio
+    return `sed -n '${a},${b}p' "${archivo}"`
+  }
+
+  const r = buscar(pregunta, { n: nMax })
+  const L = []
+  const contar = { tema: 0, objeto: 0, documento: 0 }
+  for (const x of r.resultados) contar[x.clase] = (contar[x.clase] ?? 0) + 1
+
+  for (const x of r.resultados) {
+    if (x.clase === "tema") {
+      L.push(`TEMA ${x.id}   ← respuesta YA CURADA: es restricción del run, no sugerencia`)
+      L.push(`  dice: ${recorta(x.respuesta ?? x.texto, 150)}`)
+      L.push(`  abrir: node "${join(ORION, "tools", "cerebro.mjs")}" tema ${x.id}`)
+    } else if (x.clase === "documento") {
+      const l = lineaDe(x.fuente)
+      L.push(`DOC  ${recorta(x.titulo, 70)}`)
+      L.push(`  dice: ${recorta(x.texto, 130)}`)
+      L.push(`  abrir: ${l ? ventana(x.fuente, l) : `head -60 "${x.fuente}"`}`)
+    } else {
+      L.push(`OBJ  ${x.proyecto}/${x.id} · ${x.tipo}`)
+      L.push(`  dice: ${recorta(x.texto, 150)}`)
+      L.push(`  abrir: node -e "const s=require('${x.fuente.replace(/\\/g, "/")}');const o=s.objects.find(o=>o.id==='${x.id}');console.log(JSON.stringify(o,null,1))"`)
+    }
+  }
+
+  /* Notas escritas a mano en la bóveda. Todo lo que genera ORION lleva marca
+     (`id:` de frontmatter, `_INDEX`, `_CEREBRO`, `GENERADO`); lo que no la
+     lleva lo escribió una persona, no existe en ninguna memoria, y es
+     justamente lo que ninguna otra herramienta encuentra. */
+  const propias = []
+  const GENERADO = /^(id:|# ORION|> ?GENERADO|Generado de state\.json)/m
+  /* `export-vault.mjs` escribe estas tres carpetas enteras: son copias de lo
+     que el índice ya cubre. Barrerlas devolvería el mismo tema dos veces y
+     ahogaría lo único que este barrido aporta — lo que escribió una persona. */
+  const GENERADAS = new Set(["Cerebro", "Proyectos", "Sistema"])
+  const barrer = (dir, prof = 0) => {
+    if (prof > 4 || !existsSync(dir)) return
+    let entradas = []
+    try { entradas = readdirSync(dir) } catch { return }
+    for (const e of entradas) {
+      if (e.startsWith(".")) continue
+      if (prof === 0 && GENERADAS.has(e)) continue
+      const p = join(dir, e)
+      let st; try { st = statSync(p) } catch { continue }
+      if (st.isDirectory()) { barrer(p, prof + 1); continue }
+      if (!e.endsWith(".md") || st.size > 400_000) continue
+      if (/^_(INDEX|CEREBRO|INICIO|BRIEF)/.test(e)) continue
+      let txt; try { txt = readFileSync(p, "utf8") } catch { continue }
+      if (GENERADO.test(txt.slice(0, 400))) continue
+      const bajo = txt.toLowerCase()
+      const hits = terminos.filter((t) => bajo.includes(t)).length
+      if (hits >= Math.max(2, Math.ceil(terminos.length / 3))) propias.push({ p, hits })
+    }
+  }
+  if (!tiene("sin-baul")) barrer(BAUL)
+  propias.sort((a, b) => b.hits - a.hits)
+  for (const { p, hits } of propias.slice(0, 3)) {
+    const l = lineaDe(p)
+    L.push(`BAÚL ${p.replace(BAUL, "").replace(/^[\\/]/, "")}   ← nota escrita a mano: no está en ninguna memoria`)
+    L.push(`  coincide en ${hits} términos`)
+    L.push(`  abrir: ${l ? ventana(p, l) : `head -60 "${p}"`}`)
+  }
+
+  if (!L.length) {
+    console.log(`RUTA · "${pregunta}"\n\nSIN RUTA. El ecosistema no tiene nada escrito sobre esto: es un HUECO.`)
+    console.log(`Dilo así en vez de improvisar, y cosecha la lección al cerrar (orion-harvester).`)
+    process.exit(0)
+  }
+  console.log(`RUTA · "${pregunta}"  —  ${contar.tema ?? 0} temas · ${contar.objeto ?? 0} objetos · ${contar.documento ?? 0} documentos${propias.length ? ` · ${Math.min(propias.length, 3)} notas del baúl` : ""}`)
+  console.log(`Abre solo lo que vayas a usar. Nadie más vuelve a buscar: lo que necesiten los agentes, se EXCERPTA de aquí a sus briefs.\n`)
+  console.log(L.join("\n"))
 } else {
   console.log(`cerebro.mjs — recuperación sobre todo el conocimiento de ORION
 
   indexar                       reconstruye el índice
   buscar "<pregunta>" [--n 8] [--json] [--proyecto <id>] [--temas]
+  ruta "<pregunta>" [--n 6]     COORDENADAS en vez de texto: archivo:línea y el
+                                comando para abrir solo ese trozo (+ notas a mano
+                                del baúl de Obsidian)
   tema <slug>                   imprime un tema completo
   estado                        salud del cerebro, objetos pobres y huecos
   exportar [--destino <dir>]    escribe la vista de la bóveda

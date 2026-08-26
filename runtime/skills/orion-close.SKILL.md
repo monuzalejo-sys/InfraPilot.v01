@@ -22,13 +22,33 @@ autonomous — no per-step approval needed). Order matters:
    curator with the exact errors) and re-validate. Do not close a session
    leaving invalid memory. Known invariant: metrics `sessionCount` must
    equal `sessions.length`.
-3b. **Regenerate the Obsidian vault view.** Run
-   `node C:\Users\Kalel\ORION\tools\generate-vault.mjs <memory-dir>` — a
-   deterministic script (never delegate this to an agent) that rewrites
-   `<memory-dir>/vault/` (one .md per object with [[links]] + _INDEX.md).
-   The vault is a one-way human-browsable VIEW of state.json; manual edits
-   there are input for the next curation, never synced back automatically.
+3b. **Push everything to the vault — the gateway.** Run
+
+   ```bash
+   node C:\Users\Kalel\ORION\tools\baul.mjs empujar
+   ```
+
+   One deterministic command (**never delegate this to an agent** — a subagent
+   that "summarizes on the way" is exactly how a view gets corrupted). It sends
+   the standard and runtime, every project's memory object by object, the
+   cerebro's curated temas, the execution plans **with one note per task**, the
+   session history **with what each one measured**, and the encargos — all
+   cross-linked, so opening a tema in Obsidian shows every task in every
+   project that depends on it.
+
+   The vault is a one-way human-browsable VIEW; manual edits there are never
+   synced back — but `cerebro.mjs ruta` does find hand-written notes and flags
+   them, so they become input for the next curation instead of being lost.
+   If a project's memory changed but nothing else, `--sin-export` is faster.
    Also delete `<memory-dir>/wave.json` if present and its wave is complete.
+
+3b-bis. **Write back the plan.** If this session executed tasks from
+   `plan.json`, make sure each one was closed with
+   `plan.mjs hecho … --evidencia … --tokens …` (RFC-0008 N8-R10) and run
+   `node C:\Users\Kalel\ORION\tools\plan.mjs validar <plan.json>`. A plan that
+   is not written back stops being a control loop and goes back to being a
+   document — and the budget never converges. Then regenerate its prose view
+   with `plan.mjs md <plan.json>`.
 3c. **Alimenta el cerebro.** El cierre es el único momento en que se sabe qué
    dejó la sesión. Si hubo una lección que serviría en OTRO proyecto (algo
    falló, algo se midió, el dueño rechazó algo), lanza `orion-harvester` con

@@ -57,6 +57,27 @@
         ".md"
       ],
       "rol": "plan de trabajo de un equipo: qué falta para entregar, quién responde por cada entrega, cómo se trabaja y el camino de cada persona"
+    },
+    {
+      "ruta": "C:/Users/Kalel/ORION/ECONOMIA-DE-TOKENS.md",
+      "extensiones": [
+        ".md"
+      ],
+      "rol": "analisis medido de en que se van los tokens del ecosistema y las palancas para bajar el gasto: donde esta la fuga, cuanto cuesta cada fase por modelo y por spawn, cuando conviene bajar de tier y cuando no, y que hay que arreglar para que los numeros sigan sirviendo"
+    },
+    {
+      "ruta": "C:/Users/Kalel/ORION/catalogo/_ESQUEMA.md",
+      "extensiones": [
+        ".md"
+      ],
+      "rol": "formato del catalogo de arquetipos de tarea: como se escribe una tarea reutilizable con su porque, sus pasos, su aceptacion comprobable, y la condicion que decide si aplica a un proyecto concreto"
+    },
+    {
+      "ruta": "C:/Users/Kalel/ORION/runtime/README.md",
+      "extensiones": [
+        ".md"
+      ],
+      "rol": "mapa del runtime: que agentes y skills existen, para que sirve cada uno, y como se mantienen sincronizadas las tres copias del runtime sin perder trabajo"
     }
   ]
 }

@@ -15,7 +15,7 @@ actualizado: 2026-08-24
 En una página pública solo entra lo que puedas **citar con `archivo:línea`**. Lo que
 falte se entrega como **hueco numerado y VISIBLE en el diseño**, nunca relleno con algo
 que suene bien: *"verosímil es exactamente la forma que tiene una mentira útil"*
-(`landing-prompter.md:65`). **Sí puedes inventar precios para una demo**, con dos
+(`orion-landing.md:65`). **Sí puedes inventar precios para una demo**, con dos
 condiciones: que el dueño lo **autorice a viva voz y con fecha**, y que lo ficticio quede
 marcado **DOS veces** —en el encargo y **visible en la página entregada**, jamás en
 `sr-only` ni `display:none`—. La autorización cubre **solo el catálogo**: teléfono,
@@ -142,7 +142,7 @@ la primera publicación.
    **(c) HUECO** — no existe en ninguna fuente; **esa parte no se publica**.
 2. **Grep antes de afirmar.** Prohibido escribir el encargo antes de leer las fuentes
    reales (brief, README, catálogo, código). *"Un prompt sin orígenes es un prompt que
-   inventa"* (`landing-prompter.md:50-55`).
+   inventa"* (`orion-landing.md:50-55`).
 3. **Lo de ejemplo se pinta declarándose.** Los 23 productos de Villa Broaster se usan
    como **maniquí** porque el propio código dice de sí mismo *"NO son los precios de este
    negocio"* (`broaster-app/lib/servidor/almacen-disco.ts:360-366`); en el diseño van con
@@ -157,7 +157,7 @@ la primera publicación.
 5. **Cero cifras sociales.** Años de experiencia, número de clientes, kilos vendidos,
    testimonios, premios, "más de X familias confían": si no está en las fuentes, **no
    existe**. Si el negocio lo necesita para vender, se pide como hueco
-   (`landing-prompter.md:61-65`).
+   (`orion-landing.md:61-65`).
 6. **Prohibido rellenar una descripción.** Si un producto no trae texto en el catálogo,
    la fila va **sin segunda línea**. Inventar *"crujiente por fuera, jugosa por dentro"*
    **es inventar carta** igual que inventar un producto (v3 §1).
@@ -261,7 +261,7 @@ la primera publicación.
   del prototipo).
 - `ORION/prompts-landing/orama-demo.md:16-17, 43-53` — §1.B "lo que es DEMO" y §1.C "lo que
   NO se inventa".
-- `~/.claude/agents/landing-prompter.md:46-71` — los 6 puntos de "sin inventar nada",
+- `~/.claude/agents/orion-landing.md:46-71` — los 6 puntos de "sin inventar nada",
   incluida la frase de la línea 65.
 - `fable 5/wrd/data.js:22-23` + `wrd/PEND-001` — el placeholder bien hecho: increíble y
   comentado.

@@ -232,7 +232,7 @@ hoy la portada.
 **Por qué:** quien mira es un cliente afuera, así que la portada tiene que VENDER — pero lo
 que vende a un dueño de estanco no es el grito, es **ver el software funcionando y las cifras
 cuadrando**. Además esta landing es la puerta del mismo producto: si la portada gritara en
-neón y adentro estuviera el escritorio sobrio (skill `estudio-diseno`, restricción dura del
+neón y adentro estuviera el escritorio sobrio (skill `orion-diseno`, restricción dura del
 proyecto en `memory/estanco-contable/brief.md:50`), el comprador sentiría el cambiazo. Se
 mantiene la familia visual y se sube el volumen con lo que el producto ya tiene: color de
 dato, densidad y demo jugable.

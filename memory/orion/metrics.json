@@ -1,0 +1,32 @@
+{
+  "projectId": "orion",
+  "sessionCount": 1,
+  "totalContextSaved": 0,
+  "avgCompressionRatio": 1,
+  "avgKnowledgeDensity": 0,
+  "trendCompressionRatio": "Stable",
+  "lastUpdated": "2026-08-26T06:30:00.000Z",
+  "sessions": [
+    {
+      "sessionId": "session-2026-08-26-orion-v4",
+      "runId": "orion-orion-v4-planes-y-economia",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-26T04:40:00.000Z",
+      "completedAt": "2026-08-26T07:00:00.000Z",
+      "objectsCreated": 18,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "notes": "ORION v4. Se anade RFC-0008 (planes de ejecucion como registro consultable) con tools/plan.mjs como implementacion de referencia; el catalogo de arquetipos por categoria y nivel de madurez; cuatro agentes nuevos (orion-traductor, orion-bibliotecario, orion-arquitecto, orion-estratega) y dos skills (orion-plan, orion-baul); el comando `ruta` del cerebro, que devuelve coordenadas en vez de texto y ademas barre las notas escritas a mano en la boveda; tools/costos.mjs, que suma por primera vez los 39,37 M de tokens medidos que vivian repartidos en once metrics.json; tools/baul.mjs, la pasarela que sube planes, historial y encargos a Obsidian; y tools/runtime.mjs, que arregla la deriva a tres bandas del runtime (KN-001). Todo el runtime queda bajo el prefijo orion-. La prueba de regresion del cerebro se mantuvo en 46/46 antes y despues.",
+      "measurement_mode": "MEASURED",
+      "modelOutcomes": [
+        { "phase": "build:lib", "model": "opus", "verdict": "ok", "tokens": 130330, "notes": "catalogo/seguridad.json - 70 arquetipos" },
+        { "phase": "build:lib", "model": "opus", "verdict": "ok", "tokens": 161119, "notes": "catalogo/backend.json - 72 arquetipos" },
+        { "phase": "build:lib", "model": "opus", "verdict": "ok", "tokens": 153171, "notes": "catalogo/frontend.json - 80 arquetipos" }
+      ]
+    }
+  ]
+}

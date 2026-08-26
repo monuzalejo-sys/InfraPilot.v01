@@ -245,7 +245,7 @@ Orden final de la página (móvil manda: así se lee en 390 px).
 Registro: VENDEDOR, cálido, de marca avícola colombiana — no minimalista. Es una
 portada pública y el que mira es un cliente, no un trabajador dentro de la app. El
 manifiesto "estudio del ingeniero moderno"
-(C:\Users\Kalel\.claude\skills\estudio-diseno\SKILL.md) aplica al INTERIOR de las
+(C:\Users\Kalel\.claude\skills\orion-diseno\SKILL.md) aplica al INTERIOR de las
 apps del dueño; aplicarlo a una landing ya costó un rechazo textual del dueño el
 2026-08-05 ("la landing que haces es una basura... muy minimalista... quiero que esta
 landing sea más interactiva, más llamativa"). Del manifiesto se mantienen SIEMPRE las

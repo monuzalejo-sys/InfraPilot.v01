@@ -1,0 +1,1834 @@
+{
+  "categoria": "frontend",
+  "nombre": "Frontend",
+  "meta": "Que la pantalla de afuera venda y la de adentro no le cobre toques de más a la persona del mostrador, y que las dos cosas se midan en px, ms y toques.",
+  "arquetipos": [
+    {
+      "id": "fe.base.registro-visual-declarado",
+      "titulo": "Declarar en un archivo cuál de los dos registros visuales es este proyecto",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Aplicarle a una vitrina el minimalismo del interior de la app ya costó dos rechazos con fecha: «muy minimalista… es para vender frutas» y «todo se ve muy genérico, apagado». El registro no se adivina a mitad del build: se decide antes de escribir el primer token.",
+      "queHacer": [
+        "Escribir en `docs/registro-visual.md` UNA línea con el valor `vitrina` o `interior`, y el nombre de la persona que mira la pantalla.",
+        "Si es `vitrina`: producto grande, fondo con peso, color y movimiento; la primera pantalla se juzga por el fondo antes que por la tipografía.",
+        "Si es `interior`: calma, aire, contraste bajo entre superficies y alto en texto, porque alguien va a estar ocho horas dentro.",
+        "Derivar de esa línea los tokens de `app/globals.css` y anotar al lado de cada token de color a qué registro sirve.",
+        "Si el proyecto tiene las dos superficies, escribir dos bloques de tokens con prefijo distinto y la regla de qué rutas usan cuál."
+      ],
+      "aceptacion": [
+        { "check": "El registro está declarado con uno de los dos valores permitidos", "comando": "grep -nE \"^registro: (vitrina|interior)$\" docs/registro-visual.md", "espera": "1 línea" },
+        { "check": "Los tokens de color citan su registro", "comando": "grep -c \"registro:\" app/globals.css", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/registro-visual.md", "app/globals.css"],
+      "cerebro": ["tema:pantalla-publica", "tema:generadores-de-diseno"]
+    },
+    {
+      "id": "fe.base.tokens-en-globals",
+      "titulo": "Meter todo color y toda medida en tokens de globals.css",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con los colores repartidos por los componentes, cambiar el verde de la marca es abrir 40 archivos y olvidar tres; los tres olvidados son los que ve el cliente. Con tokens es una línea.",
+      "queHacer": [
+        "Declarar en `app/globals.css`, bajo `:root`, las variables de color, radio, sombra y espaciado con nombre de ROL (`--fondo`, `--texto`, `--accion`), no de valor (`--verde-500`).",
+        "Mapear esas variables en la configuración de Tailwind para que se usen como clases y no como valores sueltos.",
+        "Reemplazar en `app/` y `components/` todo hex, `rgb(` y `hsl(` literal por su token.",
+        "Dejar escrito en `docs/registro-visual.md` que `globals.css` es intocable para quien construye una pantalla: se consume, no se edita."
+      ],
+      "aceptacion": [
+        { "check": "No queda ningún color literal fuera de globals.css", "comando": "grep -rnE \"#[0-9a-fA-F]{3,8}\\b|rgba?\\(|hsla?\\(\" app/ components/ --include=*.tsx --include=*.ts", "espera": "0 líneas" },
+        { "check": "Los tokens existen y están en un solo archivo", "comando": "grep -c \"^  --\" app/globals.css", "espera": "8+ líneas" },
+        { "check": "Cambiar un token cambia la pantalla", "comando": null, "espera": "cambiar `--accion` a un valor distinto altera el color de 2+ elementos en la captura a 390×844; se restaura después" }
+      ],
+      "aplicaSi": { "stack": ["nextjs", "tailwind", "react"] },
+      "porCada": null,
+      "posee": ["app/globals.css", "tailwind.config.ts"],
+      "cerebro": ["tema:generadores-de-diseno", "tema:pantalla-publica"]
+    },
+    {
+      "id": "fe.base.sin-estilos-sueltos",
+      "titulo": "Prohibir estilos en línea y valores arbitrarios en los componentes",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Un solo `style=` con un padding a ojo rompe la rejilla, y el siguiente que copia ese componente hereda el error. A los treinta componentes ya no hay sistema: hay treinta decisiones sueltas.",
+      "queHacer": [
+        "Buscar y eliminar todo atributo `style=` en JSX y todo valor arbitrario de Tailwind entre corchetes (`p-[13px]`, `text-[#0a0]`).",
+        "Sustituir cada uno por la clase del token equivalente; si no existe el token, añadirlo a `globals.css` en vez de inventar el valor en el componente.",
+        "Dejar la regla escrita en el README en una línea: los valores viven en `globals.css`, los componentes solo los consumen.",
+        "Añadir el grep de guardia al script `verificar` para que la próxima pasada lo detecte sola."
+      ],
+      "aceptacion": [
+        { "check": "No hay estilos en línea", "comando": "grep -rn \"style={\" app/ components/", "espera": "0 líneas" },
+        { "check": "No hay valores arbitrarios de Tailwind", "comando": "grep -rnE \"(p|m|w|h|text|bg|gap|top|left)-\\[[^]]+\\]\" app/ components/", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "stack": ["tailwind", "nextjs", "react"] },
+      "porCada": null,
+      "posee": [],
+      "cerebro": ["tema:generadores-de-diseno"]
+    },
+    {
+      "id": "fe.base.escala-tipografica",
+      "titulo": "Fijar una escala tipográfica de 5 pasos y no usar tamaños fuera de ella",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con nueve tamaños distintos nada se lee como jerarquía: el ojo no sabe qué es el título y qué es la nota, y en el mostrador eso se paga leyendo dos veces el total.",
+      "queHacer": [
+        "Definir en `app/globals.css` exactamente 5 pasos: nota, cuerpo, subtítulo, título, cifra; con su `font-size` y su `line-height` fijados juntos.",
+        "Fijar el tamaño de cuerpo en 16 px como mínimo: por debajo de 16, el navegador móvil hace zoom solo al enfocar un campo.",
+        "Fijar el paso `cifra` para el total de una venta: es lo que se lee de lejos y a la carrera.",
+        "Reemplazar en `app/` y `components/` los tamaños que no sean uno de los cinco pasos."
+      ],
+      "aceptacion": [
+        { "check": "Existen 5 pasos y no más", "comando": "grep -cE \"^  --texto-(nota|cuerpo|subtitulo|titulo|cifra):\" app/globals.css", "espera": "5 líneas" },
+        { "check": "No hay tamaños de letra fuera de la escala", "comando": "grep -rnE \"text-\\[[0-9.]+(px|rem)\\]|font-size:\" app/ components/", "espera": "0 líneas" },
+        { "check": "El cuerpo no baja de 16 px en el navegador", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('p,li,td,label,input')].filter(e=>parseFloat(getComputedStyle(e).fontSize)<16).length\"", "espera": "eval: 0" }
+      ],
+      "aplicaSi": { "stack": ["nextjs", "tailwind", "react"] },
+      "porCada": null,
+      "posee": ["app/globals.css"],
+      "cerebro": ["tema:generadores-de-diseno"]
+    },
+    {
+      "id": "fe.base.contraste-aa",
+      "titulo": "Medir el contraste de cada par de tokens y no dejar ninguno bajo AA",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El gris claro sobre blanco se ve bien en el monitor del que lo hizo y desaparece en la tablet del mostrador con sol de las 11. Ahí no se lee el precio, y el que no lee el precio, teclea otro.",
+      "queHacer": [
+        "Escribir `scripts/contraste.mjs` que lea los tokens de `app/globals.css`, arme cada par fondo/texto realmente usado y calcule su ratio WCAG.",
+        "Exigir 4.5:1 para texto de cuerpo y nota, y 3:1 para el paso `cifra` y para bordes de controles.",
+        "Hacer que el script salga con código distinto de 0 si algún par no llega, imprimiendo par y ratio con dos decimales.",
+        "Corregir el token, no el componente: si el gris no llega, se oscurece el token y se vuelve a correr.",
+        "Encadenar el script dentro de `npm run verificar`."
+      ],
+      "aceptacion": [
+        { "check": "Ningún par de tokens baja de su umbral", "comando": "node scripts/contraste.mjs", "espera": "exit 0; 0 pares por debajo de 4.5:1 en cuerpo y 3:1 en cifra" },
+        { "check": "El script falla de verdad cuando un par no llega", "comando": null, "espera": "bajar `--texto` a un gris de ratio 3.0 hace salir el script con código distinto de 0 y nombra el par; se restaura" },
+        { "check": "Está encadenado en la verificación", "comando": "grep -n \"contraste\" package.json", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["scripts/contraste.mjs", "app/globals.css"],
+      "cerebro": ["tema:verificar-con-evidencia", "tema:generadores-de-diseno"]
+    },
+    {
+      "id": "fe.base.rejilla-de-4px",
+      "titulo": "Llevar todo el espaciado a múltiplos de 4 px",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Con espaciados de 13, 15 y 18 px, dos tarjetas iguales quedan desalineadas por 2 px y la pantalla se lee como hecha a pedazos, que es exactamente lo que el dueño llama «genérico».",
+      "queHacer": [
+        "Fijar la escala de espaciado en 4, 8, 12, 16, 24, 32, 48 px y declararla en `app/globals.css`.",
+        "Reemplazar cualquier margen o padding que no caiga en esa escala por el paso más cercano.",
+        "Fijar un ancho máximo de columna de lectura y declararlo también como token.",
+        "Anotar en el README que un valor nuevo se añade a la escala, no se escribe en el componente."
+      ],
+      "aceptacion": [
+        { "check": "No hay espaciados fuera de la escala", "comando": "grep -rnE \"(p|m|gap|space)[xytrbl]?-\\[[0-9]+px\\]\" app/ components/", "espera": "0 líneas" },
+        { "check": "Los paddings calculados son múltiplos de 4", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('section,article,[data-tarjeta]')].map(e=>parseFloat(getComputedStyle(e).paddingLeft)).filter(v=>v%4!==0).length\"", "espera": "eval: 0" }
+      ],
+      "aplicaSi": { "stack": ["tailwind", "nextjs", "react"] },
+      "porCada": null,
+      "posee": [],
+      "cerebro": ["tema:generadores-de-diseno"]
+    },
+    {
+      "id": "fe.base.idioma-del-documento",
+      "titulo": "Declarar el idioma y la región del documento en el html",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Sin `lang`, el navegador corta las palabras donde no va, el traductor automático ofrece traducir del inglés una página en español, y el lector de pantalla lee «cinco mil» como «five thousand» delante de un cliente.",
+      "queHacer": [
+        "Poner `lang=\"es-CO\"` (o la región real del negocio) en el `<html>` del layout raíz.",
+        "Usar esa misma región como única fuente para el formateador de moneda y fecha del proyecto.",
+        "Comprobar que ninguna página anida un `lang` distinto sin motivo."
+      ],
+      "aceptacion": [
+        { "check": "El documento declara idioma y región", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"document.documentElement.lang\"", "espera": "eval: cadena con forma xx-XX, no vacía" },
+        { "check": "Hay una sola declaración de idioma en el código", "comando": "grep -rn \"lang=\" app/", "espera": "1 línea" }
+      ],
+      "aplicaSi": { "stack": ["nextjs", "react"] },
+      "porCada": null,
+      "posee": [],
+      "cerebro": []
+    },
+    {
+      "id": "fe.movil.viewport-y-zona-segura",
+      "titulo": "Declarar el viewport real y respetar la zona segura del teléfono",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Sin el meta de viewport, el teléfono finge 980 px y encoge todo hasta lo ilegible; sin zona segura, la barra de gestos del iPhone se come el botón de cobrar, que es justo el que está abajo.",
+      "queHacer": [
+        "Declarar el viewport en el layout raíz con `width=device-width, initial-scale=1` y SIN `maximum-scale` ni `user-scalable=no`: quitarle el zoom a alguien es quitarle la única forma de leer un precio pequeño.",
+        "Añadir a la barra inferior fija el padding de zona segura (`env(safe-area-inset-bottom)`) sobre el padding del token.",
+        "Comprobar a 390×844 que ningún control queda a menos de 16 px del borde inferior."
+      ],
+      "aceptacion": [
+        { "check": "El viewport no bloquea el zoom", "comando": "grep -rnE \"maximum-scale|user-scalable\" app/", "espera": "0 líneas" },
+        { "check": "La barra inferior respeta la zona segura", "comando": "grep -rn \"safe-area-inset\" app/ components/", "espera": "1+ líneas" },
+        { "check": "Ningún control toca el borde inferior", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('button,a')].filter(e=>844-e.getBoundingClientRect().bottom<16&&e.getBoundingClientRect().bottom<=844).length\"", "espera": "eval: 0" }
+      ],
+      "aplicaSi": { "stack": ["nextjs", "react"] },
+      "porCada": null,
+      "posee": [],
+      "cerebro": ["tema:pantalla-publica"]
+    },
+    {
+      "id": "fe.consistencia.un-formato-de-dinero-y-fecha",
+      "titulo": "Dejar un solo formateador de dinero y uno de fecha para toda la app",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando cada pantalla formatea a su manera, el mismo total sale «$12.500» en la lista y «12500.00» en el recibo, y el cliente cree que le cobraron distinto. Discutir eso en el mostrador cuesta más que el sistema.",
+      "queHacer": [
+        "Crear `lib/formato.ts` con `dinero(valor)` y `fecha(instante, forma)`, ambos con la región declarada en el layout raíz.",
+        "Fijar los decimales del dinero según la moneda real del negocio y no mostrar centavos si la moneda no los usa.",
+        "Hacer que `fecha` reciba siempre un instante en milisegundos o un `Date`, nunca el texto de un ISO, para que ordenar y comparar no dependan del texto.",
+        "Reemplazar todas las llamadas sueltas a `toLocaleString`, `toFixed` y concatenaciones de `$` en `app/` y `components/`."
+      ],
+      "aceptacion": [
+        { "check": "No queda formateo suelto fuera de lib/formato.ts", "comando": "grep -rnE \"toLocaleString|Intl\\.(NumberFormat|DateTimeFormat)|toFixed\\(\" app/ components/", "espera": "0 líneas" },
+        { "check": "El formateador existe y se usa", "comando": "grep -rn \"from '@/lib/formato'\" app/ components/", "espera": "3+ líneas" },
+        { "check": "El mismo total se ve igual en dos pantallas", "comando": null, "espera": "capturas de lista y recibo a 390×844: la cadena del total coincide carácter por carácter" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["lib/formato.ts"],
+      "cerebro": ["tema:invariantes-contables", "tema:cobro-a-clientes"]
+    },
+    {
+      "id": "fe.base.foco-visible",
+      "titulo": "Dejar visible el anillo de foco en todos los controles",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "La cajera avanza con el tabulador mientras mira el producto, no la pantalla. Sin anillo de foco no sabe en qué campo cayó, y el peso del pollo termina escrito en el campo del precio.",
+      "queHacer": [
+        "Quitar todo `outline: none` y toda clase que anule el foco sin reemplazarlo.",
+        "Definir en `app/globals.css` un solo estilo de foco con `:focus-visible`, de 2 px y con contraste 3:1 contra el fondo sobre el que aparece.",
+        "Comprobar que el foco es visible también sobre el botón de acción principal, que suele llevar fondo de color.",
+        "Recorrer con tabulador la pantalla de cobro completa y anotar el orden en que caen los focos."
+      ],
+      "aceptacion": [
+        { "check": "Nadie anula el foco", "comando": "grep -rnE \"outline-none|outline: *none|focus:outline-none\" app/ components/", "espera": "0 líneas" },
+        { "check": "Hay un estilo de foco único y declarado", "comando": "grep -n \":focus-visible\" app/globals.css", "espera": "1+ líneas" },
+        { "check": "El orden de tabulación sigue el orden de la tarea", "comando": null, "espera": "en la pantalla de cobro, ≤8 tabulaciones desde el primer campo hasta el botón de cobrar, sin volver hacia arriba" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno", "caja"] },
+      "porCada": null,
+      "posee": [],
+      "cerebro": ["tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.movil.390-sin-desborde",
+      "titulo": "Dejar {{ruta}} sin desborde horizontal a 390 px",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un desborde de 20 px mete una barra horizontal en el teléfono: el pulgar arrastra de lado cuando quiere bajar, la pantalla tiembla y el que iba a pedir cierra. 390×844 es la medida real con la que se juzga en esta casa.",
+      "queHacer": [
+        "Abrir {{ruta}} a 390×844 y comparar `scrollWidth` contra `clientWidth`.",
+        "Encontrar al culpable midiendo qué elemento excede el ancho del documento, no adivinando.",
+        "Arreglarlo en el contenedor (ancho máximo, `min-width: 0` en hijos de flex, `overflow-x: auto` propio para tablas y bloques de código), nunca escondiendo el desborde con `overflow: hidden` en el body.",
+        "Repetir la medición a 320 px para el teléfono más angosto que todavía existe en el mostrador."
+      ],
+      "aceptacion": [
+        { "check": "{{ruta}} no desborda a 390 px", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 390 --height 844 --mobile", "espera": "metrics.scrollWidth = 390 y metrics.overflowX = false" },
+        { "check": "Nadie tapó el desborde en el body", "comando": "grep -rnE \"body[^-]*overflow-x: *hidden|overflow-x-hidden\" app/globals.css app/", "espera": "0 líneas" },
+        { "check": "Tampoco desborda a 320 px", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 320 --height 844 --mobile", "espera": "metrics.overflowX = false" }
+      ],
+      "aplicaSi": {},
+      "porCada": "ruta",
+      "posee": ["app{{ruta}}/page.tsx"],
+      "cerebro": ["tema:pantalla-publica", "tema:entorno-de-la-maquina"]
+    },
+    {
+      "id": "fe.movil.area-de-toque-44",
+      "titulo": "Llevar todo control tocable a 44 px de lado como mínimo",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un botón de 28 px se falla una de cada cinco veces con el dedo. En una caja que hace 200 ventas al día eso son 40 toques perdidos diarios, y algunos caen en el botón de al lado, que borra la línea.",
+      "queHacer": [
+        "Fijar en `app/globals.css` la altura mínima de control en 44 px y aplicarla al componente de botón, al de campo y al de fila tocable.",
+        "Para los iconos pequeños, ampliar el área tocable con padding o pseudo-elemento sin agrandar el dibujo.",
+        "Separar 8 px como mínimo dos acciones vecinas cuando una de ellas sea destructiva.",
+        "Medir en el navegador a 390×844 y arreglar los que salgan en la lista, no los que se vean chicos."
+      ],
+      "aceptacion": [
+        { "check": "Ningún control visible baja de 44×44", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('a,button,input,select,[role=button]')].filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&(r.width<44||r.height<44)}).length\"", "espera": "eval: 0" },
+        { "check": "La altura mínima está en el token, no repetida en cada botón", "comando": "grep -n \"44px\\|--control-alto\" app/globals.css", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["components/ui/boton.tsx", "app/globals.css"],
+      "cerebro": ["tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.movil.teclado-numerico",
+      "titulo": "Abrir el teclado numérico en los campos de cantidad, peso y dinero",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Si al tocar «peso en kg» sale el teclado de letras, la cajera pierde un toque en cambiarlo cada vez que pesa algo. Cien pesadas al día son cien toques que nadie contó y que ella sí paga.",
+      "queHacer": [
+        "Poner `inputMode=\"decimal\"` en peso y precio, e `inputMode=\"numeric\"` en unidades y en el PIN.",
+        "Usar `type=\"text\"` con `inputMode` en vez de `type=\"number\"` para no heredar las flechitas ni el scroll que cambia el valor sin querer.",
+        "Añadir `autoComplete=\"off\"` y `enterKeyHint` acorde a lo que hace Enter en ese campo (`next` o `done`).",
+        "Comprobar campo por campo en el teléfono real, no en el navegador de escritorio."
+      ],
+      "aceptacion": [
+        { "check": "Todo campo numérico declara inputMode", "comando": "grep -rn \"type=\\\"number\\\"\" app/ components/", "espera": "0 líneas" },
+        { "check": "Los campos de peso y dinero usan teclado decimal", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('input[data-numerico]')].filter(e=>!['decimal','numeric'].includes(e.inputMode)).length\"", "espera": "eval: 0" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": [],
+      "cerebro": ["tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.estado.precedencia-url-local-default",
+      "titulo": "Fijar la precedencia URL > guardado > preguntar para el contexto de la pantalla",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "La vitrina ignoraba `?sede=` y caía siempre en la primera sede: con dos locales abiertos, todo el mundo pedía en el equivocado y el otro local no vendía. Un enlace que no reproduce lo que promete es publicidad que no llega.",
+      "queHacer": [
+        "Listar el contexto que decide qué ve la pantalla: sede, sucursal, turno, rol, moneda, categoría.",
+        "Resolverlo SIEMPRE en este orden: primero el parámetro de la URL; si no está, lo guardado en el dispositivo; si tampoco, PREGUNTAR.",
+        "No poner un valor por defecto silencioso: la primera visita de alguien se resuelve con una pregunta visible, no asumiendo por él.",
+        "Escribir la precedencia como comentario de una línea encima de la función que la implementa, para que el próximo que la toque no la invierta.",
+        "Cuando el usuario elige, escribir la elección en la URL además de guardarla, para que el enlace que comparta lleve el contexto."
+      ],
+      "aceptacion": [
+        { "check": "El parámetro de la URL gana sobre lo guardado", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url \"http://localhost:3000/?sede=b\" --width 390 --height 844 --mobile --eval \"document.querySelector('[data-sede-activa]').textContent.trim()\"", "espera": "eval: el nombre de la sede b, no el de la primera sede" },
+        { "check": "Sin URL y sin nada guardado, la pantalla pregunta", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"!!document.querySelector('[data-pregunta-contexto]')\"", "espera": "eval: true" },
+        { "check": "La precedencia está escrita en el código", "comando": "grep -rn \"primero la URL\" lib/", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "superficies": ["vitrina", "panel-interno"] },
+      "porCada": null,
+      "posee": ["lib/contexto.ts"],
+      "cerebro": ["tema:pantalla-publica", "tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "fe.estado.cargando-visible",
+      "titulo": "Mostrar carga en {{ruta}} antes de que pasen 200 ms de pantalla blanca",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Medio segundo de blanco se lee como «se rompió»: el cliente toca otra vez y manda el pedido dos veces, o cierra. El estado de carga no es decoración, es lo que evita el segundo toque.",
+      "queHacer": [
+        "Añadir `app{{ruta}}/loading.tsx` con el esqueleto de la pantalla: mismos bloques, mismas alturas que el contenido real.",
+        "Reservar en el esqueleto la altura exacta del contenido para que al llegar el dato no salte el layout.",
+        "No usar giradores centrados en pantalla completa: se pierde la referencia de dónde estaba la persona.",
+        "Deshabilitar la acción principal mientras carga, en vez de dejarla tocable contra datos que no están."
+      ],
+      "aceptacion": [
+        { "check": "Existe estado de carga para {{ruta}}", "comando": "ls app{{ruta}}/loading.tsx", "espera": "1 archivo" },
+        { "check": "El esqueleto reserva la altura del contenido", "comando": null, "espera": "diferencia de altura entre el esqueleto y el contenido cargado ≤ 8 px medida en el mismo viewport de 390×844" }
+      ],
+      "aplicaSi": { "stack": ["nextjs"] },
+      "porCada": "ruta",
+      "posee": ["app{{ruta}}/loading.tsx"],
+      "cerebro": []
+    },
+    {
+      "id": "fe.estado.error-recuperable",
+      "titulo": "Dar a cada error de pantalla una salida que la persona pueda tomar",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "«Algo salió mal» sin botón deja a la cajera con el cliente enfrente y la única salida de recargar y perder la venta a medias. El error tiene que decir qué se puede hacer ahora mismo.",
+      "queHacer": [
+        "Añadir `app/error.tsx` y `app/global-error.tsx` con: qué no se pudo hacer, en palabras de lo que la persona intentaba, y un botón de reintentar que no recargue toda la aplicación.",
+        "Conservar lo que la persona ya había escrito o agregado: el error no puede borrar el carrito ni la venta en curso.",
+        "Añadir una segunda salida siempre: volver a la pantalla anterior o al inicio de la tarea.",
+        "Registrar el error en consola con el dato que sirve para diagnosticarlo, y NO mostrar ese dato técnico en pantalla."
+      ],
+      "aceptacion": [
+        { "check": "Existen los límites de error de la aplicación", "comando": "ls app/error.tsx app/global-error.tsx", "espera": "2 archivos" },
+        { "check": "La pantalla de error ofrece 2 salidas", "comando": "grep -nE \"reintentar|volver|inicio\" app/error.tsx", "espera": "2+ líneas" },
+        { "check": "No se filtra jerga técnica al usuario", "comando": "grep -niE \"stack|payload|500|undefined|fetch failed\" app/error.tsx", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "stack": ["nextjs"] },
+      "porCada": null,
+      "posee": ["app/error.tsx", "app/global-error.tsx"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    {
+      "id": "fe.estado.vacio-que-ensena",
+      "titulo": "Convertir cada pantalla vacía en la instrucción de qué hacer primero",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El primer día de uso todo está vacío, y una tabla vacía sin explicación se lee como un sistema que no funciona. Ese es justo el día en que el dueño decide si esto sirve o no.",
+      "queHacer": [
+        "Para cada lista, tabla y panel, escribir el estado vacío con tres cosas: qué se ve aquí cuando hay datos, por qué está vacío ahora y el botón que crea el primero.",
+        "Distinguir vacío de verdad (no hay nada) de vacío por filtro (hay datos, el filtro los esconde): el segundo ofrece limpiar el filtro, no crear.",
+        "Usar las palabras que salen en el menú, no sinónimos: si el menú dice «Órdenes», el vacío dice «Órdenes», no «pedidos».",
+        "Comprobarlo con la base recién creada, no con la base de pruebas llena."
+      ],
+      "aceptacion": [
+        { "check": "Cada lista tiene su estado vacío", "comando": "grep -rln \"data-vacio\" app/ components/", "espera": "1+ archivos por cada lista del proyecto" },
+        { "check": "El vacío ofrece una acción", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ordenes --width 390 --height 844 --mobile --eval \"(()=>{const v=document.querySelector('[data-vacio]');return v?v.querySelectorAll('button,a').length:-1})()\"", "espera": "eval: 1+ (o -1 si la lista tiene datos)" },
+        { "check": "Vacío por filtro y vacío real son textos distintos", "comando": "grep -rn \"data-vacio=\" app/ components/", "espera": "2+ variantes distintas" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno", "caja"] },
+      "porCada": null,
+      "posee": ["components/ui/vacio.tsx"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    {
+      "id": "fe.formulario.campos-minimos",
+      "titulo": "Pedir solo los campos sin los cuales no se puede cumplir el encargo",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cada campo de más en un formulario público es gente que abandona a mitad. Pedir empresa, cargo y presupuesto para que alguien pida un almuerzo es cambiar ventas por curiosidad.",
+      "queHacer": [
+        "Escribir al lado de cada campo qué se hace con ese dato mañana; el que no tenga respuesta concreta se borra.",
+        "Dejar obligatorios solo los que impiden cumplir: cómo contactar y qué quiere. Lo demás, opcional y marcado como opcional.",
+        "Preguntar por adelantado lo único que hace falta para cumplir (sede, canal) en vez de asumirlo y equivocarse.",
+        "Ordenar los campos como la persona los diría en voz alta, no como están en la tabla de la base de datos."
+      ],
+      "aceptacion": [
+        { "check": "El formulario público no pasa de 4 campos obligatorios", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"document.querySelectorAll('form [required]').length\"", "espera": "eval: ≤4" },
+        { "check": "Cada campo tiene su destino escrito", "comando": "grep -c \"campo:\" docs/formularios.md", "espera": "1 línea por campo del formulario" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/formularios.md", "components/formulario-contacto.tsx"],
+      "cerebro": ["tema:pantalla-publica", "tema:cero-datos-inventados"]
+    },
+    {
+      "id": "fe.formulario.error-junto-al-campo",
+      "titulo": "Poner el error de validación pegado al campo que lo causó",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un aviso rojo arriba diciendo «revisa los datos» obliga a leer diez campos buscando cuál. Con un formulario largo en el teléfono, el error queda fuera de pantalla y la persona no ve nada: cree que el botón no funciona.",
+      "queHacer": [
+        "Renderizar el mensaje debajo del campo, unido por `aria-describedby`, y marcar el campo con `aria-invalid`.",
+        "Al enviar con errores, llevar el foco al PRIMER campo con error y hacer scroll hasta él.",
+        "Escribir el mensaje diciendo qué se espera («el teléfono va con 10 dígitos»), no qué falló («formato inválido»).",
+        "No usar el color como única señal: el mensaje en texto es la señal, el color acompaña."
+      ],
+      "aceptacion": [
+        { "check": "Los errores están asociados a su campo", "comando": "grep -rn \"aria-describedby\\|aria-invalid\" components/", "espera": "2+ líneas" },
+        { "check": "El foco cae en el primer campo con error", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/contacto --width 390 --height 844 --mobile --eval \"(async()=>{document.querySelector('form button[type=submit]').click();await new Promise(r=>setTimeout(r,400));return document.activeElement.getAttribute('aria-invalid')})()\"", "espera": "eval: \"true\"" },
+        { "check": "Ningún mensaje dice solo que es inválido", "comando": "grep -rniE \"formato inv|dato inv|campo inv|error en el formulario\" app/ components/", "espera": "0 líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["components/ui/campo.tsx"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    {
+      "id": "fe.navegacion.donde-estoy",
+      "titulo": "Dejar claro en cada pantalla dónde está la persona y cómo se llama eso",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin marca de sección, quien vuelve del baño toca «guardar» creyendo que está en inventario cuando está en caja. Y con dos pestañas abiertas, el título del navegador es lo único que las distingue.",
+      "queHacer": [
+        "Dar a cada ruta su `title` propio en los metadatos, empezando por el nombre de la pantalla y no por el de la marca.",
+        "Marcar en el menú el elemento activo con `aria-current=\"page\"` y con una señal visual que no sea solo el color.",
+        "Repetir el nombre de la pantalla como primer encabezado del contenido, con las mismas palabras del menú.",
+        "Cuando la pantalla depende de un contexto (sede, turno), mostrarlo al lado del título sin que haya que abrirlo."
+      ],
+      "aceptacion": [
+        { "check": "El elemento activo del menú está marcado", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ordenes --width 390 --height 844 --mobile --eval \"document.querySelectorAll('[aria-current=page]').length\"", "espera": "eval: 1" },
+        { "check": "El título del documento nombra la pantalla", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ordenes --width 390 --height 844 --mobile --eval \"document.title\"", "espera": "eval: empieza por el nombre de la pantalla, ≤60 caracteres" },
+        { "check": "El menú y el encabezado usan la misma palabra", "comando": null, "espera": "0 diferencias entre las etiquetas del menú y los `h1` de sus rutas, comparadas una a una" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno", "caja"] },
+      "porCada": null,
+      "posee": ["components/navegacion.tsx"],
+      "cerebro": ["tema:acceso-roles-y-puestos"]
+    },
+    {
+      "id": "fe.navegacion.404-que-devuelve",
+      "titulo": "Convertir la página de no encontrado en un camino de vuelta",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Un enlace viejo compartido por WhatsApp cae en un 404 en blanco y esa persona se fue: no va a escribir la dirección a mano. Es tráfico ya conseguido que se tira.",
+      "queHacer": [
+        "Añadir `app/not-found.tsx` con el nombre del negocio, una frase de qué pasó y dos enlaces: el inicio y la acción principal del sitio.",
+        "Si la ruta se parece a una válida (producto, sede), ofrecer esa ruta como sugerencia en vez de mandar solo al inicio.",
+        "Devolver código 404 de verdad, no 200 con una pantalla que dice 404."
+      ],
+      "aceptacion": [
+        { "check": "La página existe y ofrece salidas", "comando": "grep -cE \"href=\" app/not-found.tsx", "espera": "2+ líneas" },
+        { "check": "El servidor responde 404", "comando": "curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/ruta-que-no-existe", "espera": "404" }
+      ],
+      "aplicaSi": { "stack": ["nextjs"] },
+      "porCada": null,
+      "posee": [],
+      "cerebro": ["tema:pantalla-publica"]
+    },
+    {
+      "id": "fe.datos.numeros-alineados",
+      "titulo": "Alinear las columnas de dinero y cantidad a la derecha con cifras de ancho fijo",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Con las cifras alineadas a la izquierda y de ancho variable, $9.900 parece más grande que $12.000 y comparar dos filas exige leer dígito por dígito. En un arqueo eso es un error de conteo por columna mal leída.",
+      "queHacer": [
+        "Alinear a la derecha toda celda de dinero, cantidad y peso; el texto sigue a la izquierda.",
+        "Aplicar `font-variant-numeric: tabular-nums` a esas celdas para que todos los dígitos ocupen lo mismo.",
+        "Mostrar siempre la misma cantidad de decimales en una columna: 3 kg y 3,25 kg se escriben con los mismos decimales.",
+        "Poner el separador de miles del formateador único del proyecto, nunca a mano."
+      ],
+      "aceptacion": [
+        { "check": "Las celdas numéricas usan cifras tabulares", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ordenes --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-numero]')].filter(e=>!getComputedStyle(e).fontVariantNumeric.includes('tabular-nums')).length\"", "espera": "eval: 0" },
+        { "check": "Las celdas numéricas van a la derecha", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ordenes --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-numero]')].filter(e=>getComputedStyle(e).textAlign!=='right').length\"", "espera": "eval: 0" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": [],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "fe.datos.cantidad-y-unidad-juntas",
+      "titulo": "No mostrar nunca una cantidad sin su unidad al lado",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un «3» solo en la fila del pollo puede ser 3 unidades, 3 kg o 3 libras, y las tres se cobran distinto. La cajera cuenta a ciegas: la unidad tiene que estar en la misma línea, no en el encabezado de la columna.",
+      "queHacer": [
+        "Guardar la unidad junto a la cantidad en el modelo de la fila y renderizarlas siempre juntas desde el mismo componente.",
+        "Escribir la unidad con la palabra que usa el negocio: kg, lb, unidad, bandeja, no una abreviatura inventada.",
+        "En los campos de entrada, mostrar la unidad dentro del campo, a la derecha, para que se vea mientras se teclea.",
+        "Cuando el producto se vende por peso y por unidad a la vez, mostrar las dos: `2 bandejas · 1,4 kg`."
+      ],
+      "aceptacion": [
+        { "check": "Ninguna celda de cantidad sale sin unidad", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/inventario --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-cantidad]')].filter(e=>!/[a-zA-Z]/.test(e.textContent)).length\"", "espera": "eval: 0" },
+        { "check": "La unidad sale de un solo componente", "comando": "grep -rln \"data-cantidad\" components/", "espera": "1 archivo" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": ["components/ui/cantidad.tsx"],
+      "cerebro": ["tema:invariantes-contables", "tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.feedback.sin-alert-del-navegador",
+      "titulo": "Sacar alert, confirm y prompt del navegador de toda la aplicación",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "El `confirm` del navegador bloquea el hilo, sale con la tipografía del sistema y en algunos navegadores móviles trae la casilla de «no volver a mostrar»: si el cliente la marca, la confirmación de borrado deja de aparecer para siempre.",
+      "queHacer": [
+        "Reemplazar cada `confirm` por el diálogo propio del proyecto, con las dos acciones nombradas por lo que hacen («Anular venta» / «Seguir cobrando»), no «Aceptar/Cancelar».",
+        "Reemplazar cada `alert` por el aviso en pantalla del propio sistema, que no bloquea.",
+        "Eliminar `prompt`: cualquier dato se pide en un campo real, con su teclado y su validación.",
+        "Dejar el grep de guardia en el script `verificar`."
+      ],
+      "aceptacion": [
+        { "check": "No queda ninguno de los tres", "comando": "grep -rnE \"(window\\.)?(alert|confirm|prompt)\\(\" app/ components/ lib/", "espera": "0 líneas" },
+        { "check": "Existe el diálogo propio", "comando": "ls components/ui/dialogo.tsx", "espera": "1 archivo" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [],
+      "cerebro": []
+    },
+    {
+      "id": "fe.feedback.exito-dice-que-paso",
+      "titulo": "Hacer que el mensaje de éxito nombre lo que quedó hecho, con su número",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "«Guardado con éxito» no sirve para nada cuando el cliente pregunta cuánto pagó: la cajera tiene que ir a buscar la venta. «Venta #124 cobrada, $12.500 en efectivo» cierra la conversación en el mostrador.",
+      "queHacer": [
+        "Escribir cada mensaje de éxito con: qué objeto, su identificador visible y el dato que la persona va a necesitar decir en voz alta.",
+        "Mantenerlo en pantalla el tiempo suficiente para leerlo y copiarlo a mano: 5 segundos como mínimo, o hasta que se toque.",
+        "Cuando el resultado tiene comprobante, poner en el mismo aviso el acceso a verlo o imprimirlo.",
+        "Prohibir las palabras «éxito», «correctamente» y «operación» en los mensajes."
+      ],
+      "aceptacion": [
+        { "check": "No quedan mensajes genéricos", "comando": "grep -rniE \"con exito|con éxito|correctamente|operacion exitosa|guardado!\" app/ components/", "espera": "0 líneas" },
+        { "check": "El aviso de cobro incluye número y monto", "comando": "grep -rnE \"data-aviso-exito\" components/ app/", "espera": "1+ líneas con identificador y total interpolados" },
+        { "check": "El aviso dura lo suficiente para leerlo", "comando": "grep -rnE \"duracion|duration\" components/ui/aviso.tsx", "espera": "valor ≥5000 ms" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": ["components/ui/aviso.tsx"],
+      "cerebro": ["tema:cobro-a-clientes", "tema:documentos-para-personas"]
+    },
+    {
+      "id": "fe.publico.accion-antes-del-pliegue",
+      "titulo": "Poner lo primero que se puede pedir dentro de la primera pantalla de 844 px",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La medición de una portada real de esta casa a 390×844 dio la primera tarjeta pedible en y=1994: dos pantallas y media de scroll. Eso no es una portada apagada, es una portada donde no hay dónde comprar.",
+      "queHacer": [
+        "Medir a 390×844 la posición vertical del primer elemento con el que se puede pedir, pedir precio o contactar.",
+        "Bajar el alto del héroe hasta que ese elemento quede con su parte superior por debajo de 844 px como máximo.",
+        "Si el negocio necesita elegir sede o canal antes de pedir, esa elección va dentro de la misma primera pantalla, no después.",
+        "Volver a medir y anotar los tres números en `docs/medicion-portada.md`: alto del documento, alto del héroe, y del primer elemento pedible."
+      ],
+      "aceptacion": [
+        { "check": "El primer elemento pedible entra en la primera pantalla", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"Math.round(document.querySelector('[data-pedible]').getBoundingClientRect().top+scrollY)\"", "espera": "eval: ≤844" },
+        { "check": "Los tres números quedaron anotados", "comando": "grep -cE \"^(documento|heroe|primer-pedible): [0-9]+$\" docs/medicion-portada.md", "espera": "3 líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/medicion-portada.md", "app/page.tsx"],
+      "cerebro": ["tema:pantalla-publica"]
+    },
+    {
+      "id": "fe.publico.una-sola-accion-principal",
+      "titulo": "Dejar una sola acción principal en la vitrina y su estado siempre visible",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con cuatro botones del mismo peso —pedir, llamar, ver carta, seguir en redes— no hay ninguno: la persona elige el más fácil, que es cerrar. Y si el carrito no se ve, se olvida lo que ya había elegido.",
+      "queHacer": [
+        "Elegir la ÚNICA acción que gana plata en este negocio y darle el token de acción; todo lo demás baja a acción secundaria o a enlace de texto.",
+        "Mantener esa acción alcanzable en todo momento: barra inferior fija en móvil, con su estado (cantidad, total) escrito dentro.",
+        "No prometer en el botón nada que el servidor no vaya a honrar: si no hay domicilio, el botón no dice «pedir a domicilio».",
+        "Comprobar a 390×844 que hay exactamente un elemento con el estilo de acción principal por pantalla."
+      ],
+      "aceptacion": [
+        { "check": "Hay una sola acción principal por pantalla", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"document.querySelectorAll('[data-accion=principal]').length\"", "espera": "eval: 1" },
+        { "check": "La acción es alcanzable sin scroll en cualquier punto", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"(()=>{const e=document.querySelector('[data-accion=principal]');const p=getComputedStyle(e.closest('[data-barra]')||e).position;return p})()\"", "espera": "eval: \"fixed\" o \"sticky\"" },
+        { "check": "El estado del pedido se lee dentro de la acción", "comando": "grep -rnE \"data-accion=.principal.\" components/", "espera": "1+ líneas con cantidad y total dentro del botón" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["components/barra-accion.tsx"],
+      "cerebro": ["tema:pantalla-publica", "tema:cobro-a-clientes"]
+    },
+    {
+      "id": "fe.publico.datos-de-negocio-con-origen",
+      "titulo": "Citar el origen de cada dato de negocio que aparece en la vitrina",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un teléfono, un horario o un precio inventado en la página pública es una mentira firmada por el cliente, y quien llama a ese número es una venta que se pierde y una queja que llega. Ya pasó en tres proyectos.",
+      "queHacer": [
+        "Listar todo dato de hecho visible: teléfonos, direcciones, horarios, precios, nombres de producto, testimonios, cifras.",
+        "Anotar para cada uno su origen `archivo:línea` en la fuente real (catálogo, ficha del cliente, mensaje del dueño) en `docs/origen-de-datos.md`.",
+        "Lo que no tenga origen se convierte en HUECO visible en el documento de pendientes, no en un valor verosímil.",
+        "Dejar un grep de guardia con los rellenos típicos del generador para que la próxima pasada los detecte sola."
+      ],
+      "aceptacion": [
+        { "check": "No quedan rellenos verosímiles del generador", "comando": "grep -rniE \"lorem|ejemplo@|correo@|555-?[0-9]{4}|123 456 ?7890|Calle 123|tu-negocio\" app/ components/ content/", "espera": "0 líneas" },
+        { "check": "Cada dato de hecho tiene su origen citado", "comando": "grep -cE \"^\\| .+ \\| .+:[0-9]+ \\|$\" docs/origen-de-datos.md", "espera": "1 fila por dato de hecho; 0 filas sin `archivo:línea`" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/origen-de-datos.md"],
+      "cerebro": ["tema:cero-datos-inventados", "tema:pantalla-publica"]
+    },
+    {
+      "id": "fe.rendimiento.imagenes-con-medida",
+      "titulo": "Dar a toda imagen su medida antes de que cargue",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin alto declarado, la foto llega y empuja el contenido hacia abajo: el dedo ya iba hacia «pedir» y toca «ver más». Ese salto es la razón número uno de un toque equivocado en una vitrina con fotos.",
+      "queHacer": [
+        "Usar el componente de imagen del framework con `width` y `height` reales, o `aspect-ratio` fijado en el contenedor.",
+        "Poner `priority` solo a la imagen del héroe y `loading=\"lazy\"` al resto.",
+        "Dar a cada imagen un `alt` que diga qué producto es, porque también es lo que se lee si la foto no carga.",
+        "Reservar en el esqueleto de carga el mismo alto que va a ocupar la foto."
+      ],
+      "aceptacion": [
+        { "check": "Ninguna imagen carece de medida", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.images].filter(i=>!i.getAttribute('width')&&!getComputedStyle(i.parentElement).aspectRatio.match(/[0-9]/)).length\"", "espera": "eval: 0" },
+        { "check": "No hay etiquetas img crudas sin medida", "comando": "grep -rn \"<img \" app/ components/", "espera": "0 líneas" },
+        { "check": "Toda imagen tiene texto alternativo", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.images].filter(i=>!i.alt).length\"", "espera": "eval: 0" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["components/foto.tsx"],
+      "cerebro": ["tema:pantalla-publica"]
+    },
+    {
+      "id": "fe.operacion.total-siempre-a-la-vista",
+      "titulo": "Mantener el total de la venta a la vista sin scroll durante todo el cobro",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si para ver el total hay que bajar, la cajera dice el precio de memoria y a veces se equivoca; cuando el cliente lo corrige, se pierde el turno de la fila. El total es el dato que se dice en voz alta cien veces al día.",
+      "queHacer": [
+        "Fijar el total en la parte alta o baja de la pantalla de cobro, con el paso tipográfico `cifra` y sin depender del scroll.",
+        "Actualizarlo en el mismo cuadro donde se agregan productos: nada de navegar a un resumen para verlo.",
+        "Mostrar junto al total lo que falta por pagar cuando el pago es mixto, para que la resta no la haga la persona.",
+        "Comprobar a 390×844 con 12 líneas en la venta que el total sigue dentro de la pantalla."
+      ],
+      "aceptacion": [
+        { "check": "El total es visible sin scroll con la venta cargada", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(()=>{const r=document.querySelector('[data-total]').getBoundingClientRect();return r.top>=0&&r.bottom<=844})()\"", "espera": "eval: true" },
+        { "check": "El total se lee de lejos", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"parseFloat(getComputedStyle(document.querySelector('[data-total]')).fontSize)\"", "espera": "eval: ≥28" }
+      ],
+      "aplicaSi": { "superficies": ["caja"], "dineroReal": true },
+      "porCada": null,
+      "posee": ["app/caja/page.tsx", "components/caja/total.tsx"],
+      "cerebro": ["tema:caja-y-turnos", "tema:cobro-a-clientes"]
+    },
+    {
+      "id": "fe.base.jerarquia-de-superficies",
+      "titulo": "Reducir la pantalla a tres superficies con nombre y no más",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando cada componente inventa su propio gris de fondo, nada indica qué es tarjeta, qué es fondo y qué es zona de acción; la pantalla se lee como un collage y el ojo no encuentra dónde tocar.",
+      "queHacer": [
+        "Declarar en `app/globals.css` exactamente tres tokens de superficie: `--fondo`, `--tarjeta` y `--realce`, con su token de texto asociado.",
+        "Fijar qué distingue una superficie de la siguiente: borde, sombra o cambio de fondo, elegido UNO y usado siempre el mismo.",
+        "Reemplazar en los componentes cualquier fondo que no sea uno de los tres.",
+        "Contar en el navegador cuántos colores de fondo distintos hay pintados y bajarlos al número declarado."
+      ],
+      "aceptacion": [
+        { "check": "No hay más de cuatro fondos pintados en la pantalla", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"new Set([...document.querySelectorAll('*')].map(e=>getComputedStyle(e).backgroundColor).filter(c=>c!=='rgba(0, 0, 0, 0)')).size\"", "espera": "eval: ≤4" },
+        { "check": "Las tres superficies están declaradas", "comando": "grep -cE \"^  --(fondo|tarjeta|realce):\" app/globals.css", "espera": "3 líneas" }
+      ],
+      "aplicaSi": { "stack": ["tailwind", "nextjs", "react"] },
+      "porCada": null,
+      "posee": ["app/globals.css"],
+      "cerebro": ["tema:generadores-de-diseno"]
+    },
+    {
+      "id": "fe.movil.pulgar-alcanza-la-accion",
+      "titulo": "Dejar la acción principal dentro del alcance del pulgar en 390×844",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "En la esquina superior derecha de un teléfono de 844 px de alto el pulgar no llega: hay que soltar el aparato y usar la otra mano. En el mostrador la otra mano tiene el pollo, y la venta se detiene.",
+      "queHacer": [
+        "Medir la posición del centro de la acción principal a 390×844 y dejarla en el tercio inferior de la pantalla.",
+        "Subir al tercio superior únicamente lo que se lee y no se toca: título, total, estado.",
+        "Poner las acciones destructivas fuera de la zona del pulgar, para que un roce no las dispare.",
+        "Comprobarlo también con el teclado abierto, que se come la mitad inferior de la pantalla."
+      ],
+      "aceptacion": [
+        { "check": "La acción principal cae en el tercio inferior", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"(()=>{const r=document.querySelector('[data-accion=principal]').getBoundingClientRect();return Math.round(r.top+r.height/2)})()\"", "espera": "eval: ≥563" },
+        { "check": "Ninguna acción destructiva está en la zona del pulgar", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-destructiva]')].filter(e=>e.getBoundingClientRect().top>563).length\"", "espera": "eval: 0" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["components/barra-accion.tsx"],
+      "cerebro": ["tema:pantalla-publica", "tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.movil.sin-hover-como-unica-via",
+      "titulo": "Quitar el hover como única forma de llegar a algo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "En un teléfono no hay hover: un menú o un botón de borrar que solo aparece al pasar el mouse sencillamente no existe para el 100% de la gente que entra desde el celular, que es el canal real.",
+      "queHacer": [
+        "Listar todo lo que hoy solo aparece con `hover:` o `group-hover:` y comprobar si tiene otra vía en táctil.",
+        "Convertir esos elementos en visibles siempre, o en un menú que se abre con un toque explícito.",
+        "Dejar el hover solo como refuerzo visual de algo que ya está visible.",
+        "Repasar también los tooltips: si el tooltip lleva información que hace falta para decidir, esa información va en la pantalla."
+      ],
+      "aceptacion": [
+        { "check": "Nada queda oculto esperando el mouse", "comando": "grep -rnE \"(opacity-0|invisible|hidden)[^\\\"]*group-hover:|hover:(opacity-100|visible|block|flex)\" app/ components/", "espera": "0 líneas" },
+        { "check": "Todas las acciones de fila son tocables en 390 px", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ordenes --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-fila] button')].filter(e=>getComputedStyle(e).opacity==='0'||getComputedStyle(e).visibility==='hidden').length\"", "espera": "eval: 0" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["components/ui/fila.tsx"],
+      "cerebro": ["tema:pantalla-publica"]
+    },
+    {
+      "id": "fe.estado.url-comparte-la-pantalla",
+      "titulo": "Guardar en la URL de {{ruta}} el filtro, la pestaña y la búsqueda",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el filtro vive solo en memoria, el dueño no puede mandar por WhatsApp «mira las ventas de ayer de esta sede»: tiene que dictar cinco toques. Y al recargar, la pantalla vuelve al principio y hay que rehacerlos.",
+      "queHacer": [
+        "Pasar a parámetros de URL el estado que cambia lo que se ve en {{ruta}}: filtros, pestaña activa, texto buscado, orden y página.",
+        "Leerlos con la precedencia URL > guardado > preguntar, sin valores por defecto silenciosos que contradigan la URL.",
+        "Escribirlos con reemplazo del historial mientras se teclea, para que el botón de volver no recorra letra por letra.",
+        "Dejar fuera de la URL lo que sea dato personal: nada de identificadores de cliente ni teléfonos en la barra de direcciones."
+      ],
+      "aceptacion": [
+        { "check": "La URL reproduce la pantalla en {{ruta}}", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url \"http://localhost:3000{{ruta}}?q=pollo&orden=fecha\" --width 390 --height 844 --mobile --eval \"[document.querySelector('input[type=search]').value,document.querySelector('[data-orden-activo]').textContent.trim()]\"", "espera": "eval: [\"pollo\", \"fecha\"]" },
+        { "check": "Recargar no pierde el filtro", "comando": null, "espera": "tras recargar, los mismos 2 valores y el mismo número de filas visibles que antes de recargar" },
+        { "check": "No hay datos personales en la URL", "comando": "grep -rnE \"searchParams.set\\('(telefono|email|correo|documento|cedula)\" app/ components/", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno"] },
+      "porCada": "ruta",
+      "posee": ["app{{ruta}}/page.tsx"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "fe.formulario.no-se-pierde-lo-escrito",
+      "titulo": "Conservar lo escrito cuando el envío falla",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Perder ocho campos por un error de red es la razón por la que la gente no vuelve a intentar: reescribir todo con el cliente esperando no pasa, se abandona. Y en la caja, es una venta a medio armar que se tira.",
+      "queHacer": [
+        "Mantener los valores en el estado del formulario y volver a renderizar con ellos cuando la respuesta es error.",
+        "No limpiar el formulario hasta tener la confirmación del servidor, nunca en el momento del envío.",
+        "Para formularios largos o para la venta en curso, guardar un borrador en el dispositivo y recuperarlo al volver a entrar.",
+        "Borrar el borrador solo cuando el envío se confirma, y no dejar en él datos personales más de lo necesario."
+      ],
+      "aceptacion": [
+        { "check": "Tras un error, los campos conservan sus valores", "comando": null, "espera": "con el servidor caído, los 8 campos vuelven con el mismo texto: 0 campos vacíos" },
+        { "check": "El formulario no se limpia antes de confirmar", "comando": "grep -rnE \"reset\\(\\)|setValues\\(\\{\\}\\)\" components/ app/", "espera": "0 líneas fuera del camino de éxito" },
+        { "check": "El borrador se borra al confirmar", "comando": "grep -rn \"removeItem\" lib/ components/", "espera": "1+ líneas, en el camino de éxito" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["components/ui/formulario.tsx"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "fe.formulario.envio-una-sola-vez",
+      "titulo": "Impedir que el doble toque cree dos veces la misma cosa",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando el servidor tarda, la gente toca otra vez: salen dos pedidos idénticos, se cobra dos veces y alguien tiene que anular uno a mano. En la placita eso ya llegó a la cocina como dos bandejas.",
+      "queHacer": [
+        "Deshabilitar el botón desde el primer toque hasta que llegue la respuesta, cambiando su texto a lo que está pasando («Cobrando…»).",
+        "Generar en el cliente una clave de idempotencia por intento y mandarla en la petición, para que el reintento no duplique en el servidor.",
+        "No confiar solo en deshabilitar el botón: el Enter del teclado y el doble toque rápido llegan antes del re-render.",
+        "Al volver la respuesta, mostrar el aviso con el identificador creado, para que se vea que hay uno y no dos."
+      ],
+      "aceptacion": [
+        { "check": "El botón queda inhabilitado durante el envío", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(async()=>{const b=document.querySelector('[data-accion=cobrar]');b.click();b.click();await new Promise(r=>setTimeout(r,50));return b.disabled})()\"", "espera": "eval: true" },
+        { "check": "Se manda clave de idempotencia", "comando": "grep -rniE \"idempotency|clave-intento|intentoId\" lib/ components/", "espera": "1+ líneas" },
+        { "check": "Dos toques crean un solo documento", "comando": null, "espera": "tras el doble toque, 1 registro nuevo en la lista; conteo antes y después difiere en exactamente 1" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["components/ui/boton-envio.tsx"],
+      "cerebro": ["tema:cobro-a-clientes", "tema:invariantes-contables"]
+    },
+    {
+      "id": "fe.formulario.numeros-como-los-escribe-la-gente",
+      "titulo": "Aceptar los números como los teclea la persona, no como los quiere la base",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La cajera teclea 1,5 kg porque aquí la coma es el decimal; si el campo solo acepta punto, guarda 15 o rechaza y ella vuelve a teclear con el cliente esperando. Y el peso mal leído se cobra mal.",
+      "queHacer": [
+        "Normalizar en el cliente antes de validar: cambiar coma por punto, quitar espacios y separadores de miles, aceptar el cero inicial.",
+        "Aceptar el teléfono con espacios, guiones y prefijo, y guardarlo normalizado; no rechazar por la forma en que se escribió.",
+        "Mostrar debajo del campo, mientras se teclea, cómo quedó interpretado el valor: `1,5 kg = 1500 g`.",
+        "Rechazar solo lo que de verdad no es un número, con el mensaje diciendo qué se espera."
+      ],
+      "aceptacion": [
+        { "check": "La coma decimal se acepta y se interpreta", "comando": "npm test -- normalizar-numero", "espera": "tests verdes; \"1,5\" y \"1.5\" devuelven el mismo valor" },
+        { "check": "El campo muestra la interpretación mientras se teclea", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"!!document.querySelector('[data-interpretado]')\"", "espera": "eval: true" },
+        { "check": "Nadie parsea a mano por su cuenta", "comando": "grep -rnE \"parseFloat\\(|Number\\(\" app/ components/", "espera": "0 líneas fuera de lib/numero.ts" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": ["lib/numero.ts", "components/ui/campo-numero.tsx"],
+      "cerebro": ["tema:caja-y-turnos", "tema:invariantes-contables"]
+    },
+    {
+      "id": "fe.navegacion.volver-no-pierde",
+      "titulo": "Devolver al mismo punto de la lista cuando se vuelve atrás",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Entrar a un producto y volver arriba del todo obliga a bajar otra vez cada vez: revisar diez productos de una lista larga pasa de diez toques a cincuenta, y en el mostrador eso se abandona a la mitad.",
+      "queHacer": [
+        "Guardar la posición de scroll y el filtro al salir de la lista, y restaurarlos al volver por el botón de atrás.",
+        "Marcar visualmente la fila desde la que se salió, para no volver a entrar en la misma por error.",
+        "Usar navegación del framework en vez de recargar la página: una recarga completa siempre pierde la posición.",
+        "Comprobarlo con la lista larga de verdad, no con las tres filas de prueba."
+      ],
+      "aceptacion": [
+        { "check": "Volver restaura la posición de scroll", "comando": null, "espera": "diferencia entre la posición al salir y al volver ≤ 24 px en una lista de 300 filas" },
+        { "check": "La navegación no recarga la página", "comando": "grep -rnE \"window\\.location\\.(href|assign|reload)|<a href=\\\"/\" app/ components/", "espera": "0 líneas" },
+        { "check": "La fila visitada queda marcada", "comando": "grep -rn \"data-visitada\" components/", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno", "vitrina"] },
+      "porCada": null,
+      "posee": ["components/ui/lista.tsx"],
+      "cerebro": []
+    },
+    {
+      "id": "fe.navegacion.menu-por-tarea",
+      "titulo": "Nombrar el menú por las tareas del día y ordenarlo por frecuencia",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un menú con «Entidades», «Movimientos» y «Configuración» obliga a traducir del sistema al trabajo cada vez. Si «Cobrar» está de sexto y se usa 200 veces al día, son 200 recorridos de más por la lista.",
+      "queHacer": [
+        "Escribir cada elemento del menú con el verbo de la tarea: «Cobrar», «Recibir mercancía», «Cerrar caja», no con el nombre de la tabla.",
+        "Ordenar de arriba abajo por veces que se usa en un día real, y anotar esas veces al lado en `docs/menu.md`.",
+        "Dejar 7 elementos como máximo en el nivel principal; lo demás baja a la pantalla que lo necesita.",
+        "Esconder lo que el rol de esa persona no puede hacer, en vez de mostrarlo y rechazarlo después."
+      ],
+      "aceptacion": [
+        { "check": "El menú principal no pasa de 7 elementos", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"document.querySelectorAll('nav[data-menu-principal] a').length\"", "espera": "eval: ≤7" },
+        { "check": "Cada elemento tiene su frecuencia anotada", "comando": "grep -cE \"^\\| .+ \\| [0-9]+/día \\|$\" docs/menu.md", "espera": "1 fila por elemento del menú" },
+        { "check": "El rol de mostrador no ve lo que no puede hacer", "comando": null, "espera": "con sesión de cajera, 0 elementos del menú devuelven pantalla de sin permiso" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno", "caja"], "multiUsuario": true },
+      "porCada": null,
+      "posee": ["components/navegacion.tsx", "docs/menu.md"],
+      "cerebro": ["tema:acceso-roles-y-puestos", "tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.datos.busqueda-que-encuentra",
+      "titulo": "Hacer que la búsqueda encuentre con tildes, mayúsculas y palabras a medias",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si buscar «platano» no encuentra «Plátano», la cajera concluye que el producto no está y lo crea otra vez: queda duplicado en el inventario y el conteo del día deja de cuadrar.",
+      "queHacer": [
+        "Normalizar los dos lados —lo tecleado y el texto buscado— quitando tildes y pasando a minúsculas antes de comparar.",
+        "Buscar por coincidencia parcial en cualquier posición, no solo por comienzo de palabra.",
+        "Esperar 200 ms desde la última tecla antes de disparar la búsqueda, y no perder las teclas que llegan mientras tanto.",
+        "Mostrar cuántos resultados hay y qué se buscó, para que un cero se lea como «no hay», no como «se rompió»."
+      ],
+      "aceptacion": [
+        { "check": "Encuentra sin tildes y en minúsculas", "comando": "npm test -- buscar", "espera": "tests verdes; \"platano\", \"PLÁTANO\" y \"tano\" devuelven la misma fila" },
+        { "check": "La pantalla dice cuántos resultados hay", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url \"http://localhost:3000/inventario?q=zzz\" --width 390 --height 844 --mobile --eval \"document.querySelector('[data-conteo-resultados]').textContent.trim()\"", "espera": "eval: texto con el número 0 y el término buscado" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno", "caja"] },
+      "porCada": null,
+      "posee": ["lib/buscar.ts", "components/ui/buscador.tsx"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "fe.datos.lista-larga-no-se-pinta-entera",
+      "titulo": "Cortar la lista antes de que el teléfono tenga que pintar miles de filas",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con 5.000 movimientos, pintarlos todos deja el teléfono del mostrador congelado varios segundos por cada toque: no es que sea lento, es que no responde y la persona vuelve a tocar.",
+      "queHacer": [
+        "Fijar el tamaño de página en 50 filas y pedir al servidor solo esa página, con su conteo total.",
+        "Mostrar arriba el total real de resultados aunque solo se pinten 50, para que nadie crea que hay 50.",
+        "Ofrecer «ver más» que suma la siguiente página sin perder la posición, o paginación con número de página en la URL.",
+        "Comprobar el conteo de nodos pintados en el navegador, no la sensación de velocidad."
+      ],
+      "aceptacion": [
+        { "check": "Nunca se pintan más de 60 filas a la vez", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/movimientos --width 390 --height 844 --mobile --eval \"document.querySelectorAll('[data-fila]').length\"", "espera": "eval: ≤60 con 5.000 registros en la base" },
+        { "check": "El total real está a la vista", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/movimientos --width 390 --height 844 --mobile --eval \"document.querySelector('[data-conteo-total]').textContent.trim()\"", "espera": "eval: el conteo completo de la base, no 50" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno"] },
+      "porCada": null,
+      "posee": ["components/ui/lista-paginada.tsx"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "fe.datos.tabla-en-390",
+      "titulo": "Convertir la tabla en tarjetas por debajo de 640 px de ancho",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una tabla de siete columnas en un teléfono de 390 px o desborda la página o encoge la letra hasta lo ilegible. En los dos casos el dato que hay que leer —el total— es el que se pierde.",
+      "queHacer": [
+        "Elegir para cada tabla los 3 campos con los que se toma la decisión y montar con ellos la tarjeta de móvil.",
+        "Renderizar tarjetas por debajo de 640 px y tabla por encima, desde el MISMO componente y el mismo dato, sin duplicar el árbol.",
+        "Si la tabla tiene que sobrevivir en móvil, encerrarla en su propio contenedor con desplazamiento horizontal y la primera columna fija.",
+        "Comprobar a 390 px que la página no desborda y que la tarjeta muestra los 3 campos."
+      ],
+      "aceptacion": [
+        { "check": "A 390 px no hay tabla desbordando la página", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/movimientos --width 390 --height 844 --mobile", "espera": "metrics.overflowX = false" },
+        { "check": "En móvil se pintan tarjetas, no filas de tabla", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/movimientos --width 390 --height 844 --mobile --eval \"[document.querySelectorAll('[data-tarjeta-fila]').length,document.querySelectorAll('table tbody tr').length]\"", "espera": "eval: primer número ≥1, segundo número 0" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno"] },
+      "porCada": null,
+      "posee": ["components/ui/tabla.tsx"],
+      "cerebro": []
+    },
+    {
+      "id": "fe.feedback.confirmar-solo-lo-irreversible",
+      "titulo": "Pedir confirmación solo donde no hay vuelta atrás",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un «¿está seguro?» en cada quitar-producto suma un toque a cada corrección: en un día de 200 ventas con dos correcciones cada una son 400 toques que no arreglan nada, y la gente aprende a confirmar sin leer, justo antes de la pantalla que sí importaba.",
+      "queHacer": [
+        "Clasificar cada acción destructiva en reversible (se puede deshacer) o irreversible (anula un documento, borra un cierre, cobra plata).",
+        "Quitar la confirmación de todas las reversibles y darles deshacer en su lugar.",
+        "Dejar confirmación solo en las irreversibles, escribiendo en el diálogo qué se va a perder y con qué número.",
+        "Nombrar los botones por lo que hacen: «Anular venta #124» y «Seguir cobrando», nunca «Aceptar» y «Cancelar»."
+      ],
+      "aceptacion": [
+        { "check": "Ninguna acción reversible pide confirmación", "comando": "grep -rn \"data-confirmar\" components/ app/", "espera": "1 línea por acción marcada irreversible; 0 en acciones con deshacer" },
+        { "check": "Los diálogos no usan Aceptar/Cancelar", "comando": "grep -rniE \">\\s*(aceptar|cancelar|si|no)\\s*<\" components/ui/dialogo.tsx", "espera": "0 líneas" },
+        { "check": "El diálogo nombra el documento afectado", "comando": null, "espera": "en la captura del diálogo aparece el identificador de la venta y su total" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": ["components/ui/dialogo.tsx"],
+      "cerebro": ["tema:caja-y-turnos", "tema:invariantes-contables"]
+    },
+    {
+      "id": "fe.feedback.errores-que-ensenan",
+      "titulo": "Reescribir cada error para que diga qué hacer ahora",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "«Error 422» hace que la cajera llame al que construyó el sistema, a las 7 de la noche, por algo que ella podía arreglar sola en cinco segundos si el mensaje se lo hubiera dicho.",
+      "queHacer": [
+        "Recorrer los errores que la persona puede ver y reescribirlos en tres partes: qué se intentaba, qué lo impidió y qué hacer ahora.",
+        "Sacar de la pantalla los códigos, nombres de campo del sistema y textos en inglés; van a la consola.",
+        "Cuando el error viene de una regla del negocio (el turno está cerrado, no hay existencias), decir la regla en las palabras del negocio.",
+        "Poner en el mensaje, cuando se puede, la acción que lo resuelve como botón: abrir turno, ajustar la cantidad."
+      ],
+      "aceptacion": [
+        { "check": "No hay códigos ni jerga en los mensajes visibles", "comando": "grep -rnE \"(4[0-9]{2}|5[0-9]{2})\\b|undefined|null|payload|token|fetch|constraint\" components/mensajes.ts", "espera": "0 líneas" },
+        { "check": "Todo mensaje está en un solo archivo y en español", "comando": "grep -c \"=>\" components/mensajes.ts", "espera": "1 entrada por caso de error del proyecto" },
+        { "check": "El mensaje ofrece la salida", "comando": null, "espera": "en 3 de 3 errores de negocio provocados a mano, el aviso incluye 1 botón que resuelve el caso" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": ["components/mensajes.ts"],
+      "cerebro": ["tema:documentos-para-personas", "tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.feedback.acuse-inmediato-al-toque",
+      "titulo": "Responder visualmente a cada toque antes de 100 ms",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el botón no cambia al tocarlo, la persona no sabe si registró y toca otra vez: en una grilla de productos eso agrega dos veces el mismo artículo y la venta sale mal contada.",
+      "queHacer": [
+        "Dar a todo control un estado de presionado que se pinte con el toque, sin esperar la respuesta del servidor.",
+        "Actualizar la lista de la venta en el momento del toque y corregirla si el servidor rechaza, en vez de esperar para pintar.",
+        "Quitar los retardos de transición de más de 150 ms en los estados de presionado: la animación bonita se lee como lentitud.",
+        "Comprobar que ninguna transición de un control pasa de 150 ms."
+      ],
+      "aceptacion": [
+        { "check": "Ninguna transición de control pasa de 150 ms", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('button')].map(e=>parseFloat(getComputedStyle(e).transitionDuration)*1000).filter(v=>v>150).length\"", "espera": "eval: 0" },
+        { "check": "Existe estado de presionado en el componente de botón", "comando": "grep -nE \"active:|:active\" components/ui/boton.tsx app/globals.css", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": ["components/ui/boton.tsx"],
+      "cerebro": ["tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.rendimiento.peso-de-la-primera-pantalla",
+      "titulo": "Poner techo al peso que baja la primera pantalla",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "En el 4G de un barrio a la hora del almuerzo, un megabyte de JavaScript son varios segundos de pantalla muerta: la mitad de la gente cierra antes de ver la primera foto, y eso no aparece en ningún reporte de ventas.",
+      "queHacer": [
+        "Medir el peso transferido de JavaScript y de imágenes en la primera pantalla y anotarlo en `docs/presupuesto-frontend.md`.",
+        "Fijar el techo: 180 KB de JavaScript transferido y 500 KB de imágenes en la primera pantalla.",
+        "Bajar lo que sobre por el camino barato primero: quitar la librería que se usa una vez, cargar bajo demanda lo que no se ve, servir la foto en el tamaño que se pinta.",
+        "Anotar la medición con fecha, para que la siguiente comparación tenga contra qué."
+      ],
+      "aceptacion": [
+        { "check": "El JavaScript transferido no pasa del techo", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"Math.round(performance.getEntriesByType('resource').filter(r=>r.name.includes('.js')).reduce((a,r)=>a+r.transferSize,0)/1024)\"", "espera": "eval: ≤180" },
+        { "check": "Las imágenes de la primera pantalla no pasan del techo", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"Math.round(performance.getEntriesByType('resource').filter(r=>r.initiatorType==='img').reduce((a,r)=>a+r.transferSize,0)/1024)\"", "espera": "eval: ≤500" },
+        { "check": "El presupuesto está escrito con fecha", "comando": "grep -nE \"^(js|imagenes): [0-9]+ KB\" docs/presupuesto-frontend.md", "espera": "2+ líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/presupuesto-frontend.md"],
+      "cerebro": ["tema:pantalla-publica"]
+    },
+    {
+      "id": "fe.publico.metadatos-para-compartir",
+      "titulo": "Hacer que el enlace pegado en WhatsApp muestre foto, nombre y frase",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "En este país el enlace se comparte por WhatsApp, y si sale gris con la dirección cruda nadie lo abre. La tarjeta con foto del producto es la mitad del trabajo de venta que hace el propio cliente por nosotros.",
+      "queHacer": [
+        "Declarar en el layout raíz `openGraph` con `title`, `description`, `url` y una imagen real de 1200×630 del producto, no el logo sobre blanco.",
+        "Poner también `twitter:card` en `summary_large_image` para los clientes que lo usan.",
+        "Usar una foto que se entienda en miniatura: producto grande, sin texto pequeño encima.",
+        "Comprobar el resultado pegando el enlace en una conversación real, no solo mirando el HTML."
+      ],
+      "aceptacion": [
+        { "check": "Los metadatos de compartir existen", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('meta[property^=og]')].map(m=>m.getAttribute('property'))\"", "espera": "eval: incluye og:title, og:description y og:image" },
+        { "check": "La imagen de compartir existe y mide 1200×630", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/compartir.jpg --width 1200 --height 630 --eval \"[document.images[0].naturalWidth,document.images[0].naturalHeight]\"", "espera": "eval: [1200, 630]" },
+        { "check": "La descripción no es la genérica del generador", "comando": "grep -rniE \"description.*(mi sitio|next\\.js|create next app|descripcion del sitio)\" app/", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["app/layout.tsx", "public/compartir.jpg"],
+      "cerebro": ["tema:pantalla-publica", "tema:cero-datos-inventados"]
+    },
+    {
+      "id": "fe.publico.titulo-y-descripcion-por-ruta",
+      "titulo": "Dar a {{ruta}} su propio título y su propia descripción",
+      "nivel": "N2",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Con el mismo título en todas las páginas, el buscador muestra cinco resultados idénticos del mismo negocio y elige él cuál enseña. La página del producto que sí vende queda sin nombre propio.",
+      "queHacer": [
+        "Exportar `metadata` en `app{{ruta}}/page.tsx` con un `title` que empiece por lo específico de {{ruta}} y termine por el nombre del negocio.",
+        "Escribir una `description` de 120 a 155 caracteres con lo que se puede hacer en {{ruta}}, sin repetir el título.",
+        "Cuando {{ruta}} sea dinámica, generar el título desde el dato real (nombre del producto, de la sede), nunca un texto fijo.",
+        "Declarar la URL canónica de {{ruta}} para que la versión con parámetros no compita consigo misma."
+      ],
+      "aceptacion": [
+        { "check": "{{ruta}} tiene título propio y de largo razonable", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 390 --height 844 --mobile --eval \"[document.title,document.title.length]\"", "espera": "eval: título distinto al de la portada, largo entre 20 y 60" },
+        { "check": "{{ruta}} declara descripción y canónica", "comando": "grep -nE \"description|canonical\" app{{ruta}}/page.tsx", "espera": "2+ líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": "ruta",
+      "posee": ["app{{ruta}}/page.tsx"],
+      "cerebro": ["tema:pantalla-publica"]
+    },
+    {
+      "id": "fe.publico.registro-visual-de-vitrina",
+      "titulo": "Darle peso al fondo de la vitrina hasta que el producto domine",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El veredicto textual del dueño fue «todo se ve muy genérico, apagado, hazlo divertido, llamativo, que dé gusto verlo», y la primera palabra del reclamo anterior fue FONDO. La calma del interior de la app, aplicada a una vitrina, se lee como negocio pobre.",
+      "queHacer": [
+        "Comprobar primero que `docs/registro-visual.md` dice `vitrina`; si dice `interior`, este arquetipo no aplica.",
+        "Dar al fondo del héroe peso propio —foto del producto, color saturado del token de marca o degradado— en vez de blanco o crema plano.",
+        "Hacer que la foto del producto ocupe al menos el 40% del área de la primera pantalla a 390×844.",
+        "Usar el paso `cifra` para el precio y dejarlo visible en la primera pantalla: en comida, el precio vende.",
+        "Añadir movimiento solo donde hay algo que mostrar, y dejarlo apagado cuando el sistema pide movimiento reducido."
+      ],
+      "aceptacion": [
+        { "check": "El héroe no es un fondo plano del tema base", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"(()=>{const h=document.querySelector('[data-heroe]');const s=getComputedStyle(h);return [s.backgroundImage!=='none', s.backgroundColor]})()\"", "espera": "eval: primer valor true, o color distinto al token --fondo" },
+        { "check": "El producto ocupa la primera pantalla", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"Math.round([...document.images].filter(i=>i.getBoundingClientRect().top<844).reduce((a,i)=>{const r=i.getBoundingClientRect();return a+r.width*Math.max(0,Math.min(844,r.bottom)-Math.max(0,r.top))},0)/(390*844)*100)\"", "espera": "eval: ≥40" },
+        { "check": "Queda una captura de referencia de la primera pantalla", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --shot docs/capturas/portada-390.png", "espera": "archivo creado; exceptions: []" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["app/page.tsx", "components/heroe.tsx", "docs/capturas/portada-390.png"],
+      "cerebro": ["tema:pantalla-publica", "tema:generadores-de-diseno"]
+    },
+    {
+      "id": "fe.operacion.cobrar-en-2-toques",
+      "titulo": "Dejar el cobro en 2 toques desde la venta armada",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Cada toque de más entre el total y la plata en el cajón se paga doscientas veces al día y se paga con la fila esperando. Un cobro de cinco toques y dos pantallas es media hora diaria de la cajera y clientes que se van.",
+      "queHacer": [
+        "Montar el cobro en un solo bloque, sin navegar y sin scroll: total grande, medios de pago como grilla tocable, botón de confirmar.",
+        "Hacer que el primer toque sea el medio de pago —que además preselecciona el monto exacto— y el segundo, confirmar.",
+        "Poner los medios de pago reales del negocio visibles a la vez, sin desplegables: efectivo, transferencia, datáfono.",
+        "Exigir que los pagos sumen exacto para registrar; si no suman, el botón dice cuánto falta en vez de bloquearse mudo.",
+        "Contar los toques del recorrido completo y anotarlos en `docs/toques.md` con la fecha de la medición."
+      ],
+      "aceptacion": [
+        { "check": "Los medios de pago están visibles sin abrir nada", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-medio-pago]')].filter(e=>e.getBoundingClientRect().height>0).length\"", "espera": "eval: ≥3, sin abrir menús" },
+        { "check": "Cobrar no cambia de ruta", "comando": "grep -rnE \"router\\.push|<Link\" components/caja/", "espera": "0 líneas en el camino de cobro" },
+        { "check": "El recorrido medido cabe en 2 toques", "comando": null, "espera": "conteo anotado en docs/toques.md: 2 toques desde la venta armada hasta el aviso de cobrada" }
+      ],
+      "aplicaSi": { "superficies": ["caja"], "dineroReal": true },
+      "porCada": null,
+      "posee": ["app/caja/cobrar/page.tsx", "components/caja/cobro.tsx", "docs/toques.md"],
+      "cerebro": ["tema:caja-y-turnos", "tema:cobro-a-clientes"]
+    },
+    {
+      "id": "fe.operacion.tres-productos-en-6-toques",
+      "titulo": "Dejar armada una venta de 3 productos en 6 toques o menos",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si armar una venta corriente cuesta doce toques, la cajera vuelve al cuaderno y el sistema queda de adorno: eso ya pasó. Seis toques es el techo con el que el mostrador acepta la pantalla.",
+      "queHacer": [
+        "Poner en la primera pantalla de la caja la grilla de los productos más vendidos del negocio, cada uno agregando con un toque, sin cantidad previa.",
+        "Fijar la cantidad en 1 al agregar y ofrecer el ajuste solo cuando hace falta, en la propia fila.",
+        "Ordenar la grilla por ventas reales del último mes, no alfabéticamente.",
+        "Contar los toques de la venta corriente del negocio y anotarlos en `docs/toques.md`; si pasan de 6, se recorta el recorrido, no el número."
+      ],
+      "aceptacion": [
+        { "check": "Los productos frecuentes se agregan con un toque", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-producto-rapido]')].filter(e=>e.getBoundingClientRect().top<844).length\"", "espera": "eval: ≥8 visibles sin scroll" },
+        { "check": "El recorrido medido cabe en 6 toques", "comando": null, "espera": "conteo anotado en docs/toques.md: ≤6 toques para 3 productos, desde la caja vacía hasta la venta armada" },
+        { "check": "El orden viene de las ventas, no del alfabeto", "comando": "grep -rn \"ordenar\" lib/productos-rapidos.ts", "espera": "1+ líneas ordenando por ventas del período" }
+      ],
+      "aplicaSi": { "superficies": ["caja"] },
+      "porCada": null,
+      "posee": ["components/caja/grilla-productos.tsx", "lib/productos-rapidos.ts"],
+      "cerebro": ["tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.operacion.corregir-sin-empezar-de-cero",
+      "titulo": "Permitir corregir una línea de la venta con un solo toque",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La cajera se equivoca: agrega el producto de al lado, teclea 15 en vez de 1,5. Si corregir obliga a vaciar y volver a armar, la venta corriente pasa de 6 toques a veinte y el cliente ve el error crecer.",
+      "queHacer": [
+        "Poner en cada línea de la venta el quitar y el ajustar cantidad, tocables sin abrir menú y sin confirmación.",
+        "Hacer que quitar sea deshacible durante 8 segundos, en vez de preguntar antes.",
+        "Permitir corregir la cantidad tecleando encima, sin borrar primero: el campo se selecciona entero al enfocar.",
+        "Separar 8 px el quitar del ajustar para que el dedo no dispare el equivocado."
+      ],
+      "aceptacion": [
+        { "check": "Cada línea tiene quitar y ajustar visibles", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(()=>{const f=[...document.querySelectorAll('[data-linea-venta]')];return f.map(l=>l.querySelectorAll('[data-quitar],[data-ajustar]').length)})()\"", "espera": "eval: cada valor = 2" },
+        { "check": "Quitar no pide confirmación", "comando": "grep -rn \"data-confirmar\" components/caja/", "espera": "0 líneas" },
+        { "check": "El campo de cantidad se selecciona entero al enfocar", "comando": "grep -rn \"select()\" components/caja/", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "superficies": ["caja"] },
+      "porCada": null,
+      "posee": ["components/caja/linea-venta.tsx"],
+      "cerebro": ["tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.consistencia.un-solo-componente-por-cosa",
+      "titulo": "Dejar un solo botón, un solo campo y una sola tarjeta en todo el proyecto",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con cuatro botones distintos, arreglar el área de toque hay que hacerlo cuatro veces y se hace tres: el cuarto queda chico justo en la pantalla que menos se prueba. La duplicación no es fealdad, es trabajo repetido y un bug que sobrevive.",
+      "queHacer": [
+        "Inventariar en `components/` cuántas implementaciones distintas hay de botón, campo, tarjeta, diálogo y aviso.",
+        "Elegir una de cada tipo, moverla a `components/ui/` y reemplazar los usos de las demás.",
+        "Borrar las que quedaron sin uso en la misma pasada: dejarlas «por si acaso» garantiza que alguien las vuelva a usar.",
+        "Dejar las variantes como propiedad del componente único (`variante=\"principal\"`), no como componentes nuevos."
+      ],
+      "aceptacion": [
+        { "check": "Hay una sola definición por tipo de control", "comando": "grep -rlE \"export (default )?function (Boton|Button|Campo|Input|Tarjeta|Card)\" components/", "espera": "1 archivo por tipo" },
+        { "check": "Nadie define botones fuera de components/ui", "comando": "grep -rnE \"<button\" app/ components/ --include=*.tsx | grep -v \"components/ui/\"", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "stack": ["react", "nextjs"] },
+      "porCada": null,
+      "posee": ["components/ui/"],
+      "cerebro": ["tema:generadores-de-diseno"]
+    },
+    {
+      "id": "fe.base.tema-por-tokens",
+      "titulo": "Lograr el tema oscuro redefiniendo tokens, no duplicando clases",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con `dark:` repartido por 200 componentes, cada pantalla nueva nace con la mitad de los estados oscuros mal, y el contraste AA solo se comprueba en el tema claro. La deuda se paga en cada componente, para siempre.",
+      "queHacer": [
+        "Redefinir en `app/globals.css` los MISMOS nombres de token bajo el selector del tema oscuro; ningún componente cambia.",
+        "Comprobar el contraste AA de los pares del tema oscuro con el mismo `scripts/contraste.mjs`, no a ojo.",
+        "Eliminar de los componentes las variantes de color por tema.",
+        "Fijar qué tema arranca por defecto y de dónde sale la preferencia, con la precedencia URL > guardado > sistema."
+      ],
+      "aceptacion": [
+        { "check": "No hay variantes de tema en los componentes", "comando": "grep -rn \"dark:\" app/ components/ --include=*.tsx", "espera": "0 líneas" },
+        { "check": "El tema oscuro también pasa AA", "comando": "node scripts/contraste.mjs --tema oscuro", "espera": "exit 0; 0 pares por debajo del umbral" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno", "vitrina"] },
+      "porCada": null,
+      "posee": ["app/globals.css", "scripts/contraste.mjs"],
+      "cerebro": ["tema:generadores-de-diseno"]
+    },
+    {
+      "id": "fe.movil.escritorio-es-la-misma-columna",
+      "titulo": "Hacer del escritorio la misma columna de 390 px, no una segunda pantalla",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Mantener dos árboles —uno para móvil y otro para escritorio— duplica cada arreglo y garantiza que uno de los dos se quede atrás; el que se queda atrás siempre es el que menos se mira, y a veces es el que el cliente abre.",
+      "queHacer": [
+        "Partir del diseño a 390 px y hacer que el escritorio sea esa columna centrada con más aire, no una redistribución nueva.",
+        "Eliminar los pares de bloques duplicados por punto de corte (`hidden lg:block` junto a `lg:hidden` con el mismo contenido).",
+        "Permitir columnas adicionales en escritorio solo donde el dato lo justifica (tabla, panel de detalle), y siempre desde el mismo componente.",
+        "Comprobar a 390, 768 y 1440 que el contenido es el mismo y que ninguna medida desborda."
+      ],
+      "aceptacion": [
+        { "check": "No hay bloques duplicados por punto de corte", "comando": "grep -rnE \"hidden (md|lg):block|(md|lg):hidden\" app/ components/", "espera": "0 líneas fuera del componente de navegación" },
+        { "check": "El mismo texto aparece en los tres anchos", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 1440 --height 900 --eval \"document.body.innerText.replace(/\\\\s+/g,' ').length\"", "espera": "eval: diferencia ≤5% contra la misma medición a 390 px" },
+        { "check": "Ningún ancho desborda", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 768 --height 1024", "espera": "metrics.overflowX = false" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["app/page.tsx", "components/columna.tsx"],
+      "cerebro": ["tema:pantalla-publica"]
+    },
+    {
+      "id": "fe.estado.sin-parpadeo-de-hidratacion",
+      "titulo": "Quitar el parpadeo entre lo que pinta el servidor y lo que corrige el cliente",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Medio segundo mostrando la sede equivocada, el tema claro o el carrito vacío basta para que alguien pida en el local que no es o crea que perdió lo que había elegido. El parpadeo no es estético: cambia lo que la persona decide.",
+      "queHacer": [
+        "Listar el estado que solo existe en el cliente (tema, sede guardada, carrito) y que hoy se pinta después de hidratar.",
+        "Resolver en el servidor lo que se pueda con la URL o la cookie, para que el primer pintado ya sea el correcto.",
+        "Para lo que no se pueda, no pintar un valor provisional: pintar el esqueleto de ese trozo hasta saber, con la altura ya reservada.",
+        "Comprobar que la consola no reporta desajustes de hidratación, que son la señal temprana del parpadeo."
+      ],
+      "aceptacion": [
+        { "check": "La consola no reporta desajustes de hidratación", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile", "espera": "console sin entradas con \"hydration\"; exceptions: []" },
+        { "check": "El primer pintado ya trae el contexto correcto", "comando": "curl -s \"http://localhost:3000/?sede=b\" | grep -c \"data-sede-activa\"", "espera": "1+ líneas con la sede b ya en el HTML del servidor" },
+        { "check": "No se pinta un valor provisional", "comando": "grep -rnE \"useEffect\\(.*set(Tema|Sede|Carrito)\" app/ components/", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "stack": ["nextjs"] },
+      "porCada": null,
+      "posee": ["app/layout.tsx", "lib/contexto.ts"],
+      "cerebro": ["tema:donde-vive-el-dato", "tema:pantalla-publica"]
+    },
+    {
+      "id": "fe.estado.dato-viejo-con-hora",
+      "titulo": "Poner la hora del dato en toda pantalla que se deja abierta",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La pantalla de existencias lleva cuatro horas abierta en la tablet del mostrador y muestra el inventario de la mañana. Se vende algo que ya no hay, y quien reclama es el cliente, no el sistema.",
+      "queHacer": [
+        "Mostrar en las pantallas que se dejan abiertas —existencias, órdenes, caja— la hora de la última actualización, en formato de reloj.",
+        "Volver a pedir el dato cuando la pestaña vuelve al frente y cuando se recupera la conexión.",
+        "Marcar visiblemente el dato con más de 5 minutos y ofrecer el botón de actualizar en la misma línea de la hora.",
+        "No recargar sola la pantalla si hay una venta a medio armar: se avisa que hay dato nuevo y decide la persona."
+      ],
+      "aceptacion": [
+        { "check": "La hora del dato está en pantalla", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/inventario --width 390 --height 844 --mobile --eval \"document.querySelector('[data-actualizado]').textContent.trim()\"", "espera": "eval: texto con hora y minutos" },
+        { "check": "Se refresca al volver al frente", "comando": "grep -rnE \"visibilitychange|focus\" lib/ components/", "espera": "1+ líneas" },
+        { "check": "No hay recarga automática ciega", "comando": "grep -rnE \"setInterval\\(.*(reload|refetch)|refreshInterval\" app/ components/", "espera": "0 líneas en pantallas con venta en curso" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": ["components/ui/actualizado.tsx"],
+      "cerebro": ["tema:donde-vive-el-dato", "tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.formulario.teclado-completo-sin-raton",
+      "titulo": "Completar la venta entera con el teclado, sin tocar el ratón",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "En el mostrador con teclado físico, soltar para agarrar el ratón en cada campo cuesta un segundo largo por venta. Doscientas ventas son minutos diarios y una mano ocupada que hacía falta para el producto.",
+      "queHacer": [
+        "Hacer que Enter avance al siguiente campo dentro del formulario y solo confirme en el último.",
+        "Dar orden de tabulación igual al orden de la tarea, y sacar del recorrido lo decorativo con `tabindex=\"-1\"`.",
+        "Abrir y cerrar los desplegables y diálogos con teclado, y devolver el foco al elemento que los abrió al cerrarlos.",
+        "Recorrer la venta completa con teclado y anotar el número de pulsaciones en `docs/toques.md`."
+      ],
+      "aceptacion": [
+        { "check": "El foco no se escapa del diálogo abierto", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 1280 --height 800 --eval \"(()=>{const d=document.querySelector('[role=dialog]');return d?d.contains(document.activeElement):'sin dialogo'})()\"", "espera": "eval: true" },
+        { "check": "Nada decorativo está en el recorrido de tabulación", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 1280 --height 800 --eval \"[...document.querySelectorAll('[tabindex]')].filter(e=>+e.getAttribute('tabindex')>0).length\"", "espera": "eval: 0" },
+        { "check": "La venta se completa sin ratón", "comando": null, "espera": "pulsaciones anotadas en docs/toques.md: venta de 3 productos cerrada con ≤20 pulsaciones y 0 clics" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": ["components/ui/formulario.tsx", "docs/toques.md"],
+      "cerebro": ["tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.navegacion.ruta-directa-por-superficie",
+      "titulo": "Dar a cada pantalla de {{superficie}} una dirección propia que se pueda pegar",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el detalle de una orden vive en un panel que solo se abre navegando, nadie puede mandar «mira esta orden»: hay que dictar el recorrido. Y el enlace del correo de soporte lleva al inicio, no al problema.",
+      "queHacer": [
+        "Recorrer {{superficie}} y listar las pantallas que hoy solo se alcanzan navegando desde otra.",
+        "Darle a cada una su ruta con el identificador dentro, y que entrar por esa ruta directa pinte la pantalla completa sin pasos previos.",
+        "Mantener los paneles y diálogos, pero sincronizados con la ruta: abrir el panel cambia la dirección y pegar la dirección abre el panel.",
+        "Comprobar entrando en frío por cada ruta, sin sesión previa de navegación."
+      ],
+      "aceptacion": [
+        { "check": "Cada pantalla de {{superficie}} responde en frío", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/{{superficie}} --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-pantalla]')].map(e=>e.dataset.pantalla)\"", "espera": "eval: 1 nombre de pantalla, sin errores en exceptions" },
+        { "check": "Abrir el panel cambia la dirección", "comando": "grep -rnE \"searchParams|router\\.(push|replace)\" app/{{superficie}}/", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno"] },
+      "porCada": "superficie",
+      "posee": ["app/{{superficie}}/"],
+      "cerebro": ["tema:acceso-roles-y-puestos"]
+    },
+    {
+      "id": "fe.datos.orden-y-filtros-estables",
+      "titulo": "Hacer que el orden de la lista no cambie entre páginas",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Ordenando solo por fecha, dos ventas del mismo minuto se barajan en cada consulta: al pasar a la página 2 una fila se repite y otra desaparece. Quien está cuadrando la caja cuenta mal y no sabe por qué.",
+      "queHacer": [
+        "Añadir a todo orden un segundo criterio único de desempate (el identificador), tanto en la consulta como en el cliente.",
+        "Ordenar por instante en milisegundos, nunca por el texto del ISO ni por la fecha ya formateada.",
+        "Llevar el orden a la URL para que la página siguiente use exactamente el mismo.",
+        "Comprobar con datos que tengan empates de verdad: dos registros del mismo segundo."
+      ],
+      "aceptacion": [
+        { "check": "Todo orden tiene desempate único", "comando": "grep -rnE \"orderBy|sort\\(\" lib/ app/", "espera": "toda línea de orden incluye un segundo criterio único" },
+        { "check": "Con empates, la paginación no repite ni pierde filas", "comando": "npm test -- orden-estable", "espera": "tests verdes; unión de página 1 y 2 con 0 duplicados y 0 faltantes" },
+        { "check": "No se ordena por texto de fecha", "comando": "grep -rnE \"sort\\(.*(toISOString|fecha\\.localeCompare)\" lib/ app/", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno"] },
+      "porCada": null,
+      "posee": ["lib/orden.ts"],
+      "cerebro": ["tema:invariantes-contables", "tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "fe.feedback.deshacer-en-vez-de-preguntar",
+      "titulo": "Cambiar las confirmaciones reversibles por deshacer de 8 segundos",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Preguntar antes cobra un toque a todo el mundo, incluidos los que no se equivocan; deshacer después solo cobra al que se equivocó. Con dos correcciones por venta y 200 ventas, la diferencia es 400 toques diarios.",
+      "queHacer": [
+        "Aplicar el cambio en la pantalla en el momento del toque y encolar la operación real durante 8 segundos.",
+        "Mostrar el aviso con el botón de deshacer, diciendo qué se quitó y con qué número.",
+        "Si la persona deshace, revertir sin ida al servidor; si no, mandar la operación al vencer el plazo.",
+        "Dejar fuera de este patrón lo irreversible: anular un documento, cerrar un turno, cobrar."
+      ],
+      "aceptacion": [
+        { "check": "El aviso de deshacer aparece al quitar", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(async()=>{document.querySelector('[data-quitar]').click();await new Promise(r=>setTimeout(r,200));return !!document.querySelector('[data-deshacer]')})()\"", "espera": "eval: true" },
+        { "check": "El plazo es de 8 segundos", "comando": "grep -rnE \"8000|PLAZO_DESHACER\" lib/ components/", "espera": "1+ líneas" },
+        { "check": "Deshacer devuelve la fila", "comando": null, "espera": "conteo de líneas de la venta antes de quitar y después de deshacer: idéntico" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": ["components/ui/deshacer.tsx"],
+      "cerebro": ["tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.rendimiento.sin-saltos-de-layout",
+      "titulo": "Bajar de 0,1 el salto de layout acumulado de la primera pantalla",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El contenido que salta mientras carga hace que el dedo, que ya iba en camino, toque otra cosa: en una vitrina eso es entrar a un producto que no se quería; en la caja, quitar una línea que se acababa de agregar.",
+      "queHacer": [
+        "Medir el salto acumulado a 390×844 con el observador de layout, no a ojo.",
+        "Reservar altura para todo lo que llega tarde: imágenes, avisos, anuncios de promoción, barra de sesión.",
+        "Insertar los avisos en un espacio ya reservado o superpuestos, nunca empujando el contenido hacia abajo.",
+        "Anotar la medición en `docs/presupuesto-frontend.md` junto al peso, con fecha."
+      ],
+      "aceptacion": [
+        { "check": "El salto acumulado está por debajo del techo", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --wait 4000 --eval \"new Promise(r=>{let s=0;new PerformanceObserver(l=>{for(const e of l.getEntries())if(!e.hadRecentInput)s+=e.value}).observe({type:'layout-shift',buffered:true});setTimeout(()=>r(Math.round(s*1000)/1000),1500)})\"", "espera": "eval: ≤0.1" },
+        { "check": "La medición quedó anotada", "comando": "grep -nE \"^salto-layout: 0\\.[0-9]+\" docs/presupuesto-frontend.md", "espera": "1 línea" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/presupuesto-frontend.md"],
+      "cerebro": ["tema:pantalla-publica", "tema:entorno-de-la-maquina"]
+    },
+    {
+      "id": "fe.rendimiento.cliente-solo-donde-hace-falta",
+      "titulo": "Dejar en el cliente solo los componentes que de verdad necesitan interacción",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Marcar como cliente el componente de arriba arrastra todo el árbol al navegador: la vitrina baja el JavaScript de la app entera para pintar una lista que no se toca, y en 4G eso son segundos de nada.",
+      "queHacer": [
+        "Listar los archivos con la directiva de cliente y, para cada uno, el estado o evento que la justifica.",
+        "Bajar la directiva al componente hoja que la necesita, dejando el resto del árbol en el servidor.",
+        "Sacar de esos componentes el trabajo que puede hacerse en el servidor: dar formato, ordenar y filtrar datos fijos.",
+        "Volver a medir el peso de JavaScript transferido de la primera pantalla y comparar contra el presupuesto."
+      ],
+      "aceptacion": [
+        { "check": "La lista de componentes de cliente está justificada", "comando": "grep -rl \"use client\" app/ components/", "espera": "1 línea por entrada de docs/presupuesto-frontend.md con su motivo" },
+        { "check": "El layout raíz no es de cliente", "comando": "grep -n \"use client\" app/layout.tsx app/page.tsx", "espera": "0 líneas" },
+        { "check": "El peso de JavaScript bajó contra la medición anterior", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"Math.round(performance.getEntriesByType('resource').filter(r=>r.name.includes('.js')).reduce((a,r)=>a+r.transferSize,0)/1024)\"", "espera": "eval: ≤180 y menor que la cifra anotada antes del cambio" }
+      ],
+      "aplicaSi": { "stack": ["nextjs"] },
+      "porCada": null,
+      "posee": ["docs/presupuesto-frontend.md"],
+      "cerebro": ["tema:pantalla-publica"]
+    },
+    {
+      "id": "fe.publico.movimiento-que-no-marea",
+      "titulo": "Dejar el movimiento de la vitrina apagado cuando el sistema lo pide",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La vitrina necesita movimiento para vender, pero un carrusel que no para le impide leer el precio a quien lee despacio y marea a quien activó movimiento reducido por una razón médica. Se pierde exactamente al cliente que ya estaba mirando.",
+      "queHacer": [
+        "Dejar el movimiento que muestra producto y quitar el que solo adorna: nada que se mueva sin aportar información.",
+        "Respetar `prefers-reduced-motion`: con la preferencia activa, 0 animaciones corriendo y el contenido completo visible sin esperar.",
+        "Dar a todo carrusel un control manual y no avanzar solo mientras el dedo está encima o el foco está dentro.",
+        "Medir las animaciones vivas con y sin la preferencia, en vez de confiar en el CSS escrito."
+      ],
+      "aceptacion": [
+        { "check": "Con movimiento reducido no queda ninguna animación viva", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --reduce", "espera": "metrics.reducedMotion = true y metrics.animations = 0" },
+        { "check": "Sin la preferencia sí hay movimiento", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile", "espera": "metrics.animations ≥1" },
+        { "check": "El carrusel tiene control manual", "comando": "grep -rnE \"aria-label=.(anterior|siguiente)\" components/", "espera": "2+ líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["components/carrusel.tsx", "app/globals.css"],
+      "cerebro": ["tema:pantalla-publica", "tema:entorno-de-la-maquina"]
+    },
+    {
+      "id": "fe.operacion.la-pantalla-no-navega-sola",
+      "titulo": "Impedir que la pantalla de caja se recargue o navegue con una venta abierta",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una recarga automática con seis productos ya agregados tira la venta y hay que rearmarla con el cliente enfrente; a la tercera vez la cajera deja de usar el sistema y vuelve al cuaderno.",
+      "queHacer": [
+        "Bloquear la recarga automática y la navegación por temporizador mientras haya líneas en la venta.",
+        "Guardar la venta en curso en el dispositivo en cada cambio, y recuperarla al volver a entrar aunque el navegador se haya cerrado.",
+        "Avisar antes de salir de la ruta de caja con venta abierta, con las dos salidas nombradas: «Seguir cobrando» / «Descartar la venta».",
+        "Comprobar el flujo cerrando la pestaña a mitad de una venta de 6 líneas."
+      ],
+      "aceptacion": [
+        { "check": "La venta sobrevive al cierre de la pestaña", "comando": null, "espera": "tras cerrar y reabrir con 6 líneas en curso, las 6 líneas y el total vuelven idénticos" },
+        { "check": "No hay temporizadores que naveguen solos en la caja", "comando": "grep -rnE \"setInterval|router\\.refresh\\(\\)|location\\.reload\" app/caja/ components/caja/", "espera": "0 líneas" },
+        { "check": "Existe el guardado de la venta en curso", "comando": "grep -rn \"venta-en-curso\" lib/ components/caja/", "espera": "2+ líneas: una que guarda y una que recupera" }
+      ],
+      "aplicaSi": { "superficies": ["caja"], "dineroReal": true },
+      "porCada": null,
+      "posee": ["lib/venta-en-curso.ts", "app/caja/page.tsx"],
+      "cerebro": ["tema:caja-y-turnos", "tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "fe.consistencia.inventario-de-pantallas",
+      "titulo": "Montar una página que muestre cada componente con todos sus estados",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin un sitio donde ver el botón deshabilitado, el campo con error y la lista vacía, esos estados se prueban por casualidad: se descubren en producción, que en este caso es el mostrador un sábado.",
+      "queHacer": [
+        "Crear la ruta interna `/sistema` que renderice cada componente de `components/ui/` con sus variantes y sus estados: normal, presionado, deshabilitado, cargando, con error.",
+        "Incluir las listas y tablas en sus tres estados: vacía, con datos y con filtro sin resultados.",
+        "Excluir la ruta del sitio público y de los buscadores.",
+        "Convertirla en la primera parada del QA visual: una sola captura a 390×844 muestra el sistema entero."
+      ],
+      "aceptacion": [
+        { "check": "La página existe y cubre todos los componentes de ui", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/sistema --width 390 --height 844 --mobile --eval \"document.querySelectorAll('[data-muestra]').length\"", "espera": "eval: ≥1 por archivo de components/ui/" },
+        { "check": "La ruta no es pública", "comando": "grep -rn \"/sistema\" app/robots.ts middleware.ts", "espera": "1+ líneas excluyéndola" },
+        { "check": "La captura del sistema se genera sin errores", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/sistema --width 390 --height 844 --mobile --full --shot docs/capturas/sistema-390.png", "espera": "archivo creado; exceptions: []" }
+      ],
+      "aplicaSi": { "stack": ["react", "nextjs"] },
+      "porCada": null,
+      "posee": ["app/sistema/page.tsx", "docs/capturas/sistema-390.png"],
+      "cerebro": ["tema:generadores-de-diseno", "tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "fe.publico.medir-la-portada",
+      "titulo": "Poner número a la portada en vez de opinar sobre ella",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "«Apagada», «genérica» y «se ve bien» no permiten decidir nada ni comparar dos versiones. Tres números a 390×844 sí: la portada que puso la primera tarjeta pedible en y=1994 se supo mala antes de que nadie opinara.",
+      "queHacer": [
+        "Medir a 390×844 y anotar en `docs/medicion-portada.md`: alto del documento, alto del héroe, posición del primer elemento pedible, número de acciones principales, alto total en pantallas de scroll.",
+        "Fijar el techo de cada número y dejarlo escrito al lado de la medición: héroe ≤600 px, primer pedible ≤844 px, documento ≤4 pantallas.",
+        "Repetir la medición después de cada cambio de la portada y dejar la fila anterior en la tabla, con fecha: la tabla es el historial.",
+        "Guardar junto a cada medición la captura de la primera pantalla a 390×844, para que el número tenga cara.",
+        "Cuando el dueño rechace la portada, anotar su frase textual en la misma tabla, al lado de los números de ese día."
+      ],
+      "aceptacion": [
+        { "check": "Los cinco números están medidos hoy", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"({documento:document.documentElement.scrollHeight,heroe:Math.round(document.querySelector('[data-heroe]').getBoundingClientRect().height),pedible:Math.round(document.querySelector('[data-pedible]').getBoundingClientRect().top+scrollY),acciones:document.querySelectorAll('[data-accion=principal]').length})\"", "espera": "eval: heroe ≤600, pedible ≤844, acciones = 1, documento ≤3376" },
+        { "check": "La tabla tiene historial con fechas", "comando": "grep -cE \"^\\| 20[0-9]{2}-[0-9]{2}-[0-9]{2} \\|\" docs/medicion-portada.md", "espera": "1+ filas, una por medición" },
+        { "check": "Cada medición tiene su captura", "comando": "ls docs/capturas/portada-390*.png", "espera": "1 archivo por fila de la tabla" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/medicion-portada.md", "docs/capturas/"],
+      "cerebro": ["tema:pantalla-publica", "tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "fe.publico.velocidad-en-red-lenta",
+      "titulo": "Dejar la vitrina utilizable en la red del barrio, no en la del que la construyó",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "La portada abre instantánea en la máquina que la hizo y tarda ocho segundos en el 4G del almuerzo. Esos ocho segundos no los ve nadie del equipo, y son el momento exacto en que la mitad de la gente cierra.",
+      "queHacer": [
+        "Medir el tiempo hasta que la primera pantalla se puede tocar, con la red limitada a 4G lento y el procesador frenado 4 veces.",
+        "Fijar el techo en 3 segundos hasta poder tocar la acción principal, y anotar la medición con fecha en `docs/presupuesto-frontend.md`.",
+        "Bajar lo que sobre por el camino que más pesa: la fuente que bloquea, la imagen del héroe sin comprimir, el JavaScript que no se usa en la primera pantalla.",
+        "Servir texto y precio antes que las fotos: en una vitrina, el precio legible sin fotos ya permite decidir.",
+        "Repetir la medición después de cada cambio y dejar la fila anterior."
+      ],
+      "aceptacion": [
+        { "check": "El contenido de la primera pantalla llega dentro del techo", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --wait 6000 --eval \"Math.round(performance.getEntriesByType('paint').filter(p=>p.name==='first-contentful-paint')[0].startTime)\"", "espera": "eval: ≤3000 ms" },
+        { "check": "La acción principal existe y es tocable al terminar la carga", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"(()=>{const e=document.querySelector('[data-accion=principal]');return !!e&&!e.disabled})()\"", "espera": "eval: true" },
+        { "check": "La medición en red lenta quedó anotada", "comando": "grep -nE \"^red-lenta: [0-9]+ ms\" docs/presupuesto-frontend.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/presupuesto-frontend.md"],
+      "cerebro": ["tema:pantalla-publica", "tema:entorno-de-la-maquina"]
+    },
+    {
+      "id": "fe.publico.compartir-reproduce-la-pantalla",
+      "titulo": "Hacer que el enlace compartido abra lo mismo que veía quien lo mandó",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El dueño manda «pide aquí» con el enlace de su sede y el que lo recibe cae en la otra: con dos locales abiertos eso ya mandó a todo el mundo al equivocado. El enlace es publicidad pagada con tiempo del dueño, y llega roto.",
+      "queHacer": [
+        "Definir qué tiene que viajar en el enlace para reproducir la pantalla: sede, producto, categoría, promoción.",
+        "Poner un botón de compartir que construya ese enlace con el contexto actual y lo copie, en vez de dejar copiar la dirección a mano.",
+        "Comprobar la ida y vuelta: abrir el enlace en una sesión limpia y verificar que la pantalla resultante coincide con la de origen.",
+        "Añadir el título y la imagen de compartir propios de ese contexto, para que la tarjeta de WhatsApp muestre el producto y no la portada.",
+        "Dejar el caso probado como comprobación fija, porque este error vuelve en cada sede nueva."
+      ],
+      "aceptacion": [
+        { "check": "El enlace lleva el contexto y lo reproduce en frío", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url \"http://localhost:3000/?sede=b&producto=42\" --width 390 --height 844 --mobile --eval \"[document.querySelector('[data-sede-activa]').textContent.trim(),document.querySelector('[data-producto-abierto]').dataset.productoAbierto]\"", "espera": "eval: [nombre de la sede b, \"42\"]" },
+        { "check": "El botón de compartir construye el enlace con contexto", "comando": "grep -rnE \"navigator.(share|clipboard)\" components/", "espera": "1+ líneas incluyendo los parámetros de contexto" },
+        { "check": "La ida y vuelta está cubierta por una prueba", "comando": "npm test -- enlace-compartido", "espera": "tests verdes; 1+ casos por parámetro de contexto" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["components/compartir.tsx", "lib/contexto.ts"],
+      "cerebro": ["tema:pantalla-publica", "tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "fe.rendimiento.presupuesto-que-rompe-el-verificar",
+      "titulo": "Hacer que pasarse del presupuesto de frontend rompa la verificación",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un presupuesto escrito en un documento se incumple sin que nadie se entere: la librería que agregó 300 KB entra igual y el descubrimiento llega meses después, cuando ya hay diez cosas encima. Lo que no falla, no se cumple.",
+      "queHacer": [
+        "Escribir `scripts/presupuesto.mjs` que mida contra la aplicación construida: peso de JavaScript de la primera pantalla, peso de imágenes, salto de layout y tiempo hasta primer contenido.",
+        "Leer los techos desde `docs/presupuesto-frontend.md`, para que el documento sea la fuente y no una copia.",
+        "Salir con código distinto de 0 y nombrar qué número se pasó, en cuánto y contra qué techo.",
+        "Encadenarlo en `npm run verificar`, sin `|| true` ni ninguna forma de silenciarlo.",
+        "Anotar en el documento la fecha y la cifra de cada corrida, para que el historial muestre la deriva."
+      ],
+      "aceptacion": [
+        { "check": "El presupuesto pasa en limpio", "comando": "npm run verificar", "espera": "exit 0, con la línea del presupuesto en la salida" },
+        { "check": "Falla de verdad cuando se pasa el techo", "comando": null, "espera": "bajar el techo de JavaScript a 10 KB hace salir el script con código distinto de 0 nombrando el número y el exceso; se restaura" },
+        { "check": "Ningún paso está silenciado", "comando": "grep -nE \"presupuesto.*(\\|\\| true)|--no-verify\" package.json", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["scripts/presupuesto.mjs", "package.json"],
+      "cerebro": ["tema:que-es-estar-verificado", "tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "fe.rendimiento.la-caja-abre-en-2-segundos",
+      "titulo": "Dejar la caja lista para cobrar en 2 segundos desde el toque del icono",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "La caja se abre veinte veces al día en una tablet vieja, y cada arranque de seis segundos es la fila mirando. Si abrir cuesta más que sacar el cuaderno, el cuaderno gana y el sistema se queda sin datos.",
+      "queHacer": [
+        "Medir en la máquina real del mostrador, no en la de desarrollo, el tiempo desde la navegación hasta que la grilla de productos responde al toque.",
+        "Fijar el techo en 2 segundos y anotar la medición con el modelo de la tablet y la fecha en `docs/presupuesto-frontend.md`.",
+        "Pintar primero lo que se toca —grilla de productos y total— y dejar para después lo que se consulta: historial, informes, existencias detalladas.",
+        "Precargar la ruta de caja desde la pantalla anterior, para que el toque encuentre el código ya bajado.",
+        "Repetir la medición después de cada cambio de la caja y dejar la fila anterior en la tabla."
+      ],
+      "aceptacion": [
+        { "check": "La grilla responde dentro del techo", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"Math.round(performance.getEntriesByType('navigation')[0].domInteractive)\"", "espera": "eval: ≤2000 ms" },
+        { "check": "La medición en la máquina real quedó anotada", "comando": "grep -nE \"^caja-lista: [0-9]+ ms\" docs/presupuesto-frontend.md", "espera": "1+ líneas con el modelo del equipo" },
+        { "check": "Lo que se consulta no bloquea lo que se toca", "comando": "grep -rn \"dynamic(\" app/caja/", "espera": "1+ líneas cargando bajo demanda historial e informes" }
+      ],
+      "aplicaSi": { "superficies": ["caja"] },
+      "porCada": null,
+      "posee": ["app/caja/page.tsx", "docs/presupuesto-frontend.md"],
+      "cerebro": ["tema:caja-y-turnos", "tema:entorno-de-la-maquina"]
+    },
+    {
+      "id": "fe.movil.ensayo-cronometrado-con-la-persona-real",
+      "titulo": "Cronometrar tres ventas hechas por la persona que va a usar el sistema",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El que construyó la pantalla siempre la usa rápido: conoce el recorrido. La cajera no, y donde ella duda dos segundos está el error de diseño que ningún test encuentra. Sin ese cronómetro, se entrega una pantalla que solo funciona para su autor.",
+      "queHacer": [
+        "Sentar a la persona real frente a la máquina real y pedirle tres ventas del negocio, sin explicarle el recorrido.",
+        "Cronometrar cada venta y contar toques, sin ayudar; anotar textual cada frase que diga cuando dude.",
+        "Anotar en `docs/ensayo-mostrador.md`: segundos por venta, toques por venta, dónde se detuvo y qué palabra buscó y no encontró.",
+        "Convertir en tarea cada punto donde se detuvo más de 3 segundos: eso no es que no sepa, es que la pantalla no lo dice.",
+        "Repetir el ensayo después de los arreglos y dejar las dos columnas de números lado a lado."
+      ],
+      "aceptacion": [
+        { "check": "Las tres ventas están cronometradas y contadas", "comando": "grep -cE \"^\\| venta [123] \\| [0-9]+ s \\| [0-9]+ toques \\|\" docs/ensayo-mostrador.md", "espera": "3 filas" },
+        { "check": "La venta corriente cabe en el techo medido", "comando": null, "espera": "mediana de las 3 ventas ≤45 s y ≤8 toques, sin ayuda del que construyó la pantalla" },
+        { "check": "Cada duda quedó convertida en tarea", "comando": "grep -cE \"^- \\[ \\] \" docs/ensayo-mostrador.md", "espera": "1 tarea por cada detención de más de 3 s" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": ["docs/ensayo-mostrador.md"],
+      "cerebro": ["tema:caja-y-turnos", "tema:documentos-para-personas"]
+    },
+    {
+      "id": "fe.operacion.atajos-de-teclado-del-mostrador",
+      "titulo": "Dar atajos de teclado a las cinco acciones que más se repiten en el mostrador",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con teclado físico y lector de códigos, cada acción hecha con el dedo en pantalla cuesta soltar el teclado. Cinco atajos bien elegidos le quitan a la cajera cerca de un segundo por venta, doscientas veces al día.",
+      "queHacer": [
+        "Sacar de la medición de toques las cinco acciones más repetidas y asignarles atajos de una tecla, sin combinaciones que exijan dos dedos.",
+        "Mostrar la tecla dentro del botón, para que se aprenda usándola y no leyendo un manual.",
+        "No capturar teclas mientras el foco está en un campo de texto, para que teclear el peso no dispare un cobro.",
+        "Dejar la lista de atajos en la propia pantalla, detrás de una tecla de ayuda, y también en `docs/manual.md`.",
+        "Comprobar que ningún atajo pisa uno del navegador ni del lector de códigos."
+      ],
+      "aceptacion": [
+        { "check": "Los atajos están declarados en un solo lugar", "comando": "grep -cE \"tecla: '\" lib/atajos.ts", "espera": "5 líneas" },
+        { "check": "Las teclas se ven en los botones", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 1280 --height 800 --eval \"document.querySelectorAll('kbd').length\"", "espera": "eval: ≥5" },
+        { "check": "Teclear en un campo no dispara atajos", "comando": "grep -n \"tagName\" lib/atajos.ts", "espera": "1+ líneas descartando INPUT y TEXTAREA" }
+      ],
+      "aplicaSi": { "superficies": ["caja"] },
+      "porCada": null,
+      "posee": ["lib/atajos.ts", "components/caja/ayuda-atajos.tsx"],
+      "cerebro": ["tema:caja-y-turnos", "tema:documentos-para-personas"]
+    },
+    {
+      "id": "fe.operacion.cierre-de-turno-en-una-vista",
+      "titulo": "Dejar el cierre de turno en una sola pantalla sin scroll",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El arqueo se hace de pie, con la plata en la mano y el local cerrando. Si contar exige bajar y subir entre lo esperado y lo contado, se apunta mal y aparece un descuadre que nadie sabe explicar al día siguiente.",
+      "queHacer": [
+        "Poner en una sola pantalla, a 390×844 y sin scroll: base inicial, ventas del turno por medio de pago, gastos, esperado en efectivo y el campo de lo contado.",
+        "Calcular la diferencia en el momento en que se teclea lo contado, con su signo y la palabra que corresponde: faltante o sobrante.",
+        "Ofrecer el conteo por denominación con teclado numérico grande, porque se cuenta a ciegas mientras se mira la plata.",
+        "No dejar cerrar sin que lo contado esté escrito, y guardar la diferencia junto al cierre, nunca redondeada a cero.",
+        "Comprobar que la pantalla cabe sin scroll con el número real de medios de pago del negocio."
+      ],
+      "aceptacion": [
+        { "check": "El cierre cabe en una pantalla de 844 px", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja/cierre --width 390 --height 844 --mobile", "espera": "metrics.scrollHeight ≤844 y metrics.overflowX = false" },
+        { "check": "La diferencia se calcula y se nombra", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja/cierre --width 390 --height 844 --mobile --eval \"!!document.querySelector('[data-diferencia]')\"", "espera": "eval: true, con las palabras faltante y sobrante en el componente" },
+        { "check": "No se puede cerrar sin contar", "comando": "grep -rn \"data-accion=cerrar-turno\" components/caja/", "espera": "1+ líneas con la condición de lo contado escrito" }
+      ],
+      "aplicaSi": { "superficies": ["caja"], "dineroReal": true },
+      "porCada": null,
+      "posee": ["app/caja/cierre/page.tsx", "components/caja/arqueo.tsx"],
+      "cerebro": ["tema:caja-y-turnos", "tema:invariantes-contables"]
+    },
+    {
+      "id": "fe.consistencia.captura-de-referencia-por-superficie",
+      "titulo": "Capturar {{superficie}} a 390×844 y comparar contra esa referencia",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Los cambios visuales rompen pantallas que nadie estaba mirando: se arregla el botón de la caja y se desalinea el de la vitrina. Sin una imagen anterior contra la que comparar, eso se descubre cuando lo ve el cliente.",
+      "queHacer": [
+        "Capturar {{superficie}} a 390×844 con la herramienta de la casa y guardar la imagen en `docs/capturas/{{superficie}}-390.png`.",
+        "Anotar junto a la captura los números de esa corrida: alto del documento, animaciones vivas, errores de consola.",
+        "Volver a capturar después de cada cambio que toque tokens o componentes compartidos, y comparar las dos imágenes antes de dar por terminado.",
+        "Cuando el cambio sea intencionado, reemplazar la referencia y anotar en una línea qué cambió y por qué.",
+        "Capturar también con movimiento reducido, que es donde suelen aparecer los huecos."
+      ],
+      "aceptacion": [
+        { "check": "La captura de referencia de {{superficie}} existe y es de hoy", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/{{superficie}} --width 390 --height 844 --mobile --full --shot docs/capturas/{{superficie}}-390.png", "espera": "archivo creado; console y exceptions vacíos" },
+        { "check": "Los números de la corrida quedaron anotados", "comando": "grep -nE \"^{{superficie}}: documento [0-9]+ px\" docs/capturas/referencias.md", "espera": "1 línea" }
+      ],
+      "aplicaSi": {},
+      "porCada": "superficie",
+      "posee": ["docs/capturas/{{superficie}}-390.png", "docs/capturas/referencias.md"],
+      "cerebro": ["tema:verificar-con-evidencia", "tema:entorno-de-la-maquina"]
+    },
+    {
+      "id": "fe.consistencia.deriva-visual-vigilada",
+      "titulo": "Encadenar al verificar los greps que impiden que el sistema visual se deshaga",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Todos los arreglos de tokens, toque y contraste se deshacen solos con el tiempo: entra un componente nuevo con su hex, su padding a ojo y su botón chico. Si el guardián no corre en cada verificación, el sistema dura hasta el siguiente builder.",
+      "queHacer": [
+        "Reunir en `scripts/deriva-visual.mjs` los greps de guardia ya escritos: colores fuera de tokens, estilos en línea, valores arbitrarios, `dark:`, `alert(`, `<img `, `outline-none`, `<button` fuera de `components/ui`.",
+        "Hacer que el script imprima cuántas violaciones hay por regla y salga con código distinto de 0 si alguna pasa de cero.",
+        "Encadenarlo en `npm run verificar` antes de los tests, que es donde se corrige más barato.",
+        "Cuando una regla tenga una excepción legítima, escribirla en el script con su motivo en una línea, nunca silenciando la regla entera.",
+        "Anotar en `docs/presupuesto-frontend.md` el conteo de cada corrida, para ver si la deriva sube."
+      ],
+      "aceptacion": [
+        { "check": "El guardián pasa en limpio", "comando": "node scripts/deriva-visual.mjs", "espera": "exit 0; 0 violaciones en todas las reglas" },
+        { "check": "Falla de verdad cuando entra una violación", "comando": null, "espera": "añadir un `style=` a un componente hace salir el script con código distinto de 0 nombrando la regla y el archivo; se restaura" },
+        { "check": "Está encadenado y no silenciado", "comando": "grep -nE \"deriva-visual\" package.json", "espera": "1+ líneas, sin `|| true`" }
+      ],
+      "aplicaSi": { "stack": ["nextjs", "tailwind", "react"] },
+      "porCada": null,
+      "posee": ["scripts/deriva-visual.mjs", "package.json"],
+      "cerebro": ["tema:que-es-estar-verificado", "tema:generadores-de-diseno"]
+    },
+    {
+      "id": "fe.base.documento-del-sistema-visual",
+      "titulo": "Escribir en dos páginas el sistema visual para el que llegue después",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Sin este documento, el siguiente que toque la pantalla —o el generador de diseño al que se le encargue— reinventa la paleta y la escala, y el sistema muere en el primer encargo externo. Ya pasó: se pidió una landing sin decir el registro y volvió en el registro equivocado.",
+      "queHacer": [
+        "Página uno: el registro visual del proyecto, los tokens con su nombre y su rol, la escala tipográfica, la rejilla y la regla de que los valores viven en `globals.css`.",
+        "Página dos: las cinco decisiones que se ven raras y no lo son —por qué el total es tan grande, por qué no hay confirmación al quitar, por qué el escritorio es una columna— cada una con el daño que evita.",
+        "Escribirlo para alguien que no estuvo en la conversación, sin jerga que no salga en pantalla.",
+        "Cerrar con lo que está prohibido tocar y a quién se le pregunta cuando algo no encaja."
+      ],
+      "aceptacion": [
+        { "check": "Cabe en dos páginas", "comando": "node -e \"console.log(require('fs').readFileSync('docs/sistema-visual.md','utf8').split('\\n').length)\"", "espera": "≤120 líneas" },
+        { "check": "Cada decisión trae el daño que evita", "comando": "grep -cE \"^- (Por qué|Porque)\" docs/sistema-visual.md", "espera": "5+ líneas" },
+        { "check": "No usa jerga que no salga en pantalla", "comando": "grep -niE \"endpoint|deploy|commit|payload|backend|hydration|bundle\" docs/sistema-visual.md", "espera": "0 líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [],
+      "cerebro": ["tema:documentos-para-personas", "tema:generadores-de-diseno"]
+    },
+    {
+      "id": "fe.feedback.palabras-de-quien-la-usa",
+      "titulo": "Cambiar los textos de pantalla por las palabras que usa el negocio",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si la pantalla dice «transacción» y en el local dicen «venta», cada persona nueva necesita que alguien le traduzca, y el manual no alcanza. La palabra equivocada convierte una pantalla obvia en una que hay que enseñar.",
+      "queHacer": [
+        "Grabar o anotar cómo nombra el negocio sus cosas: venta, encargo, bandeja, sencillo, cuadre, fiado.",
+        "Armar en `docs/vocabulario.md` la tabla palabra del negocio → palabra en pantalla → nombre en el código, y dejar las tres alineadas.",
+        "Reemplazar en botones, títulos, mensajes y estados vacíos los términos de sistema por los del negocio.",
+        "Prohibir en pantalla los términos que quedaron fuera de la tabla y dejar el grep de guardia con esa lista.",
+        "Repasar la tabla con la persona del mostrador y anotar textual las correcciones que haga."
+      ],
+      "aceptacion": [
+        { "check": "La tabla de vocabulario está completa", "comando": "grep -cE \"^\\| .+ \\| .+ \\| .+ \\|$\" docs/vocabulario.md", "espera": "1 fila por término del negocio; 0 filas incompletas" },
+        { "check": "No quedan términos de sistema en pantalla", "comando": "grep -rniE \"transaccion|registro maestro|entidad|item|submit|query|filtro avanzado\" app/ components/ --include=*.tsx", "espera": "0 líneas" },
+        { "check": "El menú y los botones usan las palabras de la tabla", "comando": null, "espera": "0 diferencias entre las etiquetas visibles y la columna «palabra en pantalla» de la tabla" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": ["docs/vocabulario.md", "components/mensajes.ts"],
+      "cerebro": ["tema:documentos-para-personas", "tema:caja-y-turnos"]
+    },
+    {
+      "id": "fe.datos.exportar-lo-que-se-ve",
+      "titulo": "Exportar exactamente las filas que están en pantalla, con los filtros puestos",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El dueño pide las ventas del mes en un archivo y, sin exportación, alguien las copia a mano o se pide un desarrollo. Y si la exportación ignora el filtro, el archivo trae otra cosa distinta a lo que se estaba mirando, que es peor que no tenerlo.",
+      "queHacer": [
+        "Generar el archivo desde los MISMOS filtros, orden y período de la pantalla, leídos de la URL, no desde una consulta aparte.",
+        "Exportar todas las filas del resultado, no solo la página pintada, y avisar cuántas filas va a traer antes de generarlo.",
+        "Dar formato a fechas y dinero con el formateador único, y poner los encabezados con las palabras del vocabulario del negocio.",
+        "Nombrar el archivo con el negocio, el período y la fecha de generación, para que no queden tres «export.csv» en la carpeta de descargas.",
+        "Comprobar que el total de la columna de dinero del archivo coincide con el total mostrado en pantalla."
+      ],
+      "aceptacion": [
+        { "check": "El archivo sale de los filtros de la pantalla", "comando": "npm test -- exportar-filtros", "espera": "tests verdes; con filtro aplicado, el conteo de filas del archivo = conteo mostrado en pantalla" },
+        { "check": "El total del archivo cuadra con el de la pantalla", "comando": null, "espera": "suma de la columna de dinero del archivo = total en pantalla, diferencia 0" },
+        { "check": "El nombre del archivo lleva negocio, período y fecha", "comando": "grep -rnE \"\\.csv|\\.xlsx\" lib/exportar.ts", "espera": "1+ líneas con los tres datos interpolados" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno"] },
+      "porCada": null,
+      "posee": ["lib/exportar.ts"],
+      "cerebro": ["tema:documentos-para-personas", "tema:invariantes-contables"]
+    },
+    {
+      "id": "fe.navegacion.cero-callejones-sin-salida",
+      "titulo": "Auditar que ninguna pantalla deje a la persona sin camino de vuelta",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La pantalla de sin permiso, la de turno cerrado y la de pago rechazado suelen quedar sin salida porque son las que menos se prueban. Ahí es donde la persona cierra la aplicación y llama por teléfono, que es el soporte que se quería evitar.",
+      "queHacer": [
+        "Listar todas las pantallas alcanzables, incluidas las de error, sin permiso, vacío, turno cerrado y sesión vencida.",
+        "Comprobar en cada una que hay al menos una acción que lleva a otra parte, alcanzable sin scroll a 390×844.",
+        "Comprobar además que esa acción funciona con el rol que llegó ahí: mandar a la cajera al panel del dueño es otro callejón.",
+        "Anotar la auditoría en `docs/salidas.md` con una fila por pantalla y su salida, y dejar la fecha.",
+        "Convertir en tarea cada pantalla sin salida encontrada, en vez de arreglarla de paso sin dejar rastro."
+      ],
+      "aceptacion": [
+        { "check": "Todas las pantallas auditadas tienen salida anotada", "comando": "grep -cE \"^\\| /[a-z0-9/:-]* \\| .+ \\|$\" docs/salidas.md", "espera": "1 fila por ruta del proyecto; 0 filas con la salida vacía" },
+        { "check": "Las pantallas de error ofrecen salida sin scroll", "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/sin-permiso --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('a,button')].filter(e=>e.getBoundingClientRect().bottom<=844).length\"", "espera": "eval: ≥1" },
+        { "check": "La salida corresponde al rol que llegó ahí", "comando": null, "espera": "con sesión de cajera, las salidas de las 3 pantallas de error llevan a rutas permitidas: 0 rebotes a sin-permiso" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno", "caja"], "multiUsuario": true },
+      "porCada": null,
+      "posee": ["docs/salidas.md"],
+      "cerebro": ["tema:acceso-roles-y-puestos", "tema:documentos-para-personas"]
+    }
+  ]
+}

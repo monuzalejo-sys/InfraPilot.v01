@@ -5,7 +5,7 @@ alias: [modelo, modelos, que modelo, elegir modelo, seleccion de modelo, calibra
 preguntas: ["que modelo uso para un builder visual", "cuando uso haiku y cuando opus", "cuanto cuesta una ola de agentes", "cual es el modelo mas barato que aguanta esta tarea", "cuantos tokens gasta un builder", "vale la pena pagar opus para esto"]
 proyectos: [infrapilot, placita, villa-broaster, estanco-contable, wrd, arroces, landings, _permanent]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-08-26
 ---
 
 # Qué modelo usar para cada tipo de trabajo, y cuánto cuesta de verdad
@@ -26,7 +26,7 @@ app entera desde cero fueron 12 spawns / **1,11 M tokens**; una ola grande de pr
 
 ## Por qué (qué lo pagó)
 
-Esto no es criterio: son **280 spawns medidos y 32.741.161 tokens** registrados en
+Esto no es criterio: son **298 spawns medidos y 39.372.000 tokens** (corte 2026-08-26; antes 280 y 32,7 M) registrados en
 `modelOutcomes` de seis memorias (infrapilot, placita, villa-broaster, estanco-contable,
 wrd, arroces). La medición es real, no estimada: la notificación de fin de cada spawn trae
 `subagent_tokens` y el orquestador la persiste (`_permanent/KN-002`); el consumo inline del
@@ -86,15 +86,32 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
 5. **Presupuesta la ola con estos números medidos** (promedio por spawn, y por si te lo
    preguntan de golpe):
 
+   **Refrescada el 2026-08-26** sobre 298 spawns / 39,37 M, con los subtipos de
+   build normalizados (antes se promediaban sufijos inventados y eso partía la
+   muestra). Entre paréntesis, **cuántos spawns sostienen cada media**: una
+   celda con (1) o (2) es una anécdota, no una medición. Se reproduce con
+   `node tools/costos.mjs fases`:
+
    | Fase | haiku | sonnet | opus |
    |---|---|---|---|
-   | analysis | — | 65k (23/23 ok) | 298k |
-   | planning | — | 19k | — |
-   | build:page | 49k | 170k | 204k |
-   | build:lib | 40k | 132k | 213k |
-   | build:visual | — | 149k | 200k |
-   | verification | 19k | 71k | 284k |
-   | adversarial | — | — | 110k |
+   | analysis | — | **64k (24)** | **580k (3)** ← 9× más caro |
+   | planning | — | 19k (6) | — |
+   | build:page | 62k (5) | **158k (40)** | **325k (17)** |
+   | build:lib | 37k (3) | **118k (19)** | **255k (15)** |
+   | build:api | 49k (1) | 163k (5) | 126k (6) |
+   | build:infra | 55k (3) | 101k (3) | 100k (7) |
+   | build:visual | — | 149k (3) | 173k (32) |
+   | verification | 6k (3) | 60k (22) | 179k (2) |
+   | adversarial | — | — | 110k (2) |
+
+   Lo que esta pasada añade: **opus se lleva el 51,5 % del gasto** (20,27 M de
+   112 spawns) y en `build:page` y `build:lib` cuesta más del doble que sonnet
+   **teniendo sonnet el doble de muestra limpia**. Son los dos sitios donde
+   bajar de tier está mejor respaldado. `analysis` en opus no tiene defensa
+   ninguna. Y dos huecos que hay que cerrar para que estos números sigan
+   valiendo: **48 de 298 spawns (16,1 %) están anotados con 0 tokens**, y 17
+   usan subtipos de fase inventados que aparecen una sola vez
+   (`node tools/costos.mjs senal`).
 
    Olas completas medidas: **génesis de una app entera** (arroces, web comercial +
    operación desde cero) = 12 spawns / **1.114.811 tokens** / 1 ciclo de fix; **ola grande
@@ -156,7 +173,7 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
   equivocado) figuran como `ok`. Segundo hueco explícito: **no hay ninguna métrica de
   defectos-por-tier detectados después del run.** Hasta que exista, la regla 6 se sostiene
   sobre tres incidentes narrados, no sobre una tasa.
-- **No paralelices agentes que escriben su propia memoria.** 8 landing-prompter a la vez
+- **No paralelices agentes que escriben su propia memoria.** 8 orion-landing a la vez
   comparten `ORION/memory/landings/state.json` y lo corrompen; se les prohibió escribir por
   eso (`infrapilot/RSK-003`). El ahorro de paralelizar no compensa un state.json roto.
 - **Ola paralela sin recurso compartido pre-materializado no aplica esta economía**: si el

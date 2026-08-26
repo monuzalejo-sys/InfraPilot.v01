@@ -4,7 +4,7 @@ Cada referencia que el dueño entrega (una especificación, una captura, una URL
 un video descrito) se guarda aquí como UNA ficha `NN-slug.md` con la plantilla de
 `_PLANTILLA.md`. La ficha separa **qué aporta** (movimiento, composición, color,
 copy, interacción) de **qué NO se copia** (marca ajena, textos, datos). El agente
-`landing-prompter` lee este índice antes de escribir cualquier prompt, elige
+`orion-landing` lee este índice antes de escribir cualquier prompt, elige
 2–3 referencias por landing y deja escrito en el prompt QUÉ tomó de cada una y
 POR QUÉ (sección "Referencias combinadas"). Después del veredicto del dueño, la
 combinación se anota en `ORION/memory/landings/state.json` (KN-/POL-) y la

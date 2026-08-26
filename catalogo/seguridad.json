@@ -1,0 +1,3079 @@
+{
+  "categoria": "seguridad",
+  "nombre": "Seguridad",
+  "meta": "Que nadie haga lo que no le toca con la plata ni con los datos de las personas, y que se pueda demostrar con un comando.",
+  "arquetipos": [
+    {
+      "id": "sec.secretos.fuera-del-repo",
+      "titulo": "Sacar del repositorio toda llave, clave y token",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una llave `service_role` de Supabase commiteada da escritura sobre TODA la base saltándose RLS, y git no olvida: borrarla del archivo no la borra del historial. En WRD apareció un PIN de administrador real dentro de un comentario y los smokes lo dieron por bueno.",
+      "queHacer": [
+        "Añadir a `.gitignore` `.env`, `.env.local`, `.env.production` y cualquier archivo de credenciales antes de tocar nada más.",
+        "Ejecutar `git ls-files` y revisar uno por uno los archivos rastreados que contengan claves; incluye comentarios, doctests, seeds y fixtures de test.",
+        "Crear `.env.example` con TODAS las variables, con nombre y descripción pero con valores vacíos.",
+        "Toda llave que estuvo commiteada se ROTA en el proveedor: quitarla del código no la invalida.",
+        "Dejar en `docs/secretos.md` la lista de qué llave vive dónde y quién la puede rotar."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún archivo de entorno está rastreado por git",
+          "comando": "git ls-files | grep -E \"(^|/)\\.env($|\\.)\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "No hay valores de llave en el código rastreado",
+          "comando": "git ls-files -z | xargs -0 grep -rniE \"service_role|sk_live_|eyJhbGciOi|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC )?PRIVATE KEY\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Existe la plantilla sin valores",
+          "comando": "test -f .env.example && grep -cE \"^[A-Z_]+=$\" .env.example",
+          "espera": "exit 0 y 1+ variables listadas sin valor"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        ".gitignore",
+        ".env.example",
+        "docs/secretos.md"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "sec.secretos.arranque-fail-closed",
+      "titulo": "No arrancar si falta una variable de entorno crítica",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin esto, faltar `SESION_SECRETO` no rompe nada: el código cae a un valor por defecto y firma las cookies con una cadena que está publicada en GitHub. El sistema parece sano y la puerta está abierta.",
+      "queHacer": [
+        "Escribir un módulo `lib/entorno.ts` que lea y valide TODAS las variables en el arranque, una sola vez.",
+        "Si en producción falta una variable de la lista crítica (secreto de sesión, clave del dueño, credenciales de base), lanzar y abortar el proceso: nada de `|| 'dev-secret'`.",
+        "En desarrollo se permite un valor de relleno, pero solo si `NODE_ENV !== 'production'` y el arranque lo grita por consola.",
+        "El resto del código lee del módulo, nunca de `process.env` directamente.",
+        "Añadir un test que ponga la variable en vacío y espere que el arranque falle."
+      ],
+      "aceptacion": [
+        {
+          "check": "Nadie lee process.env fuera del módulo de entorno",
+          "comando": "grep -rn \"process.env\" app/ lib/ components/ --include=*.ts --include=*.tsx | grep -v \"lib/entorno.ts\" | grep -v \"NODE_ENV\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "No hay valores por defecto colados",
+          "comando": "grep -rnE \"process\\.env\\.[A-Z_]+ *(\\|\\||\\?\\?) *['\\\"]\" app/ lib/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Sin la variable, el proceso no levanta",
+          "comando": "SESION_SECRETO= NODE_ENV=production node -e \"require('./lib/entorno')\"; echo EXIT=$?",
+          "espera": "EXIT distinto de 0"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "next",
+          "node",
+          "typescript"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/entorno.ts",
+        "tests/seguridad/entorno.test.ts"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina",
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.auth.hash-desde-el-dia-uno",
+      "titulo": "Guardar PIN y claves solo como hash, nunca en claro",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un PIN de 4 dígitos en claro en una tabla convierte cualquier lectura de la base —un respaldo perdido, un `select *` en un log— en la firma de la cajera. Y el PIN es la firma: con él se anulan ventas.",
+      "queHacer": [
+        "Elegir y fijar el algoritmo: bcrypt vía RPC en Postgres (`privado.credenciales` + `verificar_pin`) o scrypt `N=16384,r=8,p=1` si el almacén es disco.",
+        "El hash se calcula y se compara SIEMPRE en el servidor; el cliente manda el PIN por HTTPS y nunca lo guarda.",
+        "Migrar los registros existentes: rehashear en el primer login correcto y marcar la fila; los PIN de seed viejos dejan de funcionar el día de la migración.",
+        "La columna del hash no sale de la base: ninguna consulta que alimente la pantalla la incluye en el `select`.",
+        "Test: crear un usuario con PIN conocido y comprobar que el valor almacenado no es ese PIN ni su longitud."
+      ],
+      "aceptacion": [
+        {
+          "check": "No queda comparación de PIN o clave en claro",
+          "comando": "grep -rnE \"(pin|clave|password) *={2,3} *(pin|clave|password|['\\\"])\" app/ lib/ components/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Lo almacenado no es el PIN",
+          "comando": "npm test -- hash-credenciales",
+          "espera": "test verde: el valor guardado no es igual al PIN y mide 50+ caracteres"
+        },
+        {
+          "check": "El hash no viaja al cliente",
+          "comando": "grep -rniE \"select .*(pin_hash|clave_hash|password_hash)\" app/ lib/ | grep -viE \"verificar|login|autenticar\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/acceso/credenciales.ts",
+        "supabase/migraciones/*_credenciales.sql",
+        "tests/seguridad/hash-credenciales.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "sec.auth.sin-credenciales-de-arranque",
+      "titulo": "Matar el PIN de arranque antes de que el negocio abra",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "En Mercaplaza el PIN de arranque `0000` del bootstrap siguió vivo en producción semanas, y ningún agente pudo cambiarlo porque la ruta de cambio exige el PIN actual del dueño: el candado que protege es el mismo que impide arreglarlo. Con `0000` cualquiera anula ventas.",
+      "queHacer": [
+        "Marcar la credencial de arranque en la base con `debe_cambiar = true` y una fecha de creación.",
+        "Mientras `debe_cambiar` sea true, la sesión SOLO puede ir a la pantalla de cambio de PIN: toda otra ruta responde 403, incluida la API.",
+        "La credencial de arranque caduca sola: pasadas 72 horas sin cambiarse, deja de autenticar y el acceso se recupera por el camino anti-encierro (clave de entorno del dueño), no por el PIN.",
+        "El cambio de PIN de arranque NO exige el PIN anterior: exige la sesión de arranque. Ese es el hueco que dejó a Mercaplaza atrapada.",
+        "Prohibir por grep los valores de arranque típicos en seeds, migraciones y fixtures: `0000`, `1234`, `admin`, `admin123`.",
+        "Dejar en `docs/arranque.md` el procedimiento de primer día en pasos numerados."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay credenciales de arranque escritas en el repositorio",
+          "comando": "grep -rnE \"['\\\"](0000|1234|admin123|123456)['\\\"]\" supabase/ scripts/ lib/ app/ --include=*.sql --include=*.ts",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Con el PIN de arranque solo se llega a la pantalla de cambio",
+          "comando": "npm test -- arranque-pin",
+          "espera": "test verde: login de arranque + GET /api/ventas responde 403"
+        },
+        {
+          "check": "La credencial caduca",
+          "comando": "npm test -- arranque-caducidad",
+          "espera": "test verde: con fecha de creación de hace 4 días el login responde 401"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/acceso/arranque.ts",
+        "app/api/acceso/cambiar-pin/**",
+        "docs/arranque.md",
+        "tests/seguridad/arranque-pin.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:que-es-estar-verificado"
+      ]
+    },
+    {
+      "id": "sec.permisos.tabla-unica-rol-secciones",
+      "titulo": "Definir en UNA tabla pura qué secciones ve cada rol",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el permiso se decide con un `if (rol === 'dueno')` esparcido por veinte archivos, la pantalla y la API acaban discrepando: la pestaña se esconde pero la ruta responde 200. Ese es exactamente el hueco por el que un cajero llega a los gastos.",
+      "queHacer": [
+        "Escribir `lib/acceso/roles.ts` con un objeto puro `rol → secciones[]`, sin imports de base de datos ni de React.",
+        "Exponer una única función `puedeVer(rol, seccion): boolean` y usarla en los DOS lados: el menú de la pantalla y el guardián de cada ruta.",
+        "La lista de secciones se decide negocio por negocio con el dueño: «el cajero solo ve ventas» es la regla del asadero, no una ley.",
+        "Prohibir por grep las comparaciones de rol fuera de ese módulo.",
+        "Test de tabla: para cada par (rol, sección) el resultado esperado está escrito, incluidos los que dan false."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay comparaciones de rol sueltas",
+          "comando": "grep -rnE \"rol *={2,3} *['\\\"]\" app/ components/ lib/ | grep -v \"lib/acceso/roles.ts\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La tabla está cubierta entera",
+          "comando": "npm test -- roles-tabla",
+          "espera": "test verde con un caso por cada par rol×sección"
+        },
+        {
+          "check": "El módulo es puro",
+          "comando": "grep -nE \"^import\" lib/acceso/roles.ts",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/acceso/roles.ts",
+        "tests/seguridad/roles-tabla.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.entrada.borde-unico-de-validacion",
+      "titulo": "Fijar un solo borde donde se valida todo lo que entra",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si cada ruta valida a su manera, alguna no valida. Un `cantidad: -5` que entra sin esquema no da error: da una venta que suma negativo y un arqueo que nadie sabe explicar.",
+      "queHacer": [
+        "Elegir UNA librería de esquemas (zod si el stack es TypeScript) y declararla en `lib/esquemas/`.",
+        "Regla escrita: ninguna ruta llama a `req.json()` sin pasar el resultado por un `.parse()` en la línea siguiente.",
+        "El fallo de validación devuelve 400 con el nombre del campo, nunca 500 ni el objeto crudo.",
+        "Los tipos del dominio se DERIVAN del esquema (`z.infer`), para que no existan dos verdades sobre la forma del dato.",
+        "Dejar el grep de guardia en el script de verificación."
+      ],
+      "aceptacion": [
+        {
+          "check": "Toda ruta que lee cuerpo lo valida",
+          "comando": "grep -rl \"json()\" app/api | xargs grep -L \"parse(\"",
+          "espera": "0 archivos"
+        },
+        {
+          "check": "No hay tipos de cuerpo escritos a mano en paralelo al esquema",
+          "comando": "grep -rn \"as any\" app/api",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Un cuerpo inválido responde 400",
+          "comando": "npm test -- validacion-borde",
+          "espera": "test verde: cuerpo sin campo obligatorio devuelve 400"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/esquemas/**",
+        "tests/seguridad/validacion-borde.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:cero-datos-inventados"
+      ]
+    },
+    {
+      "id": "sec.transporte.solo-https-y-cookies-marcadas",
+      "titulo": "Servir solo por HTTPS y marcar las cookies httpOnly y SameSite",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Una cookie de sesión sin `httpOnly` la lee cualquier script inyectado; sin `secure` viaja en claro por el wifi del local, que es el mismo wifi de los clientes. El que la copia entra como la cajera.",
+      "queHacer": [
+        "Poner en toda cookie de sesión: `httpOnly: true`, `secure: process.env.NODE_ENV === 'production'`, `sameSite: 'lax'` y `path: '/'`.",
+        "Redirigir 308 de http a https en el borde (middleware o configuración del hosting).",
+        "Revisar que ninguna URL de producción escrita en el código empiece por `http://`.",
+        "Anotar el dominio exacto de producción en `docs/despliegue.md`."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna cookie se crea sin httpOnly",
+          "comando": "grep -rn \"cookies().set\\|Set-Cookie\" app/ lib/ | grep -v \"httpOnly\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "No hay URLs http de producción en el código",
+          "comando": "grep -rnE \"http://(?!localhost|127\\.0\\.0\\.1)\" app/ lib/ components/ -P",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno",
+          "landing"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "middleware.ts",
+        "docs/despliegue.md"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.datos.inventario-de-datos-personales",
+      "titulo": "Inventariar qué dato personal se guarda, dónde y para qué",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La Ley 1581 obliga a decirle al cliente qué se guarda y para qué. No se puede cumplir —ni borrar a petición, ni responder un reclamo— sin saber en qué columnas vive el teléfono y la cédula. Sin inventario, la respuesta al titular es una búsqueda a mano cada vez.",
+      "queHacer": [
+        "Recorrer el esquema y listar en `docs/datos-personales.md` cada columna con dato de persona: tabla, columna, finalidad, quién la puede leer, cuánto se conserva.",
+        "Marcar las que son dato sensible según la ley (salud, biometría, datos de menores): esas exigen autorización explícita aparte.",
+        "Anotar por cada una si es necesaria para operar o solo cómoda: lo cómodo se borra en el arquetipo de minimización.",
+        "Incluir también lo que vive fuera de la base: exportaciones a Excel, mensajes de WhatsApp, copias en disco.",
+        "Cerrar con el nombre y contacto del responsable del tratamiento (persona real, no «soporte»)."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay columna de dato personal fuera del inventario",
+          "comando": "grep -rioE \"(cedula|telefono|celular|direccion|correo|email|nombre_cliente|fecha_nacimiento)\" supabase/esquema.sql | sort -u | while read c; do grep -qi \"$c\" docs/datos-personales.md || echo \"FALTA $c\"; done",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Cada fila tiene finalidad y plazo",
+          "comando": "grep -c \"|\" docs/datos-personales.md",
+          "espera": "1+ filas y ninguna con celda vacía en finalidad o conservación"
+        },
+        {
+          "check": "El responsable está nombrado",
+          "comando": "grep -niE \"responsable del tratamiento\" docs/datos-personales.md",
+          "espera": "1+ líneas con nombre y contacto"
+        }
+      ],
+      "aplicaSi": {
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/datos-personales.md"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "sec.auth.limite-intentos",
+      "titulo": "Limitar intentos de login por persona, puesto e IP",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un PIN de 4 dígitos son 10.000 combinaciones: sin límite se prueban enteras en minutos desde el celular de cualquiera conectado al wifi del local.",
+      "queHacer": [
+        "Contar fallos en el servidor por la combinación `usuario@sede:puesto` y aparte por IP, en ventana de 15 minutos.",
+        "Al 5º fallo, rechazar durante 15 minutos con el mismo mensaje que se da a una clave mala: no revelar que hay bloqueo por persona.",
+        "Bloquear la COMBINACIÓN, nunca el local entero: si se bloquea la sede, un atacante deja al negocio sin cobrar en 5 intentos.",
+        "El contador se reinicia con un login correcto, no solo con el paso del tiempo.",
+        "Registrar cada bloqueo en la bitácora con hora, usuario, puesto e IP.",
+        "Resetear el PIN desbloquea a quien estaba bloqueado: es comportamiento de producto, no efecto colateral."
+      ],
+      "aceptacion": [
+        {
+          "check": "El 6º intento fallido devuelve 429",
+          "comando": "npm test -- limite-intentos",
+          "espera": "test verde; el 6º POST de login responde 429"
+        },
+        {
+          "check": "Bloquear a un cajero no bloquea a los demás del mismo local",
+          "comando": "npm test -- limite-intentos-aislado",
+          "espera": "test verde: otro usuario del mismo puesto entra con 200"
+        },
+        {
+          "check": "El contador vive en el servidor, no en el navegador",
+          "comando": "grep -rniE \"intentos|bloqueo\" components/ --include=*.tsx | grep -iE \"localStorage|sessionStorage\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/acceso/bloqueos.ts",
+        "app/api/acceso/login/**",
+        "tests/seguridad/limite-intentos.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "sec.auth.respuesta-indistinguible",
+      "titulo": "Responder lo mismo ante usuario inexistente, inactivo y clave mala",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Si «ese usuario no existe» y «clave incorrecta» son mensajes distintos, el atacante primero averigua gratis quién trabaja en el local y solo después ataca el PIN. La lista de empleados no debería salir del login.",
+      "queHacer": [
+        "Unificar los tres casos —usuario inexistente, usuario inactivo, credencial mala— en un mismo texto, mismo código HTTP y misma forma de respuesta.",
+        "No incluir en el cuerpo ningún campo que diferencie (`motivo`, `codigo`, `usuarioExiste`).",
+        "Comprobar que el tiempo de respuesta tampoco diferencia: si el usuario no existe, igual se hace un hash de descarte antes de contestar.",
+        "El detalle real sí va a la bitácora del servidor, que no ve el que intenta entrar."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay mensajes que revelen existencia",
+          "comando": "grep -rniE \"no existe|usuario no encontrado|usuario inactivo|contrase(ñ|n)a incorrecta\" app/api/acceso/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Las tres respuestas son idénticas byte a byte",
+          "comando": "npm test -- respuesta-login",
+          "espera": "test verde: mismo status y mismo cuerpo en los tres casos"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/acceso/login/route.ts",
+        "tests/seguridad/respuesta-login.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.auth.comparacion-timing-safe",
+      "titulo": "Comparar credenciales con timingSafeEqual, nunca con ===",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "`===` sobre cadenas corta en el primer carácter distinto: la diferencia de tiempo entre fallar en el primer dígito y en el cuarto es medible y convierte 10.000 intentos en 40. Aplica igual a PIN, clave del dueño, claves de caja y tokens de webhook.",
+      "queHacer": [
+        "Hashear los dos lados con `sha256` y comparar los buffers resultantes con `crypto.timingSafeEqual`.",
+        "Hashear primero garantiza que los buffers midan lo mismo: `timingSafeEqual` lanza si difieren en longitud, y esa excepción es otro oráculo.",
+        "Aplicarlo en todos los sitios donde se compara un secreto, no solo en el login: clave de caja, token de webhook, clave de administración.",
+        "Dejar el grep de guardia en el script de verificación."
+      ],
+      "aceptacion": [
+        {
+          "check": "No queda comparación directa de secretos",
+          "comando": "grep -rnE \"(clave|pin|token|secreto|firma) *={2,3}\" lib/ app/ --include=*.ts | grep -v timingSafeEqual",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La comparación segura está en uso",
+          "comando": "grep -rn \"timingSafeEqual\" lib/",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/acceso/comparar.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.sesion.cookie-firmada-y-fail-closed",
+      "titulo": "Firmar la sesión y tratar como nula toda cookie dudosa",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una cookie de sesión sin firma es un formulario: el que la edita se pone `rol: dueno` y entra a los gastos. Y una cookie medio válida —firma buena, forma inesperada— es peor que ninguna, porque el código sigue adelante con campos vacíos.",
+      "queHacer": [
+        "Guardar en la cookie `{usuarioId, nombre, rol, puesto, exp}` firmado con HMAC-SHA256 y un secreto de entorno.",
+        "Al leerla: firma mala, JSON que no parsea, forma inesperada o `exp` vencido devuelven `null`. Nunca un objeto parcial.",
+        "Derivar el secreto de la clave del dueño si no hay uno propio, para conservar la propiedad de que cambiar la clave cierra todas las sesiones abiertas.",
+        "El rol de la cookie es la ÚNICA fuente del rol en el servidor: nada de leer `rol` del cuerpo de la petición.",
+        "Tests con cinco cookies rotas distintas: firma alterada, payload alterado, base64 inválido, campo faltante, expirada."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna ruta toma el rol del cuerpo de la petición",
+          "comando": "grep -rnE \"body\\.(rol|usuarioId|esDueno)|req\\.body\\.rol\" app/api/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Las cinco cookies rotas devuelven sesión nula",
+          "comando": "npm test -- sesion-firmada",
+          "espera": "test verde con 5 casos, todos resolviendo null"
+        },
+        {
+          "check": "La sesión no se lee sin verificar firma",
+          "comando": "grep -rn \"cookies().get\" app/ lib/ | grep -v \"lib/acceso/sesion.ts\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true,
+        "superficies": [
+          "panel-interno",
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/acceso/sesion.ts",
+        "tests/seguridad/sesion-firmada.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.sesion.caducidad-pensada-para-el-turno",
+      "titulo": "Poner a la sesión una caducidad medida en turnos, no en meses",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "En el mostrador nadie cierra sesión: se va a las 7 y la caja queda abierta con su usuario. Si la sesión dura 30 días, las ventas del turno de la noche salen firmadas por quien se fue a las 7.",
+      "queHacer": [
+        "Fijar la duración con el dueño en función del turno real (típico: 12 horas) y escribirla en `lib/acceso/sesion.ts` como constante con nombre.",
+        "Al cerrar el turno de caja, invalidar también la sesión de esa persona en ese puesto.",
+        "Cerrar sesión NO desvincula el puesto: el puesto es del equipo, el siguiente turno entra en la misma caja sin volver a vincular nada.",
+        "Mostrar en pantalla quién está en sesión, siempre visible, con las palabras que la persona reconoce (su nombre, no su id).",
+        "Test: una cookie con `exp` de hace un minuto no autentica."
+      ],
+      "aceptacion": [
+        {
+          "check": "La duración es una constante con nombre, no un número suelto",
+          "comando": "grep -rnE \"60 *\\* *60 *\\* *24 *\\* *[0-9]{2,}\" lib/ app/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La sesión vencida no autentica",
+          "comando": "npm test -- sesion-caducidad",
+          "espera": "test verde: cookie expirada devuelve 401"
+        },
+        {
+          "check": "Cerrar sesión no borra el puesto",
+          "comando": "grep -rn \"localStorage.removeItem\" app/ components/ | grep -i puesto",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ],
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/acceso/sesion.ts",
+        "app/api/acceso/salir/route.ts",
+        "tests/seguridad/sesion-caducidad.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "sec.permisos.403-en-cada-ruta",
+      "titulo": "Poner el guardián de permisos dentro de la ruta {{ruta}}",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Esconder la pestaña es cortesía; el 403 es la puerta. Una ruta sin guardián responde igual de bien a un `fetch` escrito a mano desde el navegador de la cajera que al menú del dueño.",
+      "queHacer": [
+        "Poner en la primera línea de {{ruta}} la llamada `exigirSeccion(<seccion>, <acción en palabras>)`, antes de leer el cuerpo o tocar la base.",
+        "Sin sesión → 401. Con sesión y sin permiso → 403 con un mensaje que le diga a la persona a quién llamar; recargar no le sirve.",
+        "El guardián devuelve la sesión ya verificada: la ruta usa ese objeto y no vuelve a leer la cookie.",
+        "Añadir a `tests/seguridad/rutas-403.test.ts` un caso para {{ruta}} con un rol que no debe entrar."
+      ],
+      "aceptacion": [
+        {
+          "check": "{{ruta}} exige sección antes de tocar datos",
+          "comando": "grep -n \"exigirSeccion\" {{ruta}}",
+          "espera": "1+ líneas, dentro de las 10 primeras del manejador"
+        },
+        {
+          "check": "Un rol sin permiso recibe 403 en {{ruta}}",
+          "comando": "npm test -- rutas-403 {{ruta}}",
+          "espera": "test verde: respuesta 403"
+        },
+        {
+          "check": "No hay rutas de API sin guardián",
+          "comando": "grep -rL \"exigirSeccion\\|rutaPublica\" app/api --include=route.ts",
+          "espera": "0 archivos"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno"
+        ],
+        "multiUsuario": true
+      },
+      "porCada": "ruta",
+      "posee": [
+        "{{ruta}}",
+        "tests/seguridad/rutas-403.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.entrada.sql-parametrizado",
+      "titulo": "Parametrizar todo el SQL, sin una sola cadena armada",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Un nombre de producto con comilla —«Aguardiente 'Añejo'»— rompe la consulta armada por concatenación; el mismo hueco escrito a propósito borra la tabla de ventas. En un negocio con caja eso no se restaura, se recuenta a mano.",
+      "queHacer": [
+        "Sustituir toda interpolación dentro de una consulta por parámetros posicionales (`$1`, `?`) o por el constructor de la librería.",
+        "Los identificadores que no se pueden parametrizar (nombre de tabla, dirección de orden) se validan contra una lista blanca cerrada, no se pasan tal cual.",
+        "Revisar también las RPC y las funciones SQL del esquema: `EXECUTE format(...)` sin `%I`/`%L` es el mismo agujero.",
+        "Dejar el grep de guardia en el script de verificación."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay SQL armado con plantillas",
+          "comando": "grep -rnE \"(select|insert|update|delete)[^\\\"'\\n]*\\$\\{\" lib/ app/ supabase/ -i",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "No hay format() sin escapado en el esquema",
+          "comando": "grep -rn \"EXECUTE format\" supabase/ | grep -vE \"%I|%L\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Un valor con comilla no rompe nada",
+          "comando": "npm test -- sql-comillas",
+          "espera": "test verde: se guarda y se lee «Aguardiente 'Añejo'» intacto"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql",
+          "sqlite"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/datos/**",
+        "tests/seguridad/sql-comillas.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "sec.entrada.esquema-por-entidad",
+      "titulo": "Validar en el servidor el cuerpo que crea o edita {{entidad}}",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La pantalla ya valida, pero la pantalla es del cliente: un `fetch` a mano manda `precio: -3000` o `cantidad: 1e9` y la base lo acepta. El descuadre aparece en el arqueo de la noche, cuando ya nadie sabe qué pasó.",
+      "queHacer": [
+        "Escribir en `lib/esquemas/{{entidad}}.ts` el esquema de creación y el de edición: no son el mismo, editar no lleva los campos que fija el servidor.",
+        "Poner los límites reales del negocio, no genéricos: montos positivos y con tope, cantidades enteras, textos con largo máximo, fechas dentro de un rango.",
+        "Rechazar campos desconocidos (`strict`): así un campo `rol` colado en el cuerpo de {{entidad}} da 400 en vez de escribirse.",
+        "Los campos que decide el servidor —quién lo creó, la sede, la hora— se BORRAN del cuerpo antes de validar; nunca se aceptan del cliente.",
+        "Derivar el tipo de {{entidad}} del esquema y usarlo en toda la capa de datos."
+      ],
+      "aceptacion": [
+        {
+          "check": "El esquema rechaza los valores imposibles de {{entidad}}",
+          "comando": "npm test -- esquema-{{entidad}}",
+          "espera": "test verde con casos negativos: monto negativo, cantidad no entera y campo desconocido dan 400"
+        },
+        {
+          "check": "El servidor no acepta campos de autoría del cliente",
+          "comando": "grep -rnE \"(usuarioId|creadoPor|sedeId|localId) *: *(body|cuerpo|datos)\\.\" app/api/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": "entidad",
+      "posee": [
+        "lib/esquemas/{{entidad}}.ts",
+        "tests/seguridad/esquema-{{entidad}}.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "sec.transporte.cors-lista-blanca",
+      "titulo": "Restringir CORS a los orígenes propios, sin comodín",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Con `Access-Control-Allow-Origin: *` más credenciales, cualquier página que abra la cajera puede llamar a la API con su sesión y leer las ventas del día. El navegador deja de ser una barrera.",
+      "queHacer": [
+        "Listar los orígenes válidos en una constante: el dominio de producción, el de preview y `localhost` solo fuera de producción.",
+        "Devolver el origen concreto que pidió, si está en la lista; si no está, no devolver la cabecera (no responder `*`).",
+        "Nunca combinar `*` con `Access-Control-Allow-Credentials: true`.",
+        "Limitar los métodos y cabeceras permitidas a los que la aplicación usa de verdad."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay comodín en CORS",
+          "comando": "grep -rn \"Allow-Origin\" app/ lib/ middleware.ts next.config.* | grep \"\\*\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Un origen ajeno no recibe cabecera",
+          "comando": "npm test -- cors",
+          "espera": "test verde: petición con Origin https://ajeno.com responde sin Allow-Origin"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "middleware.ts",
+        "tests/seguridad/cors.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.transporte.cabeceras-de-seguridad",
+      "titulo": "Enviar las cabeceras que impiden enmarcar y adivinar tipos",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin `X-Frame-Options`, una página cualquiera mete el panel en un iframe invisible y la cajera pulsa «anular venta» creyendo que cierra un anuncio. Sin `nosniff`, un archivo subido que dice ser imagen se ejecuta como script.",
+      "queHacer": [
+        "Añadir en el middleware o en la configuración del hosting: `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` con las capacidades que no se usan en cero.",
+        "Añadir `Strict-Transport-Security` con `max-age` de un año, solo cuando el dominio ya sirve todo por HTTPS.",
+        "Poner una CSP inicial en modo reporte para no romper la pantalla el primer día; el endurecimiento va aparte, en su propio arquetipo.",
+        "Verificar contra el despliegue real, no contra el código: el hosting puede quitar o añadir cabeceras."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las cuatro cabeceras salen en la respuesta real",
+          "comando": "curl -sI https://<dominio-produccion>/ | grep -icE \"x-frame-options|x-content-type-options|referrer-policy|strict-transport-security\"",
+          "espera": "4"
+        },
+        {
+          "check": "Están declaradas en el repositorio",
+          "comando": "grep -rn \"X-Frame-Options\" middleware.ts next.config.*",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "landing",
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "middleware.ts",
+        "next.config.mjs"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "sec.secretos.nada-de-secretos-en-el-cliente",
+      "titulo": "Sacar del paquete del navegador toda llave que no sea pública",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una llave `service_role` puesta en una variable `NEXT_PUBLIC_` viaja dentro del JavaScript que descarga cualquiera que abra la landing, y esa llave se salta RLS entera: lee y escribe todas las sedes. No hace falta ser atacante, basta con abrir el inspector.",
+      "queHacer": [
+        "Revisar que ninguna variable `NEXT_PUBLIC_*` contenga algo distinto de la llave anónima y URLs públicas.",
+        "Separar el cliente de servidor del cliente de navegador en dos archivos distintos, y marcar el de servidor con `import 'server-only'`.",
+        "Buscar la llave dentro del paquete ya compilado, no solo en el código fuente: es el único sitio donde la fuga se ve de verdad.",
+        "Si alguna llave estuvo alguna vez en el paquete, rotarla.",
+        "Dejar el grep sobre `.next/static` en el script de verificación."
+      ],
+      "aceptacion": [
+        {
+          "check": "La llave de servicio no está en el paquete compilado",
+          "comando": "npm run build && grep -rl \"service_role\" .next/static/ 2>/dev/null | wc -l",
+          "espera": "0"
+        },
+        {
+          "check": "Ninguna variable pública guarda un secreto",
+          "comando": "grep -rnE \"NEXT_PUBLIC_[A-Z_]*(SECRET|KEY|TOKEN|PASSWORD|SERVICE)\" . --include=*.ts --include=*.tsx --include=.env.example",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El cliente de servidor no se puede importar desde el navegador",
+          "comando": "grep -n \"server-only\" lib/datos/servidor.ts",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "next",
+          "supabase"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/datos/servidor.ts",
+        "lib/datos/navegador.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "sec.auditoria.quien-toco-el-dinero",
+      "titulo": "Sellar cada movimiento de dinero con quién, dónde y cuándo",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando falta plata en el arqueo, la única pregunta que importa es quién hizo el movimiento y desde qué caja. Si el registro no lo guarda, la respuesta del sistema es «no sé» y el conflicto se resuelve entre personas, no con datos.",
+      "queHacer": [
+        "Añadir a toda tabla de dinero —ventas, anulaciones, gastos, aperturas y cierres de caja— las columnas `usuario_id`, `puesto`, `sede_id` y `creado_en` con marca de tiempo del servidor.",
+        "Rellenarlas SIEMPRE desde la sesión verificada, jamás desde el cuerpo de la petición.",
+        "La hora la pone la base (`now()`), no el navegador: el reloj del PC del mostrador está mal con frecuencia.",
+        "Poner las columnas como `not null` para que la ruta que olvide sellar falle de inmediato en vez de escribir un hueco.",
+        "Mostrar el sello en la pantalla de detalle, con el nombre de la persona, para que el dueño lo lea sin consultar la base."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las columnas de sello son obligatorias",
+          "comando": "grep -nE \"usuario_id .*not null|creado_en .*not null\" supabase/esquema.sql | wc -l",
+          "espera": "1 línea por cada tabla de dinero"
+        },
+        {
+          "check": "El sello no viene del cliente",
+          "comando": "grep -rnE \"usuario_id *: *(body|cuerpo|datos|payload)\\.\" app/api/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Un movimiento sin sesión no se puede crear",
+          "comando": "npm test -- sello-movimientos",
+          "espera": "test verde: insertar sin sesión devuelve 401 y 0 filas nuevas"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "supabase/migraciones/*_sello.sql",
+        "lib/datos/movimientos.ts",
+        "tests/seguridad/sello-movimientos.test.ts"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "sec.dependencias.auditoria-y-fijado",
+      "titulo": "Fijar las versiones e instalar siempre desde el candado",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Con rangos abiertos, el despliegue del martes trae una versión que nadie revisó, y si esa versión salió comprometida el código malicioso corre con las llaves de producción. Ya pasó con paquetes de npm muy usados.",
+      "queHacer": [
+        "Commitear el archivo de candado y usar `npm ci` en despliegue y CI, nunca `npm install`.",
+        "Quitar los rangos amplios (`^` en dependencias críticas de datos y autenticación queda fijado a versión exacta).",
+        "Correr `npm audit --production` y dejar escrito qué se arregló y qué se aceptó, con el motivo, en `docs/dependencias.md`.",
+        "Añadir el audit al script de verificación con el umbral acordado (típico: falla en `high`)."
+      ],
+      "aceptacion": [
+        {
+          "check": "El candado está versionado",
+          "comando": "git ls-files | grep -E \"package-lock.json|pnpm-lock.yaml|yarn.lock\"",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "No hay vulnerabilidades altas sin decisión escrita",
+          "comando": "npm audit --production --audit-level=high",
+          "espera": "exit 0"
+        },
+        {
+          "check": "El despliegue no usa install",
+          "comando": "grep -rn \"npm install\" .github/ package.json scripts/ 2>/dev/null",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node",
+          "next",
+          "typescript"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "package.json",
+        "docs/dependencias.md"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "sec.abuso.limite-en-las-rutas-caras",
+      "titulo": "Poner techo de peticiones a las rutas que cuestan plata o CPU",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una ruta pública que genera un PDF, manda un WhatsApp o llama a un modelo se puede pedir mil veces por minuto desde un script. No es una brecha: es una factura que llega a fin de mes y un servidor que deja de atender la caja.",
+      "queHacer": [
+        "Listar las rutas caras: envío de mensajes, generación de documentos, búsquedas sin filtro, llamadas a servicios de pago.",
+        "Aplicar límite por IP y por sesión con ventana corta (típico: 20 por minuto), devolviendo 429 con `Retry-After`.",
+        "El contador vive en el servidor y sobrevive al reinicio si el hosting tiene varias instancias: memoria local no sirve con más de un proceso.",
+        "Excluir explícitamente las rutas del mostrador que se usan a ritmo alto en hora pico: un límite que frena la caja se desactiva entero al día siguiente.",
+        "Registrar los 429 para poder distinguir un abuso de un límite mal puesto."
+      ],
+      "aceptacion": [
+        {
+          "check": "Superar el límite devuelve 429",
+          "comando": "npm test -- limite-rutas",
+          "espera": "test verde: la petición 21 en un minuto responde 429 con Retry-After"
+        },
+        {
+          "check": "Toda ruta cara está en la lista",
+          "comando": "grep -rl \"sendMessage\\|generarPDF\\|openai\\|anthropic\" app/api | xargs grep -L \"limitar(\"",
+          "espera": "0 archivos"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "landing"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/limitar.ts",
+        "tests/seguridad/limite-rutas.test.ts"
+      ],
+      "cerebro": [
+        "tema:modelos-y-costos"
+      ]
+    },
+    {
+      "id": "sec.datos.autorizacion-antes-de-guardar",
+      "titulo": "Pedir y registrar la autorización del cliente antes de guardar sus datos",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La Ley 1581 exige autorización previa del titular y poder PROBARLA. Guardar el teléfono de un cliente para mandarle promociones sin ese registro es una sanción de la SIC contra el dueño del negocio, no contra quien programó.",
+      "queHacer": [
+        "Escribir la finalidad en palabras del negocio («para avisarle cuando su encargo esté listo»), no en jerga legal, y mostrarla donde se pide el dato.",
+        "Guardar la autorización como un hecho con fecha, canal y texto exacto que se mostró: `autorizaciones(titular, finalidad, texto_version, canal, creado_en)`.",
+        "La casilla no viene marcada por defecto y el formulario no envía sin ella cuando el dato es opcional para operar.",
+        "Versionar el texto: si cambia la finalidad, la autorización vieja no cubre la nueva.",
+        "Enlazar la política de tratamiento desde el formulario y desde el pie de la landing."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay casillas de consentimiento premarcadas",
+          "comando": "grep -rnE \"type=[\\\"']checkbox[\\\"'][^>]*(defaultChecked|checked=\\{true\\})\" app/ components/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Cada autorización guarda la versión del texto",
+          "comando": "grep -nE \"texto_version|version_politica\" supabase/esquema.sql",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Guardar un titular sin autorización falla",
+          "comando": "npm test -- autorizacion-titular",
+          "espera": "test verde: el insert sin fila de autorización es rechazado"
+        }
+      ],
+      "aplicaSi": {
+        "datosPersonales": true,
+        "publico": true
+      },
+      "porCada": null,
+      "posee": [
+        "supabase/migraciones/*_autorizaciones.sql",
+        "app/politica-de-datos/**",
+        "tests/seguridad/autorizacion-titular.test.ts"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas",
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "sec.permisos.puerta-por-registro",
+      "titulo": "Comprobar la pertenencia de cada {{entidad}} antes de devolverla",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Tener sesión no es tener derecho sobre ESA fila. Sin comprobación por registro, cambiar el número en `/{{entidad}}/1832` a `/{{entidad}}/1833` muestra el documento de otra sede, y la URL se comparte por WhatsApp sin querer.",
+      "queHacer": [
+        "En toda ruta que recibe un identificador de {{entidad}}, cargar la fila y comparar su sede o su dueño contra la sesión ANTES de devolver nada.",
+        "Responder 404 —no 403— cuando la fila existe pero no le pertenece: un 403 confirma que ese identificador existe.",
+        "Hacer la comprobación en la consulta, no en memoria: el `where` lleva la sede de la sesión, para que la fila ajena ni siquiera se lea.",
+        "Cubrir también las rutas de edición y borrado, no solo la de lectura: son las que hacen daño.",
+        "Test con dos sedes sembradas y un identificador cruzado."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un identificador de otra sede devuelve 404",
+          "comando": "npm test -- pertenencia-{{entidad}}",
+          "espera": "test verde: GET, PUT y DELETE cruzados responden 404 y no modifican filas"
+        },
+        {
+          "check": "Ninguna consulta de {{entidad}} olvida el filtro de sede",
+          "comando": "grep -rn \"from('{{entidad}}')\" app/ lib/ | grep -v \"sede\\|local\\|empresa\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "entidades": [
+          "*"
+        ],
+        "multiUsuario": true
+      },
+      "porCada": "entidad",
+      "posee": [
+        "app/api/{{entidad}}/**",
+        "tests/seguridad/pertenencia-{{entidad}}.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "sec.permisos.la-sede-sale-del-puesto",
+      "titulo": "Sacar la sede de la sesión y del puesto, nunca de la petición",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si la sede viaja en el cuerpo, un trabajador puede repuntear su equipo y hacer que sus movimientos salgan del local que más le convenga: falsearía de dónde salió la mercancía. Y sin mala intención pasa igual: un cajero apurado con un desplegable de sucursales factura en la equivocada, y ese error no se corrige después, se arrastra al cuadre.",
+      "queHacer": [
+        "MANDA EL PC: la sede de toda escritura sale del puesto vinculado al equipo, resuelto en el servidor a partir de la sesión.",
+        "Borrar del cuerpo de las peticiones todo campo `sedeId`/`localId` antes de validar; si llega, se ignora sin avisar o se responde 400, pero nunca se usa.",
+        "Solo el dueño vincula un puesto a una sede, y la vinculación queda registrada con fecha y con quién la hizo.",
+        "Quitar de la pantalla del cajero cualquier selector de sede: si puede elegir, tarde o temprano elige mal.",
+        "Test: una petición con `sedeId` de otra sede crea la fila en la sede del puesto, no en la enviada."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna escritura toma la sede del cuerpo",
+          "comando": "grep -rnE \"(sede_id|sedeId|local_id|localId) *: *(body|cuerpo|datos|payload)\\.\" app/api/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La sede enviada por el cliente se ignora",
+          "comando": "npm test -- sede-del-puesto",
+          "espera": "test verde: la fila creada queda con la sede del puesto, no con la enviada"
+        },
+        {
+          "check": "El cajero no tiene selector de sede",
+          "comando": "grep -rniE \"selector.*sede|select.*sucursal\" components/caja/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true,
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/acceso/puestos.ts",
+        "lib/dispositivo.ts",
+        "tests/seguridad/sede-del-puesto.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "sec.permisos.rls-probada-contra-postgres-real",
+      "titulo": "Probar las políticas RLS contra un Postgres de verdad",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Una política RLS que nadie ejecutó es una intención escrita en SQL. La barrera real de datos es RLS: si tiene un hueco, el servidor no lo tapa. En el estanco el trigger anti-escalada solo se dio por bueno cuando corrió 37/37 contra un Postgres levantado de verdad.",
+      "queHacer": [
+        "Levantar un Postgres desechable en el test (`embedded-postgres` o contenedor) y aplicarle el esquema y las políticas tal como están en el repositorio.",
+        "Sembrar dos empresas y dos sedes con datos distintos y un usuario por rol.",
+        "Escribir un caso por política y por operación: lectura, inserción, actualización y borrado, cada uno con el rol que SÍ puede y el que NO.",
+        "Los casos negativos comprueban `0 filas devueltas` o error, no solo que la consulta no explote.",
+        "Incluir el caso de la llave anónima sin sesión: debe ver cero filas de las tablas de negocio.",
+        "Añadir la suite al script de verificación para que una política nueva sin test rompa el build."
+      ],
+      "aceptacion": [
+        {
+          "check": "La suite corre contra Postgres real y pasa entera",
+          "comando": "npm test -- rls",
+          "espera": "exit 0, 1+ casos por política, ninguno saltado"
+        },
+        {
+          "check": "Toda tabla de negocio tiene RLS activa",
+          "comando": "grep -c \"ENABLE ROW LEVEL SECURITY\" supabase/esquema.sql",
+          "espera": "1 por cada tabla de negocio del esquema"
+        },
+        {
+          "check": "No hay políticas permisivas de comodín",
+          "comando": "grep -niE \"using *\\( *true *\\)\" supabase/esquema.sql | grep -vi \"public\\|catalogo\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "supabase",
+          "postgres"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "tests/seguridad/rls/**",
+        "supabase/esquema.sql"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:que-es-estar-verificado",
+        "tema:olas-de-agentes"
+      ]
+    },
+    {
+      "id": "sec.permisos.anti-escalada-de-rol",
+      "titulo": "Impedir en la base que nadie se suba a sí mismo el rol",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "En Mercaplaza, sin la comprobación de rol del lado del servidor, cualquier cajero con caja abierta podía resetear el PIN del dueño: la ruta creía lo que venía en el cuerpo. Si el candado solo vive en la ruta, la siguiente ruta que alguien escriba no lo tiene.",
+      "queHacer": [
+        "Escribir un trigger en la tabla de usuarios que rechace todo `UPDATE` que cambie `rol` cuando el autor de la sesión es la misma fila.",
+        "Rechazar también que un rol se asigne por encima del propio: un administrador no crea dueños.",
+        "El trigger devuelve un error con texto estable y comprobable, para que el test no dependa del mensaje de Postgres.",
+        "La ruta sigue comprobando el rol —defensa en profundidad—, pero la prueba de este arquetipo se hace saltándose la ruta, con SQL directo.",
+        "Probar los cuatro casos: subirse uno mismo, subir a otro por encima, bajar al último dueño, y el cambio legítimo del dueño sobre un cajero."
+      ],
+      "aceptacion": [
+        {
+          "check": "El trigger existe y está enganchado",
+          "comando": "grep -nE \"create trigger .*rol|before update on .*usuarios\" supabase/esquema.sql -i",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Saltándose la aplicación, el ascenso propio falla",
+          "comando": "npm test -- anti-escalada",
+          "espera": "test verde: el UPDATE directo lanza error y la fila conserva su rol"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "supabase",
+          "postgres"
+        ],
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "supabase/migraciones/*_rol_actual.sql",
+        "tests/seguridad/anti-escalada.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.auth.doble-candado-en-mutaciones-admin",
+      "titulo": "Exigir dos pruebas distintas para las mutaciones de administración",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una sola prueba se puede robar: el equipo queda solo un minuto con la sesión abierta y ese minuto basta para crear un usuario dueño. Con dos candados —algo del equipo y algo que solo la persona sabe— el minuto no alcanza.",
+      "queHacer": [
+        "Definir la lista cerrada de mutaciones administrativas: crear o desactivar personas, cambiar roles, resetear PIN, vincular puestos, cambiar precios base.",
+        "Exigir en cada una la clave del puesto (cabecera) MÁS el PIN del dueño verificado en el servidor contra el hash, leyendo el rol desde la base y no desde la petición.",
+        "Con más de un dueño activo, el sistema se niega y pide que lo haga él desde su sesión: probar uno por uno gasta intentos contra el bloqueo del dueño equivocado.",
+        "Cada uso del doble candado se escribe en la bitácora, incluidos los fallos.",
+        "Test de la escalada concreta: cajero con caja abierta intentando resetear el PIN del dueño."
+      ],
+      "aceptacion": [
+        {
+          "check": "El cajero no puede resetear el PIN del dueño",
+          "comando": "npm test -- doble-candado",
+          "espera": "test verde: responde 403 y el hash del dueño no cambia"
+        },
+        {
+          "check": "El rol se lee de la base en cada mutación admin",
+          "comando": "grep -rln \"exigirDueno\\|verificar_pin\" app/api/admin/ | wc -l",
+          "espera": "igual al número de rutas bajo app/api/admin"
+        },
+        {
+          "check": "Falta un candado y la ruta rechaza",
+          "comando": "npm test -- doble-candado-parcial",
+          "espera": "test verde: con PIN pero sin clave de puesto responde 401"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true,
+        "superficies": [
+          "panel-interno",
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/admin/**",
+        "lib/acceso/doble-candado.ts",
+        "tests/seguridad/doble-candado.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.auth.re-pin-para-lo-irreversible",
+      "titulo": "Volver a pedir el PIN para lo que no se puede deshacer",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Anular una venta, borrar una factura o levantar un bloqueo mueven plata y no tienen vuelta atrás. Pedir el PIN otra vez, en el momento, es lo que convierte el PIN en firma: sin eso, la sesión abierta de la cajera firma por ella.",
+      "queHacer": [
+        "Listar las acciones irreversibles del negocio con el dueño y escribirlas en `docs/acciones-irreversibles.md`.",
+        "En cada una, pedir el PIN de la persona con autoridad en el mismo diálogo de confirmación, y verificarlo en el servidor contra el hash.",
+        "El PIN se manda una vez por acción: no se guarda en memoria ni se reutiliza para la siguiente.",
+        "Guardar en la anulación quién la autorizó, además de quién la pidió: pueden ser dos personas distintas.",
+        "Un PIN mal tecleado aquí cuenta para el bloqueo por intentos igual que en el login."
+      ],
+      "aceptacion": [
+        {
+          "check": "Toda acción de la lista exige PIN en el servidor",
+          "comando": "grep -rl \"anular\\|eliminar\\|revertir\" app/api | xargs grep -L \"verificarPin\\|verificar_pin\"",
+          "espera": "0 archivos"
+        },
+        {
+          "check": "Sin PIN no se anula",
+          "comando": "npm test -- re-pin",
+          "espera": "test verde: anular sin PIN responde 401 y la venta sigue activa"
+        },
+        {
+          "check": "La anulación guarda quién autorizó",
+          "comando": "grep -nE \"autorizado_por\" supabase/esquema.sql",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/acciones-irreversibles.md",
+        "lib/acceso/re-pin.ts",
+        "tests/seguridad/re-pin.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:invariantes-contables",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "sec.auth.anti-encierro",
+      "titulo": "Impedir que el negocio se quede sin nadie que pueda entrar",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El día que el último dueño se desactiva por error —o se desactiva a sí mismo— nadie puede abrir caja, y el arreglo exige tocar la base a mano un domingo. La seguridad que deja al dueño fuera de su propia app se desactiva entera al día siguiente.",
+      "queHacer": [
+        "Rechazar con 409 la desactivación del último dueño activo y la desactivación de uno mismo con la propia autorización.",
+        "Mantener un administrador semilla que entra con la clave del entorno y NO tiene hash en la base: si el archivo de usuarios se borra o se desactiva a todos, el dueño abre igual.",
+        "Escribir el camino de recuperación en `docs/recuperar-acceso.md`, en pasos numerados, ejecutable por alguien que nunca lo hizo.",
+        "Probar el camino de recuperación de verdad una vez, y pegar la salida en el documento.",
+        "El uso del administrador semilla queda registrado en la bitácora, siempre."
+      ],
+      "aceptacion": [
+        {
+          "check": "Desactivar al último dueño responde 409",
+          "comando": "npm test -- anti-encierro",
+          "espera": "test verde: 409 en los dos casos y el usuario sigue activo"
+        },
+        {
+          "check": "El camino de recuperación está escrito y fechado",
+          "comando": "grep -niE \"ensayado el|probado el\" docs/recuperar-acceso.md",
+          "espera": "1+ líneas con fecha"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/acceso/usuarios.ts",
+        "docs/recuperar-acceso.md",
+        "tests/seguridad/anti-encierro.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "sec.auth.desactivar-en-vez-de-borrar",
+      "titulo": "Desactivar a la persona que se va, nunca borrarla",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Un cajero que se fue puede volver, y borrar su fila deja sin explicación las ventas que cobró: el arqueo de marzo pasa a estar firmado por un identificador que ya no existe. La contabilidad se vuelve irreparable por una operación de un clic.",
+      "queHacer": [
+        "Sustituir el borrado por `activo = false` con fecha y autor de la desactivación.",
+        "El login rechaza a los inactivos con el mismo mensaje neutro que a los inexistentes.",
+        "Las pantallas de listado ocultan a los inactivos por defecto, con un filtro para verlos.",
+        "Reactivar es un acto administrativo con doble candado: no es lo mismo que crear una persona nueva."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay borrado de personas",
+          "comando": "grep -rniE \"delete from usuarios|delete from personas|\\.delete\\(\\)\" app/ lib/ supabase/ | grep -iE \"usuario|persona\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El inactivo no entra y no desaparece",
+          "comando": "npm test -- desactivar-persona",
+          "espera": "test verde: login 401 y la fila sigue existiendo con activo=false"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/acceso/usuarios.ts",
+        "tests/seguridad/desactivar-persona.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "sec.sesion.cambiar-clave-cierra-sesiones",
+      "titulo": "Hacer que cambiar la clave eche a todas las sesiones abiertas",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si alguien copió la cookie, cambiar la clave no lo saca: sigue dentro hasta que la sesión venza, y el dueño cree que ya está resuelto. La acción que la persona toma cuando sospecha es exactamente la que tiene que funcionar.",
+      "queHacer": [
+        "Incluir en la firma de la sesión una versión de credencial (o derivar el secreto de firma de la clave del dueño) que cambie cuando cambia la contraseña o el PIN.",
+        "Al validar la cookie, comparar esa versión con la de la base: si no coincide, la sesión es nula.",
+        "Ofrecer al dueño un botón «cerrar todas las sesiones» que suba la versión sin cambiar la clave.",
+        "El puesto vinculado NO se pierde con esto: se cierra la sesión de las personas, no la del equipo.",
+        "Test: sesión válida + cambio de PIN → la misma cookie devuelve 401."
+      ],
+      "aceptacion": [
+        {
+          "check": "La cookie vieja deja de servir tras el cambio",
+          "comando": "npm test -- cierre-por-cambio-clave",
+          "espera": "test verde: la misma cookie pasa de 200 a 401"
+        },
+        {
+          "check": "El puesto sobrevive al cierre masivo",
+          "comando": "npm test -- cierre-masivo-puesto",
+          "espera": "test verde: tras cerrar sesiones el puesto sigue vinculado"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/acceso/sesion.ts",
+        "app/api/acceso/cerrar-todo/route.ts",
+        "tests/seguridad/cierre-por-cambio-clave.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.sesion.sin-fijacion-de-sesion",
+      "titulo": "Renovar el identificador de sesión en cada inicio de sesión",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el identificador de sesión no cambia al entrar, quien consiga fijarlo antes —dejando la cookie puesta en el PC compartido del mostrador— comparte sesión con la cajera desde el momento en que ella entra. El PC de la caja lo usan cinco personas al día.",
+      "queHacer": [
+        "Emitir una cookie completamente nueva en el login correcto, sin reutilizar el valor anterior.",
+        "Borrar la cookie previa de forma explícita antes de emitir la nueva, con el mismo `path` y `domain`.",
+        "Al cambiar de persona en el mismo equipo, invalidar la sesión anterior en el servidor, no solo en el navegador.",
+        "El identificador de sesión nunca viaja por la URL ni queda en el historial del navegador.",
+        "Test: cookie fijada antes del login no es la misma que después."
+      ],
+      "aceptacion": [
+        {
+          "check": "La cookie posterior al login es distinta",
+          "comando": "npm test -- fijacion-sesion",
+          "espera": "test verde: el valor de la cookie antes y después del login no coincide"
+        },
+        {
+          "check": "Ningún identificador de sesión va en la URL",
+          "comando": "grep -rniE \"(sesion|session|token)=\\$\\{|searchParams.set\\((['\\\"])(sesion|token)\" app/ components/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ],
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/acceso/login/route.ts",
+        "tests/seguridad/fijacion-sesion.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.entrada.sin-html-crudo",
+      "titulo": "Prohibir el HTML crudo con lo que escribe cualquier persona",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Un nombre de producto con `<script>` guardado desde la caja se ejecuta después en la pantalla del dueño, con la sesión del dueño. El texto entra por el mostrador y detona en el panel de administración.",
+      "queHacer": [
+        "Eliminar todo uso de `dangerouslySetInnerHTML` y `innerHTML` sobre datos que vengan de la base o del usuario.",
+        "Donde haya que renderizar texto enriquecido de verdad (una descripción larga), pasar por un saneador con lista blanca de etiquetas, nunca por una expresión regular propia.",
+        "Revisar también los atributos: `href` con `javascript:` y `src` construidos con datos del usuario.",
+        "Añadir un caso al test de la entidad con un valor que contenga `<img onerror=...>` y comprobar que se muestra como texto."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay HTML crudo con datos variables",
+          "comando": "grep -rn \"dangerouslySetInnerHTML\\|innerHTML\" app/ components/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "No se construyen enlaces javascript:",
+          "comando": "grep -rniE \"href=\\{[^}]*(javascript:|\\+ *url)\" app/ components/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Un nombre con etiqueta se muestra como texto",
+          "comando": "npm test -- xss-texto",
+          "espera": "test verde: el DOM contiene el literal y 0 elementos script inyectados"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "landing",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/**",
+        "tests/seguridad/xss-texto.test.ts"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "sec.entrada.csrf-en-las-mutaciones",
+      "titulo": "Impedir que otra página dispare mutaciones con la sesión abierta",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Con la sesión del mostrador abierta, una página cualquiera que abra la cajera puede enviar un formulario a la API y anular una venta: el navegador adjunta la cookie sola. La cajera no ve nada raro y el descuadre aparece en el arqueo.",
+      "queHacer": [
+        "Poner `sameSite: 'lax'` en la cookie de sesión como primera barrera; con `strict` se rompen los enlaces de vuelta desde el correo, decidirlo con conocimiento.",
+        "Añadir a toda mutación una comprobación de origen: `Origin`/`Referer` contra la lista blanca, rechazando 403 si no coincide.",
+        "En formularios que muten estado, incluir además un token por sesión y verificarlo en el servidor.",
+        "Ninguna mutación responde a `GET`: crear, editar, anular y borrar solo por POST/PUT/DELETE.",
+        "Test: petición POST con `Origin` ajeno y cookie válida responde 403."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un origen ajeno con cookie válida es rechazado",
+          "comando": "npm test -- csrf",
+          "espera": "test verde: responde 403 y 0 filas modificadas"
+        },
+        {
+          "check": "Ninguna ruta muta con GET",
+          "comando": "grep -rn \"export async function GET\" app/api | xargs -I{} grep -l \"insert\\|update\\|delete\" {} 2>/dev/null",
+          "espera": "0 archivos"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno"
+        ],
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "middleware.ts",
+        "lib/servidor/csrf.ts",
+        "tests/seguridad/csrf.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.entrada.techo-al-tamano-de-la-peticion",
+      "titulo": "Poner techo al tamaño del cuerpo y de las listas que entran",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Un cuerpo JSON de 200 MB, o una lista de 100.000 líneas de venta en una sola petición, tumban el proceso de Node y con él la caja del local: no hace falta una brecha, basta con un cliente mal escrito o un reintento en bucle.",
+      "queHacer": [
+        "Fijar un tamaño máximo de cuerpo en la configuración del servidor (típico: 1 MB para JSON) y devolver 413 al superarlo.",
+        "Poner tope de elementos a toda lista que entre (líneas de una venta, filas de una sincronización) dentro del esquema de validación.",
+        "Poner tope y valor por defecto al parámetro de paginación: sin eso, `?limite=999999` es una descarga de la base entera.",
+        "Comprobar el tope contra el despliegue real: el hosting puede tener su propio límite, más alto o más bajo."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un cuerpo grande responde 413 y no 500",
+          "comando": "npm test -- techo-cuerpo",
+          "espera": "test verde: cuerpo de 5 MB responde 413"
+        },
+        {
+          "check": "Ninguna consulta paginada carece de tope",
+          "comando": "grep -rn \"limite\\|limit(\" app/api lib/datos | grep -viE \"Math.min|max|<=|z.number\\(\\).*max\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/esquemas/comunes.ts",
+        "next.config.mjs",
+        "tests/seguridad/techo-cuerpo.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "sec.datos.pii-fuera-de-los-registros",
+      "titulo": "Sacar cédulas, teléfonos y PIN de los registros y de los errores",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un `console.log(cuerpo)` en la ruta de clientes copia teléfonos y cédulas al registro del hosting, que lo lee cualquiera con acceso al panel y se conserva meses. Es una base de datos personales paralela que nadie inventarió y nadie borra.",
+      "queHacer": [
+        "Escribir una función de registro que reciba objetos y enmascare por nombre de campo (`pin`, `clave`, `cedula`, `telefono`, `token`, `authorization`) antes de imprimir.",
+        "Prohibir `console.log` directo en el servidor: todo pasa por esa función.",
+        "Enmascarar también en los reportes de error automáticos: el cuerpo de la petición no se adjunta entero.",
+        "Los mensajes de error que ve el usuario no repiten el dato: «no encontramos ese documento», no «no existe la cédula 1.098.…».",
+        "Revisar los registros del último mes en el hosting y borrar los que ya tengan datos personales."
+      ],
+      "aceptacion": [
+        {
+          "check": "No queda console.log en el servidor",
+          "comando": "grep -rn \"console.log\" app/api lib/servidor",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El enmascarado funciona sobre los campos sensibles",
+          "comando": "npm test -- registro-enmascarado",
+          "espera": "test verde: la salida contiene *** y no el valor de pin, cedula ni telefono"
+        },
+        {
+          "check": "No se registran cuerpos completos",
+          "comando": "grep -rniE \"registrar\\(.*(body|cuerpo|payload)\\)|JSON.stringify\\((body|cuerpo)\\)\" app/ lib/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/registro.ts",
+        "tests/seguridad/registro-enmascarado.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "sec.datos.guardar-solo-lo-que-se-usa",
+      "titulo": "Borrar del modelo el dato personal que nadie usa",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La cédula que se pidió «por si acaso» y no aparece en ninguna pantalla ni en ningún reporte no aporta nada y sí añade responsabilidad: es lo que convierte una filtración menor en un problema legal para el dueño.",
+      "queHacer": [
+        "Cruzar el inventario de datos personales con el código: por cada columna, buscar dónde se LEE.",
+        "La columna que no se lee en ninguna pantalla, reporte ni integración se propone para borrado, con la lista en la mano y la decisión del dueño escrita.",
+        "Borrar en dos pasos: dejar de escribirla y verificar una semana; luego migración que la elimina y purga los valores.",
+        "Sustituir el dato completo por el mínimo suficiente donde se pueda: últimos cuatro dígitos del documento en vez del documento entero.",
+        "Actualizar `docs/datos-personales.md` en la misma tarea."
+      ],
+      "aceptacion": [
+        {
+          "check": "Toda columna personal del esquema se lee en algún sitio",
+          "comando": "grep -oE \"(cedula|telefono|direccion|correo|fecha_nacimiento)[a-z_]*\" supabase/esquema.sql | sort -u | while read c; do grep -rq \"$c\" app/ lib/ components/ || echo \"NO SE USA $c\"; done",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El inventario coincide con el esquema tras el borrado",
+          "comando": "npm test -- inventario-pii",
+          "espera": "test verde: 0 diferencias entre columnas del esquema y filas del inventario"
+        }
+      ],
+      "aplicaSi": {
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "supabase/migraciones/*_minimizar.sql",
+        "docs/datos-personales.md"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "sec.auditoria.bitacora-que-no-se-edita",
+      "titulo": "Hacer que la bitácora de dinero solo admita inserciones",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una bitácora que se puede editar no prueba nada: quien tenga acceso a la base corrige la fila que lo incrimina y el registro pasa a ser decoración. Y sin esa prueba, un faltante de caja se decide por confianza.",
+      "queHacer": [
+        "Revocar `UPDATE` y `DELETE` sobre la tabla de bitácora para todos los roles de aplicación; solo queda `INSERT` y `SELECT`.",
+        "Anular no es borrar: se inserta un movimiento inverso que referencia al original, y el original se queda.",
+        "Encadenar cada fila con el hash de la anterior si el negocio lo justifica (dinero real, varias personas): así una edición hecha por fuera se detecta.",
+        "Escribir la consulta de verificación de la cadena y dejarla en `scripts/verificar-bitacora.mjs`.",
+        "Probar que un `UPDATE` directo con el rol de la aplicación falla."
+      ],
+      "aceptacion": [
+        {
+          "check": "La aplicación no puede editar la bitácora",
+          "comando": "npm test -- bitacora-append-only",
+          "espera": "test verde: UPDATE y DELETE directos lanzan error de permisos"
+        },
+        {
+          "check": "No hay código que intente editarla",
+          "comando": "grep -rniE \"update .*(bitacora|auditoria)|from\\(['\\\"](bitacora|auditoria)['\\\"]\\)\\.(update|delete)\" app/ lib/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La cadena de hashes está íntegra",
+          "comando": "node scripts/verificar-bitacora.mjs",
+          "espera": "exit 0 y «0 filas inconsistentes»"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true,
+        "stack": [
+          "postgres",
+          "supabase"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "supabase/migraciones/*_bitacora.sql",
+        "scripts/verificar-bitacora.mjs",
+        "tests/seguridad/bitacora-append-only.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "sec.auditoria.ronda-adversarial-en-acceso",
+      "titulo": "Pasar el código de acceso por una ronda que intente romperlo",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "En WRD los smokes dieron verde y dos refutadores dedicados encontraron 16 hallazgos reales, entre ellos un PIN de administrador escrito en un comentario. El verificador normal comprueba que lo previsto funciona; nadie estaba comprobando lo no previsto.",
+      "queHacer": [
+        "Después del verificador normal, lanzar una ronda aparte con el encargo explícito de ROMPER: autenticación, autorización, RLS y rutas de administración.",
+        "Cada refutador entrega hallazgos con archivo, línea y la petición exacta que lo demuestra; nada de «revisar el manejo de sesiones».",
+        "Los hallazgos se clasifican en «se arregla ahora», «se arregla con fecha» y «se acepta con motivo escrito»; ninguno se cierra sin una de las tres.",
+        "Cada hallazgo arreglado deja un test que falla si vuelve.",
+        "Anotar en `docs/rondas-adversariales.md` la fecha, el alcance y el número de hallazgos: si la última tiene más de tres meses, la ronda toca otra vez."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada hallazgo tiene destino escrito",
+          "comando": "grep -cE \"^\\| (arreglado|con fecha|aceptado)\" docs/rondas-adversariales.md",
+          "espera": "igual al número de hallazgos listados"
+        },
+        {
+          "check": "Los hallazgos arreglados tienen test de regresión",
+          "comando": "npm test -- regresion-acceso",
+          "espera": "exit 0 con 1 caso por hallazgo arreglado"
+        },
+        {
+          "check": "No quedan credenciales en comentarios",
+          "comando": "grep -rnE \"//.*(pin|clave|password)[^a-z]*[:=][^a-z]*[0-9]{4,}\" app/ lib/ components/ -i",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rondas-adversariales.md",
+        "tests/seguridad/regresion-acceso.test.ts"
+      ],
+      "cerebro": [
+        "tema:olas-de-agentes",
+        "tema:que-es-estar-verificado",
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.abuso.el-bloqueo-se-resuelve-antes-de-la-clave",
+      "titulo": "Resolver el bloqueo antes de mirar la clave",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Si el bloqueo se comprueba después de comparar la credencial, el tiempo de respuesta cambia según la clave sea buena o mala aunque la cuenta esté bloqueada: el bloqueo se convierte en un oráculo que responde gratis a «¿acerté?».",
+      "queHacer": [
+        "En el manejador de login, la primera operación es resolver el bloqueo de `usuario@sede:puesto`; si está bloqueado, se responde sin tocar el hash.",
+        "El camino bloqueado y el camino de clave mala tardan lo mismo: si el bloqueo corta antes, añadir el retardo equivalente.",
+        "Ni el mensaje ni el código distinguen bloqueado de clave mala para quien intenta entrar; el detalle va a la bitácora.",
+        "Test de orden: con cuenta bloqueada y clave CORRECTA, la respuesta es la misma que con clave incorrecta."
+      ],
+      "aceptacion": [
+        {
+          "check": "El bloqueo se resuelve antes que la comparación",
+          "comando": "grep -n \"resolverBloqueo\\|verificarPin\\|comparar\" app/api/acceso/login/route.ts",
+          "espera": "la línea de bloqueo tiene número menor que la de comparación"
+        },
+        {
+          "check": "Bloqueado con clave buena y con clave mala responden igual",
+          "comando": "npm test -- orden-bloqueo",
+          "espera": "test verde: mismo status y mismo cuerpo en los dos casos"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/acceso/login/route.ts",
+        "tests/seguridad/orden-bloqueo.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.abuso.idempotencia-en-el-cobro",
+      "titulo": "Hacer que reenviar un cobro no cobre dos veces",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El doble clic en el botón de cobrar, o el reintento del navegador cuando el wifi del local parpadea, generan dos ventas idénticas. El cliente pagó una vez, el sistema dice dos, y el arqueo cierra con un sobrante que nadie explica.",
+      "queHacer": [
+        "Generar en el cliente una clave de idempotencia por intento de cobro y mandarla en la cabecera.",
+        "Guardarla en una columna única de la tabla de ventas: el segundo insert choca contra la restricción y se resuelve devolviendo la venta ya creada, con 200 y el mismo cuerpo.",
+        "Detectar el choque por el código de error de Postgres (`23505`), no por el texto del mensaje: el texto cambia entre versiones.",
+        "El botón se deshabilita en la pantalla, pero eso es cortesía: la garantía es la restricción en la base.",
+        "Aplicar lo mismo a anulaciones y a cualquier llamada saliente a la pasarela de pago."
+      ],
+      "aceptacion": [
+        {
+          "check": "Dos cobros con la misma clave crean una venta",
+          "comando": "npm test -- idempotencia-cobro",
+          "espera": "test verde: 2 peticiones → 1 fila y las dos respuestas con el mismo id"
+        },
+        {
+          "check": "La restricción única existe",
+          "comando": "grep -nE \"unique.*idempotencia|idempotencia.*unique\" supabase/esquema.sql -i",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "El choque se detecta por código, no por texto",
+          "comando": "grep -rniE \"duplicate key|ya existe\" lib/datos/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/ventas/**",
+        "lib/datos/ventas.ts",
+        "tests/seguridad/idempotencia-cobro.test.ts"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes",
+        "tema:invariantes-contables",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "sec.archivos.validar-lo-que-se-sube",
+      "titulo": "Comprobar tipo real, tamaño y nombre de cada archivo subido",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Confiar en la extensión y en el `Content-Type` que manda el navegador es confiar en el atacante: un `.php` renombrado a `.jpg` sube igual, y un archivo de 2 GB llena el disco del servidor y para la caja.",
+      "queHacer": [
+        "Comprobar el tipo por los bytes de cabecera del archivo, no por la extensión ni por el `Content-Type` declarado.",
+        "Fijar lista blanca de tipos (típico: jpeg, png, webp, pdf) y tamaño máximo por archivo y por petición.",
+        "Renombrar SIEMPRE con un identificador generado en el servidor y guardar el nombre original solo como texto para mostrar.",
+        "Reprocesar las imágenes (recomprimir) para descartar cargas útiles escondidas en los metadatos.",
+        "Borrar los metadatos EXIF: una foto tomada en el local lleva la ubicación GPS del negocio y del cliente."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un ejecutable renombrado a .jpg es rechazado",
+          "comando": "npm test -- subida-tipo-real",
+          "espera": "test verde: responde 400 y 0 archivos escritos"
+        },
+        {
+          "check": "El nombre del cliente no se usa como ruta",
+          "comando": "grep -rnE \"(file|archivo)\\.name\" app/api/ | grep -viE \"nombre_original|mostrar\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El tamaño tiene tope",
+          "comando": "npm test -- subida-tamano",
+          "espera": "test verde: archivo por encima del tope responde 413"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "landing"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/archivos/**",
+        "lib/servidor/subidas.ts",
+        "tests/seguridad/subida-tipo-real.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "sec.archivos.sin-recorrido-de-rutas",
+      "titulo": "Servir archivos por identificador, nunca por ruta que llegue del cliente",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una ruta que arma la ruta del archivo con lo que llega en la URL sirve `../../.env` con la misma naturalidad que una factura. En un Node con almacenamiento en JSON en disco, eso entrega la base entera.",
+      "queHacer": [
+        "Guardar los archivos con un identificador opaco y resolver la ruta a partir de una fila de la base, nunca concatenando el parámetro de la URL.",
+        "Comprobar la pertenencia del archivo antes de servirlo: la factura de otra sede responde 404.",
+        "Normalizar y verificar que la ruta resuelta queda dentro de la carpeta permitida antes de leer, como segunda barrera.",
+        "Servir con `Content-Disposition: attachment` y el tipo declarado por el servidor, para que nada se ejecute en el navegador.",
+        "Test con `..%2f..%2fetc%2fpasswd` y con `....//` codificados de tres formas distintas."
+      ],
+      "aceptacion": [
+        {
+          "check": "El recorrido de rutas no sale de la carpeta",
+          "comando": "npm test -- recorrido-rutas",
+          "espera": "test verde: los 3 intentos codificados responden 400 o 404, ninguno 200"
+        },
+        {
+          "check": "No se concatena la ruta con el parámetro",
+          "comando": "grep -rnE \"path.join\\([^)]*(params|searchParams|req\\.)\" app/api/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/archivos/[id]/route.ts",
+        "tests/seguridad/recorrido-rutas.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "sec.terceros.webhook-firmado",
+      "titulo": "Verificar la firma de todo webhook antes de creer lo que dice",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un webhook sin verificar es un endpoint público que marca pedidos como pagados: cualquiera que sepa la URL manda un JSON y se lleva la mercancía sin pagar. La URL se filtra sola, va en los registros y en el panel del proveedor.",
+      "queHacer": [
+        "Calcular el HMAC sobre el CUERPO CRUDO, antes de parsear el JSON: reserializar cambia bytes y rompe la firma.",
+        "Comparar la firma con `timingSafeEqual` y rechazar con 401 sin decir por qué.",
+        "Rechazar los eventos con marca de tiempo de más de 5 minutos, para que una petición capturada no se pueda reenviar.",
+        "Guardar el identificador del evento y descartar los repetidos: los proveedores reintentan, y un pago aplicado dos veces descuadra la caja.",
+        "Confirmar el importe contra la fuente del proveedor: el cuerpo del webhook dice lo que se le mande hasta que se verifica."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un webhook sin firma válida se rechaza",
+          "comando": "npm test -- webhook-firma",
+          "espera": "test verde: cuerpo legítimo con firma alterada responde 401 y 0 pedidos marcados"
+        },
+        {
+          "check": "La firma se calcula sobre el cuerpo crudo",
+          "comando": "grep -n \"text()\\|rawBody\" app/api/webhooks/*/route.ts",
+          "espera": "1+ líneas, antes de cualquier JSON.parse"
+        },
+        {
+          "check": "Un evento repetido no se aplica dos veces",
+          "comando": "npm test -- webhook-repetido",
+          "espera": "test verde: 2 envíos del mismo evento → 1 sola aplicación"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true,
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/webhooks/**",
+        "tests/seguridad/webhook-firma.test.ts"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "sec.terceros.llaves-separadas-por-ambiente",
+      "titulo": "Separar las llaves de prueba de las de producción",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con una sola llave, un test que corre en la máquina de desarrollo cobra de verdad a una tarjeta de verdad, o manda cien WhatsApp a clientes reales. El daño lo ve el cliente antes que el equipo.",
+      "queHacer": [
+        "Tener llaves distintas por ambiente y comprobarlo en el arranque: en desarrollo, una llave que empiece por el prefijo de producción aborta el proceso.",
+        "Los tests apuntan siempre al ambiente de prueba del proveedor; si no existe, se usa un doble local, nunca la llave real.",
+        "Los datos de prueba llevan una marca visible (prefijo en el nombre) para reconocerlos si acaban en producción.",
+        "Documentar en `docs/terceros.md` qué proveedor tiene ambiente de prueba y cuál no: los que no lo tienen exigen doble local obligatorio."
+      ],
+      "aceptacion": [
+        {
+          "check": "Una llave de producción en desarrollo aborta el arranque",
+          "comando": "NODE_ENV=development PAGOS_LLAVE=sk_live_x node -e \"require('./lib/entorno')\"; echo EXIT=$?",
+          "espera": "EXIT distinto de 0"
+        },
+        {
+          "check": "Los tests no usan llaves reales",
+          "comando": "grep -rnE \"sk_live_|pk_live_|prod\" tests/ .env.test 2>/dev/null",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/entorno.ts",
+        "docs/terceros.md"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes",
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "sec.dependencias.sin-scripts-de-instalacion",
+      "titulo": "Instalar sin ejecutar los scripts de los paquetes",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Un `postinstall` de una dependencia transitiva corre con las variables de entorno del despliegue: lee la llave de la base y la manda fuera antes de que nadie compile nada. Es la vía por la que se han robado credenciales en paquetes muy usados.",
+      "queHacer": [
+        "Instalar con `npm ci --ignore-scripts` en CI y en despliegue.",
+        "Listar los paquetes que SÍ necesitan su script (binarios compilados) y permitirlos uno a uno, con el motivo escrito.",
+        "Comprobar que el build sigue funcionando con los scripts desactivados antes de dar el arquetipo por hecho.",
+        "Dejar la orden en el archivo de configuración del gestor, no solo en el comando: así aplica también a quien instale a mano."
+      ],
+      "aceptacion": [
+        {
+          "check": "La configuración desactiva los scripts",
+          "comando": "grep -n \"ignore-scripts\" .npmrc package.json",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "El build pasa sin scripts de instalación",
+          "comando": "rm -rf node_modules && npm ci --ignore-scripts && npm run build",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node",
+          "next",
+          "typescript"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        ".npmrc",
+        "docs/dependencias.md"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "sec.transporte.csp-sin-ejecucion-en-linea",
+      "titulo": "Cerrar la CSP hasta que no admita scripts en línea",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una CSP con `unsafe-inline` no detiene nada: es exactamente la forma en que se ejecuta un script inyectado. Es la última barrera cuando una escapatoria de texto se cuela, y con el comodín puesto esa barrera no existe.",
+      "queHacer": [
+        "Pasar la CSP de modo reporte a modo bloqueo por partes: primero imágenes y estilos, al final los scripts.",
+        "Sustituir `unsafe-inline` por nonce por petición, generado en el middleware y propagado a las etiquetas que lo necesiten.",
+        "Fijar `default-src 'self'`, `object-src 'none'`, `base-uri 'self'` y `frame-ancestors 'none'`.",
+        "Listar los orígenes externos que se usan de verdad (fuentes, analítica, pasarela) y solo esos.",
+        "Recoger los informes una semana antes de bloquear, para no dejar la caja sin funcionar en hora pico."
+      ],
+      "aceptacion": [
+        {
+          "check": "La CSP no admite ejecución en línea",
+          "comando": "curl -sI https://<dominio-produccion>/ | grep -i content-security-policy | grep -c \"unsafe-inline\\|unsafe-eval\"",
+          "espera": "0"
+        },
+        {
+          "check": "Las directivas base están puestas",
+          "comando": "curl -sI https://<dominio-produccion>/ | grep -icE \"default-src 'self'|object-src 'none'|frame-ancestors\"",
+          "espera": "3"
+        },
+        {
+          "check": "La pantalla funciona con la CSP puesta",
+          "comando": "npm run test:e2e",
+          "espera": "exit 0, 0 errores de CSP en la consola del navegador"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "landing"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "middleware.ts",
+        "app/layout.tsx"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "sec.permisos.la-landing-no-es-puerta-de-administracion",
+      "titulo": "Impedir que la cara pública sirva de entrada al sistema interno",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si la landing acepta el login de administración, la puerta del negocio queda anunciada en Google y recibe intentos de todo el mundo. Y un mensaje distinto al rechazar revela que esa cuenta es de administración: ya se sabe a quién atacar.",
+      "queHacer": [
+        "El formulario público no autentica cuentas de administración: responde un error neutro, idéntico al de credencial mala.",
+        "Si una sesión de administración llega colada a la superficie pública, se expulsa y se limpia la cookie.",
+        "No poner ni un enlace del sitio público hacia el panel: quien tiene que entrar conoce la dirección.",
+        "Bloquear la indexación del panel con `robots.txt` y con cabecera `X-Robots-Tag: noindex`.",
+        "Comprobar en el despliegue real que la dirección del panel no aparece en el HTML público."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay enlaces al panel desde lo público",
+          "comando": "grep -rniE \"href=[\\\"'](/admin|/panel|/caja)\" app/\\(publico\\)/ components/landing/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El panel no se indexa",
+          "comando": "curl -sI https://<dominio-produccion>/admin | grep -i x-robots-tag",
+          "espera": "1 línea con noindex"
+        },
+        {
+          "check": "Una cuenta de administración no entra por la landing",
+          "comando": "npm test -- landing-sin-admin",
+          "espera": "test verde: mismo error neutro y 0 cookies emitidas"
+        }
+      ],
+      "aplicaSi": {
+        "publico": true,
+        "superficies": [
+          "landing"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/(publico)/**",
+        "public/robots.txt",
+        "tests/seguridad/landing-sin-admin.test.ts"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica",
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.secretos.rotacion-ensayada",
+      "titulo": "Ensayar la rotación de cada secreto y cronometrarla",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El día que una llave se filtra hay que rotarla en minutos, y ese día se descubre que está copiada en cuatro sitios y que rotarla tumba la caja en hora pico. Una rotación no ensayada es una promesa, igual que un respaldo que nunca se restauró.",
+      "queHacer": [
+        "Listar cada secreto con todos los lugares donde vive: hosting, CI, máquina del dueño, panel del proveedor.",
+        "Escribir el procedimiento de rotación por secreto, en pasos numerados, ejecutable por alguien que nunca lo hizo.",
+        "Soportar dos llaves válidas a la vez durante la ventana de cambio, para que la rotación no exija apagar el sistema.",
+        "Ensayar de verdad la rotación del secreto de sesión y la de la llave de la base, y cronometrar cuánto tardan.",
+        "Anotar la fecha del ensayo y los minutos medidos: si el ensayo tiene más de seis meses, vuelve a ser una promesa."
+      ],
+      "aceptacion": [
+        {
+          "check": "El procedimiento existe con tiempos medidos",
+          "comando": "grep -nE \"minutos|ensayado el\" docs/rotacion-secretos.md",
+          "espera": "2+ líneas con cifras y fecha"
+        },
+        {
+          "check": "El sistema aguanta con la llave nueva",
+          "comando": "npm run verificar",
+          "espera": "exit 0 apuntando al secreto rotado"
+        },
+        {
+          "check": "Cada secreto del inventario tiene procedimiento",
+          "comando": "grep -oE \"^[A-Z_]+\" .env.example | while read v; do grep -q \"$v\" docs/rotacion-secretos.md || echo \"FALTA $v\"; done",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/rotacion-secretos.md",
+        "scripts/rotar.mjs"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina",
+        "tema:dominio-migraciones-y-copias"
+      ]
+    },
+    {
+      "id": "sec.datos.borrar-a-peticion-del-titular",
+      "titulo": "Poder borrar los datos de un cliente sin romper la contabilidad",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "La Ley 1581 da derecho a pedir la supresión, y el negocio tiene 15 días hábiles para resolver el reclamo. Sin un camino previsto, borrar al cliente rompe las facturas que lo referencian —o no se borra y el dueño responde ante la SIC.",
+      "queHacer": [
+        "Separar el dato de identificación (nombre, teléfono, cédula) del hecho contable (la venta): la venta se conserva por obligación fiscal, la identificación no.",
+        "Implementar la supresión como anonimización: se vacían los campos personales y la fila contable queda con un identificador sin persona detrás.",
+        "Recorrer TODOS los sitios donde el dato está copiado: exportaciones, respaldos, caché, mensajes.",
+        "Dejar registro de la supresión —quién la pidió, cuándo, qué se borró— porque hay que poder probar que se hizo.",
+        "Escribir el procedimiento en `docs/derechos-del-titular.md` con el plazo legal y quién responde.",
+        "Probarlo de punta a punta con un cliente de prueba antes de darlo por hecho."
+      ],
+      "aceptacion": [
+        {
+          "check": "Tras la supresión no queda rastro personal",
+          "comando": "npm test -- supresion-titular",
+          "espera": "test verde: 0 filas con el teléfono o la cédula del titular en toda la base"
+        },
+        {
+          "check": "Las ventas del titular siguen cuadrando",
+          "comando": "npm test -- invariantes-caja",
+          "espera": "exit 0: los totales del periodo no cambian tras la supresión"
+        },
+        {
+          "check": "El plazo legal está escrito",
+          "comando": "grep -nE \"15 d(í|i)as h(á|a)biles|10 d(í|i)as h(á|a)biles\" docs/derechos-del-titular.md",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/datos/titulares.ts",
+        "docs/derechos-del-titular.md",
+        "tests/seguridad/supresion-titular.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "sec.datos.entregar-lo-que-se-tiene-del-titular",
+      "titulo": "Entregar en un comando todo lo que el sistema guarda de una persona",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un cliente puede preguntar qué se tiene de él y la ley da 10 días hábiles para responder la consulta. Si la respuesta exige que alguien recorra tablas a mano, no se responde a tiempo y cada consulta cuesta media jornada.",
+      "queHacer": [
+        "Escribir `scripts/datos-del-titular.mjs` que reciba un identificador y saque a un archivo todo lo asociado, tabla por tabla.",
+        "Incluir lo que no está en la base principal: exportaciones, adjuntos, registros de mensajes.",
+        "Entregarlo en formato que la persona entienda —PDF o texto con encabezados en español—, no un volcado SQL.",
+        "El script exige doble candado y deja constancia en la bitácora: es una extracción masiva de datos personales.",
+        "Probar el script con un titular real de prueba y comparar contra el inventario de datos personales: no puede faltar ninguna tabla."
+      ],
+      "aceptacion": [
+        {
+          "check": "El script cubre todas las tablas del inventario",
+          "comando": "node scripts/datos-del-titular.mjs --titular=PRUEBA --listar-tablas | sort > /tmp/a && grep -oE \"^\\| [a-z_]+\" docs/datos-personales.md | sort > /tmp/b && diff /tmp/a /tmp/b",
+          "espera": "0 líneas de diferencia"
+        },
+        {
+          "check": "La extracción queda registrada",
+          "comando": "npm test -- extraccion-titular",
+          "espera": "test verde: 1 fila nueva en la bitácora por cada extracción"
+        }
+      ],
+      "aplicaSi": {
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/datos-del-titular.mjs",
+        "tests/seguridad/extraccion-titular.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "sec.datos.copias-cifradas-y-guardadas-aparte",
+      "titulo": "Cifrar los respaldos y guardarlos fuera del mismo proveedor",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un respaldo sin cifrar es la base entera —cédulas, teléfonos, ventas— en un archivo que viaja por correo y acaba en el escritorio de alguien. Y si vive en el mismo proveedor que la base, la cuenta comprometida se lleva las dos cosas.",
+      "queHacer": [
+        "Cifrar el respaldo con una llave que NO vive en el mismo proveedor que lo almacena.",
+        "Guardar copia en un segundo destino con credenciales distintas y solo de escritura: quien escribe no puede borrar lo ya escrito.",
+        "Restringir quién puede descargar un respaldo y registrar cada descarga.",
+        "Probar el descifrado en el mismo ensayo de restauración: un respaldo cifrado que no se puede abrir es peor que ninguno.",
+        "Anotar dónde vive la llave de cifrado y quién más la tiene: si solo la tiene una persona, el negocio depende de esa persona."
+      ],
+      "aceptacion": [
+        {
+          "check": "El archivo de respaldo no es legible en claro",
+          "comando": "head -c 200 respaldos/ultimo.dump | grep -icE \"create table|insert into|cedula\"",
+          "espera": "0"
+        },
+        {
+          "check": "El descifrado y la restauración funcionan",
+          "comando": "bash scripts/restaurar.sh --desde respaldos/ultimo.dump --a base_desechable",
+          "espera": "exit 0"
+        },
+        {
+          "check": "La llave no vive con el respaldo",
+          "comando": "grep -nE \"llave|passphrase\" docs/respaldo.md",
+          "espera": "1+ líneas nombrando un almacén distinto al del respaldo"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "json-en-disco"
+        ],
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/respaldar.sh",
+        "scripts/restaurar.sh",
+        "docs/respaldo.md"
+      ],
+      "cerebro": [
+        "tema:dominio-migraciones-y-copias",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "sec.auditoria.avisar-al-dueno-de-lo-raro",
+      "titulo": "Avisar al dueño el mismo día de los eventos que importan",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una bitácora que nadie mira detecta el fraude en el cierre de mes, cuando la plata ya se fue. El dueño no va a revisar registros: hay que llevárselos, y solo los pocos que le hagan tomar una decisión.",
+      "queHacer": [
+        "Acordar con el dueño la lista corta de eventos que quiere saber el mismo día: anulaciones por encima de un monto, bloqueos repetidos, cambios de rol, accesos fuera del horario del local.",
+        "Mandar el aviso por el canal que él sí lee (WhatsApp o correo), en una frase, con qué pasó, quién y dónde.",
+        "Agrupar para no convertirlo en ruido: un resumen por evento acumulado, no un mensaje por intento.",
+        "Incluir un umbral por negocio, no uno genérico: en un asadero anular tres ventas en una noche es normal, en un estanco no.",
+        "Probar cada alerta disparándola a propósito y comprobando que el mensaje llega y se entiende."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada evento acordado dispara aviso",
+          "comando": "npm test -- alertas",
+          "espera": "test verde con 1 caso por evento de la lista, todos con mensaje generado"
+        },
+        {
+          "check": "Los umbrales están escritos y no son genéricos",
+          "comando": "grep -nE \"umbral|monto|veces\" docs/alertas.md",
+          "espera": "1+ líneas por evento, con cifras del negocio"
+        },
+        {
+          "check": "El aviso no incluye datos personales del cliente",
+          "comando": "grep -rniE \"cedula|telefono\" lib/servidor/alertas.ts",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/alertas.ts",
+        "docs/alertas.md",
+        "tests/seguridad/alertas.test.ts"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "sec.auditoria.conservacion-de-la-bitacora",
+      "titulo": "Fijar cuánto se guarda la bitácora y que quepa",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una bitácora sin plazo crece hasta llenar el disco y tumbar la base —y entonces alguien la vacía entera un domingo, justo la semana que había que investigar algo. Sin plazo escrito, o no hay historia o no hay espacio.",
+      "queHacer": [
+        "Fijar el plazo con el dueño distinguiendo dos cosas: eventos de dinero (plazo largo, obligación fiscal) y eventos técnicos (plazo corto).",
+        "Implementar el recorte como tarea programada que archiva antes de borrar, nunca un `delete` directo.",
+        "Medir cuánto ocupa la bitácora hoy y cuánto crece al mes; anotar los dos números.",
+        "Poner una alerta cuando el tamaño supere el umbral, para no enterarse por una caída.",
+        "Escribir en `docs/bitacora.md` qué se guarda, cuánto tiempo y quién lo puede consultar."
+      ],
+      "aceptacion": [
+        {
+          "check": "El plazo y el crecimiento están medidos",
+          "comando": "grep -nE \"MB al mes|meses|filas\" docs/bitacora.md",
+          "espera": "2+ líneas con cifras"
+        },
+        {
+          "check": "El recorte archiva antes de borrar",
+          "comando": "grep -rn \"delete\" scripts/recortar-bitacora.mjs | grep -v \"archivar\"",
+          "espera": "0 líneas sin archivado previo"
+        },
+        {
+          "check": "El recorte respeta el plazo de dinero",
+          "comando": "npm test -- recorte-bitacora",
+          "espera": "test verde: eventos de dinero de hace 1 año siguen presentes"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/recortar-bitacora.mjs",
+        "docs/bitacora.md",
+        "tests/seguridad/recorte-bitacora.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:memoria-y-cierre"
+      ]
+    },
+    {
+      "id": "sec.permisos.revisar-quien-sigue-teniendo-acceso",
+      "titulo": "Revisar cada trimestre quién conserva acceso y con qué rol",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El cajero que renunció en marzo sigue activo en septiembre porque nadie lo desactivó: el sistema no olvida solo. Y el que ascendió acumula el rol nuevo sobre el viejo, hasta que todos son administradores.",
+      "queHacer": [
+        "Generar un listado con cada persona activa, su rol, su puesto y la fecha de su último ingreso.",
+        "Marcar automáticamente a quien no entra hace más de 60 días como candidato a desactivar.",
+        "Revisar la lista CON el dueño, no por cuenta propia: él sabe quién sigue trabajando.",
+        "Desactivar en el mismo acto lo que se decida, y dejar la fecha de la revisión escrita.",
+        "Repetir cada trimestre: una revisión de hace un año no dice nada del estado de hoy."
+      ],
+      "aceptacion": [
+        {
+          "check": "El listado se genera y trae la última entrada",
+          "comando": "node scripts/revision-accesos.mjs",
+          "espera": "exit 0 y 1 fila por persona activa con fecha de último ingreso"
+        },
+        {
+          "check": "Nadie inactivo hace 60 días sigue activo",
+          "comando": "node scripts/revision-accesos.mjs --pendientes",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La última revisión está fechada",
+          "comando": "grep -nE \"revisado el 20[0-9]{2}-\" docs/accesos.md | tail -1",
+          "espera": "1 línea con fecha de menos de 3 meses"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/revision-accesos.mjs",
+        "docs/accesos.md"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.dependencias.actualizar-con-presupuesto",
+      "titulo": "Actualizar dependencias en una ventana fija y con presupuesto",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin ritmo, las dependencias se actualizan el día que una vulnerabilidad obliga, y ese día hay que saltar tres versiones mayores con el negocio parado. El salto grande rompe cosas que el salto pequeño no habría roto.",
+      "queHacer": [
+        "Fijar una ventana mensual y un presupuesto de horas: lo que no quepa, se anota, no se corre.",
+        "Activar avisos automáticos de versiones nuevas, pero agrupados: un aviso semanal, no uno por paquete.",
+        "Priorizar por lo que toca la seguridad —autenticación, base de datos, servidor— antes que lo cosmético.",
+        "Cada actualización pasa el verificar completo antes de entrar; ninguna entra el mismo día del cierre de mes.",
+        "Anotar en `docs/dependencias.md` la fecha de la última ventana y qué quedó pendiente con motivo."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay dependencias con vulnerabilidad alta abierta",
+          "comando": "npm audit --production --audit-level=high",
+          "espera": "exit 0"
+        },
+        {
+          "check": "La última ventana es reciente",
+          "comando": "grep -oE \"20[0-9]{2}-[0-9]{2}-[0-9]{2}\" docs/dependencias.md | sort | tail -1",
+          "espera": "fecha de menos de 60 días"
+        },
+        {
+          "check": "El verificar pasa tras actualizar",
+          "comando": "npm ci --ignore-scripts && npm run verificar",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node",
+          "next",
+          "typescript"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/dependencias.md",
+        ".github/dependabot.yml"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina",
+        "tema:modelos-y-costos"
+      ]
+    },
+    {
+      "id": "sec.abuso.techo-de-gasto-en-servicios-cobrados",
+      "titulo": "Poner techo de gasto a cada servicio que cobra por uso",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un bucle de reintentos contra un servicio que cobra por llamada convierte un error de código en una factura de varios millones antes de que nadie mire el panel. El daño no es una brecha: es plata que sale de la caja del negocio.",
+      "queHacer": [
+        "Listar todo servicio que cobre por uso: modelos, mensajería, mapas, pasarela, almacenamiento.",
+        "Poner el tope duro en el panel del proveedor donde exista, y además un contador propio por día que corte al llegar al límite.",
+        "Al cortar, degradar en vez de fallar: encolar, o responder con lo que haya en caché, nunca dejar la caja sin cobrar.",
+        "Avisar al dueño al 70% del techo del mes, no al 100%.",
+        "Anotar el gasto real de los últimos tres meses para que el techo sea un número del negocio y no una corazonada."
+      ],
+      "aceptacion": [
+        {
+          "check": "Al superar el techo diario se corta",
+          "comando": "npm test -- techo-gasto",
+          "espera": "test verde: la llamada por encima del techo no sale y responde con la degradación prevista"
+        },
+        {
+          "check": "Cada servicio de pago tiene techo escrito",
+          "comando": "grep -cE \"^\\| \" docs/gasto-servicios.md",
+          "espera": "1 fila por servicio, todas con cifra de techo"
+        },
+        {
+          "check": "No hay reintentos sin tope",
+          "comando": "grep -rnE \"while *\\(true\\)|retry\\(|reintent\" lib/ app/ | grep -viE \"max|intentos *<|limite\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node",
+          "next"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/gasto.ts",
+        "docs/gasto-servicios.md",
+        "tests/seguridad/techo-gasto.test.ts"
+      ],
+      "cerebro": [
+        "tema:modelos-y-costos"
+      ]
+    },
+    {
+      "id": "sec.sesion.cerrar-sesiones-a-distancia",
+      "titulo": "Dejar que el dueño vea y cierre las sesiones abiertas",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando se pierde el celular o el equipo del mostrador, la respuesta útil es cerrar esa sesión en dos toques desde donde esté el dueño. Sin eso, la única opción es cambiar claves a todo el mundo un domingo por la noche.",
+      "queHacer": [
+        "Guardar por sesión: persona, puesto, hora de inicio, última actividad y desde qué equipo.",
+        "Pantalla para el dueño con la lista y un botón de cerrar por fila, protegido por doble candado.",
+        "Cerrar una sesión la invalida en el servidor de inmediato, no cuando venza la cookie.",
+        "No mostrar direcciones IP crudas al dueño: mostrar el nombre del puesto, que es lo que él reconoce.",
+        "Registrar cada cierre remoto en la bitácora con quién lo ordenó."
+      ],
+      "aceptacion": [
+        {
+          "check": "La sesión cerrada deja de funcionar al instante",
+          "comando": "npm test -- cierre-remoto",
+          "espera": "test verde: la petición siguiente con esa cookie responde 401"
+        },
+        {
+          "check": "Solo el dueño puede cerrar sesiones ajenas",
+          "comando": "npm test -- cierre-remoto-permiso",
+          "espera": "test verde: un cajero recibe 403"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/admin/sesiones/**",
+        "app/api/admin/sesiones/**",
+        "tests/seguridad/cierre-remoto.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.terceros.minimo-privilegio-por-integracion",
+      "titulo": "Dar a cada integración solo los permisos que usa",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una llave de la pasarela con permisos de administración hace mucho más que cobrar: si se filtra, transfiere saldo y cambia la cuenta de destino. El alcance de la llave decide el tamaño del daño el día que se escape.",
+      "queHacer": [
+        "Listar por integración las operaciones que el código llama de verdad, buscándolas en el código, no en la documentación del proveedor.",
+        "Crear una llave por integración con los permisos mínimos de esa lista, y una por ambiente.",
+        "Restringir además por origen donde el proveedor lo permita (dominio, IP del servidor).",
+        "Reemplazar las llaves amplias que ya estaban en uso, y rotar las viejas.",
+        "Anotar en `docs/terceros.md` qué permisos tiene cada llave y qué llamada los justifica."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada permiso listado tiene una llamada que lo usa",
+          "comando": "grep -oE \"^\\| [a-z_.]+ \" docs/terceros.md | while read _ p _; do grep -rq \"$p\" lib/ app/ || echo \"SOBRA $p\"; done",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Ninguna llave amplia sigue en el entorno",
+          "comando": "grep -rnE \"(FULL|ADMIN|MASTER)_?(KEY|TOKEN)\" .env.example docs/terceros.md",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/terceros.md"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes",
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "sec.transporte.certificado-y-dominio-vigilados",
+      "titulo": "Vigilar el vencimiento del certificado y del dominio",
+      "nivel": "N3",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Un certificado vencido pone una pantalla roja de «sitio no seguro» delante de todos los clientes, y un dominio vencido se lo lleva otro. Las dos cosas pasan en una fecha conocida de antemano y aun así se descubren por una llamada del dueño.",
+      "queHacer": [
+        "Anotar en `docs/dominio.md` la fecha de vencimiento del dominio, del certificado y quién es el titular de la cuenta del registrador.",
+        "Activar la renovación automática de las dos cosas y verificar que la tarjeta asociada no está vencida.",
+        "Programar una comprobación semanal que avise con 30 días de margen.",
+        "Comprobar la cadena completa del certificado desde fuera, no desde el panel del proveedor.",
+        "Dejar escrito qué hacer si el dominio expira: a quién se llama y con qué cuenta se recupera."
+      ],
+      "aceptacion": [
+        {
+          "check": "El certificado tiene margen de sobra",
+          "comando": "echo | openssl s_client -servername <dominio-produccion> -connect <dominio-produccion>:443 2>/dev/null | openssl x509 -noout -checkend 2592000",
+          "espera": "exit 0 (no vence en 30 días)"
+        },
+        {
+          "check": "Las fechas y el titular están escritos",
+          "comando": "grep -nE \"vence|titular\" docs/dominio.md",
+          "espera": "3+ líneas con fechas y un nombre"
+        }
+      ],
+      "aplicaSi": {
+        "publico": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/dominio.md",
+        "scripts/vigilar-certificado.mjs"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica",
+        "tema:dominio-migraciones-y-copias"
+      ]
+    },
+    {
+      "id": "sec.auditoria.plan-de-respuesta-en-una-pagina",
+      "titulo": "Escribir en una página qué se hace la noche del incidente",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "El día que se filtra una llave o alguien entra con el PIN de otro, nadie se pone a leer documentación: se improvisa, se borran registros por error y se avisa tarde. Una página decidida en frío vale más que diez de arquitectura escritas después.",
+      "queHacer": [
+        "Una sola página: los cinco pasos en el orden en que se hacen, empezando por «cortar el acceso» y terminando por «avisar a quien toca».",
+        "Nombres y teléfonos reales de quién decide y quién ejecuta, no cargos: a las 11 de la noche se llama a una persona.",
+        "Regla explícita de no borrar nada antes de copiar los registros: lo primero que se pierde es la evidencia.",
+        "El plazo legal y a quién se notifica: titulares afectados y la SIC cuando corresponda.",
+        "Escrito con las palabras que salen en pantalla, para que lo ejecute quien esté, no solo quien lo construyó."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cabe en una página",
+          "comando": "wc -l docs/incidente.md",
+          "espera": "≤60 líneas"
+        },
+        {
+          "check": "Hay personas con nombre y teléfono",
+          "comando": "grep -cE \"[0-9]{3}[ -]?[0-9]{3}[ -]?[0-9]{4}\" docs/incidente.md",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "No usa jerga que no salga en pantalla",
+          "comando": "grep -niE \"endpoint|payload|deploy|rollback|commit\" docs/incidente.md",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/incidente.md"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas",
+        "tema:memoria-y-cierre"
+      ]
+    },
+    {
+      "id": "sec.auditoria.simulacro-de-filtracion",
+      "titulo": "Hacer un simulacro de credencial filtrada y cronometrarlo",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Un plan de incidente que nunca se ensayó falla en el primer paso: la llave no estaba donde el documento decía y el dueño no contestó el teléfono. El simulacro convierte el plan en un número de minutos que se puede mejorar.",
+      "queHacer": [
+        "Elegir el escenario más probable de este negocio: PIN de dueño conocido por un extrabajador, o llave de servicio filtrada.",
+        "Ejecutar el plan de verdad en un ambiente de ensayo: cortar accesos, rotar la llave, cerrar sesiones, revisar la bitácora del periodo.",
+        "Cronometrar tres tiempos: detectar, cortar y volver a operar.",
+        "Anotar qué falló del plan —siempre falla algo— y corregir el documento en la misma sesión.",
+        "Repetir con escenario distinto al año siguiente; el simulacro viejo no dice nada del sistema de hoy."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los tres tiempos están medidos",
+          "comando": "grep -nE \"detectar|cortar|volver a operar\" docs/simulacros.md",
+          "espera": "3 líneas con minutos"
+        },
+        {
+          "check": "El sistema quedó operativo tras el simulacro",
+          "comando": "npm run verificar",
+          "espera": "exit 0"
+        },
+        {
+          "check": "El plan se corrigió con lo aprendido",
+          "comando": "git log --oneline -5 -- docs/incidente.md",
+          "espera": "1+ commits con fecha del simulacro"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true,
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/simulacros.md",
+        "docs/incidente.md"
+      ],
+      "cerebro": [
+        "tema:que-es-estar-verificado",
+        "tema:olas-de-agentes",
+        "tema:memoria-y-cierre"
+      ]
+    },
+    {
+      "id": "sec.datos.registro-de-la-base-ante-la-sic",
+      "titulo": "Dejar en regla el registro de bases de datos y la política publicada",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La Ley 1581 obliga a tener política de tratamiento publicada y, según el tamaño del responsable, a registrar las bases en el RNBD de la SIC. La sanción recae sobre el dueño del negocio, y llega por una queja de un cliente, no por una auditoría.",
+      "queHacer": [
+        "Publicar la política de tratamiento en una URL estable del sitio, enlazada desde el pie y desde cada formulario que pida datos.",
+        "Incluir en la política: responsable con datos de contacto, finalidades, derechos del titular y el canal para ejercerlos.",
+        "Verificar si el responsable está obligado al RNBD y dejar escrita la respuesta con su motivo; si aplica, registrar y guardar la constancia.",
+        "Nombrar en `docs/datos-personales.md` al responsable y al canal de atención de reclamos, con un correo que alguien lea.",
+        "Revisar una vez al año: la política vieja que no cubre una finalidad nueva es peor que ninguna."
+      ],
+      "aceptacion": [
+        {
+          "check": "La política responde en producción",
+          "comando": "curl -s -o /dev/null -w \"%{http_code}\" https://<dominio-produccion>/politica-de-datos",
+          "espera": "200"
+        },
+        {
+          "check": "Los cuatro contenidos obligatorios están",
+          "comando": "curl -s https://<dominio-produccion>/politica-de-datos | grep -icE \"responsable|finalidad|derechos|reclamo\"",
+          "espera": "4+"
+        },
+        {
+          "check": "Todo formulario que pide datos enlaza la política",
+          "comando": "grep -rl \"type=\\\"email\\\"\\|type=\\\"tel\\\"\" app/ components/ | xargs grep -L \"politica-de-datos\"",
+          "espera": "0 archivos"
+        }
+      ],
+      "aplicaSi": {
+        "datosPersonales": true,
+        "publico": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/politica-de-datos/page.tsx",
+        "docs/datos-personales.md"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas",
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "sec.permisos.matriz-de-permisos-legible",
+      "titulo": "Publicar la matriz de quién puede qué en una tabla que el dueño lea",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "El dueño es quien decide si el cajero debe ver los costos, y hoy esa decisión vive en un archivo TypeScript que él no abre. Sin una tabla legible, los permisos los decide quien programa, y se descubren mal el día que un empleado ve lo que no debía.",
+      "queHacer": [
+        "Generar la tabla DESDE el código de roles, para que no pueda quedar desactualizada: filas = secciones, columnas = roles.",
+        "Escribir cada sección con el nombre que sale en pantalla, no con el identificador interno.",
+        "Marcar aparte las acciones que exigen re-PIN o doble candado: no es lo mismo ver que anular.",
+        "Hacer que el dueño la lea y firme con fecha: es su decisión de negocio, no un detalle técnico.",
+        "Añadir la generación al script de verificación para que un cambio de permisos sin regenerar la tabla rompa el build."
+      ],
+      "aceptacion": [
+        {
+          "check": "La tabla está sincronizada con el código",
+          "comando": "node scripts/generar-matriz.mjs --verificar",
+          "espera": "exit 0 y «0 diferencias»"
+        },
+        {
+          "check": "No usa identificadores internos",
+          "comando": "grep -nE \"[a-z]+_[a-z]+|camelCase\" docs/permisos.md",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Está revisada por el dueño con fecha",
+          "comando": "grep -nE \"revisado por .* el 20[0-9]{2}-\" docs/permisos.md",
+          "espera": "1 línea"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/permisos.md",
+        "scripts/generar-matriz.mjs"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "sec.auth.manual-de-acceso-del-mostrador",
+      "titulo": "Escribir para la persona del mostrador las dos páginas de acceso",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "El PIN compartido no nace de la mala fe: nace de que nadie explicó que el PIN es la firma y que las ventas salen a nombre de quien lo teclea. Sin ese manual, el control técnico se rodea en la primera hora pico.",
+      "queHacer": [
+        "Escribirlo para una persona con nombre y su turno real, no para «el usuario».",
+        "Página 1: entrar, cambiar de persona en el mismo equipo, cerrar el turno. En el orden en que ocurre.",
+        "Página 2: los cinco líos que sí van a pasar —olvidé el PIN, me bloqueé, la caja quedó abierta de otro, no me deja anular, el equipo pide vincular puesto— y qué se hace en cada uno.",
+        "Una regla de oro en negrita: el PIN no se comparte, porque las ventas salen a nombre de quien lo teclea.",
+        "Cerrar con a quién se llama cuando nada de lo anterior sirvió, con nombre y teléfono."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cabe en dos páginas",
+          "comando": "wc -l docs/manual-acceso.md",
+          "espera": "≤120 líneas"
+        },
+        {
+          "check": "Cubre los cinco líos",
+          "comando": "grep -cE \"^## \" docs/manual-acceso.md",
+          "espera": "5+ secciones de problema"
+        },
+        {
+          "check": "No usa jerga técnica",
+          "comando": "grep -niE \"token|sesi(ó|o)n firmada|cookie|endpoint|hash|servidor\" docs/manual-acceso.md",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true,
+        "superficies": [
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/manual-acceso.md"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas",
+        "tema:acceso-roles-y-puestos",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "sec.abuso.ensayo-de-abuso-con-carga",
+      "titulo": "Ensayar el abuso con carga real antes de que lo ensaye otro",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Los límites se ponen a ojo y se descubren mal en dos direcciones: o dejan pasar mil peticiones por minuto, o cortan la caja en hora pico un viernes. Solo un ensayo con carga dice cuál de las dos cosas está pasando.",
+      "queHacer": [
+        "Reproducir el pico real del negocio —ventas por minuto de un viernes, medidas, no supuestas— contra un ambiente de ensayo.",
+        "Encima del pico, lanzar el abuso: fuerza bruta contra el login, peticiones repetidas a la ruta más cara, subidas grandes en paralelo.",
+        "Medir dos cosas: que el abuso se corta y que la caja sigue cobrando mientras tanto.",
+        "Ajustar los límites con los números medidos y volver a correr; anotar el antes y el después.",
+        "Dejar el guion del ensayo en el repositorio para poder repetirlo cuando cambien los límites."
+      ],
+      "aceptacion": [
+        {
+          "check": "El abuso se corta durante el pico",
+          "comando": "node scripts/ensayo-abuso.mjs",
+          "espera": "exit 0: 100% de las peticiones de abuso en 429 tras el umbral"
+        },
+        {
+          "check": "La caja sigue cobrando durante el ensayo",
+          "comando": "node scripts/ensayo-abuso.mjs --reporte",
+          "espera": "0 ventas fallidas y percentil 95 por debajo del tope acordado"
+        },
+        {
+          "check": "Los límites quedaron anotados con su medición",
+          "comando": "grep -nE \"antes|despu(é|e)s|p95\" docs/limites.md",
+          "espera": "3+ líneas con cifras"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "caja"
+        ],
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/ensayo-abuso.mjs",
+        "docs/limites.md"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "sec.dependencias.saber-que-hay-dentro-del-despliegue",
+      "titulo": "Publicar el inventario de lo que se desplegó y de qué commit salió",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando sale una vulnerabilidad grave en un paquete, la pregunta es «¿lo tenemos y en qué versión?». Sin inventario del despliegue, la respuesta tarda horas y se contesta mirando la máquina de desarrollo, que no es lo que está corriendo.",
+      "queHacer": [
+        "Generar en cada despliegue un inventario de dependencias con versión exacta, y guardarlo junto al artefacto.",
+        "Sellar en el despliegue el commit del que salió y exponerlo en una ruta de estado que responda sin sesión.",
+        "Comprobar que el commit desplegado existe en el repositorio: un despliegue desde una máquina local sin commit es un binario sin origen.",
+        "Guardar los inventarios de los últimos despliegues para poder responder por lo que estuvo corriendo, no solo por lo de hoy.",
+        "Escribir el comando de una línea que responde «¿tenemos el paquete X?» y dejarlo en `docs/despliegue.md`."
+      ],
+      "aceptacion": [
+        {
+          "check": "El despliegue expone su commit",
+          "comando": "curl -s https://<dominio-produccion>/api/estado | grep -oE \"[0-9a-f]{7,40}\"",
+          "espera": "1 línea con un commit que existe en git log"
+        },
+        {
+          "check": "El inventario se genera y no está vacío",
+          "comando": "node scripts/inventario-despliegue.mjs --contar",
+          "espera": "1+ paquetes, todos con versión exacta"
+        },
+        {
+          "check": "Se puede responder si un paquete está dentro",
+          "comando": "node scripts/inventario-despliegue.mjs --buscar <paquete>",
+          "espera": "exit 0 con la versión, o exit 1 si no está"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node",
+          "next"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/inventario-despliegue.mjs",
+        "app/api/estado/route.ts",
+        "docs/despliegue.md"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina",
+        "tema:que-es-estar-verificado"
+      ]
+    },
+    {
+      "id": "sec.secretos.almacen-con-registro-de-quien-lo-abrio",
+      "titulo": "Guardar los secretos donde quede constancia de quién los leyó",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando una llave se usa desde un sitio raro, la pregunta es quién tuvo acceso a ella y desde cuándo. Si los secretos viven en un chat, en un archivo del escritorio del dueño y en tres paneles distintos, esa pregunta no tiene respuesta y hay que rotarlo todo.",
+      "queHacer": [
+        "Elegir un único almacén de secretos —el del hosting o un gestor— y declararlo la única fuente.",
+        "Sacar los secretos de los canales informales: chats, correos, notas, archivos sueltos en el escritorio.",
+        "Dar acceso por persona, nunca una cuenta compartida: una cuenta compartida no responde quién.",
+        "Comprobar que el almacén registra los accesos y que ese registro se puede consultar; si no lo hace, no sirve para esto.",
+        "Anotar en `docs/secretos.md` quién tiene acceso hoy y revisarlo en la misma ventana que la revisión de accesos."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay secretos fuera del almacén",
+          "comando": "grep -rniE \"(clave|llave|token|secreto).*[:=] *[A-Za-z0-9_\\-]{16,}\" docs/ notas/ 2>/dev/null",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La lista de quién tiene acceso está fechada",
+          "comando": "grep -nE \"revisado el 20[0-9]{2}-\" docs/secretos.md",
+          "espera": "1 línea con fecha de menos de 3 meses"
+        },
+        {
+          "check": "No hay cuentas compartidas en la lista",
+          "comando": "grep -niE \"compartid|equipo@|admin@|soporte@\" docs/secretos.md",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/secretos.md"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina",
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.terceros.salida-prevista-del-proveedor",
+      "titulo": "Dejar previsto cómo se sale de cada proveedor crítico",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El proveedor que guarda la base puede suspender la cuenta por un cobro rechazado o cerrar el plan gratuito con un mes de aviso. Si no hay salida prevista, el negocio queda con los datos secuestrados por un problema administrativo, no técnico.",
+      "queHacer": [
+        "Listar los proveedores sin los cuales el negocio no cobra: base de datos, hosting, pasarela, mensajería.",
+        "Por cada uno: cómo se exportan los datos, cuánto tarda, qué se pierde y cuál es el reemplazo concreto.",
+        "Mantener la capa de datos detrás de funciones con nombre para que cambiar de proveedor sea editar eso y nada más.",
+        "Probar la exportación de verdad una vez y guardar el archivo resultante con su fecha y tamaño.",
+        "Anotar quién es el titular de cada cuenta y con qué medio de pago: la cuenta a nombre de quien ya no está es el mismo problema por otra vía."
+      ],
+      "aceptacion": [
+        {
+          "check": "La exportación funciona y produce datos",
+          "comando": "node scripts/exportar-todo.mjs --a /tmp/salida && du -sh /tmp/salida",
+          "espera": "exit 0 y tamaño mayor que 0"
+        },
+        {
+          "check": "Cada proveedor crítico tiene salida escrita",
+          "comando": "grep -cE \"^\\| \" docs/proveedores.md",
+          "espera": "1 fila por proveedor, todas con reemplazo y titular"
+        },
+        {
+          "check": "La persistencia pasa por la capa de datos",
+          "comando": "grep -rn \"createClient\\|new Pool\" app/ components/ | grep -v \"lib/datos/\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "supabase",
+          "postgres",
+          "next"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/proveedores.md",
+        "scripts/exportar-todo.mjs"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:dominio-migraciones-y-copias"
+      ]
+    }
+  ]
+}

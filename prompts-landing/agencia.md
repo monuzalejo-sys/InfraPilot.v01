@@ -318,7 +318,7 @@ PALETA (hex exactos, no inventes variantes):
   --warn    #B98A3C   ocre: la plata que se está yendo (cifra de la comisión)
   --error   #B94A48   solo si hace falta
 (Los ocho primeros y ok/warn/error son la paleta canónica del dueño,
-.claude/skills/estudio-diseno/SKILL.md:19-28.)
+.claude/skills/orion-diseno/SKILL.md:19-28.)
 NO uses los colores --n1/--n2/--n3 de precios-v2.html:9: son codificación
 interna de niveles en un documento para imprimir, no marca (y el vino
 #7a4a6e roza la prohibición de morados).

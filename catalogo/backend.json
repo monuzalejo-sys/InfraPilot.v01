@@ -1,0 +1,2805 @@
+{
+  "categoria": "backend",
+  "nombre": "Backend",
+  "meta": "Que el servidor sea el que dice la verdad: que el registro refleje el hecho físico, que la plata cuadre al peso, y que nada de eso dependa de que el cliente se porte bien.",
+  "arquetipos": [
+    {
+      "id": "be.configuracion.entorno-declarado",
+      "titulo": "Cortar el arranque si falta una variable de entorno declarada",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una variable que falta no falla al desplegar: falla a las 7 de la noche, cuando la cajera cobra y la ruta devuelve 500 sin decir por qué. El fallo tiene que ocurrir en el arranque, no en la venta.",
+      "queHacer": [
+        "Listar en `lib/servidor/entorno.ts` TODA variable que el servidor lee, con su tipo y si es obligatoria.",
+        "Leerlas una sola vez al cargar el módulo; si falta una obligatoria, abortar el proceso con el nombre exacto de la variable en el mensaje.",
+        "Prohibir `process.env` fuera de ese módulo: el resto del código importa el objeto ya leído.",
+        "Dejar `.env.example` con todas las claves y sin un solo valor real."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna variable se lee fuera del módulo de entorno",
+          "comando": "grep -rn 'process.env' --include='*.ts' app/ lib/ | grep -v 'lib/servidor/entorno.ts'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Sin una variable obligatoria el proceso no arranca",
+          "comando": "env -u DATABASE_URL npm run start; echo EXIT=$?",
+          "espera": "EXIT distinto de 0 y el texto DATABASE_URL en la salida"
+        },
+        {
+          "check": ".env.example declara todas las claves",
+          "comando": "grep -cE '^[A-Z_]+=' .env.example",
+          "espera": "conteo igual al número de variables declaradas en entorno.ts"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/entorno.ts",
+        ".env.example"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "be.configuracion.sin-semilla-de-demostracion",
+      "titulo": "Arrancar contra almacenamiento vacío, sin datos de demostración",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "La semilla de la demo tapa los huecos: `crearProveedor` existía en el almacén sin ninguna pantalla que lo llamara, y como la semilla traía proveedores nadie vio que una empresa nueva no podía registrar mercancía jamás.",
+      "queHacer": [
+        "Quitar del arranque toda función que siembre datos de ejemplo, o dejarla detrás de un comando explícito que el arranque normal no llama.",
+        "Arrancar con el almacenamiento vacío y recorrer el flujo principal completo: de cero hasta el primer documento cobrado.",
+        "Anotar cada punto donde el flujo se traba por falta de un dato que ninguna pantalla ni ruta permite crear: cada uno es un hueco, no un detalle.",
+        "Dejar un test que arranque en vacío y llegue hasta el primer documento sin tocar el almacenamiento a mano."
+      ],
+      "aceptacion": [
+        {
+          "check": "El arranque no siembra nada",
+          "comando": "grep -rniE 'sembrar|seedDemo|datosDemo|mockData' lib/ app/ --include='*.ts'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Desde vacío se llega al primer documento",
+          "comando": "npm test -- arranque-en-vacio",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "modo": "genesis"
+      },
+      "porCada": null,
+      "posee": [
+        "tests/arranque-en-vacio.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:cero-datos-inventados"
+      ]
+    },
+    {
+      "id": "be.configuracion.tests-de-dominio-sin-servidor",
+      "titulo": "Correr las pruebas del dominio sin servidor y sin base de datos",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una prueba que exige el servidor arriba y la base sembrada se corre el día que se escribe y nunca más. El dominio es lo único que se puede probar en segundos: si eso también cuesta un despliegue, no se prueba nada.",
+      "queHacer": [
+        "Poner las reglas de negocio en funciones que reciben los hechos por parámetro y devuelven el resultado.",
+        "Escribir sus pruebas sin `fetch`, sin cliente de base y sin variables de entorno.",
+        "Dejar `npm test -- dominio` corriendo solo esas, y anotar en el README los segundos que tarda: es la línea base contra la que se notará si alguien las vuelve lentas.",
+        "Dejar escrito que las pruebas que sí necesitan servidor van en otro comando, no mezcladas con estas."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las pruebas de dominio no tocan red, base ni entorno",
+          "comando": "grep -rnE 'fetch\\(|createClient|process\\.env' tests/dominio/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Corren en limpio",
+          "comando": "npm test -- dominio",
+          "espera": "exit 0"
+        },
+        {
+          "check": "Tardan lo que dice el README",
+          "comando": "npm test -- dominio 2>&1 | tail -3",
+          "espera": "segundos dentro del número anotado en el README"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "tests/dominio/**",
+        "README.md"
+      ],
+      "cerebro": [
+        "tema:que-es-estar-verificado"
+      ]
+    },
+    {
+      "id": "be.dominio.dominio-aislado-del-framework",
+      "titulo": "Separar las reglas de negocio en un módulo sin red ni disco",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando la regla vive dentro de la ruta, probarla obliga a levantar todo y cambiar de base obliga a reescribirla. Con el dominio aparte, el bug del inventario fantasma se clavó con un test de tres líneas.",
+      "queHacer": [
+        "Mover a `lib/dominio/` toda función que decida algo del negocio: qué se puede cobrar, cuánto suma, qué transición está permitida.",
+        "Esas funciones reciben los hechos ya leídos y devuelven un valor o un rechazo; no leen ni escriben.",
+        "Dejar en la ruta solo tres cosas: validar la entrada, llamar al dominio, dar forma a la respuesta.",
+        "Prohibir por grep cualquier import de framework, cliente de base o `fs` dentro de `lib/dominio/`."
+      ],
+      "aceptacion": [
+        {
+          "check": "El dominio no importa infraestructura",
+          "comando": "grep -rnE \"from '(next|fs|node:fs|@supabase|pg)\" lib/dominio/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Ninguna ruta pasa de 60 líneas",
+          "comando": "find app/api -name 'route.ts' -exec wc -l {} + | sort -n | tail -5",
+          "espera": "ninguna línea supera 60"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/**"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "be.dominio.hechos-y-derivados",
+      "titulo": "Guardar solo hechos y derivar los saldos en cada lectura",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un campo `stock` o `total` guardado es una copia que se desincroniza. En placita el costo de ventas salía en $0 porque el dato vivía en el sitio equivocado: la ganancia bruta real era $4.000 sobre un precio de $20.000 y el dueño veía otra.",
+      "queHacer": [
+        "Escribir en `lib/tipos.ts` dos listas: los hechos que se persisten (movimiento, venta, gasto, cierre) y los derivados que NO se persisten (saldo, total del día, ranking).",
+        "Marcar cada tipo derivado con un comentario de una línea que diga de qué hechos sale.",
+        "Quitar de la persistencia todo campo calculable; si alguno se queda guardado por rendimiento, dejar escrito quién lo recalcula y cuándo.",
+        "Añadir un test que borre el derivado guardado y compruebe que el sistema devuelve el mismo número."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún derivado se escribe",
+          "comando": "grep -rniE 'guardar|insert|upsert' lib/persistencia.ts lib/servidor/ | grep -iE 'saldo|resumen|ranking|totalDia'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El saldo se recalcula desde los hechos",
+          "comando": "npm test -- derivados",
+          "espera": "exit 0; incluye el caso de vaciar el catálogo y esperar 0"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "lib/tipos.ts",
+        "lib/dominio/derivados.ts",
+        "tests/dominio/derivados.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "be.dominio.un-solo-dueno-por-hecho",
+      "titulo": "Dejar un solo módulo que escribe cada hecho y una sola fuente para leerlo",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si un hecho se escribe en dos sitios, la pantalla lee del que no es: toda empresa recién registrada veía «no tiene locales», no podía vincular el primer equipo, y sin vínculo no se factura. El síntoma es siempre «no hay X justo después de crear X».",
+      "queHacer": [
+        "Hacer la tabla hecho → módulo que lo escribe → módulo que lo lee, con archivo y línea de cada uno.",
+        "Donde haya dos escritores, elegir uno y dejar el otro llamándolo, nunca copiando su lógica.",
+        "Donde la pantalla lea de una fuente distinta a la que escribe, cambiar la lectura; no sincronizar las dos.",
+        "Dejar la tabla en `docs/donde-vive-el-dato.md` y actualizarla cuando entre un hecho nuevo."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada hecho tiene un único escritor",
+          "comando": null,
+          "espera": "tabla hecho→escritor→lector completa; 0 filas con dos escritores"
+        },
+        {
+          "check": "Crear y leer devuelve el mismo dato",
+          "comando": "npm test -- crear-y-leer",
+          "espera": "exit 0; un test por cada hecho de la tabla"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/donde-vive-el-dato.md",
+        "tests/crear-y-leer.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "be.api.forma-unica-de-respuesta",
+      "titulo": "Fijar una sola forma de respuesta y una sola de error para todas las rutas",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con tres formas de error distintas, quien llama escribe tres caminos de manejo y se olvida del tercero: el fallo llega al mostrador como una pantalla en blanco en vez de un mensaje.",
+      "queHacer": [
+        "Escribir en `lib/servidor/respuesta.ts` dos ayudantes: uno para el resultado y otro para el rechazo, con las claves fijas `error`, `codigo` y `campo`.",
+        "Hacer que TODA ruta devuelva a través de esos dos, nunca construyendo la respuesta a mano.",
+        "Documentar la forma en un comentario de cabecera del archivo, con un ejemplo de cada una.",
+        "Dejar un grep de guardia que detecte cualquier respuesta construida fuera del ayudante."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna ruta arma la respuesta a mano",
+          "comando": "grep -rn 'NextResponse.json\\|res.json(' app/api/ | grep -v 'lib/servidor/respuesta'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Todo rechazo trae las claves fijas",
+          "comando": "npm test -- forma-de-respuesta",
+          "espera": "exit 0; cada rechazo probado trae error, codigo y campo"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/respuesta.ts",
+        "tests/forma-de-respuesta.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.errores.el-borde-nunca-lanza",
+      "titulo": "Envolver cada ruta para que ninguna excepción salga sin registro",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una excepción sin envolver llega al navegador como 500 vacío y al log como nada: el reporte que llega es «no me deja cobrar» y no hay rastro que buscar.",
+      "queHacer": [
+        "Escribir un envoltorio en `lib/servidor/borde.ts` que reciba el manejador, lo ejecute dentro de try/catch y convierta cualquier excepción en la respuesta de error de la casa.",
+        "Registrar en el catch el mensaje, la pila y el identificador de la petición ANTES de responder.",
+        "Aplicar el envoltorio a todas las rutas; no dejar ninguna exportada en crudo.",
+        "Distinguir dos casos: rechazo de negocio (4xx, previsto) y fallo (5xx, se registra con pila)."
+      ],
+      "aceptacion": [
+        {
+          "check": "Toda ruta pasa por el envoltorio",
+          "comando": "grep -rLn 'borde' app/api --include='route.ts'",
+          "espera": "0 archivos"
+        },
+        {
+          "check": "Una excepción provocada deja línea en el log y devuelve la forma de error",
+          "comando": "npm test -- borde-no-lanza",
+          "espera": "exit 0; el caso que lanza responde 500 con la clave error"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/borde.ts",
+        "tests/borde-no-lanza.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.observabilidad.una-linea-por-peticion",
+      "titulo": "Registrar una línea por petición con método, ruta, código y milisegundos",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin una línea por petición, «el sistema estaba lento a las 7» no se puede confirmar ni desmentir, y la primera hora de cualquier diagnóstico se va en instrumentar lo que debió estar desde el principio.",
+      "queHacer": [
+        "Emitir una línea por petición al terminar, con método, ruta, código de respuesta, milisegundos e identificador de petición.",
+        "Una línea por petición, en un formato fijo que se pueda cortar con grep y contar con wc.",
+        "No registrar el cuerpo: solo el tamaño en bytes.",
+        "Comprobar que la línea sale también cuando la petición termina en error."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada petición deja exactamente una línea",
+          "comando": "npm test -- log-peticion",
+          "espera": "exit 0; 10 peticiones dejan 10 líneas"
+        },
+        {
+          "check": "La línea trae los cinco campos",
+          "comando": "grep -nE 'metodo|ruta|codigo|ms|peticionId' lib/servidor/registro.ts",
+          "espera": "5+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/registro.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.tiempo.reloj-del-servidor",
+      "titulo": "Poner la hora en el servidor y rechazar la que manda el cliente",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El reloj lo pone el servidor, nunca el celular de quien pide. Una tablet con la hora corrida media hora manda ventas al turno equivocado, y el arqueo de esa noche sale con un faltante que nadie puede explicar.",
+      "queHacer": [
+        "Sellar en el servidor todo campo de tiempo que se persiste: creación, cobro, anulación, cierre.",
+        "Ignorar cualquier fecha que venga en el cuerpo de la petición; si llega, descartarla en silencio y no guardarla.",
+        "Centralizar la lectura del reloj en una función (`ahora()`) para poder congelarla en las pruebas.",
+        "Añadir una prueba que mande una fecha de 2020 en el cuerpo y compruebe que el registro guarda la del servidor."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna ruta guarda una fecha del cuerpo",
+          "comando": "grep -rnE 'body\\.(fecha|creado|hora|timestamp|cobradoEn)' app/api/ lib/servidor/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El reloj se lee en un solo sitio",
+          "comando": "grep -rn 'new Date()\\|Date.now()' lib/dominio/ app/api/ | grep -v 'lib/servidor/reloj'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Una fecha enviada por el cliente no llega al registro",
+          "comando": "npm test -- reloj-del-servidor",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "lib/servidor/reloj.ts",
+        "tests/reloj-del-servidor.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.dinero.enteros-desde-el-primer-dia",
+      "titulo": "Guardar el dinero en pesos enteros y el peso en gramos enteros",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "0.1 + 0.2 no es 0.3: con flotantes la suma de las líneas no da lo que dice el recibo. El descuadre entra de a un peso por venta y a los dos meses el informe del mes y el cajón difieren en miles sin que nadie sepa dónde empezó.",
+      "queHacer": [
+        "Nombrar cada campo con su unidad: `totalCop`, `montoCop`, `pesoGramos`. El nombre es el contrato.",
+        "Declarar esos campos como enteros en los tipos y en el esquema de la base; ningún decimal se persiste.",
+        "Convertir a entero en el borde, una sola vez, y trabajar en enteros de ahí para adentro.",
+        "Añadir una prueba con tres líneas cuyo redondeo por línea difiere del redondeo al total, y esperar la cifra del total."
+      ],
+      "aceptacion": [
+        {
+          "check": "El dominio no usa decimales",
+          "comando": "grep -rnE 'toFixed\\(2\\)|parseFloat|\\* 1\\.19' lib/dominio/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Los campos de dinero llevan la unidad en el nombre",
+          "comando": "grep -nE '(precio|total|monto|valor)[A-Za-z]*:' lib/tipos.ts | grep -vE 'Cop|Gramos'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La suma de las líneas da el total del recibo",
+          "comando": "npm test -- redondeo",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/tipos.ts",
+        "lib/dominio/dinero.ts",
+        "tests/dominio/redondeo.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.dominio.reglas-puras-de-entidad",
+      "titulo": "Escribir las reglas de {{entidad}} como funciones puras con sus pruebas",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una regla que solo existe dentro de un botón se la salta la API, el importador masivo y la otra pantalla. La regla tiene que estar en el sitio por el que pasan los tres.",
+      "queHacer": [
+        "Escribir en `lib/dominio/{{entidad}}.ts` las funciones que crean, cambian y cierran {{entidad}}, recibiendo los hechos por parámetro.",
+        "Cada función devuelve el resultado o un rechazo con motivo; ninguna escribe en disco ni en la base.",
+        "Enumerar las reglas que {{entidad}} nunca puede violar y escribir una prueba por cada una que INTENTE romperla y espere el rechazo.",
+        "Hacer que la ruta, el trabajo programado y cualquier script de carga pasen por estas funciones, no por la persistencia directa."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las reglas de {{entidad}} tienen pruebas que intentan romperlas",
+          "comando": "npm test -- dominio/{{entidad}}",
+          "espera": "exit 0 con 3+ pruebas de rechazo"
+        },
+        {
+          "check": "Nadie escribe {{entidad}} saltándose el dominio",
+          "comando": "grep -rnE 'insert\\(|upsert\\(|guardar\\(' app/api/{{entidad}}/ scripts/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": "entidad",
+      "posee": [
+        "lib/dominio/{{entidad}}.ts",
+        "tests/dominio/{{entidad}}.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "be.validacion.entrada-de-ruta",
+      "titulo": "Validar en el servidor todo lo que entra por {{ruta}}",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La validación del formulario no existe para quien manda la petición con curl. Sin validación en el servidor entra un total negativo, una cantidad de 999.999 unidades o un identificador de otra empresa, y cuando se ve ya está guardado.",
+      "queHacer": [
+        "Declarar el esquema de entrada de {{ruta}} en un solo sitio: campos, tipos, obligatorios y rangos.",
+        "Rechazar con 400 antes de tocar el dominio, nombrando el campo que falla.",
+        "Descartar los campos no declarados en vez de guardarlos: solo entra lo que está en la lista.",
+        "Probar {{ruta}} con cuerpo vacío, con un campo de más, con un tipo cambiado y con el número justo en el borde."
+      ],
+      "aceptacion": [
+        {
+          "check": "{{ruta}} rechaza el cuerpo vacío",
+          "comando": "curl -s -o /dev/null -w '%{http_code}' -X POST localhost:3000{{ruta}} -H 'content-type: application/json' -d '{}'",
+          "espera": "400"
+        },
+        {
+          "check": "Un campo no declarado no se guarda",
+          "comando": "npm test -- validacion {{ruta}}",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": "ruta",
+      "posee": [
+        "app{{ruta}}/route.ts",
+        "lib/servidor/entrada{{ruta}}.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.validacion.rechazo-explica-el-campo",
+      "titulo": "Hacer que cada rechazo diga qué campo falla y con qué valor",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "«Datos inválidos» termina en una llamada al que construyó el sistema. La persona del mostrador a las 7 de la noche necesita saber que el problema es la cantidad que tecleó, no «el sistema».",
+      "queHacer": [
+        "Devolver en cada rechazo el nombre del campo, el valor recibido y el límite que se violó.",
+        "Un rechazo por petición: el primero que falla, con su campo; no una lista de diez que nadie lee.",
+        "Escribir el texto con las palabras que salen en pantalla, no con el nombre de la columna de la base.",
+        "Congelar los textos en un módulo y probarlos por igualdad, para que un refactor no los cambie en silencio."
+      ],
+      "aceptacion": [
+        {
+          "check": "Todo rechazo trae el campo",
+          "comando": "npm test -- rechazos",
+          "espera": "exit 0; cada rechazo probado trae la clave campo con un nombre"
+        },
+        {
+          "check": "Ningún mensaje visible usa jerga de base de datos",
+          "comando": "grep -rniE 'constraint|null value|foreign key|violates|undefined' lib/servidor/mensajes.ts",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/mensajes.ts",
+        "tests/rechazos.test.ts"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "be.api.codigos-http-honestos",
+      "titulo": "Devolver el código que corresponde y nunca 200 con un error adentro",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un 200 con `{error}` adentro hace que el cliente dé la venta por cobrada y no reintente nunca: la venta se pierde en silencio y aparece como faltante en el arqueo de la noche.",
+      "queHacer": [
+        "Fijar la tabla: 200 resultado, 201 creado, 400 entrada inválida, 401 sin sesión, 403 sin permiso, 404 no existe, 409 conflicto de estado, 422 rechazo de negocio, 500 fallo.",
+        "Revisar cada ruta contra la tabla y corregir las que devuelven 200 con error o 500 con rechazo de negocio.",
+        "Dejar la tabla escrita en el módulo de respuesta, en un comentario de cabecera.",
+        "Probar por cada ruta el camino feliz y al menos un camino de rechazo, comparando el código."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna respuesta lleva error con 200",
+          "comando": "grep -rn 'status: 200' app/api/ lib/servidor/ | grep -i 'error'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Los códigos coinciden con la tabla",
+          "comando": "npm test -- codigos-http",
+          "espera": "exit 0; una prueba por ruta y por código"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/respuesta.ts",
+        "tests/codigos-http.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.api.escribir-solo-con-post",
+      "titulo": "Prohibir que un GET cambie datos",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un GET que escribe lo ejecutan el prefetch del navegador, el antivirus del corporativo y el rastreador del buscador: aparecen registros que nadie creó y anulaciones que nadie pidió, cada una con la hora en que alguien abrió una pestaña.",
+      "queHacer": [
+        "Revisar cada manejador GET y comprobar que no llama a ninguna función de escritura.",
+        "Mover a POST, PATCH o DELETE todo lo que cambie estado, incluidos los «marcar como impreso» y los «reintentar».",
+        "Dejar los GET sin efectos: ni contadores, ni marcas de leído, ni purgas.",
+        "Añadir el grep de guardia al comando de verificación."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún GET escribe",
+          "comando": "grep -rn -A 30 'export async function GET' app/api/ | grep -nE 'insert\\(|update\\(|delete\\(|guardar\\(|anexar\\('",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Los GET declarados no cambian el estado",
+          "comando": "npm test -- get-sin-efectos",
+          "espera": "exit 0; el conteo de registros antes y después de cada GET es el mismo"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "tests/get-sin-efectos.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.errores.mensajes-para-la-persona-del-mostrador",
+      "titulo": "Escribir los rechazos en las palabras de quien está en el mostrador",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "«Abra el turno de caja» lo resuelve la cajera sola. «FOREIGN KEY constraint failed» es una llamada al que construyó el sistema, a la hora de más venta y con el cliente esperando.",
+      "queHacer": [
+        "Recoger todo texto de rechazo que llega a una pantalla y ponerlo en `lib/servidor/mensajes.ts`.",
+        "Reescribir cada uno en imperativo, diciendo qué hacer, no qué falló: «Abra el turno de caja», «De ese producto solo quedan 3».",
+        "Cada mensaje nombra lo que la persona ve en pantalla, con las mismas palabras que salen en pantalla.",
+        "Congelar los textos con pruebas de igualdad para que sigan siendo los mismos entre la demo y la base real."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún mensaje visible trae jerga",
+          "comando": "grep -rniE 'endpoint|payload|token|constraint|null|undefined|exception' lib/servidor/mensajes.ts",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Los textos están congelados",
+          "comando": "npm test -- mensajes",
+          "espera": "exit 0; cada mensaje comparado por igualdad exacta"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/mensajes.ts",
+        "tests/mensajes.test.ts"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "be.dinero.los-pagos-suman-exacto",
+      "titulo": "Rechazar la venta si los pagos no suman exactamente el total",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si los pagos suman 39.000 y el total es 65.000, guardar la venta deja un descuadre de 26.000 que aparece esa noche en el arqueo sin dueño. El rechazo del estanco dice literalmente «[Descuadre: pagos 39000 ≠ total 65000]» y nombra el recibo.",
+      "queHacer": [
+        "Verificar la suma de los pagos contra el total ANTES de escribir nada, dentro del dominio.",
+        "Si no cuadra, devolver un rechazo que incluya las dos cifras y el número del documento.",
+        "En pago mixto, autocompletar la segunda cifra a partir de la primera: quien cobra no hace la resta con el cliente enfrente.",
+        "Probar con un caso mixto real (efectivo 18.700 + transferencia 4.200 = 22.900) y con otro que difiera en un peso."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un peso de diferencia se rechaza",
+          "comando": "npm test -- pagos-exactos",
+          "espera": "exit 0; el caso con 1 peso de diferencia devuelve rechazo"
+        },
+        {
+          "check": "El rechazo nombra las dos cifras",
+          "comando": "grep -rn 'Descuadre' lib/dominio/",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/pagos.ts",
+        "tests/dominio/pagos-exactos.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.dinero.un-solo-redondeo-al-total",
+      "titulo": "Aplicar descuentos y comisiones al total, con un solo redondeo",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Redondear el 10 % de descuento línea por línea y luego sumar da una cifra distinta a la del recibo impreso. Con 30 ventas al día, el informe del mes y el cajón difieren en miles de pesos y nadie sabe cuál de los dos creer.",
+      "queHacer": [
+        "Calcular en enteros hasta el final y redondear UNA vez, al total.",
+        "Guardar el porcentaje aplicado y la cifra resultante, para poder rehacer la cuenta sin adivinar.",
+        "Congelar en el documento la comisión del datáfono que se cobró, no la que hoy tiene el catálogo.",
+        "Añadir la prueba del caso donde la suma de redondeos por línea difiere del redondeo al total, y esperar la cifra del total."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay redondeo por línea",
+          "comando": "grep -rnE 'Math.round|toFixed' lib/dominio/ | grep -iE 'linea|item|detalle'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El total del recibo coincide con el guardado",
+          "comando": "npm test -- descuentos-y-comisiones",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/dinero.ts",
+        "tests/dominio/descuentos-y-comisiones.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.tiempo.fecha-de-negocio-con-zona-del-local",
+      "titulo": "Calcular la jornada con la zona horaria del local, no con UTC",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una venta de las 11:28 p.m. en Bogotá cae al día siguiente en UTC: la factura sale en la lista pero la cabecera del día marca cero, justo en las horas de más venta. Pasó en el estanco y se detectó a las 11:28 de la noche.",
+      "queHacer": [
+        "Escribir `fechaNegocio(instante, zona)` en un solo módulo del dominio y usarla en TODA comparación de jornada.",
+        "Fijar la zona en la configuración del local (`America/Bogota` en Colombia), no en el servidor ni en el navegador.",
+        "Reemplazar cualquier `toISOString().slice(0,10)` y cualquier comparación de texto de fecha por una llamada a esa función.",
+        "Añadir la prueba del caso nocturno: las 23:28 hora local del día D pertenecen a la jornada D, no a D+1."
+      ],
+      "aceptacion": [
+        {
+          "check": "Nadie corta la fecha del ISO a mano",
+          "comando": "grep -rnE 'toISOString\\(\\)\\.(slice|substring|split)' lib/ app/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El caso nocturno está probado",
+          "comando": "npm test -- fecha-de-negocio",
+          "espera": "exit 0; incluye el caso de las 23:28 hora local"
+        },
+        {
+          "check": "La zona sale de la configuración del local",
+          "comando": "grep -rn 'America/Bogota' lib/ app/ | grep -v 'lib/config'",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/fecha-negocio.ts",
+        "tests/dominio/fecha-de-negocio.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "be.tiempo.dos-fechas-en-el-documento",
+      "titulo": "Guardar por separado la hora en que se tomó y la hora en que se cobró",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Con una sola fecha no se puede responder «¿de qué turno es esta plata?». Un pedido tomado a las 3:03 p.m. y cobrado a las 3:20 quedó fuera del arqueo: el turno mostraba $0 en ventas y su plata apareció como sobrante que nadie sabía explicar.",
+      "queHacer": [
+        "Añadir al documento dos campos distintos: `creado` (cuando se tomó) y `cobradoEn` (cuando entró la plata).",
+        "Dejar `cobradoEn` en nulo hasta el cobro: un documento sin cobrar no es de ningún turno todavía.",
+        "Sellar los dos con el reloj del servidor y no permitir que ninguno se edite después.",
+        "Añadir la prueba del pedido tomado antes de abrir caja y cobrado con el turno ya abierto."
+      ],
+      "aceptacion": [
+        {
+          "check": "El tipo del documento declara las dos fechas",
+          "comando": "grep -nE 'creado|cobradoEn' lib/tipos.ts",
+          "espera": "2+ líneas"
+        },
+        {
+          "check": "Un documento sin cobrar no trae fecha de cobro",
+          "comando": "npm test -- dos-fechas",
+          "espera": "exit 0; el documento sin cobrar tiene cobradoEn nulo"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true,
+        "superficies": [
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/tipos.ts",
+        "tests/dominio/dos-fechas.test.ts"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "be.transaccion.el-total-se-verifica-antes-de-guardar",
+      "titulo": "Verificar que el total es la suma de sus líneas antes de escribir",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El día que alguien meta un descuento en medio, la diferencia se cae en el cuadre del mes y no se sabe en qué venta empezó. La comprobación corre siempre, incluso cuando hoy no puede fallar.",
+      "queHacer": [
+        "Escribir `cuadraTotal(documento)` en el dominio: suma las líneas y compara con el total declarado.",
+        "Llamarla en el camino de escritura, no en el de lectura: lo que no cuadra no entra.",
+        "Devolver el rechazo con las dos cifras y el identificador del documento.",
+        "Dejar la llamada aunque hoy sea imposible que falle, con un comentario de una línea que diga por qué se queda."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un documento descuadrado no se guarda",
+          "comando": "npm test -- cuadra-total",
+          "espera": "exit 0; el caso descuadrado devuelve rechazo y 0 registros escritos"
+        },
+        {
+          "check": "La comprobación está en el camino de escritura",
+          "comando": "grep -rn 'cuadraTotal' lib/ app/api/",
+          "espera": "2+ líneas: la definición y al menos una llamada antes de escribir"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/cuadre.ts",
+        "tests/dominio/cuadra-total.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.transaccion.escritura-atomica-en-disco",
+      "titulo": "Escribir en un temporal y renombrar, nunca sobre el archivo vivo",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un corte de luz a mitad de la escritura deja el JSON de ventas partido y el sistema arranca vacío al día siguiente. Con temporal más renombrado, el archivo o está entero o es el anterior.",
+      "queHacer": [
+        "Escribir siempre a `<archivo>.tmp` en el MISMO directorio y renombrar encima al terminar.",
+        "Que nada de la capa de almacenamiento lance: devolver un booleano o un valor vacío y dejar que el borde decida.",
+        "Si al leer el archivo está corrupto, respaldarlo a `.bak` y seguir con el vacío; nunca sobrescribirlo.",
+        "Probar con un archivo truncado a la mitad y comprobar que arranca y deja el `.bak`."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay escritura directa sobre el archivo vivo",
+          "comando": "grep -rn 'writeFile' lib/servidor/ | grep -v '.tmp'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Un archivo corrupto no se pierde",
+          "comando": "npm test -- almacen-corrupto",
+          "espera": "exit 0; queda un archivo .bak y el proceso sigue vivo"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node",
+          "json-en-disco"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/almacen-disco.ts",
+        "tests/almacen-corrupto.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "be.estado.anular-en-vez-de-borrar",
+      "titulo": "Anular los documentos de plata en vez de borrarlos",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un documento borrado no se puede explicar. En el estanco el borrado se lleva la factura y todos sus movimientos de kardex sin dejar rastro, y además reutiliza el consecutivo porque lo calcula contando facturas.",
+      "queHacer": [
+        "Sustituir el borrado por un campo de anulación con hora y motivo (`anuladaEn`, `anulado`, `eliminadoEn`).",
+        "Los listados siguen mostrando lo anulado, marcado; los totales lo excluyen y lo cuentan aparte, como su propia cifra.",
+        "Quitar del código y de los permisos de la base la vía de borrado físico de cualquier cosa que toque plata.",
+        "Probar que anular no cambia el número de documentos listados y sí cambia el neto."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay borrado físico en el dominio ni en las rutas",
+          "comando": "grep -rniE 'delete from|\\.delete\\(|DROP ' lib/dominio/ app/api/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Lo anulado sigue listado y no suma",
+          "comando": "npm test -- anulacion",
+          "espera": "exit 0; tras anular, el conteo listado es el mismo y el neto baja"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/anulacion.ts",
+        "tests/dominio/anulacion.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.estado.el-estado-lo-decide-el-dominio-no-la-pantalla",
+      "titulo": "Poner la transición de estado en el dominio y dejar la pantalla llamándola",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "En el estanco la vía destructiva vive en el componente: la pantalla borra la factura y su kardex directamente. Una regla que vive en un componente no la respetan ni la API, ni el importador, ni la segunda pantalla que alguien añada.",
+      "queHacer": [
+        "Buscar toda asignación de estado hecha fuera del dominio y anotarla con archivo y línea.",
+        "Mover cada una a una función del dominio que reciba el documento y devuelva el nuevo estado o el rechazo.",
+        "Dejar el componente y la ruta llamando a esa función, sin condiciones propias.",
+        "Añadir el grep de guardia: ninguna asignación directa de estado fuera de `lib/dominio/`."
+      ],
+      "aceptacion": [
+        {
+          "check": "Nadie asigna estado fuera del dominio",
+          "comando": "grep -rn 'estado =' app/ components/ lib/ | grep -v 'lib/dominio/'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La transición rechaza lo prohibido desde cualquier entrada",
+          "comando": "npm test -- transiciones",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/transiciones.ts",
+        "tests/dominio/transiciones.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "be.integracion.tercero-detras-de-un-modulo",
+      "titulo": "Meter cada servicio de terceros detrás de un módulo propio",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con el cliente del tercero regado por veinte archivos, el día que cambie el proveedor se tocan veinte archivos y se olvidan tres. Y sin un punto único no hay dónde poner el tiempo de espera, el reintento ni el registro de lo que se le pidió.",
+      "queHacer": [
+        "Crear un módulo por tercero en `lib/servidor/integraciones/` con las funciones del negocio, no con las del proveedor: `enviarComprobante`, no `postMessage`.",
+        "Mover ahí la clave, la URL base, el tiempo de espera y la traducción de sus errores a los rechazos de la casa.",
+        "Prohibir que el resto del código importe el SDK o llame a su dominio directamente.",
+        "Dejar en ese módulo el registro de cada llamada saliente: qué se pidió, qué contestó y cuántos milisegundos tardó."
+      ],
+      "aceptacion": [
+        {
+          "check": "Nadie llama al tercero fuera de su módulo",
+          "comando": "grep -rn 'api.proveedor.com' app/ lib/ | grep -v 'lib/servidor/integraciones/'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El módulo traduce los errores del tercero",
+          "comando": "npm test -- integraciones",
+          "espera": "exit 0; cada error del tercero probado sale como rechazo de la casa"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/integraciones/**",
+        "tests/integraciones.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.observabilidad.errores-con-identificador",
+      "titulo": "Dar a cada error un identificador que la persona pueda dictar por teléfono",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin un código en pantalla, el reporte que llega es «no me deja cobrar» y encontrar el rastro en el log cuesta media hora de la noche. Con un identificador se encuentra con un grep.",
+      "queHacer": [
+        "Generar un identificador corto por petición y devolverlo en toda respuesta de error.",
+        "Escribirlo en la misma línea de log donde va la pila, para que el grep devuelva la causa completa.",
+        "Mostrarlo en la pantalla junto al mensaje, con las palabras «si llama, dicte este número».",
+        "Probar que el identificador de la respuesta y el de la línea de log son el mismo."
+      ],
+      "aceptacion": [
+        {
+          "check": "Toda respuesta de error trae identificador",
+          "comando": "npm test -- identificador-de-error",
+          "espera": "exit 0; cada error probado trae la clave peticionId"
+        },
+        {
+          "check": "El identificador de la respuesta aparece en el log",
+          "comando": "npm test -- identificador-de-error 2>&1 | grep -c 'peticionId'",
+          "espera": "2+"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/peticion-id.ts",
+        "tests/identificador-de-error.test.ts"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "be.configuracion.la-configuracion-del-local-fuera-del-codigo",
+      "titulo": "Sacar al archivo de configuración lo que cambia de un local a otro",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La zona horaria, el nombre del negocio, el prefijo del consecutivo y la base de caja metidos en el código convierten «abrir la segunda sede» en una copia del repositorio, y desde ese día los dos se arreglan por separado.",
+      "queHacer": [
+        "Listar todo valor que cambiaría si el sistema se instalara en otro local: zona horaria, nombre, NIT, dirección, prefijo del consecutivo, moneda, redondeo.",
+        "Moverlos a `lib/config/local.ts`, leído una sola vez, con el tipo declarado y un valor por defecto solo para lo que de verdad tenga uno.",
+        "Lo que no tenga valor real queda como hueco visible que impide arrancar, no como un dato verosímil.",
+        "Prohibir por grep que esos valores aparezcan literales en cualquier otro archivo."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los datos del local no están regados",
+          "comando": "grep -rniE 'America/Bogota|NIT|Calle [0-9]|Carrera [0-9]' app/ lib/ components/ | grep -v 'lib/config/'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Falta un dato del local y el arranque se detiene",
+          "comando": "npm test -- config-local",
+          "espera": "exit 0; el caso sin zona horaria devuelve rechazo al arrancar"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/config/local.ts",
+        "tests/config-local.test.ts"
+      ],
+      "cerebro": [
+        "tema:cero-datos-inventados",
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "be.validacion.la-lista-blanca-de-campos",
+      "titulo": "Guardar solo los campos declarados y descartar el resto del cuerpo",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un insert con el cuerpo entero deja que quien llama escriba `empresaId`, `rol` o `totalCop` a mano. Un `empresa_id` ajeno viajando en la cola de subida produjo un 500 de RLS y hubo que bloquear los envíos hasta que el arranque confirmara la empresa.",
+      "queHacer": [
+        "Construir el objeto a guardar campo por campo desde el esquema, nunca esparciendo el cuerpo recibido.",
+        "Los campos que fija el servidor (empresa, local, autor, fechas, totales derivados) se toman de la sesión y del reloj, jamás del cuerpo.",
+        "Añadir la prueba que manda `empresaId` de otra empresa y comprueba que el registro queda con la de la sesión.",
+        "Dejar el grep de guardia contra el esparcido del cuerpo en escrituras."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna escritura esparce el cuerpo recibido",
+          "comando": "grep -rnE 'insert\\(\\{ *\\.\\.\\.(body|datos|payload)|update\\(\\{ *\\.\\.\\.(body|datos)' app/api/ lib/servidor/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Un campo de servidor enviado por el cliente se descarta",
+          "comando": "npm test -- lista-blanca",
+          "espera": "exit 0; el registro guarda la empresa de la sesión"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/mapeo-entrada.ts",
+        "tests/lista-blanca.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "be.dominio.congelar-lo-cobrado-en-el-documento",
+      "titulo": "Congelar en el documento el nombre, el precio y la comisión que se cobraron",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si el recibo vuelve a mirar el catálogo, subir el precio del pollo cambia las ventas del mes pasado y el informe deja de coincidir con los papeles impresos. Se congela al CREAR —el catálogo se lee una vez, antes de entrar a la cola—, no al cobrar.",
+      "queHacer": [
+        "Copiar dentro de cada línea del documento el nombre, el precio unitario, el costo y la comisión vigentes en ese momento.",
+        "Leer el catálogo una sola vez, al crear la línea; de ahí en adelante el documento se basta a sí mismo.",
+        "Quitar de los informes cualquier lectura del catálogo para reconstruir precios pasados.",
+        "Añadir la prueba: cambiar el precio del catálogo no cambia el total de un documento ya creado."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los informes no consultan el catálogo",
+          "comando": "grep -rn 'catalogo\\|productos' lib/dominio/contabilidad.ts",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Cambiar el catálogo no mueve un documento viejo",
+          "comando": "npm test -- precio-congelado",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/documento.ts",
+        "tests/dominio/precio-congelado.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.dominio.la-particion-viaja-desde-el-dia-uno",
+      "titulo": "Poner el identificador de local en todo objeto operativo desde el primer día",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Añadir el segundo local no debe migrar datos. Sin `localId` desde el primer día, abrir la sede 2 obliga a reescribir todas las filas existentes adivinando a cuál pertenecen, y a esa altura ya son decenas de miles.",
+      "queHacer": [
+        "Añadir `localId` (y `empresaId` si hay más de una empresa) a TODO tipo operativo: venta, movimiento, gasto, turno, cierre.",
+        "Rellenarlo desde la sesión o el puesto, nunca desde el cuerpo de la petición.",
+        "Hacer que toda consulta de listado y todo cálculo de totales filtren por él, aunque hoy solo haya un valor.",
+        "Añadir la prueba con dos locales: los totales de uno no incluyen ni un registro del otro."
+      ],
+      "aceptacion": [
+        {
+          "check": "Todo tipo operativo declara el local",
+          "comando": "grep -c 'localId' lib/tipos.ts",
+          "espera": "conteo igual al número de tipos operativos declarados"
+        },
+        {
+          "check": "Los totales de un local no traen los del otro",
+          "comando": "npm test -- particion-local",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/tipos.ts",
+        "tests/dominio/particion-local.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "be.api.contrato-congelado-de-ruta",
+      "titulo": "Congelar con una prueba el contrato de {{ruta}}",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un campo que cambia de nombre en {{ruta}} rompe a quien la llama sin que ninguna prueba se ponga roja: se descubre cuando el dueño abre la pantalla y está vacía.",
+      "queHacer": [
+        "Escribir el contrato de {{ruta}} en un solo archivo: campos de entrada, campos de salida y códigos que puede devolver.",
+        "Escribir una prueba que llame a {{ruta}} y compare la forma COMPLETA de la respuesta, no un campo suelto.",
+        "Incluir en la prueba al menos un camino de rechazo con su código.",
+        "Hacer que la prueba se ponga roja tanto si se quita un campo como si se añade uno sin declararlo."
+      ],
+      "aceptacion": [
+        {
+          "check": "El contrato de {{ruta}} está congelado",
+          "comando": "npm test -- contrato {{ruta}}",
+          "espera": "exit 0"
+        },
+        {
+          "check": "Quitar un campo pone la prueba roja",
+          "comando": null,
+          "espera": "se quita un campo de la respuesta de {{ruta}}, la prueba falla, se pega la salida y se restaura"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": "ruta",
+      "posee": [
+        "tests/contrato{{ruta}}.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.estado.transiciones-de-entidad",
+      "titulo": "Escribir la máquina de estados de {{entidad}} y prohibir el resto",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Sin tabla de transiciones permitidas, {{entidad}} llega a estados que nadie pensó: cobrada dos veces, anulada y luego entregada, cerrada y reabierta. Cada uno de esos aparece después como un descuadre sin causa.",
+      "queHacer": [
+        "Enumerar los estados de {{entidad}} y escribir la tabla de transiciones permitidas: de qué estado, a cuál, quién puede.",
+        "Dejar UNA función `transicionar{{entidad}}` que consulte la tabla y rechace todo lo que no esté en ella.",
+        "Registrar en cada transición quién la hizo y a qué hora; los estados terminales no salen de ahí.",
+        "Escribir una prueba que recorra TODAS las transiciones prohibidas y espere rechazo en cada una."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las transiciones prohibidas de {{entidad}} se rechazan",
+          "comando": "npm test -- estados/{{entidad}}",
+          "espera": "exit 0; una prueba por cada par prohibido de la tabla"
+        },
+        {
+          "check": "Nadie cambia el estado de {{entidad}} sin pasar por la función",
+          "comando": "grep -rn '{{entidad}}' app/ components/ lib/ | grep 'estado' | grep -v 'lib/dominio/estados-{{entidad}}'",
+          "espera": "0 líneas de asignación directa"
+        }
+      ],
+      "aplicaSi": {
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": "entidad",
+      "posee": [
+        "lib/dominio/estados-{{entidad}}.ts",
+        "tests/dominio/estados-{{entidad}}.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.transaccion.idempotencia-de-ruta",
+      "titulo": "Hacer que repetir la misma petición a {{ruta}} no duplique el hecho",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "La cajera con el cliente enfrente da doble clic y la red del local se corta a mitad de la petición: sin clave de idempotencia el reintento crea la segunda factura. En este ecosistema la idempotencia de la cola está diseñada por escrito desde julio y nunca se implementó ni se midió.",
+      "queHacer": [
+        "Hacer que quien llama genere una clave por intento (dispositivo + documento) y la mande en la cabecera de {{ruta}}.",
+        "Guardar la clave junto al hecho, con restricción de unicidad; el segundo intento con la misma clave devuelve el MISMO resultado y el mismo código, no un error.",
+        "Distinguir reintento (misma clave) de operación nueva (clave nueva): no deduplicar por parecido de los datos.",
+        "Probar dos peticiones idénticas seguidas y dos lanzadas en paralelo."
+      ],
+      "aceptacion": [
+        {
+          "check": "Dos peticiones con la misma clave dejan un registro",
+          "comando": "npm test -- idempotencia {{ruta}}",
+          "espera": "exit 0; 2 POST con la misma clave dejan 1 registro"
+        },
+        {
+          "check": "El reintento devuelve la misma respuesta",
+          "comando": "curl -s -X POST localhost:3000{{ruta}} -H 'Idempotency-Key: prueba-1' -d @cuerpo.json > a.json; curl -s -X POST localhost:3000{{ruta}} -H 'Idempotency-Key: prueba-1' -d @cuerpo.json > b.json; diff a.json b.json",
+          "espera": "0 líneas de diferencia"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "dineroReal": true
+      },
+      "porCada": "ruta",
+      "posee": [
+        "lib/servidor/idempotencia.ts",
+        "tests/idempotencia{{ruta}}.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.transaccion.un-solo-recurso-abierto-a-la-vez",
+      "titulo": "Serializar la apertura para que no haya dos turnos abiertos en la misma sede",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Dos aperturas simultáneas dejan dos turnos abiertos en la misma sede y las ventas se reparten entre los dos: ningún arqueo cuadra y nadie sabe cuál cerrar. Y sin turno abierto no se cobra: el rechazo dice «Abra el turno de caja».",
+      "queHacer": [
+        "Poner la unicidad donde el motor la garantice: índice único parcial sobre (sede, estado abierto) en base, o la cola de un carril si el almacenamiento es un archivo.",
+        "Que la apertura consulte y escriba dentro de la misma operación serializada, no en dos pasos.",
+        "Rechazar el cobro sin turno abierto con el texto congelado, y probar ese rechazo.",
+        "Probar dos aperturas lanzadas en paralelo y esperar que solo una gane y la otra reciba 409."
+      ],
+      "aceptacion": [
+        {
+          "check": "Dos aperturas en paralelo dejan un solo turno abierto",
+          "comando": "npm test -- apertura-concurrente",
+          "espera": "exit 0; 1 turno abierto y 1 rechazo con 409"
+        },
+        {
+          "check": "Sin turno abierto no se cobra",
+          "comando": "npm test -- cobro-sin-turno",
+          "espera": "exit 0; el cobro devuelve rechazo con el texto congelado"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ],
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/turno.ts",
+        "tests/dominio/apertura-concurrente.test.ts"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "be.transaccion.consecutivo-sin-carreras",
+      "titulo": "Generar el consecutivo sin contar filas y sin reutilizar números",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Dos órdenes que entran en el mismo milisegundo leen el archivo antes de que la otra escriba, sacan el mismo `L1-0007` y la segunda pisa a la primera: la venta del primer cliente desaparece y nadie se entera hasta el cuadre. Calcularlo contando además reutiliza el número de las anuladas, que siguen existiendo.",
+      "queHacer": [
+        "Sacar el consecutivo de una fuente que garantice unicidad bajo concurrencia: secuencia de la base, restricción única con reintento, o la cola de un solo carril del proceso.",
+        "No calcularlo nunca contando registros: los anulados siguen existiendo y su número no se reutiliza.",
+        "Es por local y no reinicia; el prefijo es presentación, así que agrupar por la clave real (`puestoId`), nunca por el texto del número.",
+        "Probar con 50 creaciones en paralelo y comprobar 50 números distintos."
+      ],
+      "aceptacion": [
+        {
+          "check": "50 creaciones en paralelo dan 50 números",
+          "comando": "npm test -- consecutivo-concurrente",
+          "espera": "exit 0; 50 números distintos"
+        },
+        {
+          "check": "Nadie cuenta filas para numerar",
+          "comando": "grep -rnE '\\.length \\+ 1|count\\(\\) *\\+ *1' lib/ app/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Nadie agrupa por el texto del consecutivo",
+          "comando": "grep -rnE 'startsWith\\(.L|split\\(.-.\\)\\[0\\]' lib/dominio/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/consecutivo.ts",
+        "tests/dominio/consecutivo-concurrente.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.transaccion.un-solo-escritor-por-archivo",
+      "titulo": "Pasar toda escritura por una cola de un solo carril",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Ocho escritores en paralelo sobre el mismo archivo lo corrompen; ya pasó con el `state.json` del runtime. La cola serializa dentro de un proceso Node, y dos procesos contra la misma carpeta necesitan además un lock o una sola instancia desplegada.",
+      "queHacer": [
+        "Encolar TODA escritura del almacén en una promesa encadenada: la siguiente empieza cuando la anterior terminó.",
+        "No anidar tareas: una tarea encolada que encola otra se espera a sí misma; por eso solo las escrituras pasan por la cola, nunca las lecturas.",
+        "Dejar escrito en el despliegue que solo una instancia escribe esa carpeta, y comprobarlo antes de publicar.",
+        "Probar 100 escrituras lanzadas a la vez y comprobar que el archivo final tiene los 100 registros."
+      ],
+      "aceptacion": [
+        {
+          "check": "100 escrituras concurrentes dejan 100 registros",
+          "comando": "npm test -- cola-de-escritura",
+          "espera": "exit 0; 100 registros y 0 archivos .tmp huérfanos"
+        },
+        {
+          "check": "Ninguna escritura se salta la cola",
+          "comando": "grep -rn 'writeFile' lib/servidor/ | grep -v 'encolar'",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node",
+          "json-en-disco"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/almacen-disco.ts",
+        "tests/cola-de-escritura.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:olas-de-agentes"
+      ]
+    },
+    {
+      "id": "be.tiempo.la-plata-es-del-turno-del-cobro",
+      "titulo": "Asignar cada venta al turno en que se cobró, no al que la tomó",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un pedido tomado a las 3:03 p.m., antes de abrir caja, y cobrado a las 3:20 con turno abierto quedaba fuera del arqueo: las ventas del turno mostraban $0 y su plata salía como sobrante inexplicable al cerrar. Un documento sin cobrar no es de ningún turno todavía.",
+      "queHacer": [
+        "Filtrar la ventana del turno por `cobradoEn`, nunca por la fecha de creación del documento.",
+        "Excluir los documentos sin cobrar: entran al turno el día que entra la plata.",
+        "Filtrar además por sede: la ventana de tiempo sola mezcla locales.",
+        "Añadir la prueba del pedido tomado antes de abrir el turno y cobrado dentro: cuenta en el turno del cobro."
+      ],
+      "aceptacion": [
+        {
+          "check": "El filtro del turno usa la fecha de cobro",
+          "comando": "grep -n 'cobradoEn' lib/dominio/cierre.ts",
+          "espera": "1+ líneas; 0 líneas con creado en el mismo filtro"
+        },
+        {
+          "check": "El pedido tomado antes de abrir cuenta en el turno del cobro",
+          "comando": "npm test -- turno-del-cobro",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true,
+        "superficies": [
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/cierre.ts",
+        "tests/dominio/turno-del-cobro.test.ts"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.tiempo.ventanas-por-instante-no-por-texto",
+      "titulo": "Comparar las ventanas de tiempo por instante, nunca por texto de fecha",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Comparar cadenas ISO deja fuera del turno todo lo que traiga otro huso, otro formato o milisegundos, y el fallo solo asoma en el turno que cruza la medianoche: el que menos gente revisa.",
+      "queHacer": [
+        "Convertir a milisegundos desde epoch al entrar a cualquier comparación de ventana.",
+        "Fijar los bordes: inicio incluido, fin excluido, y escribirlo en el comentario de cabecera de la función.",
+        "Sustituir toda comparación de fechas con `<`, `>` o `===` sobre cadenas por la comparación numérica.",
+        "Añadir la prueba del turno nocturno que cruza la medianoche: pertenece entero a la jornada en que abrió."
+      ],
+      "aceptacion": [
+        {
+          "check": "No se comparan fechas como texto",
+          "comando": "grep -rnE '(fecha|creado|cobradoEn)[A-Za-z]* *[<>]=? *[\".]' lib/dominio/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El turno nocturno cae en la jornada de apertura",
+          "comando": "npm test -- turno-nocturno",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/ventana.ts",
+        "tests/dominio/turno-nocturno.test.ts"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "be.dinero.el-arqueo-solo-cuenta-lo-que-deja-billetes",
+      "titulo": "Calcular el efectivo esperado contando solo lo que deja billetes",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si el esperado suma transferencia y datáfono, todo turno con datáfono aparece con un faltante enorme y quien cobra carga con una culpa inventada. La fórmula no se copia: se copia la pregunta.",
+      "queHacer": [
+        "Responder por escrito dos preguntas del local: ¿se registra base inicial al abrir?, ¿salen gastos del cajón durante el turno?",
+        "Con base registrada: esperado = base inicial + ventas en EFECTIVO del turno. Sin base: esperado = ventas en efectivo − gastos en efectivo. No inventar una base que nadie registró.",
+        "Pedir lo CONTADO antes de mostrar el esperado, para que la cifra contada no se ajuste a la de pantalla.",
+        "Guardar en el cierre las dos cifras y su diferencia, no solo la hora."
+      ],
+      "aceptacion": [
+        {
+          "check": "El esperado ignora transferencia y datáfono",
+          "comando": "npm test -- arqueo",
+          "espera": "exit 0; un turno con datáfono da diferencia 0"
+        },
+        {
+          "check": "El cierre guarda contado, esperado y diferencia",
+          "comando": "grep -nE 'contado|esperado|diferencia' lib/tipos.ts",
+          "espera": "3+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true,
+        "superficies": [
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/arqueo.ts",
+        "tests/dominio/arqueo.test.ts"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.errores.el-descuadre-grita",
+      "titulo": "Mostrar el número que no cuadra roto en vez de cuadrarlo solo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Preferimos una factura que grita su descuadre a una que miente cuadrada. Un total que se ajusta solo para cerrar esconde el bug meses, y cuando aparece ya hay 3.000 documentos con la misma mentira encima.",
+      "queHacer": [
+        "Buscar todo ajuste silencioso: redondeos que absorben la diferencia, `|| 0`, `catch` vacíos alrededor de un cálculo de plata.",
+        "Sustituirlos por un rechazo o por una marca visible que viaje con el documento y salga en el informe.",
+        "Incluir en el texto las dos cifras y el identificador, con un formato fijo que se pueda buscar con grep.",
+        "Añadir la prueba que fuerza el descuadre y espera la marca, no el número cuadrado."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay ajustes silenciosos en el cálculo de plata",
+          "comando": "grep -rnE '\\|\\| 0|catch *\\( *\\) *\\{ *\\}' lib/dominio/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El descuadre forzado sale marcado",
+          "comando": "npm test -- descuadre-visible",
+          "espera": "exit 0; la salida trae las dos cifras y el identificador"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/cuadre.ts",
+        "tests/dominio/descuadre-visible.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:cero-datos-inventados"
+      ]
+    },
+    {
+      "id": "be.validacion.el-limite-de-cada-campo",
+      "titulo": "Poner tope al tamaño del cuerpo y al rango de cada número",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin tope, una cantidad de 999.999 pasa la validación, deja el saldo derivado en negativo y descuadra el inventario del mes; y un cuerpo de 50 MB tumba el mismo proceso que está cobrando.",
+      "queHacer": [
+        "Fijar un tope de tamaño de cuerpo en el borde y devolver 413 al superarlo.",
+        "Dar a cada número su rango real del negocio (cantidad, precio, descuento, base de caja) y rechazar fuera de él nombrando el límite.",
+        "Poner longitud máxima a cada texto que se persiste, para que un nombre de producto no traiga un documento entero.",
+        "Probar cada campo con el valor justo en el límite y con el siguiente."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un cuerpo por encima del tope se rechaza",
+          "comando": "npm test -- limites",
+          "espera": "exit 0; el cuerpo por encima del tope devuelve 413"
+        },
+        {
+          "check": "Cada número declarado tiene rango",
+          "comando": "grep -cE 'min|max' lib/servidor/esquemas.ts",
+          "espera": "conteo igual o mayor al número de campos numéricos declarados"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/esquemas.ts",
+        "tests/limites.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.api.filtro-de-vigencia-compartido",
+      "titulo": "Hacer que el total y la lista que lo acompaña usen el mismo filtro",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El dueño borró todo su catálogo y el reporte seguía mostrando ~$800.000 de inventario porque el total recorría los lotes sin mirar si el producto seguía vigente. Un total que no comparte el filtro de la lista que acompaña no es un número: es una sospecha.",
+      "queHacer": [
+        "Listar cada pantalla e informe donde convivan una lista y un total, y nombrar por escrito el filtro de vigencia de cada uno.",
+        "Extraer ese filtro a UNA función que usen los dos; ninguno lo reescribe por su cuenta.",
+        "Contar aparte lo excluido y devolverlo como su propia cifra, en vez de esconderlo.",
+        "Dejar la regresión: vaciar el catálogo entero deja el valor de inventario en 0."
+      ],
+      "aceptacion": [
+        {
+          "check": "Vaciar el catálogo deja el inventario en 0",
+          "comando": "npm test -- vigencia",
+          "espera": "exit 0; el caso de catálogo vacío devuelve 0"
+        },
+        {
+          "check": "El filtro no está duplicado",
+          "comando": "grep -rn 'eliminadoEn' lib/dominio/ | grep -v 'lib/dominio/vigencia.ts'",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/vigencia.ts",
+        "tests/dominio/vigencia.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.dominio.la-decision-adentro-del-almacen",
+      "titulo": "Meter la decisión dentro del almacén en vez de dejarla en quien llama",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Leer, decidir fuera y escribir deja una ventana entre la lectura y la escritura: dos peticiones deciden con el mismo estado viejo y la segunda pisa a la primera. Con la decisión adentro, la función recibe lo ya guardado delante y dentro del mismo carril.",
+      "queHacer": [
+        "Buscar cada sitio con el patrón leer → decidir → escribir y anotarlo con archivo y línea.",
+        "Cambiar la firma del almacén para que reciba una función que decide con el estado ya leído (`anexar(coleccion, decidir)`).",
+        "Devolver el resultado de la decisión a quien llamó, para que sepa si se aplicó o se rechazó.",
+        "Probar dos llamadas en paralelo sobre el mismo registro y comprobar que la segunda ve el efecto de la primera."
+      ],
+      "aceptacion": [
+        {
+          "check": "Dos llamadas en paralelo no se pisan",
+          "comando": "npm test -- decision-adentro",
+          "espera": "exit 0; la segunda llamada ve el resultado de la primera"
+        },
+        {
+          "check": "No queda el patrón leer-decidir-escribir fuera del almacén",
+          "comando": "grep -rn -A 6 'obtenerAlmacen()' app/api/ | grep -cE 'guardar\\(|escribir\\('",
+          "espera": "0"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node",
+          "json-en-disco"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/almacen.ts",
+        "tests/decision-adentro.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.errores.el-fallo-parcial-no-tumba-el-lote",
+      "titulo": "Degradar a fila por fila cuando el lote entero falla por una sola",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un solo upsert por tabla hacía que una fila chocada tumbara las 67 del envío; el cliente ponía la tabla en cuarentena y la reintentaba para siempre. Medido en producción: la ruta devolvía 5 productos, los 5 eliminados, 0 vivos, durante días.",
+      "queHacer": [
+        "Intentar el lote entero primero; si falla, reintentar fila por fila y devolver cuáles entraron y cuáles no.",
+        "Detectar el choque por el código del motor y el nombre exacto de la restricción (SQLSTATE 23505 y `productos_codigo_unico`), nunca por el texto del mensaje: cambia entre versiones.",
+        "Devolver las filas rechazadas con su motivo, para que quien llama actúe en vez de reintentar a ciegas.",
+        "Poner esa orquestación en un módulo fuera del route handler, porque las pruebas no cubren `app/api/**`."
+      ],
+      "aceptacion": [
+        {
+          "check": "Una fila chocada no tumba el lote",
+          "comando": "npm test -- reintento-filas",
+          "espera": "exit 0; 67 filas con una chocada entran 67"
+        },
+        {
+          "check": "El choque se detecta por código y restricción",
+          "comando": "grep -rn '23505' lib/servidor/reintento-filas.ts",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Nadie mira el texto del mensaje del motor",
+          "comando": "grep -rniE 'message.includes|mensaje.includes' lib/servidor/reintento-filas.ts",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/reintento-filas.ts",
+        "tests/reintento-filas.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "be.observabilidad.auditoria-de-lo-destructivo",
+      "titulo": "Registrar quién, cuándo y sobre qué se ejecutó cada vía destructiva",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Toda vía destructiva pide credencial y deja registro. Sin eso, la pregunta «¿quién anuló esta factura de $180.000?» no tiene respuesta y la sospecha cae sobre quien estaba en el turno.",
+      "queHacer": [
+        "Listar las vías destructivas reales: anular, cancelar, cerrar, ajustar inventario, cambiar precio, vaciar papelera.",
+        "Hacer que cada una escriba una fila de auditoría con persona, puesto, hora del servidor, documento afectado y valores antes y después.",
+        "Exigir volver a teclear la credencial de quien tiene la sesión abierta antes de ejecutarla.",
+        "Probar que sin credencial la vía se rechaza y que con credencial deja exactamente una fila."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada vía destructiva deja una fila de auditoría",
+          "comando": "npm test -- auditoria",
+          "espera": "exit 0; una fila por vía probada"
+        },
+        {
+          "check": "Ninguna vía destructiva se ejecuta sin credencial",
+          "comando": "grep -rn -L 'autorizadoConPin' lib/dominio/anulacion.ts lib/dominio/ajustes.ts",
+          "espera": "0 archivos"
+        }
+      ],
+      "aplicaSi": {
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/auditoria.ts",
+        "tests/auditoria.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.configuracion.version-de-los-datos-y-migracion",
+      "titulo": "Subir la versión de los datos y migrar en el mismo cambio que cambia la forma",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Añadir un campo de precio sin subir la versión ni migrar tumbó producción con `undefined.toFixed`: en desarrollo funcionaba con datos nuevos y en el navegador del dueño caía con los viejos. Fue la segunda vez que pasaba lo mismo.",
+      "queHacer": [
+        "Declarar `VERSION_DATOS` junto a los tipos persistidos y subirla en el MISMO cambio que altera la forma.",
+        "Escribir la migración de la versión anterior a la nueva, con valor por defecto explícito para cada campo añadido.",
+        "Correr la migración al leer, no al escribir: los datos viejos ya están en el navegador y en el disco del cliente.",
+        "Probar la lectura con un archivo de la versión anterior y comprobar que no lanza y que rellena el campo nuevo."
+      ],
+      "aceptacion": [
+        {
+          "check": "La versión sube con la forma",
+          "comando": "git diff --name-only HEAD~1 | grep -q tipos && grep -n 'VERSION_DATOS' lib/tipos.ts",
+          "espera": "1+ líneas con el número subido"
+        },
+        {
+          "check": "Los datos de la versión anterior se leen sin lanzar",
+          "comando": "npm test -- migracion",
+          "espera": "exit 0; el caso de datos v anterior devuelve el campo nuevo con su valor por defecto"
+        }
+      ],
+      "aplicaSi": {
+        "modo": "evolucion"
+      },
+      "porCada": null,
+      "posee": [
+        "lib/migraciones.ts",
+        "tests/migracion.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:dominio-migraciones-y-copias"
+      ]
+    },
+    {
+      "id": "be.estado.no-hay-desanular",
+      "titulo": "Prohibir que un documento en estado terminal vuelva a moverse",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un gasto anulado que se vuelve a anular genera el reverso dos veces y devuelve el stock dos veces. No hay desanular: si el cliente vuelve, es una orden nueva. Anular sí es idempotente.",
+      "queHacer": [
+        "Marcar los estados terminales de cada documento y prohibir toda transición que salga de ellos.",
+        "Hacer que anular sobre algo ya anulado devuelva el mismo resultado sin generar un segundo reverso.",
+        "Elegir UNA de las dos vías de reversa —retirar los movimientos originales o sumar los contrarios— y dejar escrito cuál, porque hacer las dos devuelve el stock dos veces.",
+        "Probar anular dos veces seguidas y comprobar que el saldo queda igual que tras la primera."
+      ],
+      "aceptacion": [
+        {
+          "check": "Anular dos veces no duplica el reverso",
+          "comando": "npm test -- anular-idempotente",
+          "espera": "exit 0; el saldo tras la segunda anulación es el mismo que tras la primera"
+        },
+        {
+          "check": "No existe una vía para revivir lo terminal",
+          "comando": "grep -rniE 'desanular|reactivar|restaurarFactura|reabrir' lib/ app/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/anulacion.ts",
+        "tests/dominio/anular-idempotente.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.api.listado-acotado-de-entidad",
+      "titulo": "Acotar y paginar el listado de {{entidad}}",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un listado sin tope devuelve la tabla entera: a los 50.000 registros de {{entidad}} la respuesta pesa megas, el celular del dueño no la abre y el proceso que está cobrando se queda sin memoria en la hora pico.",
+      "queHacer": [
+        "Poner tope por defecto y tope máximo al listado de {{entidad}}; una petición sin parámetros nunca devuelve todo.",
+        "Ordenar por un criterio estable (instante más identificador) para que la segunda página no repita ni salte filas cuando entren registros nuevos.",
+        "Devolver el cursor de continuación, no el número de página, si la lista crece por delante.",
+        "Medir con el volumen del tercer año del negocio, no con los 20 registros de la demo."
+      ],
+      "aceptacion": [
+        {
+          "check": "El listado de {{entidad}} sin parámetros viene acotado",
+          "comando": "npm test -- listado-{{entidad}}",
+          "espera": "exit 0; la respuesta sin parámetros trae como máximo el tope declarado"
+        },
+        {
+          "check": "La segunda página no repite filas",
+          "comando": "npm test -- listado-{{entidad}} -- paginacion",
+          "espera": "exit 0; 0 identificadores repetidos entre página 1 y página 2"
+        }
+      ],
+      "aplicaSi": {
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": "entidad",
+      "posee": [
+        "lib/servidor/listado-{{entidad}}.ts",
+        "tests/listado-{{entidad}}.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.api.cambio-de-contrato-de-ruta-sin-romper",
+      "titulo": "Ampliar el contrato de {{ruta}} sin dejar campos inertes por el camino",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Al añadir dos campos a la respuesta de una ruta, la capa cliente rearmaba el objeto con solo los campos viejos: las otras tres capas del arreglo habrían quedado inertes y en silencio, sin que ninguna prueba se pusiera roja.",
+      "queHacer": [
+        "Listar las capas que tocan la respuesta de {{ruta}} entre el servidor y quien la consume, con archivo y línea.",
+        "Buscar las que rearman el objeto campo por campo: esas son las que dejan lo nuevo fuera.",
+        "Añadir el campo nuevo como opcional y no quitar el viejo en el mismo cambio; dar una versión de gracia antes de retirarlo.",
+        "Cerrar con una prueba de punta a punta que compruebe que el campo nuevo llega al ÚLTIMO consumidor, no solo al borde."
+      ],
+      "aceptacion": [
+        {
+          "check": "El campo nuevo llega al último consumidor de {{ruta}}",
+          "comando": "npm test -- contrato-extremo {{ruta}}",
+          "espera": "exit 0"
+        },
+        {
+          "check": "Ninguna capa rearma la respuesta campo por campo",
+          "comando": "grep -rn -A 8 '{{ruta}}' lib/ | grep -cE 'return \\{ *[a-z]+:'",
+          "espera": "0"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "modo": "evolucion"
+      },
+      "porCada": "ruta",
+      "posee": [
+        "app{{ruta}}/route.ts",
+        "tests/contrato-extremo{{ruta}}.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "be.trabajos.cola-con-reintento-y-tope",
+      "titulo": "Reintentar los trabajos con espera creciente y un tope que los saca",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un trabajo que reintenta sin espera y sin tope martillea al tercero caído y esconde el fallo: la cola crece, nadie la mira, y cuando el tercero vuelve entran 4.000 peticiones de golpe.",
+      "queHacer": [
+        "Fijar la espera creciente entre intentos y el número máximo de intentos, escritos como constantes con su unidad.",
+        "Pasado el tope, mover el trabajo a una lista de fallidos con su último error y dejar de reintentarlo.",
+        "Registrar cada intento con el número de intento y el motivo, para poder contar cuántos llegaron al tope.",
+        "Probar un trabajo que siempre falla y comprobar que se detiene en el intento declarado, no antes ni después."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un trabajo que siempre falla se detiene en el tope",
+          "comando": "npm test -- reintentos",
+          "espera": "exit 0; el conteo de intentos es igual al tope declarado"
+        },
+        {
+          "check": "Los fallidos quedan listados con su motivo",
+          "comando": "npm test -- reintentos 2>&1 | grep -c 'fallido'",
+          "espera": "1+"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/trabajos/reintento.ts",
+        "tests/reintentos.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.trabajos.el-cron-no-se-solapa",
+      "titulo": "Impedir que una tarea programada arranque si la anterior sigue corriendo",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El cierre nocturno que tarda más de lo previsto se solapa con el del minuto siguiente y procesa dos veces los mismos documentos: el informe del día sale duplicado y el dueño ve el doble de ventas.",
+      "queHacer": [
+        "Tomar un cerrojo con nombre y vencimiento al empezar cada tarea programada; si ya está tomado, salir sin trabajar y dejar constancia.",
+        "Liberar el cerrojo en el camino de salida, incluido el de error; el vencimiento es la red de seguridad si el proceso muere.",
+        "Registrar por corrida: hora de inicio, duración y qué procesó, para poder ver cuándo empezó a acercarse al intervalo.",
+        "Probar dos arranques simultáneos y comprobar que solo uno trabaja."
+      ],
+      "aceptacion": [
+        {
+          "check": "Dos arranques simultáneos dejan un solo trabajo hecho",
+          "comando": "npm test -- cron-sin-solape",
+          "espera": "exit 0; 1 corrida ejecutada y 1 salida por cerrojo tomado"
+        },
+        {
+          "check": "Cada corrida deja su duración registrada",
+          "comando": "npm test -- cron-sin-solape 2>&1 | grep -cE 'duracionMs'",
+          "espera": "1+"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/trabajos/cerrojo.ts",
+        "tests/cron-sin-solape.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.trabajos.el-trabajo-largo-sale-de-la-peticion",
+      "titulo": "Sacar de la petición todo trabajo que pase de unos segundos",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El informe del mes calculado dentro de la petición se corta con el tiempo límite de la plataforma y quien lo pidió reintenta: dos informes a medias, ninguno completo, y el servidor ocupado en los dos.",
+      "queHacer": [
+        "Medir cuánto tarda cada ruta con el volumen real y listar las que pasan del límite de la plataforma.",
+        "Convertirlas en dos pasos: la petición encola y devuelve un identificador; el trabajo escribe el resultado cuando termina.",
+        "Dar una ruta para consultar el estado del trabajo, con los estados enumerados y sin adivinanzas.",
+        "Probar con el volumen del tercer año, no con el de la demo."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna ruta pasa del límite con volumen real",
+          "comando": "npm test -- duracion-rutas",
+          "espera": "exit 0; ninguna ruta supera los milisegundos declarados como límite"
+        },
+        {
+          "check": "La ruta larga responde con identificador de trabajo",
+          "comando": "npm test -- trabajo-diferido",
+          "espera": "exit 0; la respuesta trae trabajoId y estado"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/trabajos/diferido.ts",
+        "tests/trabajo-diferido.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.trabajos.la-cola-no-gira-para-siempre",
+      "titulo": "Sacar de la cola lo que el servidor aceptó y corrigió",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si el servidor ACEPTA una fila pero la CAMBIA y esa fila se queda en la cola, el cliente re-sube el valor viejo, el servidor lo vuelve a corregir y el sistema gira para siempre, consumiendo datos del local sin avanzar.",
+      "queHacer": [
+        "Hacer que la respuesta de la subida diga tres cosas: qué entró tal cual, qué entró cambiado y qué se rechazó.",
+        "Descontar de la cola tanto lo aceptado como lo aceptado-con-cambio: las dos cosas salen.",
+        "Adoptar en local el valor que impuso el servidor por una vía que NO vuelva a encolar; si la adopción encola, el bucle sigue.",
+        "Probar el ciclo completo tres veces seguidas y comprobar que la cola llega a 0 y se queda en 0."
+      ],
+      "aceptacion": [
+        {
+          "check": "La cola llega a 0 tras una corrección del servidor",
+          "comando": "npm test -- cola-converge",
+          "espera": "exit 0; tras 3 ciclos la cola tiene 0 elementos"
+        },
+        {
+          "check": "La adopción no reencola",
+          "comando": "grep -rn -A 5 'adoptar' lib/ | grep -cE 'encolar|aplicar\\('",
+          "espera": "0"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/outbox.ts",
+        "tests/cola-converge.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "be.trabajos.purga-con-regla-no-con-cron-a-ciegas",
+      "titulo": "Atar la purga a un hecho del negocio y no solo al paso del tiempo",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Purgar «a los tres días» borra el rastro del día que todavía no ha cerrado, que es justo el que se está investigando. La papelera se purga dos horas después del cierre de caja; mientras el día no tenga cierre, sus registros se conservan.",
+      "queHacer": [
+        "Nombrar el hecho del negocio que autoriza la purga de cada colección (cierre del día, entrega del pedido, conciliación del mes).",
+        "Hacer que la purga busque ese hecho; si no existe, no borra nada y lo deja anotado.",
+        "Registrar cuántos elementos borró cada corrida y de qué fecha eran.",
+        "Probar el caso del día sin cierre: 0 borrados."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un día sin cierre no se purga",
+          "comando": "npm test -- purga",
+          "espera": "exit 0; el caso sin cierre borra 0 elementos"
+        },
+        {
+          "check": "La purga cuenta lo que borró",
+          "comando": "npm test -- purga 2>&1 | grep -cE 'borrados: [0-9]+'",
+          "espera": "1+"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/purga.ts",
+        "tests/dominio/purga.test.ts"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.integracion.webhook-firmado-y-idempotente",
+      "titulo": "Verificar la firma de cada webhook y tolerar que llegue repetido",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un webhook sin firma lo puede mandar cualquiera que conozca la URL: se registra un pago que nadie hizo. Y el proveedor reenvía cuando no recibe 2xx a tiempo, así que sin idempotencia el mismo pago entra dos veces.",
+      "queHacer": [
+        "Verificar la firma sobre el cuerpo CRUDO, antes de interpretarlo; si no cuadra, responder 401 y no procesar nada.",
+        "Guardar el identificador del evento del proveedor con restricción de unicidad: el repetido se responde 200 sin volver a aplicar.",
+        "Responder 2xx en cuanto el evento está guardado y procesarlo después, para no forzar reenvíos por lentitud.",
+        "Descartar los eventos que llegan fuera de orden comparando su marca de tiempo con la del último aplicado."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un webhook con firma falsa no se procesa",
+          "comando": "npm test -- webhook",
+          "espera": "exit 0; el caso con firma falsa devuelve 401 y 0 registros"
+        },
+        {
+          "check": "El mismo evento dos veces deja un registro",
+          "comando": "npm test -- webhook -- repetido",
+          "espera": "exit 0; 2 entregas del mismo evento dejan 1 registro"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/webhooks/**",
+        "lib/servidor/webhook.ts",
+        "tests/webhook.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.integracion.tiempo-de-espera-y-corte",
+      "titulo": "Poner tiempo de espera a toda llamada saliente y cortar tras fallos seguidos",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una llamada sin tiempo de espera cuelga la petición que la contiene hasta el límite de la plataforma: el tercero caído deja de ser su problema y pasa a ser una caja que no cobra.",
+      "queHacer": [
+        "Poner tiempo de espera explícito a cada llamada saliente, en el módulo del tercero, con el número escrito y su unidad.",
+        "Contar los fallos seguidos; pasado el umbral, dejar de llamar durante una ventana y devolver el rechazo previsto de inmediato.",
+        "Volver a probar con una sola llamada al terminar la ventana antes de reabrir del todo.",
+        "Registrar cada apertura y cierre del corte, para poder contar cuántas veces pasó en un mes."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna llamada saliente va sin tiempo de espera",
+          "comando": "grep -rn 'fetch(' lib/servidor/integraciones/ | grep -v 'signal'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Tras los fallos declarados el corte responde sin llamar",
+          "comando": "npm test -- corte-de-integracion",
+          "espera": "exit 0; tras el umbral, 0 llamadas salientes y rechazo inmediato"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/integraciones/corte.ts",
+        "tests/corte-de-integracion.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.integracion.el-tercero-caido-no-tumba-la-venta",
+      "titulo": "Cobrar aunque el tercero esté caído y conciliar después",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una venta con el cliente enfrente no puede depender de que el proveedor conteste. Se escribe en local y se sube después; lo que no puede es quedarse sin dueño: una cola de subida sin dueño confirmado es una bomba con retardo.",
+      "queHacer": [
+        "Separar lo que la venta necesita para existir de lo que necesita el tercero: la venta se guarda primero, siempre.",
+        "Encolar el envío al tercero con su reintento y dejar el documento marcado como pendiente de envío, visible en pantalla.",
+        "No dejar volar la cola hasta que el arranque confirme a qué empresa y a qué local pertenece: subir con dueño ajeno da rechazo del servidor y datos cruzados.",
+        "Añadir la conciliación: contar los documentos pendientes de envío por día y mostrar el número."
+      ],
+      "aceptacion": [
+        {
+          "check": "Con el tercero caído la venta se guarda",
+          "comando": "npm test -- tercero-caido",
+          "espera": "exit 0; 1 venta guardada y 1 envío pendiente"
+        },
+        {
+          "check": "La cola no vuela sin dueño confirmado",
+          "comando": "npm test -- cola-sin-dueno",
+          "espera": "exit 0; sin confirmación de empresa salen 0 envíos"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true,
+        "superficies": [
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/outbox.ts",
+        "tests/tercero-caido.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "be.observabilidad.traza-de-punta-a-punta",
+      "titulo": "Llevar el identificador de la petición hasta el último log que produce",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con una petición que dispara un trabajo que llama a un tercero, sin un hilo común el diagnóstico es cruzar horas a mano entre tres logs, y eso se hace de noche con la caja parada.",
+      "queHacer": [
+        "Generar el identificador en el borde si no viene, y pasarlo a todo lo que la petición dispare: trabajos, llamadas salientes, escrituras.",
+        "Incluirlo en TODA línea de log, sin excepción, en la misma posición.",
+        "Propagarlo al tercero en una cabecera, para poder cruzar con su soporte.",
+        "Comprobar con una petición real que las líneas de las tres capas comparten el mismo identificador."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las tres capas comparten identificador",
+          "comando": "npm test -- traza",
+          "espera": "exit 0; una petición deja 3+ líneas con el mismo peticionId"
+        },
+        {
+          "check": "Ninguna línea de log sale sin identificador",
+          "comando": "grep -rn 'console.log\\|logger.' lib/ app/ | grep -v 'peticionId'",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/traza.ts",
+        "tests/traza.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.api.el-listado-no-hace-n-mas-uno",
+      "titulo": "Traer las relaciones del listado en una consulta y no una por fila",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un listado de 200 ventas que pide su detalle fila por fila hace 201 viajes: la pantalla de ventas del día tarda 4 s y quien cobra empieza a evitarla, que es la manera en que un sistema se deja de usar.",
+      "queHacer": [
+        "Contar las consultas que produce cada listado con el registro activado; anotar el número antes de tocar nada.",
+        "Sustituir el bucle de consultas por una sola con las relaciones incluidas, o por dos consultas y un cruce en memoria.",
+        "Volver a contar y anotar el número después: el listado no puede crecer en consultas cuando crece en filas.",
+        "Dejar una prueba que falle si el número de consultas de ese listado sube."
+      ],
+      "aceptacion": [
+        {
+          "check": "El número de consultas no crece con las filas",
+          "comando": "npm test -- n-mas-uno",
+          "espera": "exit 0; el mismo conteo de consultas con 10 filas y con 200"
+        },
+        {
+          "check": "Los dos números están anotados",
+          "comando": "grep -nE 'consultas' docs/rendimiento.md",
+          "espera": "2+ líneas con cifras"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento.md",
+        "tests/n-mas-uno.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.transaccion.bloqueo-de-fila-para-el-ultimo-disponible",
+      "titulo": "Bloquear la fila al reservar la última unidad",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Dos clientes pidiendo la última unidad al mismo tiempo se la llevan los dos si nadie bloquea la fila: se promete lo que no hay y alguien espera un pedido que no existe. Con bloqueo, el segundo espera y encuentra el stock ya descontado.",
+      "queHacer": [
+        "Descontar la existencia dentro de la misma transacción que crea la línea del pedido, con bloqueo de la fila del producto.",
+        "Rechazar dentro de esa transacción si no alcanza, con el texto congelado que ya usa la pantalla.",
+        "Congelar el mismo mensaje en la vía de demostración y en la de base real, para que se comporten igual.",
+        "Probar dos reservas en paralelo de la última unidad y esperar una aceptada y una rechazada."
+      ],
+      "aceptacion": [
+        {
+          "check": "Dos reservas en paralelo de la última unidad dejan una",
+          "comando": "npm test -- reserva-concurrente",
+          "espera": "exit 0; 1 aceptada y 1 rechazada"
+        },
+        {
+          "check": "El descuento va con bloqueo de fila",
+          "comando": "grep -rn 'for update' setup/schema.sql",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "setup/schema.sql",
+        "tests/reserva-concurrente.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.observabilidad.medir-antes-de-optimizar",
+      "titulo": "Medir el tiempo de las tres rutas más usadas antes de tocar nada",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin medición previa, «va lento» se responde con un índice al azar y nadie sabe si mejoró. La cifra que importa es la de la ruta de cobro en la hora pico, no la media de todas.",
+      "queHacer": [
+        "Identificar las tres rutas más llamadas con el registro de peticiones, no por intuición.",
+        "Medir cada una con el volumen del tercer año del negocio y anotar la mediana y el percentil 95 en `docs/rendimiento.md`.",
+        "Anotar también la fecha de la medición y el volumen con el que se hizo: sin eso, el número no se puede comparar después.",
+        "Solo entonces optimizar, y volver a medir con el mismo volumen para poder restar."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las tres rutas tienen su cifra anotada",
+          "comando": "grep -cE 'p95|percentil 95' docs/rendimiento.md",
+          "espera": "3+"
+        },
+        {
+          "check": "La medición se puede repetir",
+          "comando": "npm run medir",
+          "espera": "exit 0; imprime mediana y p95 por ruta"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento.md",
+        "scripts/medir.mjs"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "be.dinero.los-informes-cuadran-con-los-documentos",
+      "titulo": "Conciliar cada informe contra la suma de sus documentos",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El dinero sale del total del documento y los kilos de sus líneas: volver a sumar las líneas para «confirmar» el ingreso da otra cifra, y la que manda es la del recibo. Sin conciliación programada, la diferencia se descubre en el cierre del mes con 3.000 documentos encima.",
+      "queHacer": [
+        "Escribir por cada informe de qué campo sale cada cifra: el dinero del total del documento, los kilos y el costo de las líneas.",
+        "Añadir una comprobación que recorra el periodo y compare informe contra documentos, y devuelva la lista de los que no cuadran con su identificador.",
+        "Correrla al cerrar el día y dejar su resultado guardado con el cierre.",
+        "Probar con un documento descuadrado a propósito y esperar que salga nombrado en la lista."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un documento descuadrado sale nombrado",
+          "comando": "npm test -- conciliacion",
+          "espera": "exit 0; la lista trae el identificador del documento descuadrado"
+        },
+        {
+          "check": "La conciliación corre con el cierre",
+          "comando": "grep -n 'conciliar' lib/dominio/cierre.ts",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/conciliacion.ts",
+        "tests/dominio/conciliacion.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "be.observabilidad.alerta-que-alguien-lee",
+      "titulo": "Dejar alerta solo para lo que alguien va a atender esa noche",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una alerta que salta 40 veces al día se silencia en una semana, y con ella se silencia la que importaba. Se alerta de lo que alguien va a hacer algo, con el nombre de quien lo hace escrito al lado.",
+      "queHacer": [
+        "Escoger las condiciones que exigen acción: la caja no puede cobrar, la cola no baja en una hora, el cierre del día no corrió.",
+        "Escribir por cada una a quién le llega y qué se hace: si no hay nombre ni acción, no es alerta, es una métrica.",
+        "Fijar el umbral con la medición real, no con un número redondo elegido a ojo.",
+        "Contar durante una semana cuántas veces saltó cada una y quitar las que nadie atendió."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada alerta tiene destinatario y acción escritos",
+          "comando": "grep -cE '^\\| ' docs/alertas.md",
+          "espera": "conteo igual al número de alertas configuradas"
+        },
+        {
+          "check": "Ninguna alerta saltó más de lo declarado en la semana de prueba",
+          "comando": "grep -cE 'alerta' logs/semana.txt",
+          "espera": "conteo por debajo del tope escrito en docs/alertas.md"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "equipo": "orion+humanos"
+      },
+      "porCada": null,
+      "posee": [
+        "docs/alertas.md",
+        "lib/servidor/alertas.ts"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "be.observabilidad.el-log-no-lleva-datos-personales",
+      "titulo": "Sacar del log la cédula, el teléfono y el valor de los secretos",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El log se copia al portátil, al chat del equipo y al servicio de terceros. Una cédula y un teléfono ahí dentro son datos personales de un cliente colombiano fuera de su sitio, y una clave en el log es una clave publicada.",
+      "queHacer": [
+        "Listar los campos personales y secretos que pueden pasar por el servidor: cédula, teléfono, dirección, correo, claves, tokens.",
+        "Filtrarlos en la función de registro, por nombre de campo, dejando la marca de que había algo y no el valor.",
+        "Prohibir registrar el cuerpo entero de la petición o de la respuesta: solo su tamaño.",
+        "Probar con un cuerpo que trae los campos de la lista y comprobar que ninguno aparece en la salida."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún campo de la lista aparece en el log",
+          "comando": "npm test -- log-sin-datos",
+          "espera": "exit 0; 0 apariciones de los campos de la lista"
+        },
+        {
+          "check": "Nadie registra el cuerpo entero",
+          "comando": "grep -rnE 'log\\(.*(body|payload|req\\.body)' lib/ app/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/registro.ts",
+        "tests/log-sin-datos.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.api.documento-vivo-del-contrato",
+      "titulo": "Generar la referencia de la API desde el código y no escribirla a mano",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una referencia escrita a mano miente a los dos meses, y quien la lee escribe el cliente contra la mentira. Generada del código, o está al día o el comando de verificación se pone rojo.",
+      "queHacer": [
+        "Generar el documento de rutas desde los esquemas de entrada y salida que ya existen, sin duplicar la declaración.",
+        "Incluir por ruta: método, campos de entrada, campos de salida y los códigos que puede devolver.",
+        "Añadir la generación al comando de verificación y fallar si el archivo generado difiere del que está en el repositorio.",
+        "Dejar los ejemplos con datos que no existen en la vida real, para que nadie copie el NIT de un cliente."
+      ],
+      "aceptacion": [
+        {
+          "check": "El documento está al día",
+          "comando": "npm run documentar && git diff --exit-code docs/api.md",
+          "espera": "exit 0"
+        },
+        {
+          "check": "No hay rutas sin documentar",
+          "comando": "find app/api -name 'route.ts' | wc -l; grep -cE '^## ' docs/api.md",
+          "espera": "los dos conteos coinciden"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/api.md",
+        "scripts/documentar.mjs"
+      ],
+      "cerebro": [
+        "tema:cero-datos-inventados"
+      ]
+    },
+    {
+      "id": "be.errores.catalogo-de-errores-con-numero",
+      "titulo": "Numerar los rechazos del negocio y congelar su texto",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin número, el mismo rechazo se escribe distinto en tres sitios y quien da soporte no puede buscarlo. Con número, «me sale el E-014» localiza la causa en un grep y sin ver la pantalla.",
+      "queHacer": [
+        "Recoger todos los rechazos de negocio y darles un código estable que no se reutilice nunca.",
+        "Poner en la tabla, por código: el texto que ve la persona, qué lo causa y qué hay que hacer.",
+        "Devolver el código en la respuesta y mostrarlo junto al mensaje en pantalla.",
+        "Probar por igualdad que el texto de cada código no cambió."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada rechazo del código está en la tabla",
+          "comando": "grep -oE 'E-[0-9]{3}' lib/ -r | sort -u | wc -l; grep -cE '^\\| E-[0-9]{3}' docs/errores.md",
+          "espera": "los dos conteos coinciden"
+        },
+        {
+          "check": "Los textos siguen congelados",
+          "comando": "npm test -- catalogo-errores",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/errores.md",
+        "lib/servidor/errores.ts"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "be.configuracion.un-interruptor-por-funcionalidad-nueva",
+      "titulo": "Dejar interruptor para apagar lo nuevo sin desplegar",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando lo nuevo falla a las 7 de la noche, desplegar la vuelta atrás cuesta minutos que el local no tiene con clientes en fila. Un interruptor lo apaga en segundos y deja el resto del sistema vivo.",
+      "queHacer": [
+        "Declarar los interruptores en un solo módulo, con su valor por defecto y una línea que diga qué apaga cada uno.",
+        "Leerlos en el servidor, no en el navegador: apagarlo tiene que valer para todos los puestos a la vez.",
+        "Poner interruptor solo a lo nuevo y a lo que llama a un tercero; no a todo, porque un interruptor sin usar es una rama sin probar.",
+        "Borrar el interruptor cuando la funcionalidad lleve un mes encendida, y dejar escrita esa fecha."
+      ],
+      "aceptacion": [
+        {
+          "check": "Apagado, la funcionalidad no se ejecuta",
+          "comando": "npm test -- interruptores",
+          "espera": "exit 0; con el interruptor apagado, 0 llamadas a la funcionalidad"
+        },
+        {
+          "check": "Cada interruptor tiene fecha de retiro",
+          "comando": "grep -cE 'retirar: 20[0-9]{2}-' lib/config/interruptores.ts",
+          "espera": "conteo igual al número de interruptores declarados"
+        }
+      ],
+      "aplicaSi": {
+        "modo": "evolucion"
+      },
+      "porCada": null,
+      "posee": [
+        "lib/config/interruptores.ts",
+        "tests/interruptores.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.trabajos.la-cola-se-ve-y-se-reintenta-a-mano",
+      "titulo": "Dejar un comando que muestra la cola y reintenta un trabajo concreto",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando algo se atasca, la única salida no puede ser entrar a la base a mano. Quien opera necesita ver cuántos hay pendientes, cuál falló y volver a lanzar ese, sin llamar al que construyó el sistema.",
+      "queHacer": [
+        "Escribir un comando que liste la cola: cuántos pendientes, cuántos fallidos, el más viejo y su motivo.",
+        "Añadir un segundo comando que reintente un trabajo por identificador y devuelva el resultado.",
+        "Hacer que los dos se puedan correr contra producción sin editar código y sin abrir la base.",
+        "Escribir el procedimiento en `docs/operacion.md`, en pasos numerados, para alguien que nunca lo hizo."
+      ],
+      "aceptacion": [
+        {
+          "check": "El comando lista la cola",
+          "comando": "npm run cola",
+          "espera": "exit 0; imprime pendientes, fallidos y el más viejo con su motivo"
+        },
+        {
+          "check": "Un trabajo se reintenta por identificador",
+          "comando": "npm run cola -- reintentar T-000",
+          "espera": "exit 0; imprime el resultado del reintento"
+        }
+      ],
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/cola.mjs",
+        "docs/operacion.md"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "be.dominio.glosario-del-dominio-en-el-idioma-del-negocio",
+      "titulo": "Atar cada palabra del negocio a su tipo en el código",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Cuando «pedido», «orden» y «venta» significan tres cosas según quién hable, la regla que se escribe no es la que el dueño pidió, y el que llega nuevo tarda una semana en descubrirlo.",
+      "queHacer": [
+        "Listar las palabras que el dueño usa hablando de su negocio, con sus palabras, no con las del código.",
+        "Atar cada una a su tipo o tabla, con archivo y línea, y marcar las que hoy tienen dos nombres.",
+        "Renombrar en el código las que no coincidan con la palabra del dueño; el código se pliega al negocio, no al revés.",
+        "Anotar las que el negocio distingue y el código no: cada una es un hueco de modelo, no un detalle de nombres."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada palabra del glosario apunta a un tipo real",
+          "comando": "grep -cE '^\\| ' docs/glosario.md; grep -cE '^(export )?(type|interface) ' lib/tipos.ts",
+          "espera": "el primer conteo es igual o mayor que el segundo"
+        },
+        {
+          "check": "No quedan dos nombres para la misma cosa",
+          "comando": null,
+          "espera": "tabla palabra→tipo completa; 0 filas con dos nombres sin decidir"
+        }
+      ],
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
+      "porCada": null,
+      "posee": [
+        "docs/glosario.md"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "be.integracion.simulador-del-tercero-para-ensayar",
+      "titulo": "Dejar un doble del tercero para provocar sus fallos sin llamarlo",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El caso que rompe —el corte de espera, el 500, la respuesta con un campo de menos— no se puede provocar en el proveedor real, así que nunca se prueba y se descubre en producción, con la caja abierta.",
+      "queHacer": [
+        "Escribir un doble del tercero que devuelva sus respuestas reales guardadas, no inventadas: capturarlas una vez y congelarlas.",
+        "Darle modos: responder bien, tardar más del tiempo de espera, devolver 500, devolver la respuesta sin un campo.",
+        "Correr contra el doble las pruebas de los cuatro modos y comprobar que el sistema sigue cobrando.",
+        "Dejar escrito cómo se apunta al doble y cómo se vuelve al proveedor real, en dos líneas."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los cuatro modos están probados",
+          "comando": "npm test -- doble-del-tercero",
+          "espera": "exit 0; 4 casos, uno por modo"
+        },
+        {
+          "check": "Las respuestas del doble son capturas, no invenciones",
+          "comando": "ls tests/capturas/ | wc -l",
+          "espera": "1+ archivos, cada uno con la fecha de captura en el nombre"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "tests/dobles/**",
+        "tests/capturas/**"
+      ],
+      "cerebro": [
+        "tema:cero-datos-inventados"
+      ]
+    },
+    {
+      "id": "be.configuracion.procedimiento-de-vuelta-atras",
+      "titulo": "Ensayar la vuelta atrás del despliegue y anotar cuánto tarda",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una vuelta atrás que nunca se ensayó se ensaya el peor día: con la caja parada. Y si el cambio tocó la forma de los datos, volver el código atrás sin volver los datos deja el sistema peor que roto.",
+      "queHacer": [
+        "Desplegar la versión anterior en un entorno con datos restaurados y cronometrar cuánto tarda desde que se decide hasta que cobra.",
+        "Comprobar qué pasa con los datos escritos por la versión nueva: si la forma cambió, escribir la migración de vuelta o declarar que no hay vuelta atrás.",
+        "Escribir el procedimiento en pasos numerados para alguien que nunca lo hizo, con el comando exacto de cada paso.",
+        "Anotar la fecha del ensayo: pasados tres meses vuelve a ser un documento sin probar."
+      ],
+      "aceptacion": [
+        {
+          "check": "El ensayo se hizo y está cronometrado",
+          "comando": "grep -nE 'minutos|fecha del ensayo' docs/vuelta-atras.md",
+          "espera": "2+ líneas con cifras"
+        },
+        {
+          "check": "El sistema funciona en la versión anterior",
+          "comando": "npm run verificar",
+          "espera": "exit 0 apuntando al despliegue de la versión anterior"
+        }
+      ],
+      "aplicaSi": {
+        "modo": "evolucion"
+      },
+      "porCada": null,
+      "posee": [
+        "docs/vuelta-atras.md",
+        "scripts/vuelta-atras.sh"
+      ],
+      "cerebro": [
+        "tema:dominio-migraciones-y-copias",
+        "tema:que-es-estar-verificado"
+      ]
+    }
+  ]
+}

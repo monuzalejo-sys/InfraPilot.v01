@@ -23,7 +23,7 @@ que esta landing sea más interactiva, más llamativa, es para vender frutas"*.
 1. Quien mira esta pantalla es un **ingeniero de presupuestos evaluando una herramienta de
    trabajo**, no un comprador de fruta. Va a pasar 6 horas diarias adentro. Lo que necesita
    sentir es *"qué tranquilidad trabajar aquí"* — que es, literalmente, la tesis del
-   manifiesto (`C:\Users\Kalel\.claude\skills\estudio-diseno\SKILL.md:9`). En este producto
+   manifiesto (`C:\Users\Kalel\.claude\skills\orion-diseno\SKILL.md:9`). En este producto
    **la calma no es una decisión estética: es el argumento de venta**. Una landing ruidosa
    prometería un producto que la app no es, y la primera pantalla del dashboard desmentiría
    la portada.

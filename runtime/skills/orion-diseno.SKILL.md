@@ -1,5 +1,5 @@
 ---
-name: estudio-diseno
+name: orion-diseno
 description: "Sistema de diseño 'El estudio del ingeniero moderno' — manifiesto visual del usuario para InfraPilot y productos afines. Usar SIEMPRE que se diseñe o rediseñe UI (landing, dashboard, componentes): paleta cálida exacta, tipografía con aire, componentes como objetos físicos, botones-herramienta, composición editorial, IA como compañero silencioso. Incluye las prohibiciones explícitas del usuario."
 ---
 

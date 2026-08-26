@@ -1,0 +1,298 @@
+{
+  "projectId": "orion",
+  "snapshotDate": "2026-08-26T06:45:00.000Z",
+  "version": 2,
+  "lastAmmRun": "2026-08-26T06:30:00.000Z",
+  "objects": [
+    {
+      "id": "DEC-001",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [],
+      "title": "El ecosistema ORION tiene memoria propia en memory/orion",
+      "description": "Las lecciones del TALLER (agentes, modelos, verificacion, herramientas) se guardaban en memory/infrapilot, la memoria de un PRODUCTO. El diagnostico del 2026-08-24 ya lo senalaba: ~45 de 110 lecciones no hablaban de ningun negocio sino del propio metodo. Desde hoy el runtime, el estandar, el catalogo y las herramientas tienen su propia memoria en ORION/memory/orion. cerebro.mjs y baul.mjs la descubren solas por estar bajo ORION/memory.",
+      "reason": "Un producto y el metodo con el que se construye no comparten ciclo de vida ni audiencia. Mezclarlos hacia que buscar 'como elijo modelo' devolviera decisiones de InfraPilot y viceversa."
+    },
+    {
+      "id": "DEC-002",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-001"
+      ],
+      "title": "RFC-0008: el plan de ejecucion es un REGISTRO consultable, no un documento",
+      "description": "Se anade RFC-0008 al estandar. Un plan vive en <memory-dir>/plan.json; cualquier forma en prosa se GENERA desde el (PLAN.md) y nunca se edita en paralelo. Cada tarea lleva porque, pasos, archivos que posee en exclusiva, criterios comprobables, dificultad, ceremonia y presupuesto en tokens. Implementacion de referencia: tools/plan.mjs, con `validar` como forma ejecutable de la conformidad.",
+      "reason": "Un plan en prosa hay que leerlo entero para usarlo, que es exactamente el costo que RFC-0004 existe para evitar. Un plan de mil tareas en markdown es inservible; uno al que se le pregunta 'que sigue' cuesta 5 lineas de contexto."
+    },
+    {
+      "id": "DEC-003",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Accepted",
+      "dependencies": [],
+      "title": "runtime/ es la unica fuente de verdad del runtime; tools/runtime.mjs es la unica puerta",
+      "description": "El runtime vivia en tres sitios (runtime/ en el repo, ~/.claude, y el payload embebido de instalar-orion.mjs) sin nadie que los cuadrara. tools/runtime.mjs anade: `estado` (deriva a tres bandas con fechas), `instalar` (runtime -> ~/.claude, con .bak), `recoger` (rescate ~/.claude -> runtime, que era el paso que faltaba) y `empaquetar` (regenera el payload del instalador desde runtime/). El inventario se descubre leyendo runtime/, no de una lista escrita a mano.",
+      "reason": "Ver KN-001: 5 de 15 archivos habian derivado en ambas direcciones y correr el instalador habria revertido en silencio las mejoras que solo vivian en ~/.claude."
+    },
+    {
+      "id": "DEC-004",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-003"
+      ],
+      "title": "Todo el runtime bajo el prefijo orion-",
+      "description": "Instruccion literal del dueno 2026-08-26: 'todos los agentes que creemos quiero que sea barra Orion algo'. Renombrados: landing-prompter -> orion-landing, estudio-diseno -> orion-diseno. Se actualizaron las 17 superficies vivas que los citaban (runtime, READMEs, temas del cerebro, prompts-landing). NO se tocaron los respaldos (kit-portabilidad) ni las cosechas congeladas (_cosecha), que son historia. Las citas archivo:linea de los temas siguen siendo validas porque el contenido no cambio, solo el nombre del archivo.",
+      "reason": "Un prefijo unico hace que el dueno sepa que /orion-<algo> es siempre suyo, y que un agente nuevo sepa donde encaja."
+    },
+    {
+      "id": "DEC-005",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-002"
+      ],
+      "title": "La pasarela al baul: tools/baul.mjs sube planes, historial y encargos ademas de las memorias",
+      "description": "export-vault.mjs ya subia sistema, memorias y cerebro. baul.mjs lo envuelve y anade lo que se produce trabajando y se quedaba enterrado en JSON: los planes con UNA NOTA POR TAREA enlazada a su tema, el historial de sesiones con lo que costo cada una, y los encargos. Escribe la portada. Se corre solo dentro de /orion-close y a mano con /orion-baul. Unidireccional: el repo manda.",
+      "reason": "El grafo de Obsidian responde preguntas que ningun archivo suelto responde: abrir un tema muestra todas las tareas de todos los proyectos que dependen de el. Primera corrida: 121 sesiones y 39,37 M de tokens que nadie habia sumado nunca."
+    },
+    {
+      "id": "KN-001",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "DEC-003"
+      ],
+      "fact": "MEDIDO 2026-08-26: 5 de 15 piezas del runtime habian derivado entre el repo y ~/.claude, y la deriva iba en LAS DOS DIRECCIONES. El repo tenia mejoras que nunca se ejecutaron (portabilidad ORION_HOME en curator y reflector; orion-validate reescrito en espanol) y la copia viva tenia mejoras que el repo no tenia (la herramienta PowerShell del verifier). Correr el instalador habria borrado las segundas sin avisar, porque su payload embebido era una TERCERA copia mas vieja que las dos.",
+      "context": "Se detecto comparando hashes, no leyendo. Un espejo que nadie compara no es un espejo: es una copia que miente en un tercio de los casos y ademas te deja creer que estas sincronizado.",
+      "source": "sesion 2026-08-26, node tools/runtime.mjs estado"
+    },
+    {
+      "id": "KN-002",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "GASTO MEDIDO DEL ECOSISTEMA a 2026-08-26: 298 spawns, 39,37 M tokens de subagente, 9 proyectos. Reparto por tier: opus 112 spawns / 20,27 M / 51,5 % del gasto; sonnet 155 / 14,97 M / 38 %; workflows mixtos 5 / 3,48 M / 8,8 %; haiku 24 / 651k / 1,7 %. Fallos reales de capacidad: 10 de 298 (3,4 %). Por proyecto: placita 33,6 %, villa-broaster 21,5 %, wrd 14,7 %. Costo medio por spawn y fase (muestra entre parentesis): analysis sonnet 64k (24) vs opus 580k (3); build:page sonnet 158k (40) vs opus 325k (17); build:lib sonnet 118k (19) vs opus 255k (15); build:visual sonnet 149k (3) vs opus 173k (32); verification sonnet 60k (22).",
+      "context": "Se reproduce con `node tools/costos.mjs`. Hasta hoy estos numeros vivian repartidos en once metrics.json y nadie los sumaba. Leer la tabla al reves ('opus casi no falla, bajemoslo todo') es el error: opus no falla porque la rubrica le da lo dificil.",
+      "source": "sesion 2026-08-26, tools/costos.mjs sobre 11 metrics.json"
+    },
+    {
+      "id": "KN-003",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "La palanca de gasto mas grande y sin contraindicacion: si una tarea ya esta en plan.json, NO se vuelve a analizar ni a planear. `plan.mjs brief <plan.json> T-042` produce el encargo completo de forma determinista y a coste cero. Se ahorran los 64k del analisis mas los 19k de la planeacion POR TAREA: en un proyecto de 40 tareas, 3,3 M de tokens sin tocar la calidad de nada.",
+      "context": "Es la razon de fondo por la que un plan tiene que ser un registro y no un documento: un documento no sabe generar un encargo.",
+      "source": "sesion 2026-08-26, RFC-0008 N8-R11 + medias medidas de KN-002"
+    },
+    {
+      "id": "KN-004",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "`cerebro.mjs ruta \"<pregunta>\"` devuelve COORDENADAS en vez de texto: archivo, linea y el `sed -n 'a,bp'` acotado para abrir solo ese trozo. Un tema del cerebro son ~900 lineas; la regla que hacia falta son 6. Ademas barre la boveda de Obsidian buscando notas ESCRITAS A MANO -- lo que el dueno escribio en Obsidian y no esta en ningun state.json, que ninguna otra herramienta encuentra. Excluye Cerebro/, Proyectos/ y Sistema/ porque esas tres carpetas las genera export-vault y devolverlas seria duplicar.",
+      "context": "Aplica en TODAS las fases y varias veces por turno, asi que su efecto compuesto es mayor que su numero individual.",
+      "source": "sesion 2026-08-26, tools/cerebro.mjs comando ruta"
+    },
+    {
+      "id": "KN-005",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-002"
+      ],
+      "fact": "HUECOS DE MEDICION detectados al sumar las metricas: 48 de 298 spawns (16,1 %) estan registrados con 0 tokens -- la medicion se perdio ahi. Y 17 spawns usan subtipos de fase inventados (build:landing, build:dashboard-editorial, build:topografia...), cada uno UNA sola vez: un subtipo con un dato no calibra nada, solo parte la muestra. La disciplina de subtipos canonicos esta en 91,7 % y conviene que no baje.",
+      "context": "Un presupuesto calibrado sobre datos con 16 % de huecos arrastra ese error para siempre. Los canonicos son cinco: build:visual, build:page, build:api, build:lib, build:infra; lo que distingue proyecto o pieza va en OTRO campo, nunca en `phase`.",
+      "source": "sesion 2026-08-26, node tools/costos.mjs senal"
+    },
+    {
+      "id": "KN-006",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "DEC-002"
+      ],
+      "fact": "Como un catalogo acotado produce un plan de cientos de tareas sin inventar ninguna: un arquetipo marcado `porCada: \"entidad\"` (o ruta, superficie, rol) se instancia UNA VEZ POR CADA VALOR REAL DEL PERFIL del proyecto, sustituyendo {{entidad}} en titulo, pasos, archivos que posee y criterios. Regla dura N8-R9: solo se instancia con valores observados en el repo. Una entidad inventada genera trabajo inventado, y ese trabajo se hace.",
+      "context": "Es la misma doctrina de 'cero datos inventados' aplicada a los planes en vez de al copy.",
+      "source": "sesion 2026-08-26, RFC-0008 3 + tools/plan.mjs funcion instanciar"
+    },
+    {
+      "id": "KN-007",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "DEC-002"
+      ],
+      "fact": "`plan.mjs ola --max N` elige el conjunto mas grande de tareas listas con PROPIEDAD DE ARCHIVOS DISJUNTA, respetando dependencias, y opcionalmente escribe wave.json. Eso convierte el fallo #1 medido del ecosistema -- builders en paralelo pisandose -- en una propiedad COMPUTABLE del plan en vez de un juicio del orquestador en el momento del spawn. `validar` ademas avisa de los pares de tareas listas que comparten archivos.",
+      "context": "N8-R4 exige `posee` no vacio para toda tarea con ceremonia 1-builder u ola, precisamente para que esto se pueda calcular.",
+      "source": "sesion 2026-08-26, tools/plan.mjs comandos ola y validar"
+    },
+    {
+      "id": "KN-008",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "Un mensaje dictado por voz trae correcciones a mitad ('el MAUI... el baul no, el baul'), ejemplos que suenan a requisitos ('por ejemplo, un proyecto inmobiliario'), enfasis en forma de numero ('mil tareas'), condicionales que el mismo resuelve mas adelante, y la peticion central enterrada entre tres secundarias. Un agente que lo lea en crudo se lleva el ejemplo por requisito y pierde la correccion. El agente orion-traductor existe para eso: produce un ENCARGO con secciones separadas para correcciones detectadas, ejemplos que NO son requisitos, enfasis traducido, y huecos con su asuncion por defecto.",
+      "context": "La regla operativa es contar: items pedidos vs items escritos. El hueco que deje el encargo, el ejecutor lo rellena inventando -- ya paso con un prompt que mandaba dibujar 23 productos citando solo 10.",
+      "source": "sesion 2026-08-26, diseno de orion-traductor sobre el mensaje real del dueno"
+    },
+    {
+      "id": "CON-001",
+      "type": "Constraint",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Active",
+      "dependencies": [],
+      "constraint": "El catalogo NO contiene tareas de un solo proyecto: eso lo escribe orion-arquitecto leyendo el repo real. Tampoco tareas que dependan de una decision que nadie ha tomado -- eso es un HUECO y va como pregunta en el encargo, no como tarea. Y nada de relleno para inflar el numero: el valor del catalogo es que todo lo que hay dentro se puede defender; uno con paja se deja de leer.",
+      "scope": "ORION/catalogo/*.json",
+      "reason": "Un catalogo con paja se deja de leer, y entonces deja de servir aunque tenga mil entradas. El valor esta en que todo lo que hay dentro se pueda defender."
+    },
+    {
+      "id": "PEND-001",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "High",
+      "priority": "High",
+      "status": "Ready",
+      "dependencies": [
+        "DEC-002"
+      ],
+      "task": "Estrenar /orion-plan de punta a punta en los proyectos con trabajo pendiente (villa-broaster, placita, orama) y medir el gasto real del pipeline traductor -> bibliotecario -> arquitecto -> estratega para calibrar la tabla COSTO de tools/plan.mjs con datos propios.",
+      "reason": "La tabla COSTO de plan.mjs sale hoy de medias del corpus historico, no del pipeline nuevo. Hasta que no corra de verdad, el presupuesto de un plan es una estimacion prestada."
+    },
+    {
+      "id": "PEND-002",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "High",
+      "priority": "Medium",
+      "status": "Ready",
+      "dependencies": [
+        "KN-002"
+      ],
+      "task": "Bajar build:page y build:lib a sonnet por defecto, UNO CADA VEZ y vigilando el historial. Sube otra vez ante el primer FAIL de capacidad -- nunca ante una muerte de sesion, que no es lo mismo. Ahorro estimado sobre el corpus historico: ~4,9 M de tokens.",
+      "reason": "build:page y build:lib son los dos sitios donde opus cuesta el doble que sonnet teniendo sonnet el doble de muestra limpia. Es el ahorro mas grande disponible sin tocar calidad."
+    },
+    {
+      "id": "PEND-003",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Ready",
+      "dependencies": [
+        "KN-005"
+      ],
+      "task": "Cerrar los huecos de medicion: anotar SIEMPRE los subagent_tokens (tambien en spawns que fallan), marcar infraDeath: true en las muertes de sesion, y usar solo los cinco subtipos canonicos de build en el campo phase.",
+      "reason": "Un presupuesto calibrado sobre datos con 16 % de huecos arrastra ese error para siempre, y un subtipo con un solo dato no calibra nada."
+    },
+    {
+      "id": "RSK-001",
+      "type": "Risk",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Open",
+      "dependencies": [
+        "PEND-002"
+      ],
+      "risk": "Bajar de tier leyendo mal la estadistica: que opus pase 102 de 107 veces NO significa que sobre, significa que la rubrica le esta dando lo dificil. Bajarlo todo de golpe convierte un ahorro en una tanda de ciclos de correccion, que cuestan mas que el ahorro.",
+      "probability": "Medium",
+      "mitigation": "Bajar por TIPO DE TRABAJO con historial limpio y muestra suficiente, uno cada vez, y dejar que un FAIL real lo suba solo. Y nunca poner hechos de negocio ni copy publico en el tier barato aunque salga ok: verdict ok mide que el spawn aterrizo, no que acerto (_permanent/KN-016)."
+    }
+  ],
+  "archives": []
+}

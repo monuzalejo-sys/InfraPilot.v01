@@ -63,7 +63,7 @@ una leer→numerar→escribir; sin serializar, la segunda lee el archivo ANTES d
 la primera lo escriba, saca el mismo `L1-0007` y la pisa — la venta del primer
 cliente desaparece y nadie se entera hasta el cuadre"*
 (`almacen-disco.ts:205-210`). La versión de este mismo fallo **medida** está en el
-ecosistema, no en un cliente: ocho agentes `landing-prompter` en paralelo
+ecosistema, no en un cliente: ocho agentes `orion-landing` en paralelo
 compartiendo un `state.json` lo **corrompen**, y por eso se les prohibió escribir
 (`infrapilot/RSK-003`, Permanent). La mitigación registrada es la misma que la del
 mostrador: serializar, o que escriba uno solo.

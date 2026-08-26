@@ -1,0 +1,120 @@
+{
+  "categoria": "_ejemplo",
+  "nombre": "Ejemplo — la vara de calidad, no un catálogo real",
+  "meta": "Cinco arquetipos que muestran los cinco casos del formato: uno por nivel, uno con porCada, uno con aplicaSi booleano, uno inline y uno de ola. Imítalos. NO se carga en los planes (el generador ignora los archivos que empiezan por _).",
+  "arquetipos": [
+    {
+      "id": "ejemplo.base.un-comando-verifica",
+      "titulo": "Dejar un solo comando que verifica todo el proyecto",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si verificar exige recordar tres comandos, se verifica a veces; y lo que se verifica a veces, en la práctica no se verifica. Sin esto, cada QA cuesta una conversación.",
+      "queHacer": [
+        "Añadir a package.json el script `verificar` que encadene, en orden y cortando al primer fallo: typecheck, lint, tests.",
+        "Hacer que devuelva código de salida distinto de 0 si cualquiera falla (nada de `|| true`).",
+        "Correrlo en limpio y anotar en el README los segundos que tarda: es la línea base contra la que se notará si alguien lo vuelve lento.",
+        "Dejar escrito en el README que ningún PR entra sin `verificar` en verde."
+      ],
+      "aceptacion": [
+        { "check": "El comando existe y pasa en limpio", "comando": "npm run verificar", "espera": "exit 0" },
+        { "check": "Falla de verdad cuando algo está mal", "comando": "node -e \"require('fs').appendFileSync('lib/_roto.ts','const x: number = \\\"s\\\"\")\" && npm run verificar; echo EXIT=$?; rm -f lib/_roto.ts", "espera": "EXIT distinto de 0" },
+        { "check": "Ningún paso está silenciado", "comando": "grep -n \"|| true\\|--passWithNoTests\\|--no-verify\" package.json", "espera": "0 líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["package.json", "README.md"],
+      "cerebro": ["tema:que-es-estar-verificado"]
+    },
+    {
+      "id": "ejemplo.datos.invariante-por-entidad",
+      "titulo": "Proteger con un test el invariante de {{entidad}}",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un invariante que solo vive en la cabeza de quien lo escribió se rompe en el primer refactor y nadie se entera hasta que el dueño ve un número imposible.",
+      "queHacer": [
+        "Escribir en una línea cuál es la regla que {{entidad}} nunca puede violar (ej.: el saldo nunca queda negativo; la suma de los movimientos es igual al total).",
+        "Escribir un test que INTENTE romperla y espere el rechazo, no un test que la confirme por el camino feliz.",
+        "Añadir un segundo test con el caso límite exacto (cero, el máximo, el borde de la ventana de tiempo).",
+        "Dejar el nombre del test empezando por `invariante:` para que se puedan correr todos juntos."
+      ],
+      "aceptacion": [
+        { "check": "Existe al menos un test de invariante para {{entidad}}", "comando": "npm test -- invariante {{entidad}}", "espera": "1+ tests, todos verdes" },
+        { "check": "El test falla si se quita la guarda", "comando": null, "espera": "comentar la validación en el código hace fallar el test; se pega la salida antes de restaurar" }
+      ],
+      "aplicaSi": { "entidades": ["*"] },
+      "porCada": "entidad",
+      "posee": ["tests/invariantes/{{entidad}}.test.ts"],
+      "cerebro": ["tema:invariantes-contables", "tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "ejemplo.publico.sin-datos-inventados",
+      "titulo": "Auditar que ningún dato de negocio de la página pública sea inventado",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un teléfono, un horario o un testimonio inventado en una página pública es una mentira firmada por el cliente. Ya pasó en tres proyectos y el más caro estuvo una semana vivo.",
+      "queHacer": [
+        "Listar TODO dato de hecho de la página: teléfonos, direcciones, horarios, precios, nombres de producto, testimonios, cifras.",
+        "Para cada uno, anotar su origen `archivo:línea` en la fuente real (catálogo, ficha del cliente, mensaje del dueño).",
+        "Lo que no tenga origen se convierte en HUECO visible en el documento de pendientes, no en un valor verosímil.",
+        "Dejar un grep de guardia con los inventos típicos ya vistos para que la próxima pasada los detecte sola."
+      ],
+      "aceptacion": [
+        { "check": "Cada dato de hecho tiene origen citado", "comando": null, "espera": "tabla dato→origen completa; 0 filas sin origen" },
+        { "check": "No quedan rellenos verosímiles del generador", "comando": "grep -rniE \"lorem|ejemplo@|555-?[0-9]{4}|Rionegro|Calle 123\" app/ components/", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/origen-de-datos.md"],
+      "cerebro": ["tema:cero-datos-inventados", "tema:pantalla-publica"]
+    },
+    {
+      "id": "ejemplo.ops.restaurar-ensayado",
+      "titulo": "Ensayar la restauración del respaldo, no solo el respaldo",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Un respaldo que nunca se restauró no es un respaldo: es un archivo. El día que se necesite se descubre que le falta una tabla, y ese día es el peor día posible.",
+      "queHacer": [
+        "Tomar el respaldo más reciente y restaurarlo en una base VACÍA y desechable.",
+        "Correr contra esa base el mismo `verificar` y el flujo principal completo.",
+        "Medir y anotar dos números: cuánto tarda la restauración y cuánta información se pierde en el peor caso (la ventana entre respaldos).",
+        "Escribir el procedimiento en pasos numerados, de forma que lo ejecute alguien que nunca lo hizo.",
+        "Anotar en el documento la fecha del ensayo: si tiene más de tres meses, vuelve a ser un archivo."
+      ],
+      "aceptacion": [
+        { "check": "La restauración se completó en una base vacía", "comando": null, "espera": "salida del comando de restauración con exit 0, pegada en el documento" },
+        { "check": "El sistema funciona contra los datos restaurados", "comando": "npm run verificar", "espera": "exit 0 apuntando a la base restaurada" },
+        { "check": "Los dos números están escritos", "comando": "grep -nE \"minutos|ventana de pérdida\" docs/respaldo.md", "espera": "2+ líneas con cifras" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase", "sqlite", "mysql"] },
+      "porCada": null,
+      "posee": ["docs/respaldo.md", "scripts/restaurar.sh"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "ejemplo.doc.manual-de-dos-paginas",
+      "titulo": "Escribir el manual de 2 páginas para quien va a usarlo de verdad",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Sin manual, el soporte es el teléfono del que lo construyó, para siempre. Y el que llama no es el dueño: es la persona del mostrador a las 7 de la noche.",
+      "queHacer": [
+        "Escribirlo para UNA persona con nombre y su turno real, no para «el usuario».",
+        "Dos páginas: la primera, el día normal en el orden en que ocurre; la segunda, los cinco líos que sí van a pasar y qué se toca en cada uno.",
+        "Cada instrucción nombra lo que la persona ve en pantalla, con las palabras que salen en pantalla.",
+        "Cerrar con la única regla de oro del sistema y a quién se llama cuando nada de lo anterior sirvió."
+      ],
+      "aceptacion": [
+        { "check": "Cabe en dos páginas", "comando": null, "espera": "≤2 páginas impresas / ≤120 líneas" },
+        { "check": "No usa jerga técnica que no salga en pantalla", "comando": "grep -niE \"endpoint|deploy|commit|payload|backend|token\" docs/manual.md", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/manual.md"],
+      "cerebro": ["tema:documentos-para-personas"]
+    }
+  ]
+}

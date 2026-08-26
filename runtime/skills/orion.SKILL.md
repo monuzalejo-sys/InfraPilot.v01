@@ -25,6 +25,20 @@ objective is — don't invent a task. Otherwise, proceed without asking
 further clarifying questions unless a wrong guess would waste real work;
 this skill exists so the user doesn't have to babysit every phase.
 
+**If `args` is a task id from the plan** (`/orion T-042`), skip straight to
+BUILDING with `plan.mjs brief` — see the plan check in phase 1.
+
+**If `args` is a long dictated stream** — several paragraphs, self-corrections
+mid-sentence, examples that sound like requirements, emphasis as numbers
+("mil tareas"), or three requests tangled into one — do NOT interpret it
+yourself. Spawn `orion-traductor` (opus) with the message **verbatim**; it
+returns a canonical ENCARGO that separates decisions already made,
+corrections (the later version wins), examples that are NOT requirements,
+translated emphasis, and each open hole with the assumption to proceed under.
+From then on the ENCARGO is the source of truth and nobody re-reads the
+original. A short, single-purpose instruction does not need this — the
+translator is for when a misreading would cost real work.
+
 ## 1. PENDING → set up the Task
 
 - `projectId` = current repo's folder name, lowercased (e.g. `infrapilot`
@@ -49,16 +63,21 @@ this skill exists so the user doesn't have to babysit every phase.
   work directly, re-spawn only what's genuinely missing), then delete it.
 - Also read `C:\Users\Kalel\ORION\memory\permanent\state.json` — machine-level
   facts shared across ALL projects (a handful of objects, one cheap read).
-- PREGÚNTALE AL CEREBRO ANTES DE ANALIZAR. El conocimiento del ecosistema
-  entero (270+ objetos de 10 memorias + los temas curados) se consulta en
-  milisegundos y cuesta ~0:
+- PIDE LA RUTA ANTES DE ANALIZAR. Nunca abras archivos a ciegas: primero
+  pregunta DÓNDE está lo que necesitas. Cuesta ~0 y devuelve coordenadas —
+  archivo, línea y el comando para abrir solo ese trozo— en vez de texto:
 
   ```bash
-  node C:\Users\Kalel\ORION\tools\cerebro.mjs buscar "<el objetivo de la tarea>" --n 8
+  node C:\Users\Kalel\ORION\tools\cerebro.mjs ruta "<el objetivo, con las palabras del usuario>" --n 6
+  node C:\Users\Kalel\ORION\tools\cerebro.mjs ruta "<los términos del dominio>" --n 6
   ```
 
-  Hazlo SIEMPRE, con el objetivo tal como lo escribió el usuario, y otra vez
-  con los términos del dominio (caja, turno, roles, landing, despliegue…).
+  Hazlo SIEMPRE, dos o tres veces con formulaciones distintas («caja», «turno»
+  y «arqueo» son tres puertas al mismo cuarto). `ruta` barre además las notas
+  escritas a mano en el baúl de Obsidian, que no están en ninguna memoria.
+  Para tareas SUSTANCIALES, delega esto al agente `orion-bibliotecario`
+  (haiku): busca por su cuenta, comprueba que las rutas existen y devuelve el
+  paquete ya ordenado, sin gastarte contexto a ti.
   Un TEMA que salga arriba es una respuesta ya curada: ábrelo con
   `cerebro.mjs tema <slug>` y trátalo como restricción del run, no como
   sugerencia — se pagó con un fallo real. Si lo que vas a hacer contradice un
@@ -66,6 +85,21 @@ this skill exists so the user doesn't have to babysit every phase.
   briefs de los agentes (nadie más vuelve a buscar). Si el cerebro no sabe
   nada del tema, dilo: es un hueco, y al cerrar se cosecha con
   `orion-harvester`.
+
+- ¿HAY PLAN? Si existe `memory/<projectId>/plan.json`, el trabajo probablemente
+  ya está especificado y NO hay que volver a analizarlo ni a planearlo:
+
+  ```bash
+  node C:\Users\Kalel\ORION\tools\plan.mjs siguiente <memory-dir>/plan.json --n 3
+  ```
+
+  Si el objetivo del usuario es un id de tarea (`/orion T-042`) o coincide con
+  una tarea del plan, salta directo a BUILDING con el brief que da
+  `plan.mjs brief <plan.json> T-042`: ese brief ya trae el porqué, los pasos,
+  los archivos que posee y los criterios comprobables, es determinista y cuesta
+  cero. Analizar y planear otra vez lo que ya está en el registro es pagar dos
+  veces por el mismo pensamiento. **Nunca leas el plan entero** (RFC-0008
+  N8-R11): pregúntale.
 
 Each phase below maps to an ORION behavioral contract (RFC-0002) and has a
 dedicated subagent. You (the main conversation) are the RUNTIME/orchestrator:
@@ -104,6 +138,29 @@ How to apply it:
   run produced rich, nuanced lessons worth careful distillation.
 - When unsure between two tiers, pick the cheaper one and let a FAIL/escalation
   bump it up on the next attempt — don't default everything to Opus.
+
+MEASURED DEFAULTS (298 spawns / 39.4M tokens across 9 projects, 2026-08-26 —
+reproduce with `node C:\Users\Kalel\ORION\tools\costos.mjs fases`). Sample size
+in parentheses; a cell with (1) is an anecdote, not a measurement:
+
+| phase | haiku | sonnet | opus | default |
+|---|---|---|---|---|
+| analysis | — | 64k (24) | 580k (3) | **sonnet — never opus**, it costs 9× |
+| planning | — | 19k (6) | — | sonnet |
+| build:page | 62k (5) | 158k (40) | 325k (17) | **sonnet** (40 clean spawns) |
+| build:lib | 37k (3) | 118k (19) | 255k (15) | **sonnet** |
+| build:api | 49k (1) | 163k (5) | 126k (6) | sonnet |
+| build:infra | 55k (3) | 101k (3) | 100k (7) | haiku if mechanical |
+| build:visual | — | 149k (3) | 173k (32) | sonnet for app interiors, **opus for public-facing** |
+| verification | 6k (3) | 60k (22) | 179k (2) | sonnet |
+| adversarial | — | — | 110k (2) | opus, and only where a miss is expensive |
+
+Read this the right way: opus passing 102 of 107 times does NOT mean it is
+wasted — it means the rubric is giving it the hard work. Drop a tier **per work
+type with a clean history, one at a time**, and let a real FAIL raise it again.
+A session-limit death is not a FAIL of capability and must not raise a tier.
+And never put business facts or public-facing copy on the cheap tier regardless
+of cost: `verdict: ok` measures that the spawn landed, not that it was right.
 
 Cost measurement: each agent spawn's REAL token usage arrives in its
 completion notification (`subagent_tokens`). Collect these and hand them to
@@ -149,6 +206,20 @@ Subagent spawns are the token cost of an ORION run. Control them:
   saves. Conversely, don't inline substantial work just to skip a handoff.
 - **Parallel builders share nothing.** Each gets only its own step + the plan
   summary — not the other steps' details.
+- **BATCH the trivial ones into ONE builder.** A spawn's cost is mostly fixed
+  (a fresh agent re-reads everything before it can act). Ten trivial steps in
+  ten haiku builders is ~450k tokens; the same ten in ONE haiku builder, listed
+  as ten numbered items over the same namespace, is ~60-80k. Only batch steps
+  that are (a) trivial, (b) in the same area of the tree, and (c) independent
+  of each other — otherwise a single failure takes the whole batch down.
+- **If you already hold the file, edit it inline.** A subagent starts blank and
+  would have to re-read the whole file to touch it — which is precisely the
+  cost you are trying to avoid. Delegation is for work that starts from zero,
+  not for work already loaded in your context.
+- **Ask for coordinates, not files.** `cerebro.mjs ruta` returns `archivo:línea`
+  plus a bounded `sed -n 'a,bp'`. Reading 30 targeted lines instead of a
+  900-line document is the cheapest single habit in the runtime, and it applies
+  every single phase.
 
 ## 1d. Proportional lifecycle — ceremony must match task size
 
@@ -265,6 +336,23 @@ Append one entry to `<repo-root>/memory/<projectId>/metrics.json` in the
 `SessionMetrics` shape (counts of objects created/merged/archived are
 enough; there's no live token metering in this environment, so
 context/compression fields can be left at reasonable defaults).
+
+## 7a. WRITE BACK TO THE PLAN — mandatory when the task came from one
+
+If this run executed a task from `plan.json`, close the loop (RFC-0008 N8-R10):
+
+```bash
+node C:\Users\Kalel\ORION\tools\plan.mjs hecho <plan.json> T-042 \
+  --evidencia "<the fact the verifier OBSERVED, not 'done'>" --tokens <measured>
+```
+
+`--evidencia` is the verifier's evidence verbatim, and `--tokens` is the sum of
+the `subagent_tokens` this task actually cost. Without the write-back the plan
+is a document; with it, it is a control loop — and it is the loop that makes
+`presupuesto` converge on reality instead of staying a guess forever. Check
+`plan.mjs estado` for the calibration line; if it says the budget is off by
+more than 25 % over 5+ measured tasks, that is a real signal to adjust `COSTO`
+in `tools/plan.mjs`, not noise.
 
 ## 7b. COMMIT — autocommit on verification pass
 

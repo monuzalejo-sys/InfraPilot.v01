@@ -34,9 +34,26 @@ READ-ONLY skill: no agents, no edits, minimal tokens.
    Y si el usuario pregunta algo concreto en vez de pedir estado, no recites la
    memoria: usa el skill `orion-cerebro`, que responde con cita.
 
-4. End with a short recommendation: the 1-3 highest-value next tasks, derived
-   from open Pending priorities and the user's known goals — each phrased so
-   the user can reply `/orion <task>` to launch it.
+3c. **¿Hay plan? Entonces él manda sobre los pendientes.** Si existe
+   `<memory-dir>/plan.json`, córrelo — dos comandos baratos, y **nunca leas el
+   plan entero** (RFC-0008 N8-R11):
+
+   ```bash
+   node C:\Users\Kalel\ORION\tools\plan.mjs estado <memory-dir>/plan.json
+   node C:\Users\Kalel\ORION\tools\plan.mjs siguiente <memory-dir>/plan.json --n 3
+   ```
+
+   Reporta el avance por nivel, el presupuesto que queda, las bloqueadas (cada
+   una es una decisión que alguien no ha tomado) y las tres tareas listas. La
+   línea de calibración importa: si dice que el presupuesto está descalibrado
+   sobre 5+ tareas medidas, menciónalo. Si NO hay plan y el proyecto tiene
+   trabajo abierto, proponlo: `/orion-plan` es lo que más ahorra después
+   (`tema:planes-de-ejecucion`).
+
+4. End with a short recommendation: the 1-3 highest-value next tasks. If there
+   is a plan, they come from `plan.mjs siguiente` and the user launches one
+   with `/orion T-042`. If there is no plan, derive them from open Pending
+   priorities as before, phrased so the user can reply `/orion <task>`.
 
 Respond in the user's language (Spanish for this user). Total output ≤30 lines.
 Do NOT start any task — this skill only orients.

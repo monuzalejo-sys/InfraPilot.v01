@@ -1,0 +1,1171 @@
+{
+  "categoria": "operacion",
+  "nombre": "Operación",
+  "meta": "Que publicar, hospedar, respaldar y sostener un proyecto en producción sea una decisión tomada a propósito, nunca una sorpresa que el dueño descubre solo.",
+  "arquetipos": [
+    {
+      "id": "ops.repo.gitignore-secretos-y-datos",
+      "titulo": "Excluir del repo secretos, credenciales y datos reales de clientes",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un .env, una clave de base de datos o un data/registros.json con facturas reales que entra a un commit queda en el historial para siempre aunque se borre después; si el repo se sube, aunque sea privado, esa clave o esos datos viajan con él.",
+      "queHacer": [
+        "Listar todo archivo que hoy contenga secretos o datos reales de negocio: .env*, credenciales, data/*.json con clientes reales, exports de base de datos.",
+        "Añadirlos a .gitignore antes del primer commit que los toque; si ya fueron commiteados, tratarlo como incidente y no como limpieza cosmética.",
+        "Dejar un .env.example con las claves SIN valores, para que el siguiente que clone sepa qué variables necesita.",
+        "Confirmar con git status que ningún archivo de la lista aparece como rastreado."
+      ],
+      "aceptacion": [
+        { "check": "Ningún archivo de secretos o datos reales está rastreado por git", "comando": "git ls-files | grep -iE \"\\.env$|\\.env\\.local|data/.*\\.json$|credenciales\"", "espera": "0 líneas, salvo archivos .example" },
+        { "check": "Existe una plantilla de variables sin valores reales", "comando": "test -f .env.example && echo SI || echo NO", "espera": "SI" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [".gitignore", ".env.example"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "ops.repo.pendientes-de-subir",
+      "titulo": "Dejar visible qué commits locales faltan por subir",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "git push falla desde la terminal de esta máquina porque Git Credential Manager no tiene diálogo; sin una lista escrita, los commits sin subir se acumulan en silencio hasta que nadie recuerda cuáles son.",
+      "queHacer": [
+        "Después de cada commit local, correr `git log @{u}..HEAD --oneline` (o el equivalente si no hay upstream) para ver qué falta subir.",
+        "Si la lista no está vacía, anotarla en PENDIENTES-GIT.md con el hash corto y una línea de qué es.",
+        "No intentar `git push` desde el agente: es una acción del dueño vía GitHub Desktop.",
+        "Marcar cada línea como resuelta cuando el dueño confirme que ya la subió."
+      ],
+      "aceptacion": [
+        { "check": "La lista de commits sin subir coincide con lo realmente pendiente", "comando": "git log @{u}..HEAD --oneline | wc -l", "espera": "coincide con las líneas activas de PENDIENTES-GIT.md (0 si no hay pendientes)" },
+        { "check": "Ningún hook o script intenta push automático", "comando": "grep -rln \"git push\" .git/hooks/ package.json 2>/dev/null", "espera": "0 líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["PENDIENTES-GIT.md"],
+      "cerebro": ["tema:entorno-de-la-maquina"]
+    },
+    {
+      "id": "ops.repo.rama-para-cambios-grandes",
+      "titulo": "Aislar en una rama todo cambio que pueda dejar main a medias",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Si un cambio grande se commitea directo a main y se corta a la mitad, main deja de ser una versión publicable — y un arreglo urgente para el cliente tiene que esperar a que ese trabajo a medias se resuelva.",
+      "queHacer": [
+        "Antes de un cambio de varios archivos con riesgo de quedar incompleto, crear una rama con nombre descriptivo (feature/<lo-que-es>).",
+        "Commitear ahí en pasos pequeños hasta que el cambio compile y pase `verificar`.",
+        "Solo entonces mergear a main localmente (el push sigue la regla de ops.repo.pendientes-de-subir).",
+        "Si el cambio se queda a medias por límite de sesión, dejar la rama tal cual y anotar en qué quedó — nunca forzar el merge para no perder el trabajo."
+      ],
+      "aceptacion": [
+        { "check": "El HEAD de main compila y pasa verificar", "comando": "npm run verificar", "espera": "exit 0" },
+        { "check": "No queda trabajo a medias suelto en main sin commitear", "comando": "git status --porcelain", "espera": "0 líneas en main" }
+      ],
+      "aplicaSi": { "modo": "evolucion" },
+      "porCada": null,
+      "posee": ["docs/flujo-de-ramas.md"],
+      "cerebro": []
+    },
+    {
+      "id": "ops.repo.auditar-secretos-en-historial",
+      "titulo": "Buscar credenciales filtradas en el historial de git, no solo en el código",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un PIN de administrador ya apareció una vez escrito en un comentario dentro del código y solo lo encontraron dos revisores dedicados, no el verificador normal; borrar la línea del archivo actual no lo saca del historial de git.",
+      "queHacer": [
+        "Correr un grep sobre TODO el historial (no solo el working tree) buscando PIN, password, api_key, secret, token, Bearer y credenciales conocidas del proyecto.",
+        "Para cada hallazgo, confirmar si el secreto sigue vigente hoy; si sí, rotarlo YA, no solo limpiarlo del historial.",
+        "Si el repo va a compartirse, reescribir el historial para quitar el secreto o, si es más caro, rotar y dejar documentado que el historial viejo queda expuesto.",
+        "Añadir un grep de guardia a `verificar` para que un secreto nuevo no vuelva a colarse."
+      ],
+      "aceptacion": [
+        { "check": "El historial completo no contiene secretos vigentes", "comando": "git log -p | grep -iE \"pin.{0,3}[0-9]{4}|api.?key|secret.?=|password.?=\" | head -20", "espera": "0 líneas, o cada una corresponde a un secreto ya rotado y documentado" },
+        { "check": "El grep de guardia corre dentro de verificar", "comando": "grep -n \"secretos\" package.json", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "superficies": ["panel-interno", "api", "caja"] },
+      "porCada": null,
+      "posee": ["package.json", "scripts/auditar-secretos.mjs"],
+      "cerebro": ["tema:acceso-roles-y-puestos"]
+    },
+
+    { "id": "ops.entorno.variables-fuera-del-codigo",
+      "titulo": "Sacar toda clave y URL de servicio del código a variables de entorno",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Una URL de base de datos o una API key escrita literal en el código obliga a editar y redesplegar cada vez que cambia, y queda legible para cualquiera que abra el archivo o el historial de git.",
+      "queHacer": [
+        "Listar toda URL de servicio externo, API key, token o clave escrita literal en el código.",
+        "Moverlas a variables de entorno con nombres consistentes (usar el prefijo público del framework solo para lo que de verdad es público).",
+        "Configurar esas variables en el panel del proveedor de hosting elegido, no solo en el .env local.",
+        "Confirmar que el arranque falla con mensaje claro si falta una variable requerida, en vez de arrancar a medias."
+      ],
+      "aceptacion": [
+        { "check": "No hay claves ni URLs de servicio escritas literal en el código fuente", "comando": "grep -rnE \"sk_live_|AIza[0-9A-Za-z_-]{20,}|://[a-z0-9_.-]+:[^/]*@\" --include=*.ts --include=*.tsx --include=*.js .", "espera": "0 líneas" },
+        { "check": "El arranque avisa explícito si falta una variable requerida", "comando": null, "espera": "quitar una variable requerida y arrancar: el mensaje nombra la variable, no un stack trace genérico; se pega la salida" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [".env.example", "lib/config.ts"],
+      "cerebro": []
+    },
+    { "id": "ops.entorno.documentar-el-stack-elegido",
+      "titulo": "Dejar escrito qué proveedor de hosting, base de datos y dominio se eligió",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Sin esto escrito, cada persona nueva que retoma el proyecto pierde tiempo reconstruyendo el stack a partir de variables de entorno y adivinando qué proveedor es cada URL.",
+      "queHacer": [
+        "Anotar el proveedor de hosting, el de base de datos y el registrador del dominio, cada uno con la URL de su panel de administración.",
+        "Anotar la fecha de la decisión y la razón corta si la hay (precio, lo que ya conocía el equipo, lo que pidió el cliente).",
+        "Mantenerlo actualizado si algo cambia, por ejemplo al migrar de proveedor."
+      ],
+      "aceptacion": [
+        { "check": "El stack elegido está documentado con fecha", "comando": "grep -nE \"hosting|proveedor\" docs/stack.md", "espera": "1+ líneas con fecha" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/stack.md"],
+      "cerebro": []
+    },
+    { "id": "ops.entorno.separar-desarrollo-de-produccion",
+      "titulo": "Separar de verdad la base y las claves de desarrollo de las de producción",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El navegador de desarrollo de esta máquina llegó a tener en su localStorage facturas de prueba completas; si alguien configurara ahí una clave real, la siguiente sincronización sube esos datos falsos al negocio vivo — mezclar entornos no avisa, solo contamina.",
+      "queHacer": [
+        "Confirmar que desarrollo y producción usan proyectos o bases distintas, nunca la misma base con un flag booleano.",
+        "Nombrar las variables de forma que el entorno sea obvio a simple vista, no un `esProduccion` fácil de dejar mal puesto.",
+        "Verificar que ninguna clave de producción vive en un archivo que se abre en desarrollo por defecto.",
+        "Dejar escrito, en un lugar visible, cuál base es cuál."
+      ],
+      "aceptacion": [
+        { "check": "Desarrollo y producción apuntan a proyectos distintos", "comando": null, "espera": "las dos URLs/IDs de proyecto anotadas lado a lado; son diferentes" },
+        { "check": "Ninguna clave de producción real está en el .env.example de desarrollo", "comando": "grep -f <(grep -o \"^[A-Z_]*\" .env.production 2>/dev/null) .env.example 2>/dev/null | grep -v \"^[A-Z_]*=$\"", "espera": "0 líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/entornos.md", ".env.production.example"],
+      "cerebro": ["tema:donde-vive-el-dato", "tema:entorno-de-la-maquina"]
+    },
+    { "id": "ops.entorno.rotar-credenciales-por-defecto",
+      "titulo": "Rotar todo PIN o clave de fábrica antes de que el cliente empiece a usarlo",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El PIN de arranque 0000 de un sistema real en producción estuvo vivo semanas porque cambiarlo exigía el PIN actual del dueño y nadie lo hizo el día del lanzamiento: cualquiera que lo supiera podía entrar como dueño.",
+      "queHacer": [
+        "Listar todo usuario, PIN o clave que el sistema trae de fábrica (seed, bootstrap, admin inicial).",
+        "Antes de que el cliente reciba el sistema, cambiar cada uno por un valor real elegido por el dueño.",
+        "Si cambiarlo requiere la propia clave actual, dejarlo como el PRIMER paso de la entrega, no como pendiente para después.",
+        "Confirmar en producción que el valor de fábrica ya no funciona."
+      ],
+      "aceptacion": [
+        { "check": "El PIN o clave de fábrica ya no autentica en producción", "comando": null, "espera": "intento de login con el valor de fábrica devuelve rechazo; se pega la respuesta" },
+        { "check": "El cambio de credencial de fábrica quedó marcado hecho antes de la fecha de entrega", "comando": "grep -n \"credencial de f[aá]brica\" docs/entrega.md", "espera": "1+ líneas marcadas como hechas" }
+      ],
+      "aplicaSi": { "multiUsuario": true },
+      "porCada": null,
+      "posee": ["docs/entrega.md"],
+      "cerebro": ["tema:acceso-roles-y-puestos"]
+    },
+    { "id": "ops.entorno.quien-tiene-acceso-a-que",
+      "titulo": "Llevar una lista de quién tiene acceso a las claves de producción",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Sin una lista, nadie puede responder rápido a quién más tiene la clave de la base de datos el día que hace falta saberlo, por ejemplo cuando alguien deja de trabajar en el proyecto.",
+      "queHacer": [
+        "Escribir qué credenciales de producción existen (panel de hosting, base de datos, dominio, correo del negocio) y quién las conoce hoy.",
+        "Cuando alguien deje de necesitar acceso, quitárselo y anotarlo con fecha.",
+        "Preferir accesos nombrados a claves compartidas por chat cuando el proveedor lo permita.",
+        "Revisar la lista contra el acceso real al menos una vez: quién puede entrar hoy de verdad, no quién debería."
+      ],
+      "aceptacion": [
+        { "check": "La lista de accesos tiene fecha de última revisión", "comando": "grep -n \"[UÚ]ltima revisi\" docs/accesos.md", "espera": "1 línea con fecha" },
+        { "check": "Nadie fuera de la lista tiene acceso real al panel de hosting o dominio", "comando": null, "espera": "miembros del panel del proveedor comparados 1 a 1 contra docs/accesos.md; coinciden" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/accesos.md"],
+      "cerebro": []
+    },
+
+    { "id": "ops.build.un-comando-reproducible",
+      "titulo": "Dejar un comando que construye el proyecto igual en cualquier máquina",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Si construir el proyecto depende de pasos que solo alguien recuerda de memoria, el día que otra persona tenga que desplegarlo adivina en vez de ejecutar — y adivinar en producción sale caro.",
+      "queHacer": [
+        "Confirmar que `npm run build` construye el proyecto completo sin pasos manuales previos.",
+        "Fijar las versiones de las dependencias con el lockfile commiteado, nunca ignorado.",
+        "Anotar la versión de runtime que el proyecto requiere en un archivo que el hosting pueda leer.",
+        "Correr el build en limpio, borrando node_modules y las carpetas de build, para confirmar que no depende de caché local."
+      ],
+      "aceptacion": [
+        { "check": "El build corre limpio desde cero", "comando": "rm -rf node_modules .next dist && npm ci && npm run build", "espera": "exit 0" },
+        { "check": "La versión de runtime requerida está declarada", "comando": "grep -n \"engines\" package.json; test -f .nvmrc && echo SI", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["package.json", ".nvmrc"],
+      "cerebro": []
+    },
+    { "id": "ops.build.falla-cortando-no-avisando",
+      "titulo": "Hacer que el build falle con código distinto de cero cuando algo está mal",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Un build que imprime errores mezclados con advertencias pero devuelve éxito igual se ve verde en cualquier revisión automática — y lo primero que se publica así es lo primero que se rompe en producción.",
+      "queHacer": [
+        "Revisar que ningún paso del build tenga `|| true`, `--passWithNoTests` sin motivo, u otro silenciador de fallos reales.",
+        "Provocar un error real a propósito (un tipo mal puesto, un import roto) y confirmar que el build corta con código distinto de cero.",
+        "Restaurar el error provocado."
+      ],
+      "aceptacion": [
+        { "check": "El build corta de verdad ante un error real", "comando": "node -e \"require('fs').appendFileSync('lib/_roto.ts','const x: number = \\\"s\\\"')\" && npm run build; echo EXIT=$?; rm -f lib/_roto.ts", "espera": "EXIT distinto de 0" },
+        { "check": "Ningún paso está silenciado", "comando": "grep -n \"|| true\\|--passWithNoTests\\|--no-verify\" package.json", "espera": "0 líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["package.json"],
+      "cerebro": []
+    },
+    { "id": "ops.build.paridad-entre-build-local-y-hosting",
+      "titulo": "Confirmar que el build del proveedor de hosting es el mismo que el local",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Ningún proyecto de esta casa tiene todavía evidencia de un despliegue real ejecutado a internet: un build que pasa en local y falla en el hosting (versión de runtime distinta, variable que solo existe en local) descubre el problema en medio de un despliegue, con el sitio a medio publicar.",
+      "queHacer": [
+        "Confirmar la versión de runtime que usa el proveedor de hosting y que coincide con la declarada en el proyecto.",
+        "Confirmar que TODAS las variables de entorno que el build necesita están configuradas en el panel del proveedor, no solo en el .env local.",
+        "Hacer un despliegue de prueba a un entorno de preview antes del primero a producción, si el proveedor lo ofrece.",
+        "Comparar el log del build del proveedor contra el build local: mismo resultado."
+      ],
+      "aceptacion": [
+        { "check": "El build en el proveedor de hosting termina en éxito", "comando": null, "espera": "log del proveedor pegado, terminando en build exitoso" },
+        { "check": "Las variables configuradas en el proveedor cubren las que el proyecto requiere", "comando": "comm -23 <(grep -o \"^[A-Z_]*\" .env.example | sort) <(sort variables-configuradas-en-el-proveedor.txt)", "espera": "0 líneas faltantes" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/despliegue.md"],
+      "cerebro": ["tema:entorno-de-la-maquina"]
+    },
+    { "id": "ops.build.tiempo-de-build-medido",
+      "titulo": "Medir y publicar cuánto tarda el build, como línea base",
+      "nivel": "N4",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Sin un número de referencia, un build que empieza a tardar el triple pasa desapercibido hasta que alguien se queja de que publicar se siente lento, y para entonces nadie sabe desde cuándo.",
+      "queHacer": [
+        "Correr el build en limpio y cronometrarlo.",
+        "Anotar el número en segundos junto a la fecha y el tamaño aproximado del proyecto en docs/build.md.",
+        "Repetir la medición cuando el proyecto crezca notablemente, para tener más de un punto de comparación."
+      ],
+      "aceptacion": [
+        { "check": "El tiempo de build está anotado con fecha", "comando": "grep -nE \"[0-9]+ ?(s|segundos)\" docs/build.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/build.md"],
+      "cerebro": []
+    },
+
+    { "id": "ops.despliegue.primer-despliegue-real",
+      "titulo": "Publicar el proyecto y confirmar que responde desde internet, no solo local",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "De los proyectos de esta casa, casi ninguno ha sido desplegado de verdad a internet — 'definir hosting' lleva bloqueado como pendiente en más de uno. Un proyecto que solo corre en localhost es una demo, no un proyecto en producción.",
+      "queHacer": [
+        "Confirmar con el dueño el proveedor de hosting elegido (esta tarea no impone cuál).",
+        "Configurar el despliegue desde el repo o subir el build manualmente, según el proveedor.",
+        "Confirmar que el sitio responde desde una red distinta a la de esta máquina, por ejemplo un celular con datos móviles.",
+        "Anotar la URL real de producción en docs/despliegue.md."
+      ],
+      "aceptacion": [
+        { "check": "El sitio responde desde internet, no solo localhost", "comando": "curl -s -o /dev/null -w \"%{http_code}\" https://<url-real>", "espera": "200 (o el código esperado de la ruta pública)" },
+        { "check": "La URL de producción está documentada", "comando": "grep -n \"https://\" docs/despliegue.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/despliegue.md"],
+      "cerebro": ["tema:entorno-de-la-maquina"]
+    },
+    { "id": "ops.despliegue.checklist-antes-de-publicar",
+      "titulo": "Correr una lista de chequeo fija antes de cada despliegue, no de memoria",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Sin una lista escrita, cada despliegue depende de que alguien se acuerde de todo — variables de entorno, migración pendiente, build en verde — y lo que se olvida una vez se sigue olvidando hasta que rompe algo en vivo.",
+      "queHacer": [
+        "Escribir la lista de chequeo del proyecto: build en verde, variables configuradas en el proveedor, migración aplicada si la hay, respaldo reciente antes de un cambio de esquema.",
+        "Ponerla en un archivo corto, no en la cabeza de una persona.",
+        "Usarla de verdad en el próximo despliegue y tacharla ítem por ítem.",
+        "Añadirle un ítem nuevo cada vez que un despliegue falle por algo que la lista no cubría."
+      ],
+      "aceptacion": [
+        { "check": "La checklist cubre al menos build, variables y migración", "comando": "grep -ciE \"build|variable|migraci\" docs/checklist-despliegue.md", "espera": "3+ coincidencias" },
+        { "check": "Se usó en el último despliegue real", "comando": "git log -1 --format=%ci -- docs/checklist-despliegue.md", "espera": "fecha igual o posterior al último despliegue registrado" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/checklist-despliegue.md"],
+      "cerebro": []
+    },
+    { "id": "ops.despliegue.dominio-propio-y-tls",
+      "titulo": "Apuntar un dominio propio al proyecto con HTTPS activo",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un cliente que paga mensualidad y recibe un enlace genérico del proveedor en vez de su propio dominio no siente que tiene un negocio en internet, y un sitio sin candado espanta a cualquiera que mire la barra de direcciones.",
+      "queHacer": [
+        "Confirmar y dejar escrito quién es dueño del dominio: el cliente o la agencia — es decisión de negocio, no técnica.",
+        "Configurar los registros DNS que pide el proveedor de hosting.",
+        "Confirmar que el certificado TLS se emitió y que HTTP redirige a HTTPS, no que ambos responden por separado.",
+        "Verificar el dominio cargando desde un dispositivo fuera de esta red."
+      ],
+      "aceptacion": [
+        { "check": "El dominio propio sirve el sitio con HTTPS válido", "comando": "curl -sI https://<dominio-del-cliente> | head -1", "espera": "HTTP/... 200" },
+        { "check": "HTTP redirige a HTTPS", "comando": "curl -sI http://<dominio-del-cliente> | grep -i location", "espera": "1 línea con https://" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/dominio.md"],
+      "cerebro": []
+    },
+    { "id": "ops.despliegue.banner-de-migracion-pendiente",
+      "titulo": "Avisar en pantalla, con nombre, cuando el código llegó antes que su migración",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el código nuevo espera una columna que la base todavía no tiene, sin un aviso claro el sistema falla con un error genérico o una pantalla en blanco, y quien lo ve no tiene forma de saber que el arreglo es pegar un SQL, no que algo se rompió.",
+      "queHacer": [
+        "Detectar en cada ruta el error específico de 'esto no existe todavía' (42P01/42703 en Postgres, o el equivalente del motor usado).",
+        "Responder con un código de estado claro y un identificador de la migración que falta, nunca un 500 genérico.",
+        "Mostrar un aviso en pantalla que nombre el archivo de migración pendiente, no descartable con un clic accidental.",
+        "Confirmar que las rutas con su esquema ya listo siguen funcionando normal mientras otra parte espera su migración."
+      ],
+      "aceptacion": [
+        { "check": "El error de esquema faltante se distingue de un error genérico", "comando": null, "espera": "con una columna esperada ausente a propósito, la respuesta trae el código de migración pendiente, no un 500 plano; se pega la respuesta" },
+        { "check": "El aviso en pantalla nombra el archivo de la migración", "comando": "grep -rn \"MIGRATION_.*_REQUIRED\" app/ components/", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase", "mysql", "sqlite"] },
+      "porCada": null,
+      "posee": ["lib/servidor/migracion-pendiente.ts", "components/aviso-migracion.tsx"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    { "id": "ops.despliegue.ventana-de-mantenimiento-sin-sorprender",
+      "titulo": "Avisar de antemano cuando un despliegue va a interrumpir el servicio",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Un negocio que cobra con el sistema y lo ve caerse sin aviso a mitad de la tarde pierde ventas y confianza en el mismo minuto; avisar con antelación convierte un susto en un detalle esperado.",
+      "queHacer": [
+        "Medir cuánto tiempo queda el sitio no disponible durante un deploy típico del proveedor elegido, sin suponerlo.",
+        "Si el tiempo es perceptible, acordar con el dueño una ventana de horario bajo para desplegar cambios grandes.",
+        "Avisar al dueño o cliente antes de un despliegue que se sepa riesgoso, con el horario elegido.",
+        "Si el negocio no tiene horas bajas, dejarlo escrito como restricción y ajustar el proceso en vez de ignorarlo."
+      ],
+      "aceptacion": [
+        { "check": "El tiempo de caída durante un deploy está medido", "comando": null, "espera": "cifra en segundos medida con un curl en loop durante un despliegue real, pegada en docs/ventana-mantenimiento.md" },
+        { "check": "Existe una ventana acordada o la razón por la que no aplica", "comando": "grep -n \"ventana\\|horario\" docs/ventana-mantenimiento.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/ventana-mantenimiento.md"],
+      "cerebro": []
+    },
+    { "id": "ops.despliegue.rollback-ensayado",
+      "titulo": "Ensayar volver a la versión anterior, no solo saber que se podría",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Ninguna migración de este ecosistema trae reverso escrito, y ningún rollback se ha probado contra una base con datos reales: el día que un despliegue rompa producción, improvisar en caliente es el peor momento para descubrirlo.",
+      "queHacer": [
+        "Publicar un cambio pequeño y de bajo riesgo, en una ventana de bajo tráfico si no hay entorno de prueba separado.",
+        "Ejecutar el procedimiento de rollback del proveedor elegido y medir cuánto tarda.",
+        "Si el cambio incluyó una migración de base de datos, confirmar y escribir qué pasa con los datos escritos DESPUÉS de migrar si se revierte el código.",
+        "Dejar el procedimiento en pasos numerados, ejecutable por alguien que no lo hizo la primera vez."
+      ],
+      "aceptacion": [
+        { "check": "El rollback al deploy anterior se ejecutó de verdad", "comando": null, "espera": "salida del comando o panel de rollback pegada, con el sitio sirviendo la versión anterior confirmado por curl o captura" },
+        { "check": "El tiempo de rollback está medido", "comando": "grep -nE \"minutos|segundos\" docs/rollback.md", "espera": "1+ líneas con cifra" },
+        { "check": "La limitación sobre datos post-migración está escrita, no omitida", "comando": "grep -n \"migraci\" docs/rollback.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/rollback.md"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+
+    { "id": "ops.persistencia.detectar-disco-efimero-antes-de-publicar",
+      "titulo": "Confirmar si el hosting borra los archivos que el proyecto escribe en disco",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un hosting serverless reinicia el sistema de archivos en cada despliegue: lo que el proyecto haya escrito en disco —un JSON local, imágenes subidas— desaparece en el siguiente deploy. Un proyecto real de esta casa lo descubrió tarde, después de que ya había datos ahí.",
+      "queHacer": [
+        "Revisar el código buscando toda escritura a disco: fs.writeFile, fs.appendFile, un JSON en data/, subida de imágenes a una carpeta local.",
+        "Confirmar en la documentación del proveedor de hosting elegido si su sistema de archivos es persistente o efímero.",
+        "Si es efímero y el proyecto escribe algo que tiene que sobrevivir, moverlo a una base de datos o almacenamiento de objetos ANTES de publicar, no después del primer dato perdido.",
+        "Dejar la decisión escrita: hosting elegido, si su disco es persistente o no, con la fuente."
+      ],
+      "aceptacion": [
+        { "check": "Toda escritura a disco del proyecto está identificada y clasificada", "comando": "grep -rn \"writeFileSync\\|fs\\.writeFile\\|fs\\.appendFile\" --include=*.ts --include=*.js .", "espera": "cada resultado tiene su fila en docs/persistencia.md diciendo a dónde va en producción" },
+        { "check": "La naturaleza del disco del hosting elegido está documentada con fuente", "comando": "grep -n \"ef[ií]mero\\|persistente\" docs/persistencia.md", "espera": "1+ líneas con URL de la documentación oficial del proveedor" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/persistencia.md"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    { "id": "ops.persistencia.declarar-alcance-de-localstorage",
+      "titulo": "Declarar si el sistema es un kiosko de un equipo o necesita datos compartidos",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "localStorage es por navegador: dos mostradores del mismo negocio no comparten nada entre sí. Es una limitación estructural válida, no un bug, pero descubrirla el día de la apertura en vez de antes convierte una decisión de diseño en una sorpresa cara.",
+      "queHacer": [
+        "Confirmar en qué guarda sus datos el sistema hoy: localStorage por navegador, o un backend compartido.",
+        "Si es localStorage, escribir explícito qué NO puede hacer (compartir datos entre dos equipos o dos pantallas del mismo negocio).",
+        "Confirmarlo con el dueño ANTES de la entrega, no dejar que lo descubra comparando dos pantallas que no coinciden.",
+        "Si el negocio sí necesita compartir entre equipos, marcarlo como el pendiente estructural del proyecto, no como detalle menor."
+      ],
+      "aceptacion": [
+        { "check": "El alcance de localStorage está escrito y confirmado con el dueño antes de la entrega", "comando": "grep -n \"kiosko\\|un solo equipo\\|por navegador\" docs/alcance-localstorage.md", "espera": "1+ líneas con fecha anterior a la entrega" }
+      ],
+      "aplicaSi": { "stack": ["static", "node"] },
+      "porCada": null,
+      "posee": ["docs/alcance-localstorage.md"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    { "id": "ops.persistencia.version-de-datos-guardados",
+      "titulo": "Subir de versión y migrar en el mismo cambio al alterar un dato guardado",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un campo nuevo obligatorio sin subir la versión de los datos tumbó en producción la pantalla de un cliente real, con el navegador del dueño lleno de datos de la versión anterior: en desarrollo funcionaba porque los datos eran frescos, en producción se caía.",
+      "queHacer": [
+        "Todo campo nuevo obligatorio, campo que se quita, o eje de dato nuevo sube la versión y trae su migración en el MISMO commit.",
+        "Probar el cambio con un dato guardado de la versión ANTERIOR, nunca solo con datos frescos.",
+        "Si la versión nueva no puede leer un dato viejo, decidir explícito: migrar, o respaldar el crudo y sembrar de nuevo — nunca fallar en silencio.",
+        "Revalidar después de migrar: si el resultado es basura, no se da por buena la migración."
+      ],
+      "aceptacion": [
+        { "check": "Un dato guardado con la versión anterior sigue funcionando o migra sin perderse", "comando": null, "espera": "cargar un dato de ejemplo de la versión previa; el sistema lo migra o lo respalda, nunca revienta con un error tipo undefined" },
+        { "check": "Existe un número de versión de los datos declarado en el código", "comando": "grep -rn \"VERSION_DATOS\\|SCHEMA_VERSION\" lib/", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["lib/dominio/version-datos.ts", "docs/versionado-de-datos.md"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    { "id": "ops.persistencia.mas-de-un-equipo-mismo-negocio",
+      "titulo": "Probar qué pasa con los datos si el negocio usa más de un equipo a la vez",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Una producción real de esta casa corre con dos PCs en el mismo local sin compartir backend, y el resultado medido fue exactamente '2 PCs = 2 inventarios': cada equipo cree tener la existencia completa y ninguno sabe lo que vendió el otro.",
+      "queHacer": [
+        "Confirmar cuántos equipos van a operar al mismo tiempo en el negocio real, hoy y en el próximo año, no asumir uno solo porque hoy es uno solo.",
+        "Si van a ser varios y comparten inventario o caja, decidir a propósito: un backend real compartido en la nube, o equipos independientes con la limitación explícita de que no comparten nada en vivo.",
+        "Probar el escenario con los equipos reales o simulados antes de la entrega.",
+        "Si la decisión es 'equipos independientes', escribirla antes de que el dueño la descubra por un inventario que no cuadra."
+      ],
+      "aceptacion": [
+        { "check": "El comportamiento con 2+ equipos reales está probado, no asumido", "comando": null, "espera": "prueba con los equipos reales o simulados del negocio; se documenta si el inventario o la caja queda compartido o separado, con evidencia" },
+        { "check": "La limitación, si existe, está escrita antes de la entrega", "comando": "grep -n \"no comparten\\|equipos independientes\\|un solo equipo\" docs/multi-equipo.md", "espera": "1+ líneas con fecha anterior a la entrega" }
+      ],
+      "aplicaSi": { "superficies": ["caja"], "multiUsuario": true },
+      "porCada": null,
+      "posee": ["docs/multi-equipo.md"],
+      "cerebro": ["tema:entorno-de-la-maquina", "tema:donde-vive-el-dato"]
+    },
+    { "id": "ops.persistencia.archivo-que-crece-sin-limite",
+      "titulo": "Anticipar qué pasa cuando el archivo o tabla chica crece con el negocio",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un archivo JSON que hoy pesa 40 KB puede pesar varios MB al año si el negocio crece, y reescribirlo completo en cada guardado deja de ser instantáneo — nadie lo nota hasta que un guardado tarda varios segundos con un cliente esperando en el mostrador.",
+      "queHacer": [
+        "Identificar todo almacenamiento en archivo plano (JSON, CSV) que crece con cada venta o registro nuevo.",
+        "Medir cuánto pesa hoy y proyectar cuánto pesará con el volumen esperado en 6 a 12 meses.",
+        "Si la proyección supera lo que un archivo plano maneja bien, decidir el punto de corte para migrar a una base de datos real, antes de llegar ahí.",
+        "Escribir la decisión y el número que la dispara."
+      ],
+      "aceptacion": [
+        { "check": "El tamaño actual y proyectado están medidos, no estimados a ojo", "comando": "find data/ -name \"*.json\" -exec du -h {} \\;", "espera": "tamaño real listado, con la proyección escrita en docs/crecimiento-de-datos.md" },
+        { "check": "Existe un disparador explícito para migrar a base de datos real", "comando": "grep -nE \"migrar cuando|disparador\" docs/crecimiento-de-datos.md", "espera": "1+ líneas con número" }
+      ],
+      "aplicaSi": { "stack": ["static", "node"] },
+      "porCada": null,
+      "posee": ["docs/crecimiento-de-datos.md"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    { "id": "ops.persistencia.cache-declarada-no-segunda-verdad",
+      "titulo": "Declarar la copia local como caché, no como una segunda verdad",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Una copia local que cualquiera de los dos lados puede editar sin reglas claras es exactamente cómo dos fuentes de verdad empiezan a desviarse en silencio: el síntoma no es un error, es un número que un día no cuadra y nadie sabe por qué.",
+      "queHacer": [
+        "Declarar en la cabecera del módulo que maneja la copia local que es caché y no la verdad, y cuál es la fuente real.",
+        "Confirmar que la copia solo guarda hechos, no resúmenes ni totales calculados, y que se sobreescribe completa en cada actualización.",
+        "Confirmar que lo escrito localmente mientras no hay red viaja aparte, en una cola de solo agregar, nunca mezclado en la copia de lectura.",
+        "Confirmar que mientras esa cola tiene algo pendiente de subir, el sistema NO acepta una bajada que la pise."
+      ],
+      "aceptacion": [
+        { "check": "El módulo declara explícitamente que es caché y cuál es la fuente real", "comando": "grep -n \"cach[eé]\\|no es la verdad\\|fuente real\" lib/persistencia.ts", "espera": "1+ líneas en la cabecera del archivo" },
+        { "check": "Con cola pendiente de subir, no se acepta una bajada que la pise", "comando": null, "espera": "encolar un cambio local, forzar una bajada del servidor; el cambio local pendiente sigue ahí, no se perdió" }
+      ],
+      "aplicaSi": { "superficies": ["caja"] },
+      "porCada": null,
+      "posee": ["lib/persistencia.ts", "lib/outbox.ts"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+
+    { "id": "ops.respaldo.existe-y-corre-solo",
+      "titulo": "Tener un respaldo automático que no dependa de que alguien lo recuerde",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un respaldo que depende de que alguien lo corra a mano se salta justo la semana en la que hacía falta — el negocio no avisa cuándo va a perder el disco.",
+      "queHacer": [
+        "Confirmar si el proveedor de base de datos elegido ya hace respaldo automático, con qué frecuencia y retención.",
+        "Si el proyecto guarda datos fuera de esa base (JSON en disco, localStorage), diseñar un respaldo propio hacia un lugar que sobreviva a un despliegue.",
+        "Confirmar que el respaldo automático se está ejecutando de verdad, no solo que está disponible en el plan contratado.",
+        "Dejar escrito dónde vive cada respaldo y cómo se accede, en un lugar que no dependa de una sola persona."
+      ],
+      "aceptacion": [
+        { "check": "Existe un respaldo con fecha reciente", "comando": null, "espera": "panel del proveedor o carpeta propia mostrando un respaldo de menos de 24-48h según la frecuencia configurada; fecha pegada" },
+        { "check": "La ubicación y forma de acceso están documentadas", "comando": "grep -n \"respaldo\" docs/respaldo.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/respaldo.md"],
+      "cerebro": []
+    },
+    { "id": "ops.respaldo.antes-de-cada-migracion",
+      "titulo": "Respaldar el dato crudo antes de correr una migración que le cambie la forma",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Ninguna migración de este ecosistema trae un procedimiento escrito para volver atrás; el único seguro real es tener el dato de antes guardado tal cual, en un sitio que la propia migración no toque.",
+      "queHacer": [
+        "Antes de correr una migración contra datos reales, copiar el estado actual completo a un lugar separado.",
+        "Marcar esa copia con fecha y con qué migración está a punto de correr.",
+        "Correr la migración.",
+        "Revalidar los datos después de migrar: si el resultado es basura, restaurar desde la copia en vez de arreglarlo a mano en caliente."
+      ],
+      "aceptacion": [
+        { "check": "Existe una copia previa a la última migración corrida", "comando": null, "espera": "copia con fecha anterior a la migración, identificable por nombre o carpeta" },
+        { "check": "La migración se revalidó después de correr", "comando": "grep -n \"revalidad\\|verificado tras migrar\" docs/respaldo-pre-migracion.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase", "mysql", "sqlite"] },
+      "porCada": null,
+      "posee": ["docs/respaldo-pre-migracion.md", "scripts/respaldar-antes-de-migrar.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    { "id": "ops.respaldo.exportacion-fuera-del-proveedor",
+      "titulo": "Guardar una copia de los datos reales fuera del proveedor principal",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un respaldo que vive solo dentro del mismo proveedor que aloja los datos en vivo no protege contra que ese proveedor falle o cierre una cuenta por error de pago: la copia y el original no pueden compartir el mismo punto de falla.",
+      "queHacer": [
+        "Programar una exportación periódica de los datos reales hacia un lugar fuera del proveedor principal.",
+        "Confirmar que esa exportación se puede abrir y leer sin depender de herramientas propietarias del proveedor original.",
+        "Anotar la frecuencia y el último éxito verificado."
+      ],
+      "aceptacion": [
+        { "check": "El script de exportación existe y corre sin error", "comando": "node scripts/exportar.mjs --dry-run; echo EXIT=$?", "espera": "EXIT=0" },
+        { "check": "Existe una exportación reciente fuera del proveedor principal", "comando": null, "espera": "archivo de exportación con fecha reciente, ubicado fuera de la infraestructura del proveedor principal" },
+        { "check": "La exportación se abre sin herramientas del proveedor original", "comando": null, "espera": "el archivo se abre con una herramienta genérica; se confirma con una captura" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/exportacion-de-datos.md", "scripts/exportar.mjs"],
+      "cerebro": []
+    },
+    { "id": "ops.respaldo.restaurar-ensayado",
+      "titulo": "Ensayar la restauración completa del respaldo, no solo confirmar que existe",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Ninguna migración de este ecosistema trae reverso escrito y ninguna restauración se ha ensayado contra una base vacía: un respaldo que nunca se restauró no es un respaldo, es un archivo, y el día que de verdad hace falta es el peor momento para descubrir que le falta una tabla.",
+      "queHacer": [
+        "Tomar el respaldo más reciente y restaurarlo en un entorno completamente vacío y desechable, nunca en producción.",
+        "Correr contra esa base restaurada el mismo `verificar` del proyecto y el flujo principal de negocio de punta a punta.",
+        "Medir y anotar dos números: cuánto tarda la restauración completa, y cuánta información se perdería en el peor caso.",
+        "Escribir el procedimiento en pasos numerados, ejecutable por alguien que nunca lo hizo.",
+        "Repetir el ensayo cada pocos meses: uno viejo vuelve a ser, en la práctica, un archivo sin probar."
+      ],
+      "aceptacion": [
+        { "check": "La restauración se completó en un entorno vacío", "comando": null, "espera": "salida del comando o panel de restauración con éxito, pegada en docs/rehearsal-restauracion.md, contra una base marcada como desechable" },
+        { "check": "El sistema funciona de punta a punta contra los datos restaurados", "comando": "npm run verificar", "espera": "exit 0 apuntando a la base restaurada" },
+        { "check": "Los dos números están escritos", "comando": "grep -nE \"minutos|ventana de p[eé]rdida\" docs/rehearsal-restauracion.md", "espera": "2+ líneas con cifras" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/rehearsal-restauracion.md", "scripts/restaurar.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    { "id": "ops.respaldo.retencion-y-quien-la-paga",
+      "titulo": "Decidir por cuánto tiempo se guardan los respaldos y qué cuesta guardarlos más",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Un respaldo diario que se sobreescribe cada 7 días no sirve si el error se detectó al mes de haber pasado, y la retención larga tiene un costo mensual que hay que decidir a propósito, no descubrir en la factura.",
+      "queHacer": [
+        "Confirmar la política de retención de respaldos del proveedor elegido en el plan actual.",
+        "Decidir con el dueño si esa retención alcanza para el negocio: ¿cuánto tiempo puede pasar antes de notar un dato mal migrado o borrado por error?",
+        "Si hace falta más retención, confirmar el costo adicional y dejarlo junto al resto de costos mensuales.",
+        "Anotar la decisión final y su fecha."
+      ],
+      "aceptacion": [
+        { "check": "La política de retención está escrita con su fuente", "comando": "grep -n \"retenci[oó]n\" docs/retencion-respaldo.md", "espera": "1+ líneas con días/copias y fuente" },
+        { "check": "El costo de la retención elegida está en el desglose mensual", "comando": "grep -n \"respaldo\" docs/costos.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/retencion-respaldo.md"],
+      "cerebro": []
+    },
+    { "id": "ops.respaldo.alerta-si-el-respaldo-deja-de-correr",
+      "titulo": "Enterarse el mismo día si el respaldo automático deja de correr",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un respaldo automático que falla en silencio da la misma sensación de seguridad que uno que sí funciona, hasta el día que hace falta y no está — y para entonces ya pasaron semanas de negocio sin red de protección.",
+      "queHacer": [
+        "Confirmar si el proveedor de respaldo elegido avisa cuando un respaldo programado falla.",
+        "Si no lo hace, dejar un chequeo simple que compare la fecha del último respaldo contra hoy y avise si pasó más tiempo del esperado.",
+        "Probarlo de verdad simulando un respaldo atrasado y confirmando que la alerta llega.",
+        "Decidir quién recibe la alerta, sin que sea solo el dueño si es quien menos revisa correo técnico."
+      ],
+      "aceptacion": [
+        { "check": "La alerta de respaldo atrasado se disparó en una prueba real", "comando": null, "espera": "mensaje o correo de alerta recibido tras simular un respaldo viejo; se describe la prueba" },
+        { "check": "Está definido quién la recibe", "comando": "grep -n \"recibe la alerta\\|destinatario\" docs/alerta-respaldo.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/alerta-respaldo.md", "scripts/alerta-respaldo.mjs"],
+      "cerebro": []
+    },
+
+    { "id": "ops.observabilidad.errores-no-desaparecen-en-silencio",
+      "titulo": "Registrar los errores de producción en un sitio que alguien vaya a mirar",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin registro de errores, la única forma de enterarse de que algo falla en producción es que el dueño llame quejándose, y para cuando llama ya perdió ventas o tiempo varias veces sin que nadie lo supiera.",
+      "queHacer": [
+        "Elegir un destino para los errores del servidor: el log del proveedor de hosting como mínimo.",
+        "Confirmar que un error real, provocado a propósito, aparece ahí con contexto suficiente, no solo un código genérico.",
+        "Distinguir en el registro un error de negocio esperado de un error real del sistema, porque mezclarlos entierra las señales de verdad.",
+        "Anotar dónde se revisan los errores y con qué frecuencia alguien lo hace."
+      ],
+      "aceptacion": [
+        { "check": "Un error provocado aparece en el registro con contexto útil", "comando": null, "espera": "provocar un error real; aparece en el log con mensaje identificable, no solo un código genérico; se pega el fragmento" },
+        { "check": "Está escrito dónde y con qué frecuencia se revisan los errores", "comando": "grep -n \"revisar\\|frecuencia\" docs/observabilidad.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/observabilidad.md"],
+      "cerebro": []
+    },
+    { "id": "ops.observabilidad.salud-que-no-miente",
+      "titulo": "Hacer que la ruta de salud confirme que el sistema funciona de verdad",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un endpoint de salud que solo responde 200 porque el proceso está vivo dice 'todo bien' mientras la base ya no responde — es un semáforo en verde mintiendo, y el que confía en él deja de mirar hasta que un cliente reporta que nada funciona.",
+      "queHacer": [
+        "Definir qué significa que el sistema funcione: al menos, que puede leer y escribir en su almacenamiento real, no solo que el proceso arrancó.",
+        "Construir la ruta de salud para que ejercite eso de verdad, no un 200 fijo.",
+        "Provocar una falla real de la dependencia (por ejemplo, una URL de base de datos mala a propósito, revertida después) y confirmar que la ruta de salud cambia a error.",
+        "Documentar qué revisa exactamente la ruta de salud."
+      ],
+      "aceptacion": [
+        { "check": "La ruta de salud detecta una dependencia caída de verdad", "comando": null, "espera": "con la base inalcanzable a propósito, la ruta de salud responde error, no 200; se pega la respuesta antes y después" },
+        { "check": "La ruta existe y responde en condiciones normales", "comando": "curl -s -o /dev/null -w \"%{http_code}\" https://<url>/api/salud", "espera": "200" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["app/api/salud/route.ts"],
+      "cerebro": []
+    },
+    { "id": "ops.observabilidad.quien-se-entera-primero",
+      "titulo": "Decidir quién se entera primero cuando algo se cae, y probar que le llega",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el único mecanismo de aviso es que el dueño note que el sistema no responde, el tiempo entre la caída y que alguien reaccione lo pone la suerte, no un diseño — y ese tiempo, para un negocio que cobra con el sistema, es plata.",
+      "queHacer": [
+        "Decidir un canal concreto para avisos de caída y quién lo recibe primero.",
+        "Configurar la alerta más simple que ofrezca el proveedor de hosting elegido.",
+        "Probarla de verdad provocando una caída real o simulada y confirmar que llega, y en cuánto tiempo.",
+        "Anotar el tiempo medido como línea base."
+      ],
+      "aceptacion": [
+        { "check": "La alerta llegó de verdad en una prueba", "comando": null, "espera": "captura o registro del aviso recibido tras una caída provocada, con la hora de la caída y la hora del aviso" },
+        { "check": "El tiempo entre caída y aviso está medido", "comando": "grep -nE \"[0-9]+ ?(min|seg)\" docs/observabilidad.md", "espera": "1+ líneas con cifra" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/observabilidad.md"],
+      "cerebro": []
+    },
+    { "id": "ops.observabilidad.avisos-de-pantalla-catalogados",
+      "titulo": "Catalogar cada aviso que el sistema muestra y qué hacer con él",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Redactar el manual de un sistema real en producción destapó avisos que nadie había escrito en ningún lado; sin catalogarlos, cada uno se vuelve una llamada de auxilio a quien construyó el sistema.",
+      "queHacer": [
+        "Recorrer el sistema y listar cada aviso o mensaje que un usuario real puede ver, no solo los de error.",
+        "Para cada uno, escribir en una tabla el aviso citado tal cual aparece en pantalla, qué significa, y qué debe hacer la persona.",
+        "Verificar cada fila abriendo la pantalla real, marcando la que solo se confirmó leyendo el código.",
+        "Publicar la tabla donde la persona del mostrador la encuentre rápido."
+      ],
+      "aceptacion": [
+        { "check": "La tabla de avisos existe con sus columnas completas", "comando": "grep -c \"|\" docs/avisos.md", "espera": "10+ líneas de tabla" },
+        { "check": "Cada fila dice si se verificó en vivo o solo contra código", "comando": "grep -ciE \"verificado en vivo|verificado contra c[oó]digo\" docs/avisos.md", "espera": "igual al número de avisos catalogados" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "porCada": null,
+      "posee": ["docs/avisos.md"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    { "id": "ops.observabilidad.metricas-basicas-del-negocio",
+      "titulo": "Tener a la vista, sin pedirlo, si el sistema se está usando de verdad",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin un número visible de uso real, nadie nota una caída silenciosa de actividad —un formulario roto, un pago fallando— hasta que el dueño pregunta por qué bajaron las ventas del mes.",
+      "queHacer": [
+        "Elegir 2-3 números que de verdad importan para este negocio: ventas del día, pedidos completados, errores de pago.",
+        "Ponerlos donde el dueño ya mira, no en un dashboard nuevo que nadie va a abrir.",
+        "Confirmar que el número se mueve cuando pasa algo real.",
+        "Dejar escrito qué significa cada número y de dónde sale."
+      ],
+      "aceptacion": [
+        { "check": "El número reacciona a una acción real", "comando": null, "espera": "hacer una venta o pedido de prueba; el número visible cambia en consecuencia; se pega antes/después" },
+        { "check": "Cada número tiene su definición escrita", "comando": "grep -n \"significa\\|se calcula\" docs/metricas.md", "espera": "1+ líneas por número" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/metricas.md"],
+      "cerebro": []
+    },
+    { "id": "ops.observabilidad.panel-para-quien-no-es-tecnico",
+      "titulo": "Traducir el estado técnico del sistema a algo que el dueño entienda solo",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un panel de errores en jerga técnica, con códigos HTTP y nombres de tabla, es tan útil para el dueño de un negocio como no tener ninguno: el aviso de que todo está bien o de que hay un problema tiene que llegarle en una frase que entienda sin traducir.",
+      "queHacer": [
+        "Tomar las señales técnicas ya existentes (errores, salud, alertas) y traducirlas a un estado simple: bien, atención, o algo se rompió.",
+        "Ponerlo en un lugar que el dueño ya revisa, no en un panel aparte que hay que recordar visitar.",
+        "Provocar un problema real y confirmar que el estado cambia de forma que el dueño lo entendería sin ayuda.",
+        "Probar el mensaje leyéndoselo en voz alta a alguien que no construyó el sistema."
+      ],
+      "aceptacion": [
+        { "check": "El estado simple cambia ante un problema real", "comando": null, "espera": "provocar una falla real; el indicador visible pasa de bien a atención sin intervención manual; se pega antes/después" },
+        { "check": "El mensaje no usa jerga técnica", "comando": "grep -rniE \"endpoint|stack trace|undefined|null pointer\" components/estado-sistema.tsx", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["components/estado-sistema.tsx"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+
+    { "id": "ops.incidente.a-quien-se-llama",
+      "titulo": "Dejar un solo canal para cuando el sistema falla y nadie sabe qué hacer",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Un dueño con el negocio parado y sin saber a quién escribirle pierde minutos buscando una conversación de hace meses donde alguien mencionó un contacto — y esos minutos, para un negocio que cobra con el sistema, cuestan plata.",
+      "queHacer": [
+        "Definir un único canal de contacto para emergencias y dejarlo en un lugar que el dueño realmente vaya a encontrar, pegado cerca de la caja si hace falta.",
+        "Aclarar el horario real en que ese canal se atiende, sin prometer algo que no se puede cumplir.",
+        "Confirmar que el dueño ya lo probó una vez: le escribió y recibió respuesta."
+      ],
+      "aceptacion": [
+        { "check": "El canal de emergencia está documentado y visible", "comando": "grep -n \"emergencia\\|urgente\" docs/contacto-emergencia.md", "espera": "1+ líneas" },
+        { "check": "El dueño confirmó que el canal funciona", "comando": null, "espera": "mensaje de prueba enviado por el canal y respondido; se referencia la fecha" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/contacto-emergencia.md"],
+      "cerebro": []
+    },
+    { "id": "ops.incidente.runbook-de-los-fallos-mas-probables",
+      "titulo": "Escribir de antemano qué hacer para los fallos más probables de este sistema",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Improvisar la respuesta a una caída con el negocio parado y el dueño llamando es el peor momento para pensar con calma, y ya se sabe cuáles son los fallos típicos de este tipo de sistema antes de que ocurran.",
+      "queHacer": [
+        "Listar los fallos más probables de este proyecto: se cayó el hosting, se acabó una cuota, falta una migración, el dominio expiró, no hay internet en el local.",
+        "Para cada uno, escribir en pasos concretos qué revisar primero y qué hacer, sin jerga técnica que no sirva a quien lo va a ejecutar.",
+        "Incluir a quién llamar si el paso a paso no resuelve, y con qué información a la mano.",
+        "Practicar al menos uno de los pasos a paso contra un fallo simulado, no dejarlo solo en teoría."
+      ],
+      "aceptacion": [
+        { "check": "El runbook cubre al menos 3 fallos con pasos concretos", "comando": "grep -c \"^## \" docs/incidentes.md", "espera": "3+" },
+        { "check": "Al menos un procedimiento se probó de verdad", "comando": "grep -n \"probado\\|simulado\" docs/incidentes.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/incidentes.md"],
+      "cerebro": []
+    },
+    { "id": "ops.incidente.simulacro-de-caida-total",
+      "titulo": "Simular una caída total del sistema al menos una vez, con el dueño mirando",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "ola",
+      "porQue": "El primer simulacro de incendio no debería ser el incendio real: si nadie ha visto qué pasa cuando el sistema completo no responde, el día que pase de verdad se suma el pánico de no saber qué tan grave es al tiempo perdido resolviéndolo.",
+      "queHacer": [
+        "Elegir una ventana de bajo riesgo y avisar al dueño que se va a simular una caída.",
+        "Apagar el servicio o bloquear el acceso a la base y verificar qué ve el dueño o cajero: ¿un error entendible o una pantalla en blanco?",
+        "Medir cuánto tarda alguien en darse cuenta y confirmar que el runbook, si existe, lleva de verdad a la solución.",
+        "Corregir lo que el simulacro reveló como confuso antes de considerar el sistema listo para producción real."
+      ],
+      "aceptacion": [
+        { "check": "El simulacro se ejecutó y quedó registrado", "comando": "grep -n \"simulacro\" docs/simulacro-caida.md", "espera": "1+ líneas con fecha, qué se apagó y qué vio el usuario" },
+        { "check": "Lo que reveló como confuso quedó corregido o anotado como pendiente explícito", "comando": null, "espera": "cada hallazgo del simulacro tiene su línea de seguimiento" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/simulacro-caida.md"],
+      "cerebro": []
+    },
+    { "id": "ops.incidente.modo-degradado-declarado",
+      "titulo": "Decidir qué sigue funcionando cuando falla una parte, no todo junto",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Si un fallo en un servicio secundario —envío de correo, un proveedor externo— tumba TODO el sistema en vez de solo esa función, un problema pequeño se convierte en el negocio parado completo.",
+      "queHacer": [
+        "Identificar las dependencias externas del sistema y qué pasa hoy si cada una falla.",
+        "Para las que puedan fallar sin motivo de negocio real, aislar el fallo para que no tumbe vender, cobrar o registrar.",
+        "Simular la caída de cada dependencia una por una y confirmar qué sigue funcionando.",
+        "Escribir la lista de qué se degrada y qué no, como decisión explícita."
+      ],
+      "aceptacion": [
+        { "check": "El flujo principal sobrevive a la caída de una dependencia secundaria", "comando": null, "espera": "con la dependencia secundaria apagada, el flujo principal se completa igual; se pega la prueba" },
+        { "check": "La lista de qué se degrada está escrita", "comando": "grep -c \"^-\" docs/modo-degradado.md", "espera": "1+ líneas por dependencia identificada" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/modo-degradado.md"],
+      "cerebro": []
+    },
+    { "id": "ops.incidente.registro-de-lo-que-paso",
+      "titulo": "Dejar escrito cada incidente real: qué pasó, cuánto duró y qué se hizo",
+      "nivel": "N3",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Sin un registro, el mismo incidente se resuelve desde cero la segunda vez, con el mismo tiempo perdido, y nadie puede notar un patrón si cada caída vive solo en la memoria de quien la atendió.",
+      "queHacer": [
+        "Cada vez que algo se cae en producción, anotar fecha y hora de inicio y fin, qué pasó, cómo se detectó y qué se hizo.",
+        "Guardarlo en un archivo simple en orden cronológico, no repartido en conversaciones sueltas.",
+        "Revisar el registro de vez en cuando buscando patrones antes de tratar cada incidente como si fuera el primero."
+      ],
+      "aceptacion": [
+        { "check": "El registro existe con los campos mínimos por incidente", "comando": "grep -c \"^## \" docs/incidentes-registro.md", "espera": "1+ (aumenta con cada incidente real)" },
+        { "check": "Cada entrada tiene duración", "comando": "grep -ciE \"duraci[oó]n\" docs/incidentes-registro.md", "espera": "igual al número de entradas" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/incidentes-registro.md"],
+      "cerebro": []
+    },
+
+    { "id": "ops.soporte.canal-y-tiempo-de-respuesta-acordado",
+      "titulo": "Acordar con el cliente cómo se pide ayuda y en cuánto tiempo se responde",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Sin un acuerdo explícito, cada cliente asume un tiempo de respuesta distinto, y el primer desacuerdo real sobre esto pasa en medio de una urgencia, no en una conversación tranquila.",
+      "queHacer": [
+        "Definir el canal y el tiempo de respuesta que de verdad se puede cumplir, no el que suena mejor.",
+        "Escribirlo en el mismo documento donde está la mensualidad, para que sea parte de lo que se cobra.",
+        "Distinguir soporte incluido (algo se rompió) de trabajo nuevo, porque se cobra distinto.",
+        "Confirmar con el cliente que lo leyó y está de acuerdo."
+      ],
+      "aceptacion": [
+        { "check": "El canal y el tiempo de respuesta están escritos junto a la mensualidad", "comando": "grep -n \"tiempo de respuesta\\|canal de soporte\" docs/soporte.md", "espera": "1+ líneas" },
+        { "check": "Distingue soporte incluido de trabajo nuevo cobrable aparte", "comando": "grep -n \"no incluye\\|fuera de alcance\" docs/soporte.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/soporte.md"],
+      "cerebro": ["tema:cobro-a-clientes"]
+    },
+    { "id": "ops.soporte.que-pasa-si-el-cliente-se-va",
+      "titulo": "Dejar escrito qué se le entrega al cliente si termina el contrato",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Sin esto escrito de antemano, la conversación de salida se negocia con las dos partes ya molestas, y decidir en caliente si el cliente se lleva sus datos y su dominio es el peor momento para decidirlo por primera vez.",
+      "queHacer": [
+        "Definir qué es del cliente sin condición (sus datos, su dominio si lo compró él) y qué es de la agencia.",
+        "Escribir cómo se entrega cada cosa si el contrato termina: exportar datos en qué formato, transferir el dominio cómo.",
+        "Dejarlo en el documento de servicio, no como promesa verbal.",
+        "Confirmar al menos una vez que la exportación de datos prometida se puede generar hoy."
+      ],
+      "aceptacion": [
+        { "check": "Las condiciones de salida están escritas en el documento de servicio", "comando": "grep -n \"termina el contrato\\|fin del contrato\" docs/fin-de-contrato.md", "espera": "1+ líneas" },
+        { "check": "La exportación de datos prometida se generó de verdad al menos una vez", "comando": null, "espera": "archivo de exportación real generado y verificado; se referencia" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/fin-de-contrato.md"],
+      "cerebro": []
+    },
+    { "id": "ops.soporte.manual-de-la-persona-del-mostrador",
+      "titulo": "Escribir el manual para quien usa el sistema a diario, no para el dueño",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "ola",
+      "porQue": "Sin manual, el soporte es el teléfono de quien lo construyó, para siempre, y quien llama no es el dueño leyendo con calma: es la persona del mostrador a las 7 de la noche con un cliente esperando.",
+      "queHacer": [
+        "Escribirlo para UNA persona con su turno real, no para 'el usuario' en abstracto.",
+        "Dividirlo en secciones cortas tituladas con el verbo del trabajo (vender, cerrar caja, registrar mercancía), no con sustantivos del sistema.",
+        "Al frente, la ruta de lectura por rol: qué secciones son lo suyo y en qué orden.",
+        "Citar literal lo que la persona ve en pantalla, con las mismas palabras.",
+        "Verificar cada sección abriendo la pantalla real, marcando al pie si se verificó en vivo o solo contra el código."
+      ],
+      "aceptacion": [
+        { "check": "Cada sección declara cómo se verificó", "comando": "grep -ciE \"verificado en vivo|verificado contra c[oó]digo\" docs/manual/*.md", "espera": "1 por archivo de sección, sin excepción" },
+        { "check": "No usa jerga técnica que no sale en pantalla", "comando": "grep -rniE \"endpoint|deploy|commit|payload|backend|token\" docs/manual/", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/manual/"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    { "id": "ops.soporte.capacitacion-con-evidencia",
+      "titulo": "Confirmar que la persona real ya usó el sistema con ayuda al lado",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Ningún manual de este ecosistema ha sido leído todavía por el trabajador real que lo va a usar a diario; entregar un PDF no es lo mismo que confirmar que la persona sabe usar el sistema sola.",
+      "queHacer": [
+        "Sentarse o hacer videollamada con la persona real mientras usa el sistema por primera vez con un caso real o casi real.",
+        "Anotar qué le costó, qué preguntó, qué pantalla no entendió a la primera.",
+        "Corregir el manual o la interfaz con esos hallazgos, no descartarlos como 'ya se acostumbrará'.",
+        "Repetir con la siguiente persona nueva que entre al puesto."
+      ],
+      "aceptacion": [
+        { "check": "Existe un registro de al menos una sesión de capacitación real con hallazgos", "comando": "grep -n \"capacitaci[oó]n\" docs/soporte.md", "espera": "1+ líneas con fecha y persona" },
+        { "check": "Los hallazgos se reflejaron en el manual o el sistema", "comando": null, "espera": "al menos un cambio referenciado desde el hallazgo" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/soporte.md"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    { "id": "ops.soporte.reporte-mensual-al-cliente",
+      "titulo": "Mandar cada mes un reporte corto de qué se hizo y cómo está el sistema",
+      "nivel": "N4",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Una mensualidad que no muestra nada nuevo se siente igual el mes que hubo tres mejoras que el mes que no hubo ninguna, y un reporte mensual es de las cosas que se pueden dar la más barata de producir y la que más retiene al cliente.",
+      "queHacer": [
+        "Al cierre de cada mes, listar qué cambió, qué se arregló y cómo estuvo el sistema.",
+        "Incluir el número de costo o uso si el plan tiene tope de consumo variable.",
+        "Mandarlo por el canal que el cliente ya revisa, no dejarlo en un documento que nadie abre.",
+        "Guardar copia de cada reporte enviado, con fecha."
+      ],
+      "aceptacion": [
+        { "check": "Existe al menos un reporte mensual enviado con fecha", "comando": "ls docs/reportes-mensuales/ | wc -l", "espera": "1+" },
+        { "check": "El reporte cubre estado del sistema, no solo cambios", "comando": "grep -ciE \"ca[ií]da|estado del sistema|sin incidentes\" docs/reportes-mensuales/*.md", "espera": "1+ por reporte" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/reportes-mensuales/"],
+      "cerebro": ["tema:cobro-a-clientes"]
+    },
+
+    { "id": "ops.costos.desglose-mensual-real",
+      "titulo": "Escribir el costo mensual real de tener esto vivo, servicio por servicio",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Cotizar una mensualidad sin saber el costo real de sostenerla es cotizar a ciegas, y el costo fijo de herramientas es el mismo con un cliente que con ocho, así que el primero que se cobra mal define la referencia para todos los que siguen.",
+      "queHacer": [
+        "Listar cada servicio de pago del que depende el sistema en producción: hosting, base de datos, dominio, correo, cualquier API externa con costo.",
+        "Anotar el costo mensual de cada uno en el plan actual, con la fuente.",
+        "Sumar el total y dejarlo separado de lo que se le cobra al cliente.",
+        "Marcar cuáles escalan con el uso y cuáles son fijos."
+      ],
+      "aceptacion": [
+        { "check": "El desglose de costos existe con fuente por cada línea", "comando": "grep -c \"COP\\|USD\" docs/costos.md", "espera": "1+ por servicio listado" },
+        { "check": "Distingue costo fijo de costo variable por uso", "comando": "grep -ciE \"fijo|variable|por uso\" docs/costos.md", "espera": "2+ líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/costos.md"],
+      "cerebro": ["tema:cobro-a-clientes"]
+    },
+    { "id": "ops.costos.que-pasa-si-no-se-paga-el-plan",
+      "titulo": "Saber qué le hace el proveedor al sistema si se atrasa un pago",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Algunos proveedores suspenden el servicio de inmediato al vencer un pago y otros dan días de gracia; no saberlo significa enterarse el día que el negocio del cliente se cae por una tarjeta vencida, no por un error del sistema.",
+      "queHacer": [
+        "Revisar, para cada servicio de pago crítico, qué pasa si el pago falla: ¿suspende de inmediato?, ¿avisa antes?, ¿cuántos días de gracia da?",
+        "Anotar quién recibe el aviso de pago fallido y confirmar que esa persona de verdad revisa ese correo.",
+        "Si el proveedor no da días de gracia, decidir si hace falta un recordatorio propio antes del vencimiento."
+      ],
+      "aceptacion": [
+        { "check": "La política de pago fallido de cada proveedor crítico está documentada", "comando": "grep -n \"d[ií]as de gracia\\|suspende\" docs/costos.md", "espera": "1+ líneas por proveedor crítico" },
+        { "check": "Está definido quién recibe el aviso de pago fallido", "comando": "grep -n \"recibe el aviso\\|tarjeta a nombre\" docs/costos.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/costos.md"],
+      "cerebro": []
+    },
+    { "id": "ops.costos.tope-al-consumo-variable",
+      "titulo": "Poner un techo al gasto por uso, antes de que lo ponga la factura",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un servicio que cobra por conversación, por mensaje o por uso de IA escala con el éxito del cliente sin avisar, y sin un tope el cliente que más crece es exactamente el que empieza a dejar pérdida en vez de ganancia.",
+      "queHacer": [
+        "Identificar todo servicio que factura por uso (mensajería, IA por token, envíos por unidad).",
+        "Definir un número de tope mensual razonable para el tamaño actual del negocio.",
+        "Configurar una alerta que avise ANTES de llegar al tope, no cuando ya se pasó.",
+        "Escribir en el documento de servicio qué tope incluye la mensualidad y qué pasa si se supera."
+      ],
+      "aceptacion": [
+        { "check": "Existe una alerta configurada antes del tope, no solo un corte duro sin avisar", "comando": null, "espera": "configuración del proveedor o script propio mostrando el umbral de alerta por debajo del tope real" },
+        { "check": "El tope y qué pasa al superarlo están en el documento de servicio", "comando": "grep -n \"tope\" docs/tope-consumo.md", "espera": "1+ líneas con número" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/tope-consumo.md"],
+      "cerebro": ["tema:cobro-a-clientes"]
+    },
+    { "id": "ops.costos.revision-contra-el-crecimiento-real",
+      "titulo": "Revisar el costo mensual cuando el negocio crece, no dejarlo fijo al inicio",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Un costo mensual calculado para el tamaño del negocio en el lanzamiento deja de ser real cuando el negocio crece, y si nadie vuelve a mirarlo, el margen se lo come el crecimiento del cliente sin que nadie lo note.",
+      "queHacer": [
+        "Fijar una fecha, cada 3 a 6 meses o al notar un salto de uso, para revisar el costo real contra el desglose original.",
+        "Comparar el consumo actual contra el tope puesto al principio.",
+        "Si el costo real ya no cuadra con lo cobrado, ajustar la mensualidad o el tope, no absorber la diferencia en silencio.",
+        "Registrar cada revisión con fecha y el número encontrado."
+      ],
+      "aceptacion": [
+        { "check": "Existe al menos una revisión de costos posterior al lanzamiento", "comando": "grep -c \"^## Revisi\" docs/costos.md", "espera": "1+" },
+        { "check": "Cada revisión compara contra el número anterior", "comando": "grep -n \"comparado con\\|vs\\.\" docs/costos.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/costos.md"],
+      "cerebro": []
+    },
+
+    { "id": "ops.continuidad.metodo-de-respaldo-en-papel",
+      "titulo": "Dejar un método en papel para cuando el sistema completo no es opción",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Si la única forma de vender es el sistema y el sistema no está disponible por cualquier motivo, un negocio sin ningún plan B se detiene por completo en vez de solo perder velocidad.",
+      "queHacer": [
+        "Definir con el dueño un método mínimo de respaldo, como un recibo escrito a mano, para cuando el sistema no esté disponible.",
+        "Dejar escrito cómo se registran esas ventas en el sistema después, cuando vuelva a estar disponible.",
+        "Confirmar que el dueño ya tiene a la mano lo necesario para el respaldo en papel antes de que haga falta."
+      ],
+      "aceptacion": [
+        { "check": "El método de respaldo en papel está escrito y confirmado", "comando": "grep -n \"respaldo en papel\\|cuaderno\\|talonario\" docs/continuidad.md", "espera": "1+ líneas" },
+        { "check": "Está escrito cómo esas ventas entran después al sistema", "comando": "grep -n \"registrar despu[eé]s\\|cargar al sistema\" docs/continuidad.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "superficies": ["caja"] },
+      "porCada": null,
+      "posee": ["docs/continuidad.md"],
+      "cerebro": []
+    },
+    { "id": "ops.continuidad.puede-cobrar-sin-internet",
+      "titulo": "Probar si el negocio puede seguir cobrando cuando se cae la conexión del local",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Un negocio físico que no puede cobrar porque se cayó la línea de internet es un negocio parado, con clientes esperando y sin forma de facturar — y esto no avisa: la conexión de un local pequeño se cae sin previo aviso, no en una ventana programada.",
+      "queHacer": [
+        "Confirmar si el sistema depende de internet para el paso crítico de cobrar.",
+        "Decidir a propósito: ¿el negocio acepta no poder cobrar por sistema mientras no haya señal, con un método de respaldo en papel, o el sistema necesita funcionar localmente y sincronizar después?",
+        "Simular la caída de internet en el local, desconectando el router, y confirmar qué pasa de verdad al intentar cobrar.",
+        "Escribir la decisión y el comportamiento real, para que no sea una sorpresa el día que pase."
+      ],
+      "aceptacion": [
+        { "check": "El comportamiento sin internet está probado, no supuesto", "comando": null, "espera": "con la red desconectada, intento real de cobro; se documenta uno de tres resultados: cobró localmente, quedó bloqueado con un mensaje que nombra la causa, o terminó sin ningún mensaje" },
+        { "check": "La decisión de negocio está escrita", "comando": "grep -n \"sin internet\\|sin conexi[oó]n\" docs/continuidad-sin-internet.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "superficies": ["caja"], "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/continuidad-sin-internet.md"],
+      "cerebro": []
+    },
+    { "id": "ops.continuidad.que-pasa-si-falla-un-periferico",
+      "titulo": "Decidir qué pasa con la venta si falla la impresora, la báscula o el lector",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Un negocio físico depende de hardware que se traba —papel atascado, báscula descalibrada, lector que no lee un código sucio— más seguido que de una caída del sistema; ya hay precedente real de resolverlo con un tope explícito (3 facturas sin imprimir antes de exigir resolver la impresora) en vez de dejar que la fila se detenga por un aparato.",
+      "queHacer": [
+        "Listar los periféricos de los que depende el flujo de cobro: impresora de recibos, báscula, lector de código de barras, datáfono.",
+        "Para cada uno, definir el camino manual si falla: ¿se puede cobrar sin imprimir e imprimir después?, ¿se puede teclear el peso o el código a mano?",
+        "Probarlo desconectando o simulando la falla de cada periférico durante una venta de prueba.",
+        "Escribir el límite: cuántas ventas sin resolver el periférico se permiten antes de exigir arreglarlo."
+      ],
+      "aceptacion": [
+        { "check": "El sistema permite cobrar con al menos un periférico simulado como fallando", "comando": null, "espera": "venta de prueba completada con la impresora, báscula o lector desconectado; se documenta el camino manual usado" },
+        { "check": "El límite o comportamiento ante la falla está escrito", "comando": "grep -n \"impresora\\|b[aá]scula\\|lector\" docs/continuidad-perifericos.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "superficies": ["caja"] },
+      "porCada": null,
+      "posee": ["docs/continuidad-perifericos.md"],
+      "cerebro": ["tema:caja-y-turnos"]
+    },
+    { "id": "ops.continuidad.cola-de-subida-al-volver-la-senal",
+      "titulo": "Confirmar que lo vendido sin internet sube completo al volver la señal",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Escribir localmente mientras no hay señal solo sirve si lo escrito de verdad sube después completo: una venta cobrada sin internet que se pierde al reconectar no es un modo offline, es un agujero silencioso en la caja.",
+      "queHacer": [
+        "Confirmar que lo escrito localmente sin red viaja en una cola separada de solo agregar, que se sube completa al volver la señal.",
+        "Confirmar que mientras hay algo pendiente de subir, el sistema no sobreescribe esa copia local con algo que venga de fuera.",
+        "Probar el caso real: vender sin señal, reconectar, y confirmar que la venta aparece completa del otro lado.",
+        "Probar también dos equipos del mismo local vendiendo sin señal a la vez: ¿qué pasa si generan el mismo número de referencia por separado?"
+      ],
+      "aceptacion": [
+        { "check": "La cola de subida existe en el código, separada de la copia de lectura", "comando": "grep -rln \"outbox\\|colaDeSubida\\|colaPendiente\" lib/", "espera": "1+ archivos" },
+        { "check": "Una venta hecha sin señal aparece completa tras reconectar", "comando": null, "espera": "venta de prueba cobrada con la red apagada; tras reconectar, la misma venta se ve en el sistema central con sus datos completos; se pega la comparación antes/después" },
+        { "check": "No se pierde ni se duplica con dos equipos vendiendo sin señal a la vez", "comando": null, "espera": "prueba con dos equipos simulados generando ventas sin señal; al reconectar ambos, las dos ventas existen y ninguna quedó con datos de la otra" }
+      ],
+      "aplicaSi": { "superficies": ["caja"], "dineroReal": true },
+      "porCada": null,
+      "posee": ["lib/outbox.ts", "docs/continuidad.md"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    }
+  ]
+}
