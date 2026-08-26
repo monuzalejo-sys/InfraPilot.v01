@@ -107,6 +107,13 @@
           "verdict": "ok",
           "tokens": 70629,
           "notes": "orion-traductor sobre el mensaje dictado real: 8 entregables, 5 correcciones, 3 ejemplos separados, 3 tensiones. Una de las tensiones destapo un defecto real (KN-012)."
+        },
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 179566,
+          "notes": "orion-estratega sobre villa-broaster: 6 comparables con URL, precio con 11 supuestos y una tension declarada. Encontro que todo el nicho resuelve DIAN menos nosotros."
         }
       ]
     }

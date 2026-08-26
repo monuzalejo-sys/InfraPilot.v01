@@ -1,7 +1,7 @@
 {
   "projectId": "orion",
-  "snapshotDate": "2026-08-26T08:40:00.000Z",
-  "version": 5,
+  "snapshotDate": "2026-08-26T09:10:00.000Z",
+  "version": 6,
   "lastAmmRun": "2026-08-26T06:30:00.000Z",
   "objects": [
     {
@@ -374,6 +374,41 @@
       "source": "sesion 2026-08-26, memory/orion/encargos/2026-08-26-orion-v4.md",
       "created": "2026-08-26T08:40:00.000Z",
       "updated": "2026-08-26T08:40:00.000Z"
+    },
+    {
+      "id": "KN-014",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-08-26T09:10:00.000Z",
+      "updated": "2026-08-26T09:10:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "DEC-002"
+      ],
+      "fact": "El bloque `negocio` del plan (RFC-0008 §1.5) funciona y produjo informacion de venta que no existia: seis comparables reales del nicho con URL y precio -Alegra POS, Gestro, Loggro Restobar, Loyverse, Waro, Soft Restaurant CO- y DOS hallazgos. (1) Todos menos uno ya resuelven facturacion DIAN y nosotros no: es la diferencia mas visible frente a la competencia, y PEND-001 lleva meses bloqueado sin decidir. (2) Soft Restaurant, jugador establecido, NO publica precio: que no compita mostrando cifra es informacion de venta, no un fracaso de la busqueda. Y lo que ninguno de los seis ofrece: evitar la comision de domicilio y quedarse con el suscriptor propio.",
+      "context": "La exigencia de N8-R7 -ninguna cifra sin sus supuestos- resulto ser lo mas valioso, no un tramite: los 11 supuestos escritos dejan ver que la tarifa por token no esta medida por la casa, que el dolar va a 4.000 por convencion y no por mercado, y que el costo en pesos es SOLO computo de API sin las horas de orquestacion. Un precio con esos supuestos visibles se puede discutir; sin ellos solo se puede creer o no creer.",
+      "reason": "Precio y contrato eran un hueco conocido del ecosistema: dos lecciones en todo el corpus y nada de cuanto vale cada producto. Este es el primer numero defendible.",
+      "source": "sesion 2026-08-26, orion-estratega sobre villa-broaster"
+    },
+    {
+      "id": "RSK-002",
+      "type": "Risk",
+      "tier": "Project",
+      "created": "2026-08-26T09:10:00.000Z",
+      "updated": "2026-08-26T09:10:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Open",
+      "dependencies": [
+        "KN-014"
+      ],
+      "risk": "El precio propuesto para villa-broaster (400.000 COP/mes x 12 = 4,8M) apenas cubre el computo de terminar los niveles N0+N1 (~865k COP) mas el hosting del ano (~420k) mas el soporte. Si el dueno espera que la mensualidad financie ademas el backlog rapido, el numero queda corto y la cuenta se vuelve trabajo a perdida.",
+      "probability": "Medium",
+      "mitigation": "La decision es del dueno y el estratega no la tomo por el: o se sube la mensualidad, o se estira el calendario de N0+N1, o se recorta explicitamente que entra en la cuota. Lo que NO se puede es dejarlo implicito, que es como se llega a los tres meses trabajando gratis. Piso escrito: 250.000 COP/mes."
     }
   ],
   "archives": []
