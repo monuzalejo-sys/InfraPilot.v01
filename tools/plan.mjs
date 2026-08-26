@@ -339,6 +339,9 @@ function cmdOla() {
   const ruta = posicional[0] ?? morir("falta <plan.json>")
   const plan = leerJSON(ruta)
   const max = Number(val("max", 4))
+  /* Nivel primero (N8-R8) y, dentro del nivel, la más CARA primero: con
+     agentes en paralelo, empezar por la más larga es lo que minimiza el tiempo
+     total de la ola — la barata siempre cabe después en el hueco que quede. */
   const cands = listas(plan)
     .filter((t) => t.ceremonia !== "inline")
     .sort((a, b) => NIVELES.indexOf(a.nivel) - NIVELES.indexOf(b.nivel) || b.presupuesto - a.presupuesto)

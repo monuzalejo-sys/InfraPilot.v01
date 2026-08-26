@@ -1,11 +1,11 @@
 ---
 slug: olas-de-agentes
 titulo: Repartir trabajo entre agentes en paralelo sin colisiones ni pérdidas
-alias: [ola, olas, ola de agentes, olas de agentes, agentes en paralelo, varios agentes, repartir trabajo, dividir el trabajo, dividir la tarea, partir la tarea, parto la tarea, en cuantos pedazos, pedazos, trozos, trocear, partir en pedazos, granularidad, un builder por paso, por pasos, tamano del encargo, equipo de agentes, paralelo, paralelizar, paralelismo, builder, builders, subagente, subagentes, spawn, spawns, wave, wave.json, manifiesto de ola, colision, colisiones, conflicto de archivos, pisarse, se pisan, muerte de agente, agente muerto, se murio, se murieron, se cayo, se cayeron, limite de sesion, infra-death, infra death, reanudar, reanudacion, recuperar ola, recuperacion de ola, respawn, relanzar, orquestador, orquestrador, contratos, ownership, propiedad de archivos, SendMessage, trabajo perdido, se me murio un agente, se me murio un builder, se me murio el agente, murio a mitad, checklist de rescate, rescate de ola, protocolo de muerte, que hago si se muere un agente, audita el disco, auditar el disco, antes de relanzar, mirar el disco, stub de 0 bytes, 0 bytes, archivo vacio, archivo en cero, tamano en disco, reporte vacio, reporte truncado, no es fallo del modelo, no lo cuentes como fallo, senal de capacidad, infraDeath, INFRA_DEATH, sufijo de fase, arqueologia, trabajo huerfano, delta, respawn estrecho, siembra en disco, sembrar datos, fixture sembrado, qa reanudable, resumeFromRunId, HEAD, mover HEAD, checkout a mitad de sesion, cambio de rama, cambia de rama, rama se movio, rama distinta a mitad, builder en rama vieja, construyendo sobre rama vieja, git checkout, git switch, reflog, conteo de tests no cuadra, numero de tests no coincide, cifra medida que no cuadra, metrica no coincide, discrepancia de tests, señal no ruido, no es ruido]
+alias: [ola, olas, ola de agentes, tope de salida, limite de salida, output token maximum, 64000, 64k, respuesta demasiado larga, escribir por tandas, escribir por partes, archivo grande, json grande, no dejo nada, no escribio nada, murio sin dejar rastro, olas de agentes, agentes en paralelo, varios agentes, repartir trabajo, dividir el trabajo, dividir la tarea, partir la tarea, parto la tarea, en cuantos pedazos, pedazos, trozos, trocear, partir en pedazos, granularidad, un builder por paso, por pasos, tamano del encargo, equipo de agentes, paralelo, paralelizar, paralelismo, builder, builders, subagente, subagentes, spawn, spawns, wave, wave.json, manifiesto de ola, colision, colisiones, conflicto de archivos, pisarse, se pisan, muerte de agente, agente muerto, se murio, se murieron, se cayo, se cayeron, limite de sesion, infra-death, infra death, reanudar, reanudacion, recuperar ola, recuperacion de ola, respawn, relanzar, orquestador, orquestrador, contratos, ownership, propiedad de archivos, SendMessage, trabajo perdido, se me murio un agente, se me murio un builder, se me murio el agente, murio a mitad, checklist de rescate, rescate de ola, protocolo de muerte, que hago si se muere un agente, audita el disco, auditar el disco, antes de relanzar, mirar el disco, stub de 0 bytes, 0 bytes, archivo vacio, archivo en cero, tamano en disco, reporte vacio, reporte truncado, no es fallo del modelo, no lo cuentes como fallo, senal de capacidad, infraDeath, INFRA_DEATH, sufijo de fase, arqueologia, trabajo huerfano, delta, respawn estrecho, siembra en disco, sembrar datos, fixture sembrado, qa reanudable, resumeFromRunId, HEAD, mover HEAD, checkout a mitad de sesion, cambio de rama, cambia de rama, rama se movio, rama distinta a mitad, builder en rama vieja, construyendo sobre rama vieja, git checkout, git switch, reflog, conteo de tests no cuadra, numero de tests no coincide, cifra medida que no cuadra, metrica no coincide, discrepancia de tests, señal no ruido, no es ruido]
 preguntas: ["¿por qué se me murieron los agentes a mitad de la ola?", "¿cómo reparto el trabajo entre varios agentes?", "¿cómo lanzo varios builders sin que se pisen los archivos?", "¿qué hago si un builder se cayó a mitad del trabajo?", "¿cómo recupero una ola que murió?", "¿cuántos agentes puedo lanzar a la vez?", "se me murió un agente, ¿qué hago?", "¿qué reviso antes de relanzar un builder muerto?", "el agente dijo que arrancó pero no veo nada en disco, ¿entregó o no?", "¿cómo anoto una muerte por límite de sesión sin que cuente como fallo del modelo?", "el conteo de tests no coincide con lo esperado, ¿lo ignoro?", "¿puede un subagente cambiar la rama del repo?", "¿por qué dos builders en paralelo construyeron sobre código viejo?"]
 proyectos: [infrapilot, estanco-contable, villa-broaster, wrd, placita, orama, landings]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-08-26
 ---
 
 # Repartir trabajo entre agentes en paralelo sin colisiones ni pérdidas
@@ -77,10 +77,26 @@ calibración**: los dos builders que trabajaron sobre la rama equivocada no
 representan un fallo de capacidad del modelo — fue el entorno moviéndoles el suelo
 por debajo, igual que un infra-death (`placita/KN-052`).
 
+**Hay una segunda forma de morir, y no es el límite de sesión: el TOPE DE SALIDA.**
+Medido el 2026-08-26 construyendo el catálogo de ORION: cinco builders escribían
+un JSON grande cada uno; cuatro entregaron (122, 142, 147 y 85 KB) y **uno murió
+con «Claude's response exceeded the 64000 output token maximum», dejando el disco
+vacío**. La diferencia no fue el modelo ni el tamaño del archivo —el que murió
+iba a ser el más pequeño de los cinco—: fue que los que sobrevivieron lo
+escribieron **por tandas** (20 y 31 llamadas de herramienta) y el que murió
+intentó una sola escritura gigante. Se reconoce al instante porque **no deja
+nada**: no es un archivo a medias, es un archivo que no existe. Y como cualquier
+muerte de infraestructura, **no es un fallo de capacidad del modelo** y no debe
+subir su tier.
+
 ## Cómo se aplica
 
 **Antes de lanzar (esto es la mitad del trabajo):**
 
+0. **Si el encargo produce un archivo generado grande, pide que se escriba por
+   tandas** y que compruebe entre una y otra (para JSON, que siga parseando).
+   Ninguna escritura debería acercarse al tope de salida. Un builder que planea
+   volcar 40 KB de una vez es un builder que va a morir sin dejar rastro.
 1. **Escribe tú los archivos compartidos y decláralos intocables** en cada brief:
    contrato de tipos, seed/datos de demo, tokens visuales, esqueletos de página. Los
    builders codean contra archivos **reales en disco**, no contra una descripción

@@ -1,0 +1,760 @@
+{
+  "categoria": "producto",
+  "nombre": "Producto y negocio",
+  "meta": "Que el software llegue a un dueño real que lo entienda, lo use todos los días y lo pague todos los meses — y que cada una de esas cuatro cosas se compruebe con un archivo, una firma con fecha o un número medido.",
+  "arquetipos": [
+    {
+      "id": "prod.alcance.una-frase-que-el-dueno-repite",
+      "titulo": "Escribir en una frase qué hace este sistema por ESTE negocio",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Sin una frase acordada, cada conversación reabre el proyecto entero y el dueño espera algo distinto de lo que se está construyendo. Se descubre el día de la entrega, cuando ya no hay presupuesto para corregirlo.",
+      "queHacer": [
+        "Escribir una sola frase con esta forma: para <quién, con nombre y puesto>, que <problema medible de hoy>, este sistema <lo que hace>, y se nota en <el número o el hecho que cambia>.",
+        "Prohibido nombrar tecnología en la frase: si aparece la base de datos o el framework, está escrita para nosotros y no para él.",
+        "Leérsela al dueño y anotar la frase con la que ÉL la repite; si repite otra cosa, la buena es la suya.",
+        "Dejarla como primera línea de `docs/negocio/alcance.md` y como primera línea del brief que lee cualquier agente."
+      ],
+      "aceptacion": [
+        { "check": "La frase existe y es una sola", "comando": "head -3 docs/negocio/alcance.md", "espera": "1 frase de ≤40 palabras en la primera línea de contenido" },
+        { "check": "No nombra tecnología", "comando": "head -3 docs/negocio/alcance.md | grep -niE 'supabase|next|api|base de datos|react|typescript'", "espera": "0 líneas" },
+        { "check": "El dueño la repitió con sus palabras", "comando": "grep -nE 'Confirmada por .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/negocio/alcance.md", "espera": "1 línea" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/negocio/alcance.md"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    {
+      "id": "prod.alcance.lo-que-no-entra",
+      "titulo": "Escribir la lista de lo que este sistema NO va a hacer",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Lo que no está escrito como excluido se asume incluido, y se termina construyendo gratis un módulo que nadie cotizó. La casa ya tiene la lista de lo que siempre se cobra aparte: rediseño, módulo nuevo, integración no prevista, migración y capacitación extra.",
+      "queHacer": [
+        "Listar, por nombre, lo que el dueño podría suponer incluido y no lo está: rediseño o cambio de identidad, módulo fuera de alcance, integración con un tercero no prevista, migración de datos vieja, capacitación más allá de la entrega.",
+        "Añadir lo específico de ESTE negocio que ya salió en conversación y se dejó fuera (segunda sede, domicilios propios, nómina, inventario por lote…).",
+        "Al lado de cada exclusión, escribir qué pasa si el dueño la pide igual: se cotiza aparte, entra en la siguiente etapa, o no se hace nunca y por qué.",
+        "Cerrar con la regla de negociación de la casa: si piden rebaja se quita alcance, no se baja el precio."
+      ],
+      "aceptacion": [
+        { "check": "La lista tiene filas y ninguna queda sin consecuencia", "comando": "grep -c '^| ' docs/negocio/fuera-de-alcance.md", "espera": "5+ filas" },
+        { "check": "Ninguna fila queda sin decir qué pasa si lo piden", "comando": "grep -nE '^\\|[^|]+\\|[^|]*\\| *\\|' docs/negocio/fuera-de-alcance.md", "espera": "0 líneas" },
+        { "check": "El dueño vio la lista", "comando": "grep -nE 'Le(í|i)da con .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/negocio/fuera-de-alcance.md", "espera": "1 línea" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/negocio/fuera-de-alcance.md"],
+      "cerebro": ["tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.alcance.preguntas-que-cambian-el-precio",
+      "titulo": "Hacer las preguntas al dueño que cambian el diseño y el precio",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Se cotizó y se construyó sin saber si el negocio está obligado a factura electrónica, cuánto se lleva el datáfono o cuántas personas van a usar el sistema; cada una de esas respuestas mueve el módulo de plata y el número de la propuesta. Preguntarlas después es rehacer.",
+      "queHacer": [
+        "Escribir la lista de preguntas cuya respuesta cambia el diseño o el precio, no las de curiosidad: obligación de factura electrónica, comisión del datáfono, precios y carta por sede, quién y cuántos usan el sistema, qué se hace hoy en papel, qué ya se paga a otro proveedor.",
+        "Cada pregunta con una línea de por qué se pregunta: qué se decide distinto según la respuesta.",
+        "Mandarlas por el canal donde el dueño de verdad contesta y anotar la fecha de envío.",
+        "Registrar la respuesta textual con su fecha; lo que no llegue queda como HUECO abierto y bloquea la tarea que dependía de él, no se rellena con un supuesto verosímil."
+      ],
+      "aceptacion": [
+        { "check": "Cada pregunta dice qué decide", "comando": "grep -c '^- \\*\\*P' docs/negocio/preguntas-al-dueno.md", "espera": "6+ preguntas, cada una con su línea 'decide:'" },
+        { "check": "Ninguna respuesta está inventada", "comando": "grep -nE 'respuesta: *(supongo|asumimos|probablemente|por defecto)' docs/negocio/preguntas-al-dueno.md", "espera": "0 líneas" },
+        { "check": "Lo que falta está marcado como hueco", "comando": "grep -c 'HUECO' docs/negocio/preguntas-al-dueno.md", "espera": "tantos HUECO como preguntas sin fecha de respuesta" }
+      ],
+      "aplicaSi": { "modo": "genesis" },
+      "porCada": null,
+      "posee": ["docs/negocio/preguntas-al-dueno.md"],
+      "cerebro": ["tema:cobro-a-clientes", "tema:cero-datos-inventados"]
+    },
+    {
+      "id": "prod.alcance.huecos-en-vez-de-rellenos",
+      "titulo": "Convertir en hueco visible cada dato que el dueño todavía no dio",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un dato faltante que se rellena con algo verosímil deja de verse: nadie vuelve a preguntarlo y el sistema sale con un teléfono, un horario o un precio que nadie confirmó. Un hueco marcado se pregunta; un relleno se publica.",
+      "queHacer": [
+        "Recorrer el sistema y el material del cliente buscando todo dato de hecho sin origen: teléfonos, horarios, precios, nombres de producto, cifras, nombres de personas.",
+        "Cada uno pasa a `docs/negocio/huecos.md` con: qué falta, quién lo tiene, para cuándo se necesita y qué tarea queda bloqueada sin él.",
+        "En el sistema, el hueco se ve como hueco —etiqueta visible o campo vacío—, nunca como un valor de ejemplo con pinta de real.",
+        "Dejar un grep de guardia con los rellenos típicos ya vistos para que la siguiente pasada los detecte sola."
+      ],
+      "aceptacion": [
+        { "check": "Ningún relleno verosímil sobrevive en el código", "comando": "grep -rniE 'lorem|ejemplo@|300 ?123 ?4567|555-?[0-9]{4}|Calle 123|\\$ ?9\\.?999' app/ components/ contenido/", "espera": "0 líneas" },
+        { "check": "Cada hueco tiene dueño y fecha", "comando": "grep -c '^| ' docs/negocio/huecos.md", "espera": "1+ filas, todas con columna 'quién lo tiene' y 'para cuándo' llenas" },
+        { "check": "Los huecos bloquean de verdad", "comando": "node tools/plan.mjs estado", "espera": "las tareas que dependen de un hueco aparecen en estado bloqueado, no pendiente" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/negocio/huecos.md"],
+      "cerebro": ["tema:cero-datos-inventados", "tema:encargos-verificables"]
+    },
+    {
+      "id": "prod.alcance.cada-peticion-nueva-clasificada",
+      "titulo": "Clasificar cada petición nueva antes de construirla",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con el cliente ya en marcha, las peticiones llegan sueltas por chat y se construyen por cortesía; a los tres meses la mitad del trabajo del mes es gratis y la mensualidad ya no alcanza para sostenerlo. Lo que no se clasifica al entrar, se regala.",
+      "queHacer": [
+        "Escribir la regla: toda petición se anota antes de tocarse, con fecha, quién la pidió y con qué palabras la pidió.",
+        "Clasificarla en tres cajones y nada más: dentro de la cuota, se cotiza aparte, o no se hace (con el motivo).",
+        "Si cae en 'dentro de la cuota', anotar contra qué renglón de lo que ya se cobra se paga: si no hay renglón, no está dentro de la cuota.",
+        "Responderle al que la pidió con el cajón y el motivo, el mismo día, por el canal donde la pidió.",
+        "Revisar la tabla una vez al mes: si más de un tercio del trabajo hecho fue 'dentro de la cuota' sin renglón, el precio está mal y se revisa."
+      ],
+      "aceptacion": [
+        { "check": "Ninguna petición queda sin clasificar", "comando": "grep -nE '^\\|[^|]+\\|[^|]*\\| *(pendiente de clasificar|\\?|) *\\|' docs/negocio/cambios-de-alcance.md", "espera": "0 líneas" },
+        { "check": "Lo construido este mes salió de la tabla", "comando": "git log --since='1 month ago' --oneline | wc -l; grep -c 'construido' docs/negocio/cambios-de-alcance.md", "espera": "cada cambio funcional del mes tiene su fila; se pega la correspondencia" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/negocio/cambios-de-alcance.md"],
+      "cerebro": ["tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.datos-reales.inventario-de-lo-que-solo-tiene-el-dueno",
+      "titulo": "Listar lo que solo el dueño tiene y ponerle fecha de entrega",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El proyecto se frena semanas esperando fotos, la carta con precios o el horario de festivos, y nadie sabe qué falta exactamente porque nunca se listó. Mientras tanto se rellena con material inventado que después hay que quitar entero.",
+      "queHacer": [
+        "Recorrer pantalla por pantalla y anotar cada pieza que el negocio tiene y nosotros no: fotos de los productos, lista de precios vigente, horarios y festivos, teléfono y dirección reales, logo en alta, nombres del equipo, textos legales existentes.",
+        "Por cada pieza: quién la tiene, en qué formato la va a mandar, para cuándo, y qué pantalla queda incompleta sin ella.",
+        "Ordenar la lista por lo que bloquea antes, y mandarle al dueño solo las tres primeras: una lista de veinte cosas no la llena nadie.",
+        "Marcar en el inventario lo recibido con la fecha en que llegó; lo no recibido se queda visible, no se sustituye."
+      ],
+      "aceptacion": [
+        { "check": "El inventario existe con dueño y fecha por fila", "comando": "grep -c '^| ' docs/cliente/material.md", "espera": "6+ filas, todas con 'quién' y 'para cuándo'" },
+        { "check": "Nada figura como recibido sin fecha", "comando": "grep -nE 'recibido' docs/cliente/material.md | grep -vE '20[0-9]{2}-[0-9]{2}-[0-9]{2}'", "espera": "0 líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/cliente/material.md"],
+      "cerebro": ["tema:cero-datos-inventados", "tema:generadores-de-diseno"]
+    },
+    {
+      "id": "prod.datos-reales.foto-de-lo-que-se-vende",
+      "titulo": "Conseguir foto real de cada cosa que el negocio vende de verdad",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La casa prohíbe la foto de stock y genera imágenes, pero nadie escribió cómo se consigue la foto del producto real: el cliente que llega por una foto generada y recibe otra cosa no vuelve, y esa foto la firmó el dueño. La imagen generada sirve de ambiente, no de producto.",
+      "queHacer": [
+        "Separar en dos listas: lo que existe físicamente y se vende (necesita foto real) y lo que es ambiente o ilustración (puede ser imagen generada).",
+        "Escribir la lista de tomas como encargo para quien la va a hacer: qué producto, con qué fondo, a qué hora del día, en qué plato o empaque, cuántas tomas, y con el celular que ya tiene.",
+        "Fijar día y responsable de la sesión; si el negocio no puede, la pieza queda como HUECO y el producto sale sin foto, no con una parecida.",
+        "Registrar por cada imagen publicada su origen: foto real (fecha y quién la tomó) o imagen generada, y para qué se usa.",
+        "Revisar que ninguna imagen de producto real esté marcada como generada ni descargada de un banco."
+      ],
+      "aceptacion": [
+        { "check": "Cada imagen publicada tiene origen escrito", "comando": "ls public/img/productos/ | wc -l; grep -c '^| ' docs/cliente/fotos.md", "espera": "las dos cifras coinciden" },
+        { "check": "Ningún producto real ilustrado con banco de imágenes", "comando": "grep -rniE 'unsplash|pexels|shutterstock|istock|freepik' public/ app/ contenido/ docs/cliente/fotos.md", "espera": "0 líneas" },
+        { "check": "Ningún producto que se vende usa imagen generada", "comando": "grep -nE '^\\|[^|]+\\| *producto real *\\| *generada' docs/cliente/fotos.md", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/cliente/fotos.md"],
+      "cerebro": ["tema:generadores-de-diseno", "tema:cero-datos-inventados"]
+    },
+    {
+      "id": "prod.datos-reales.precios-y-horarios-de-la-fuente",
+      "titulo": "Traer precios y horarios de la fuente del negocio, con su fecha",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un precio viejo publicado es una promesa que el mostrador tiene que honrar o discutir con el cliente delante. Sin la fecha del dato, nadie sabe si lo que se ve tiene una semana o cinco meses.",
+      "queHacer": [
+        "Pedir la fuente tal como existe en el negocio —foto de la carta, lista de WhatsApp, archivo del contador— y guardarla como está en `docs/cliente/`.",
+        "Transcribir a la estructura del sistema sin ajustar ni redondear nada: si un precio se ve raro, se pregunta, no se corrige.",
+        "Guardar junto a cada bloque de precios la fecha de la fuente y quién la entregó.",
+        "Mostrar esa fecha donde el precio se ve, o al menos donde el dueño puede revisarla.",
+        "Anotar cada diferencia encontrada entre lo que decía el sistema y lo que dice la fuente: esa lista es lo que se le confirma al dueño."
+      ],
+      "aceptacion": [
+        { "check": "Cada precio publicado se puede rastrear a la fuente", "comando": "grep -c '^| ' docs/cliente/precios-y-horarios.md", "espera": "una fila por precio o bloque, cada una con 'fuente' y fecha" },
+        { "check": "La fuente original está guardada", "comando": "ls docs/cliente/fuente-precios.* docs/cliente/fuente/*", "espera": "1+ archivos" },
+        { "check": "Ningún precio quedó sin fecha", "comando": "grep -nE '^\\| *\\$' docs/cliente/precios-y-horarios.md | grep -vE '20[0-9]{2}-[0-9]{2}-[0-9]{2}'", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "superficies": ["landing", "vitrina", "caja"] },
+      "porCada": null,
+      "posee": ["docs/cliente/precios-y-horarios.md", "docs/cliente/fuente/**"],
+      "cerebro": ["tema:cero-datos-inventados", "tema:pantalla-publica"]
+    },
+    {
+      "id": "prod.datos-reales.lo-que-caduca-y-quien-lo-refresca",
+      "titulo": "Marcar qué dato caduca, cada cuánto y quién lo refresca",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El horario de diciembre, la promoción que terminó y el producto que se dejó de vender siguen publicados porque nadie tiene esa tarea. El sistema envejece solo y el dueño se entera por un cliente molesto.",
+      "queHacer": [
+        "Listar los datos que caducan: horarios y festivos, promociones, carta o catálogo, precios, teléfono del domiciliario, fotos de temporada.",
+        "Por cada uno: cada cuánto cambia de verdad en este negocio, quién lo cambia y en qué pantalla lo cambia.",
+        "Para los que caducan en fecha fija (promoción, festivo), guardar la fecha de vencimiento junto al dato para que el sistema pueda avisar o esconderlo.",
+        "Dejar un chequeo que liste lo vencido y lo que lleva más tiempo sin tocarse que su periodo declarado."
+      ],
+      "aceptacion": [
+        { "check": "El chequeo de caducidad corre y no encuentra vencidos", "comando": "node scripts/caducidad.mjs", "espera": "exit 0 y 0 datos vencidos" },
+        { "check": "El chequeo detecta de verdad", "comando": "node scripts/caducidad.mjs --simular-vencido; echo EXIT=$?", "espera": "EXIT distinto de 0 y el dato simulado aparece listado" },
+        { "check": "Cada dato que caduca tiene responsable", "comando": "grep -nE '^\\|[^|]+\\|[^|]*\\| *(nadie|\\?|) *\\|' docs/cliente/caducidad.md", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/cliente/caducidad.md", "scripts/caducidad.mjs"],
+      "cerebro": ["tema:cero-datos-inventados", "tema:pantalla-publica"]
+    },
+    {
+      "id": "prod.datos-reales.el-dueno-cambia-sin-nosotros",
+      "titulo": "Que el dueño cambie {{entidad}} sin llamarnos, y verlo hacerlo",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si cambiar un precio exige escribirnos, el dueño deja de cambiarlo: el sistema se queda viejo y nosotros quedamos de mantenimiento gratis para siempre. Un cliente que no puede editar lo suyo es un cliente que se va cuando encuentre a alguien que se lo deje editar.",
+      "queHacer": [
+        "Elegir los campos de {{entidad}} que el dueño cambia de verdad —precio, nombre, foto, disponible o no— y dejarlos editables desde su pantalla, no desde la base.",
+        "El cambio se ve publicado sin que nadie despliegue nada, y se puede deshacer.",
+        "Escribir media página con los pasos exactos, nombrando los botones como se ven, en `docs/cliente/edicion-{{entidad}}.md`.",
+        "Sentarlo a hacerlo él, sin tocar nosotros el teclado, y anotar en qué paso dudó y qué palabra de la pantalla lo confundió.",
+        "Corregir la pantalla con lo que salió de esa prueba antes de darla por hecha."
+      ],
+      "aceptacion": [
+        { "check": "El cambio se publica sin despliegue", "comando": "npm test -- edicion-{{entidad}}", "espera": "test verde: editar y leer devuelve el valor nuevo sin reiniciar" },
+        { "check": "El dueño lo hizo solo y quedó anotado", "comando": "grep -nE 'Lo hizo .+ sin ayuda el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/cliente/edicion-{{entidad}}.md", "espera": "1 línea, más la lista de dudas observadas" },
+        { "check": "Los pasos nombran botones, no conceptos técnicos", "comando": "grep -niE 'endpoint|deploy|commit|json|base de datos' docs/cliente/edicion-{{entidad}}.md", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "entidades": ["*"], "equipo": "orion+humanos" },
+      "porCada": "entidad",
+      "posee": ["docs/cliente/edicion-{{entidad}}.md"],
+      "cerebro": ["tema:documentos-para-personas", "tema:acceso-roles-y-puestos"]
+    },
+    {
+      "id": "prod.copy.promesa-que-el-negocio-puede-cumplir",
+      "titulo": "Comprobar que cada promesa de la página la puede cumplir el negocio",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "«Entrega en 30 minutos» escrito por nosotros lo cumple el que maneja la moto, no la página. Una promesa que el negocio no puede sostener convierte cada venta en un reclamo, y el que queda mal es el dueño.",
+      "queHacer": [
+        "Extraer TODA promesa del texto público: tiempos, coberturas, garantías, horarios de atención, formas de pago, devoluciones.",
+        "Por cada una, escribir quién la cumple dentro del negocio y con qué capacidad real (cuántas motos, cuántas personas, hasta qué hora).",
+        "Confirmar cada una con el dueño en una frase suya, no con un supuesto nuestro; lo que no confirme, sale del texto.",
+        "Reescribir en promesa cumplible lo que no aguante: menos ambicioso y verdadero vende más que ambicioso y falso.",
+        "Dejar la tabla promesa → quién la cumple → confirmada el <fecha>, en `docs/negocio/promesas.md`."
+      ],
+      "aceptacion": [
+        { "check": "Ninguna promesa queda sin quién la cumple", "comando": "grep -nE '^\\|[^|]+\\| *(\\?|nadie|) *\\|' docs/negocio/promesas.md", "espera": "0 líneas" },
+        { "check": "Toda promesa del texto está en la tabla", "comando": "grep -rniE 'garantiza|garantía|en [0-9]+ minutos|24 ?/ ?7|siempre|gratis' app/ components/ contenido/", "espera": "cada línea encontrada tiene su fila en docs/negocio/promesas.md; se pega la correspondencia" },
+        { "check": "Cada fila está confirmada con fecha", "comando": "grep -c '20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]' docs/negocio/promesas.md", "espera": "tantas fechas como filas de promesa" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/negocio/promesas.md"],
+      "cerebro": ["tema:pantalla-publica", "tema:cero-datos-inventados"]
+    },
+    {
+      "id": "prod.copy.palabras-del-negocio-no-del-publicista",
+      "titulo": "Escribir la página con las palabras que usa el negocio",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "El texto genérico de agencia —«soluciones integrales», «excelencia»— no lo dice el dueño ni lo busca el cliente, y hace que la página parezca de cualquiera. El que compra busca la palabra con la que él pide la cosa, no la que suena elegante.",
+      "queHacer": [
+        "Sacar de mensajes reales, pedidos y conversaciones del negocio las palabras con que el cliente pide lo que vende: el plato, la porción, el corte, la marca, el barrio.",
+        "Armar un glosario de 10 a 20 términos con su origen (mensaje, fecha o de quién se oyó) y usarlos tal cual en títulos y botones.",
+        "Prohibir en el texto la lista de muletillas de agencia y dejarla como grep de guardia.",
+        "Leer el texto en voz alta con el dueño: lo que él no diría con esas palabras, se cambia por las suyas."
+      ],
+      "aceptacion": [
+        { "check": "No queda lenguaje de agencia", "comando": "grep -rniE 'soluciones integrales|excelencia|sinergia|de vanguardia|l(í|i)deres del mercado|pasi(ó|o)n por' app/ components/ contenido/", "espera": "0 líneas" },
+        { "check": "El glosario tiene origen por término", "comando": "grep -c '^| ' docs/negocio/voz.md", "espera": "10+ filas, todas con columna de origen llena" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/negocio/voz.md"],
+      "cerebro": ["tema:pantalla-publica", "tema:generadores-de-diseno"]
+    },
+    {
+      "id": "prod.copy.el-boton-lleva-a-alguien-que-contesta",
+      "titulo": "Probar que el botón de la página llega a alguien que contesta",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "WhatsApp es el canal real de al menos tres de estos negocios, y un botón que abre un número equivocado, sin mensaje previo o que nadie mira los sábados, convierte cada visita pagada en una venta perdida sin que nadie se entere.",
+      "queHacer": [
+        "Escribir a qué canal va cada llamado a la acción, qué número o cuenta exacta, quién lo atiende y en qué horas.",
+        "Dejar el mensaje previo escrito de forma que el que atiende sepa de dónde viene la persona y qué estaba mirando.",
+        "Probarlo de verdad desde un teléfono que no sea el nuestro, en horario de negocio y en horario cerrado, y pegar la hora de envío y la hora de la respuesta.",
+        "Escribir qué pasa fuera de horario: respuesta automática, mensaje de espera o formulario, pero algo, no silencio.",
+        "Dejar el número en un solo sitio del código para que cambiarlo no exija tocar cinco archivos."
+      ],
+      "aceptacion": [
+        { "check": "No hay números de prueba o placeholder en el código", "comando": "grep -rnE '(57)?3[0-9]{9}|300 ?123 ?4567|wa\\.me/[0-9]+' app/ components/ contenido/ | grep -v 'lib/config'", "espera": "0 líneas fuera del archivo de configuración" },
+        { "check": "Alguien contestó la prueba", "comando": "grep -nE 'enviado 20[0-9]{2}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}.*respondido [0-9]{2}:[0-9]{2}' docs/negocio/canal-de-venta.md", "espera": "1+ líneas con las dos horas" },
+        { "check": "El fuera de horario está resuelto", "comando": "grep -niE 'fuera de horario' docs/negocio/canal-de-venta.md", "espera": "1+ líneas describiendo qué recibe la persona" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/negocio/canal-de-venta.md"],
+      "cerebro": ["tema:pantalla-publica", "tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.copy.aprobado-por-el-dueno-con-fecha",
+      "titulo": "Publicar solo el texto que el dueño leyó y aprobó con fecha",
+      "nivel": "N2",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "El texto público lo firma el dueño aunque lo hayamos escrito nosotros: si dice algo que él no diría, el que da explicaciones es él. Aprobar «por chat, en algún momento» no sirve cuando el texto ya cambió tres veces desde entonces.",
+      "queHacer": [
+        "Congelar la versión que se le manda a revisar: fecha y número de líneas o hash del archivo de contenido.",
+        "Mandarle el texto como se ve en pantalla, no en un documento aparte.",
+        "Anotar su respuesta textual y la fecha, y qué cambió él con sus palabras.",
+        "Si el texto se modifica después de aprobado, vuelve a estado 'sin aprobar' hasta que lo vea otra vez."
+      ],
+      "aceptacion": [
+        { "check": "La aprobación existe con fecha y versión", "comando": "grep -nE 'Aprobado por .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2} .*(versi(ó|o)n|hash|l(í|i)neas)' docs/negocio/aprobacion-copy.md", "espera": "1 línea" },
+        { "check": "El texto publicado es el aprobado", "comando": "md5sum contenido/*.md contenido/*.json | sort", "espera": "coincide con los hashes anotados en docs/negocio/aprobacion-copy.md" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/negocio/aprobacion-copy.md"],
+      "cerebro": ["tema:pantalla-publica", "tema:que-es-estar-verificado"]
+    },
+    {
+      "id": "prod.copy.relectura-contra-el-negocio-real",
+      "titulo": "Releer la página completa contra el negocio de hoy, cada trimestre",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La página se escribió una vez y el negocio siguió: cambió el horario, subió el precio, se dejó de vender un producto y entró otro. Un texto que envejece calladamente le hace perder al dueño la venta que la página prometió.",
+      "queHacer": [
+        "Recorrer el texto público entero renglón por renglón contra la realidad de hoy: precios, horarios, productos, personas, teléfonos, promesas de tiempo.",
+        "Anotar cada discrepancia encontrada con la fecha y lo que decía antes: esa lista es la medida de cuánto envejeció.",
+        "Corregir, y aprovechar para quitar lo que sobra: la palabra que nadie usa, el bloque que nadie mira.",
+        "Presupuestar la relectura como trabajo real —cuesta casi lo mismo que escribir— y dejar la fecha de la próxima.",
+        "Registrar quién la hizo y en qué fecha, al pie del documento."
+      ],
+      "aceptacion": [
+        { "check": "La relectura está fechada y firmada", "comando": "grep -nE 'Rele(í|i)do por .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/negocio/relectura.md", "espera": "1+ líneas, la última de menos de 3 meses" },
+        { "check": "Las discrepancias quedaron escritas y corregidas", "comando": "grep -c '^| ' docs/negocio/relectura.md", "espera": "1+ filas, todas con columna 'corregido el'" },
+        { "check": "No reaparecieron rellenos ni jerga de agencia", "comando": "grep -rniE 'lorem|ejemplo@|soluciones integrales|pr(ó|o)ximamente' app/ components/ contenido/", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/negocio/relectura.md"],
+      "cerebro": ["tema:pantalla-publica", "tema:cero-datos-inventados"]
+    },
+    {
+      "id": "prod.precio.modelo-de-cobro-confirmado-antes-de-la-cifra",
+      "titulo": "Confirmar el modelo de cobro antes de escribir la primera cifra",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Ya pasó: una propuesta salió con bloque de pago único, el dueño corrigió en reunión que aquí se cobra por mensualidades con permanencia, y hubo que reescribir el capítulo de inversión — y hoy dos documentos del mismo cliente todavía se contradicen. Escribir la cifra antes de confirmar el modelo obliga a rehacer el documento entero.",
+      "queHacer": [
+        "Preguntar y anotar, antes de teclear cualquier número: mensualidad con permanencia, instalación más mensualidad, o por tramos de uso.",
+        "No dar por buena la memoria del proyecto: si un documento viejo dice otra cosa, está desactualizado y se marca como superado con la fecha.",
+        "Escribir el modelo elegido en `docs/negocio/modelo-de-cobro.md` con quién lo confirmó y cuándo.",
+        "Si el modelo entra sin cobro de instalación, la permanencia mínima queda escrita en el mismo documento; sin ese número el modelo está incompleto.",
+        "Pasar un grep por TODOS los documentos que ve el cliente para que ninguno siga hablando de otro modelo."
+      ],
+      "aceptacion": [
+        { "check": "Ningún documento del cliente habla de pago único", "comando": "grep -rniE 'pago (ú|u)nico|un solo pago|una sola vez' docs/ propuesta*.html plan-servicio*.html", "espera": "0 líneas" },
+        { "check": "El modelo está escrito y confirmado", "comando": "grep -nE 'Confirmado por .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/negocio/modelo-de-cobro.md", "espera": "1 línea" },
+        { "check": "Si no hay instalación, hay permanencia con número", "comando": "grep -niE 'permanencia (m(í|i)nima)? *: *[0-9]+ meses' docs/negocio/modelo-de-cobro.md", "espera": "1 línea con cifra, o la línea que declara que sí hay cobro de instalación" }
+      ],
+      "aplicaSi": { "modo": "genesis" },
+      "porCada": null,
+      "posee": ["docs/negocio/modelo-de-cobro.md"],
+      "cerebro": ["tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.precio.la-cuenta-de-lo-que-gana-o-ahorra",
+      "titulo": "Hacer la cuenta de lo que el cliente gana o deja de perder",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cotizar contra lo que nos cuestan las herramientas lleva a cobrar por un sistema lo que cuesta el hosting; el costo fijo de la casa es el mismo con un cliente que con ocho. Sin la cuenta del cliente, la conversación es «cuánto cuesta la página» en vez de «cuánto está regalando cada mes».",
+      "queHacer": [
+        "Pedirle al dueño los números de su operación, no estimarlos: cuántos pedidos al mes, ticket promedio, qué comisión le cobran hoy, cuánto tiempo le toma la tarea que el sistema reemplaza.",
+        "Hacer la cuenta con SUS números y dejar cada supuesto escrito al lado del resultado; si un número no lo dio él, va marcado como supuesto y no como hecho.",
+        "Expresar el resultado en la unidad que él entiende: pesos al mes, horas a la semana, o pedidos perdidos.",
+        "Leérsela y anotar si la reconoce; una cuenta que el dueño no reconoce como suya no sirve para vender ni para fijar precio.",
+        "Guardar el archivo con fecha: esa cuenta es la línea contra la que después se medirá si el sistema sirvió."
+      ],
+      "aceptacion": [
+        { "check": "Todo número de la cuenta tiene origen", "comando": "grep -nE '^\\|' docs/negocio/lo-que-gana.md | grep -vE 'dato del due(ñ|n)o|medido|SUPUESTO'", "espera": "0 líneas (fuera de la cabecera de la tabla)" },
+        { "check": "Los supuestos están separados de los hechos", "comando": "grep -c 'SUPUESTO' docs/negocio/lo-que-gana.md", "espera": "1+ líneas, o la línea que declara que todos los números los dio el dueño" },
+        { "check": "El dueño reconoció la cuenta", "comando": "grep -nE 'Revisada con .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/negocio/lo-que-gana.md", "espera": "1 línea" }
+      ],
+      "aplicaSi": { "modo": "genesis" },
+      "porCada": null,
+      "posee": ["docs/negocio/lo-que-gana.md"],
+      "cerebro": ["tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.precio.tres-opciones-y-la-del-medio",
+      "titulo": "Presentar tres opciones de servicio, nunca una sola",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con una sola opción la decisión del cliente es sí o no, y la mitad de las veces es no. Con tres, la conversación pasa a ser cuál, y la mayoría toma la del medio: si no hay tres, se pierde el control de dónde cae.",
+      "queHacer": [
+        "Armar tres opciones que se distingan por ALCANCE, no por descuento: qué incluye cada una y qué no.",
+        "Poner en la del medio lo que de verdad queremos vender, y que las otras dos existan para darle contexto.",
+        "Cada opción lleva su mensualidad y, si aplica, su instalación y su permanencia, con la misma estructura.",
+        "Escribir debajo de cada una qué recibe el cliente cada mes por esa cuota: si una opción no tiene nada que entregar mensualmente, la cancelan a los tres o cuatro meses y con razón.",
+        "Dejar escrito, para uso interno, que si piden rebaja se quita alcance y no se baja la cifra."
+      ],
+      "aceptacion": [
+        { "check": "Hay exactamente tres opciones", "comando": "grep -c '^## Opci(ó|o)n' docs/negocio/propuesta.md", "espera": "3 líneas" },
+        { "check": "Cada opción dice qué se entrega cada mes", "comando": "grep -c 'Cada mes recibe' docs/negocio/propuesta.md", "espera": "3 líneas" },
+        { "check": "Ninguna opción se presenta como pago único", "comando": "grep -niE 'pago (ú|u)nico|un solo pago' docs/negocio/propuesta.md", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "modo": "genesis" },
+      "porCada": null,
+      "posee": ["docs/negocio/propuesta.md"],
+      "cerebro": ["tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.precio.que-incluye-la-cuota-cada-mes",
+      "titulo": "Escribir qué recibe el cliente cada mes por la cuota",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una mensualidad sin nada que entregar se cancela al tercer o cuarto mes, y el cliente tiene razón: pagó por algo que no cambió. Si lo que da la cuota no está escrito, ni el dueño sabe qué está comprando ni nosotros sabemos qué debemos.",
+      "queHacer": [
+        "Listar lo que la cuota cubre, en cosas que el cliente pueda notar: que siga al aire, que alguien responda cuando se rompe, una mejora pequeña al mes, el reporte mensual.",
+        "Escribir al lado de cada renglón cómo se comprueba que se entregó ese mes (el reporte enviado, el registro de soporte, el cambio publicado).",
+        "Listar aparte lo que NO cubre, apuntando al documento de fuera de alcance para no repetir dos verdades distintas.",
+        "Revisar al cierre de cada mes que los renglones se entregaron; el que no, se anota como deuda, no se olvida."
+      ],
+      "aceptacion": [
+        { "check": "Cada renglón dice cómo se comprueba", "comando": "grep -nE '^\\|[^|]+\\| *(\\?|) *\\|' docs/negocio/que-incluye.md", "espera": "0 líneas" },
+        { "check": "Hay algo entregable cada mes, no solo estar al aire", "comando": "grep -ciE 'reporte|mejora|revisi(ó|o)n' docs/negocio/que-incluye.md", "espera": "2+ líneas" },
+        { "check": "El mes pasado se entregó lo prometido", "comando": "grep -nE '20[0-9]{2}-[0-9]{2} *\\| *entregado' docs/negocio/que-incluye.md", "espera": "1+ líneas del mes anterior, o la deuda anotada" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/negocio/que-incluye.md"],
+      "cerebro": ["tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.precio.que-pasa-si-deja-de-pagar",
+      "titulo": "Decidir y escribir qué pasa con sus datos si deja de pagar",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El día que un cliente deja de pagar, alguien tiene que decidir en caliente si se apaga la caja con la que factura, si se borran sus ventas o si el dominio se pierde — y decidirlo enojado sale mal para los dos. Sin regla escrita, o se le hace un daño que no le corresponde, o se le regala el servicio indefinidamente.",
+      "queHacer": [
+        "Escribir la escala en el tiempo: qué pasa el día 1 de mora, a los 15, a los 30 y a los 90, para cada cosa (acceso, publicación, dominio, respaldo de sus datos).",
+        "Decidir explícitamente qué NUNCA se hace, aunque no pague: borrar los datos que la ley o el negocio le obligan a conservar, y quedarse con el dominio a nombre nuestro sin decirlo.",
+        "Definir cómo se entrega su información si se va: en qué formato, en cuántos días y quién la genera.",
+        "Escribir el aviso previo: cuántos días antes se le avisa y por qué canal, antes de apagar nada.",
+        "Que el dueño lea esta hoja ANTES de firmar, no cuando ya deba dos meses."
+      ],
+      "aceptacion": [
+        { "check": "La escala está escrita con los cuatro momentos", "comando": "grep -cE 'd(í|i)a 1|15 d(í|i)as|30 d(í|i)as|90 d(í|i)as' docs/negocio/impago.md", "espera": "4+ líneas" },
+        { "check": "Está escrito cómo se le entregan sus datos", "comando": "grep -niE 'se le entrega|exportaci(ó|o)n|formato' docs/negocio/impago.md", "espera": "1+ líneas con formato y plazo" },
+        { "check": "El dueño lo leyó antes de firmar", "comando": "grep -nE 'Le(í|i)do por .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/negocio/impago.md", "espera": "1 línea, con fecha anterior o igual a la del acuerdo firmado" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/negocio/impago.md"],
+      "cerebro": ["tema:cobro-a-clientes", "tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "prod.precio.costo-real-de-sostener-a-este-cliente",
+      "titulo": "Sumar renglón por renglón lo que cuesta sostener a este cliente al mes",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin el costo real medido no se sabe si la mensualidad deja margen o lo consume, y el primer cliente termina pagando la infraestructura de todos sin que nadie lo haya calculado. El costo fijo de la casa es el mismo con uno que con ocho clientes: lo que hay que saber es cuánto suma ESTE.",
+      "queHacer": [
+        "Listar cada renglón con su factura real: hosting, dominio, base de datos, mensajería, modelos de IA, y el prorrateo de las herramientas fijas de la casa.",
+        "Añadir lo que se olvida siempre: horas de soporte del mes, la mejora incluida en la cuota y el tiempo del reporte.",
+        "Anotar de dónde sale cada cifra (recibo, panel del proveedor, sesión medida en tokens), no de memoria.",
+        "Restar del cobro mensual y dejar el margen escrito, en pesos y en porcentaje.",
+        "Marcar los renglones que crecen si al cliente le va bien: esos son los que hay que topar en el contrato."
+      ],
+      "aceptacion": [
+        { "check": "Cada renglón tiene su origen", "comando": "grep -nE '^\\| ' docs/negocio/costo-mensual.md | grep -vE 'recibo|panel|medido|tokens'", "espera": "0 líneas fuera de cabecera y total" },
+        { "check": "El margen está calculado", "comando": "grep -niE 'margen' docs/negocio/costo-mensual.md", "espera": "1+ líneas con cifra y porcentaje" },
+        { "check": "Está marcado lo que escala con el éxito del cliente", "comando": "grep -c 'ESCALA' docs/negocio/costo-mensual.md", "espera": "1+ líneas, o la línea que declara que ningún renglón es variable" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/negocio/costo-mensual.md"],
+      "cerebro": ["tema:cobro-a-clientes", "tema:modelos-y-costos"]
+    },
+    {
+      "id": "prod.precio.tope-al-consumo-que-crece-con-el-exito",
+      "titulo": "Poner tope escrito al consumo que crece cuando al cliente le va bien",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El consumo variable —conversaciones de mensajería, operaciones de IA, almacenamiento— sube con las ventas del cliente mientras la cuota se queda quieta: sin cláusula de tope, el cliente que más crece es el que deja pérdida. Y se descubre con la factura del proveedor, no antes.",
+      "queHacer": [
+        "Identificar cada renglón que crece con el uso y su unidad real (conversación, operación, gigabyte, mensaje).",
+        "Fijar el número incluido en la cuota para cada uno, calculado sobre el consumo medido de los últimos meses, no a ojo.",
+        "Escribir en el acuerdo la frase de tope: incluye hasta N al mes; lo que pase se factura aparte, a tanto la unidad.",
+        "Medir el consumo mes a mes y avisar al cliente ANTES de pasarse, no después de cobrarle.",
+        "Dejar una alerta que avise al llegar a un porcentaje del tope."
+      ],
+      "aceptacion": [
+        { "check": "Cada renglón variable tiene su tope con número", "comando": "grep -nE 'incluye hasta [0-9]+' docs/negocio/tope-de-consumo.md", "espera": "1+ líneas, una por renglón variable" },
+        { "check": "El tope está también en el acuerdo firmado", "comando": "grep -niE 'incluye hasta|se factura aparte' docs/negocio/contrato.md", "espera": "1+ líneas" },
+        { "check": "El consumo del mes se mide solo", "comando": "node scripts/consumo.mjs --mes-actual", "espera": "exit 0 e imprime consumo y porcentaje del tope por renglón" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/negocio/tope-de-consumo.md", "scripts/consumo.mjs"],
+      "cerebro": ["tema:cobro-a-clientes", "tema:modelos-y-costos"]
+    },
+    {
+      "id": "prod.precio.revision-del-precio-con-el-numero-medido",
+      "titulo": "Revisar el precio una vez al año contra lo medido, no contra la sensación",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El precio se fijó cuando el sistema hacía la mitad y el cliente usaba una pantalla; un año después se soporta más, cuesta más y sigue cobrándose lo mismo. Sin revisión con fecha, el margen se erosiona en silencio hasta que el cliente sale caro y se le atiende peor.",
+      "queHacer": [
+        "Traer los tres números del año: lo que costó sostenerlo, lo que el cliente ganó o ahorró medido, y cuánto soporte consumió.",
+        "Comparar con lo que se prometió al firmar y anotar la diferencia, en los dos sentidos.",
+        "Decidir con eso: se mantiene, sube, o cambia el alcance; y si sube, se avisa con la anticipación pactada.",
+        "Escribir la conversación con el cliente y su respuesta textual, no un resumen.",
+        "Dejar fijada la fecha de la siguiente revisión."
+      ],
+      "aceptacion": [
+        { "check": "La revisión trae los tres números", "comando": "grep -cE 'cost(ó|o)|gan(ó|o)|soporte' docs/negocio/revision-de-precio.md", "espera": "3+ líneas con cifras" },
+        { "check": "La decisión y la fecha están escritas", "comando": "grep -nE 'Decidido el 20[0-9]{2}-[0-9]{2}-[0-9]{2}.*(mantiene|sube|alcance)' docs/negocio/revision-de-precio.md", "espera": "1 línea" },
+        { "check": "Hay fecha de la próxima revisión", "comando": "grep -nE 'Pr(ó|o)xima revisi(ó|o)n: 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/negocio/revision-de-precio.md", "espera": "1 línea" }
+      ],
+      "aplicaSi": { "modo": "evolucion" },
+      "porCada": null,
+      "posee": ["docs/negocio/revision-de-precio.md"],
+      "cerebro": ["tema:cobro-a-clientes", "tema:modelos-y-costos"]
+    },
+    {
+      "id": "prod.entrega.piloto-con-fecha-de-fin-y-firma",
+      "titulo": "Correr un piloto acotado en días que termine en reporte y firma",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El cliente que quiere probar antes de firmar, sin piloto acotado, prueba gratis durante meses y nunca firma. Un piloto con fecha de fin convierte la prueba en una decisión con fecha.",
+      "queHacer": [
+        "Fijar la duración en días y qué se hace cada día, del primero al último, con el último día dedicado a reporte y decisión.",
+        "Escribir qué se va a demostrar exactamente y con qué número se va a demostrar; si no hay número, es una demo, no un piloto.",
+        "Acotar lo que se construye durante el piloto: lo mínimo para producir ese número, nada más.",
+        "Cerrar el último día con el reporte de lo medido y la pregunta de firma; sin decisión escrita, el piloto no terminó.",
+        "No repartir el trabajo al equipo hasta que el cliente esté cerrado."
+      ],
+      "aceptacion": [
+        { "check": "El piloto tiene día por día y fecha de fin", "comando": "grep -cE '^\\| *D[0-9]+' docs/entrega/piloto.md", "espera": "tantas filas como días, la última con 'reporte y decisión'" },
+        { "check": "El número que se iba a demostrar quedó medido", "comando": "grep -nE 'medido: ' docs/entrega/piloto.md", "espera": "1+ líneas con cifra y fecha" },
+        { "check": "Hay decisión escrita al cierre", "comando": "grep -nE '(Firma|Decisi(ó|o)n) de .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/entrega/piloto.md", "espera": "1 línea" }
+      ],
+      "aplicaSi": { "modo": "genesis" },
+      "porCada": null,
+      "posee": ["docs/entrega/piloto.md"],
+      "cerebro": ["tema:cobro-a-clientes", "tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "prod.entrega.lista-de-puesta-en-marcha-firmada",
+      "titulo": "Cerrar la puesta en marcha con una lista firmada, no con un 'ya quedó'",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un PIN de fábrica 0000 estuvo vivo semanas en un sistema entregado porque nadie tenía la lista de lo que se cambia el día de encender. Lo que no está en una lista firmada, se entrega a medias y se descubre por accidente.",
+      "queHacer": [
+        "Escribir la lista de lo que se hace el día de encender: claves y PIN de fábrica cambiados, cuentas de prueba borradas, datos de ejemplo fuera, respaldo probado, dominio apuntando, canal de soporte avisado.",
+        "Cada punto con su comprobación al lado, no con un visto: qué se corre o qué se abre para saber que quedó.",
+        "Correr la lista completa el día de la entrega, delante del dueño, y anotar la hora de cada punto.",
+        "Firmar al pie: quién entregó, quién recibió, fecha. Un punto que no se pudo cerrar queda escrito como pendiente con responsable, no se marca igual.",
+        "Repetir la lista tal cual en cada instalación nueva: es la misma lista, no una versión libre."
+      ],
+      "aceptacion": [
+        { "check": "No sobrevive ninguna credencial de fábrica", "comando": "grep -rnE '\"?0000\"?|\"?1234\"?|admin.?admin|clave *= *\"?(demo|prueba|test)' app/ lib/ scripts/ seed/", "espera": "0 líneas" },
+        { "check": "No quedan datos de ejemplo en producción", "comando": "node scripts/verificar-produccion.mjs --sin-datos-de-prueba", "espera": "exit 0 y 0 registros de prueba" },
+        { "check": "La lista está firmada por los dos lados", "comando": "grep -nE 'Entreg(ó|o) .+ · Recibi(ó|o) .+ · 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/entrega/puesta-en-marcha.md", "espera": "1 línea" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/entrega/puesta-en-marcha.md", "scripts/verificar-produccion.mjs"],
+      "cerebro": ["tema:acceso-roles-y-puestos", "tema:entorno-de-la-maquina"]
+    },
+    {
+      "id": "prod.entrega.migrar-el-cuaderno-y-cuadrarlo",
+      "titulo": "Migrar lo que el negocio ya tenía y cuadrarlo contra el papel",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El negocio no arranca en cero: tiene un cuaderno, un Excel o un sistema viejo con saldos, deudas de clientes e inventario. Si lo migrado no cuadra con lo que el dueño tiene anotado, no confía en ninguna cifra del sistema nuevo y vuelve al cuaderno.",
+      "queHacer": [
+        "Inventariar qué hay que traer y en qué formato está: saldos, deudores, inventario, precios, clientes.",
+        "Escribir la equivalencia campo a campo y qué se hace con lo que no tiene equivalente: se guarda como nota, no se inventa.",
+        "Importar a una base de prueba primero y cuadrar totales contra la fuente: suma de saldos, número de clientes, valor del inventario.",
+        "Sentar al dueño a comparar tres cifras que él sepa de memoria; si una no cuadra, no se migra hasta entender por qué.",
+        "Dejar guardada la fuente original tal cual llegó, y la fecha de corte de la migración."
+      ],
+      "aceptacion": [
+        { "check": "Los totales cuadran contra la fuente", "comando": "node scripts/migrar.mjs --verificar", "espera": "exit 0: diferencia 0 en total de saldos, conteo de clientes y valor de inventario" },
+        { "check": "Lo migrado se comparó con el dueño", "comando": "grep -nE 'Cuadrado con .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/entrega/migracion.md", "espera": "1 línea, más las 3 cifras comparadas" },
+        { "check": "La fuente original está guardada", "comando": "ls docs/entrega/fuente-migracion/*", "espera": "1+ archivos" }
+      ],
+      "aplicaSi": { "entidades": ["*"] },
+      "porCada": null,
+      "posee": ["docs/entrega/migracion.md", "scripts/migrar.mjs", "docs/entrega/fuente-migracion/**"],
+      "cerebro": ["tema:dominio-migraciones-y-copias", "tema:invariantes-contables"]
+    },
+    {
+      "id": "prod.entrega.primer-dia-acompanado-en-hora-pico",
+      "titulo": "Acompañar el primer día en la hora de más movimiento",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El sistema se prueba tranquilo y se estrena con cola en el mostrador: ahí aparecen los toques de más, el aviso que nadie entiende y la pantalla que tapa el teclado. Si ese día no hay nadie de nuestra parte, la conclusión del negocio es que el sistema no sirve, y volver de esa impresión cuesta meses.",
+      "queHacer": [
+        "Elegir el día y la franja de más movimiento real del negocio, no la que nos queda cómoda.",
+        "Estar presentes sin tocar el teclado: la persona opera, nosotros anotamos.",
+        "Anotar cada tropiezo con la hora, qué estaba haciendo y qué palabra o botón la confundió.",
+        "Arreglar el mismo día lo que se pueda arreglar en minutos; el resto entra a la lista con prioridad de esa observación.",
+        "Cerrar el día preguntándole a la persona —no al dueño— si mañana lo usaría otra vez, y anotar la respuesta textual."
+      ],
+      "aceptacion": [
+        { "check": "El acompañamiento quedó registrado con hora y franja", "comando": "grep -nE '20[0-9]{2}-[0-9]{2}-[0-9]{2} de [0-9]{1,2}(:[0-9]{2})? a [0-9]{1,2}(:[0-9]{2})?' docs/entrega/dia-uno.md", "espera": "1 línea" },
+        { "check": "Los tropiezos están anotados uno por uno", "comando": "grep -c '^| ' docs/entrega/dia-uno.md", "espera": "1+ filas con hora, qué pasó y qué se hizo" },
+        { "check": "La persona que opera dio su respuesta", "comando": "grep -nE 'Dijo .+:' docs/entrega/dia-uno.md", "espera": "1+ líneas con la frase textual" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/entrega/dia-uno.md"],
+      "cerebro": ["tema:caja-y-turnos", "tema:documentos-para-personas"]
+    },
+    {
+      "id": "prod.entrega.una-semana-sin-nosotros",
+      "titulo": "Probar que el negocio aguanta una semana sin llamarnos",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un sistema entregado que sigue dependiendo de nosotros para cualquier cosa no está entregado: es un empleo de por vida mal pagado, y el día que no contestemos el negocio se para. La prueba de que la entrega terminó es una semana en la que no nos necesitaron.",
+      "queHacer": [
+        "Anunciar la semana de prueba y a quién llamar en su lugar (el dueño, el manual, el instructivo de arreglos).",
+        "Registrar cada vez que aun así nos escribieron: qué necesitaban y por qué no lo resolvieron con lo que tienen.",
+        "Cada uno de esos contactos se convierte en un arreglo concreto: una frase del manual, un aviso en pantalla, o un permiso que le faltaba a alguien.",
+        "Repetir la semana después de los arreglos hasta que el número de contactos evitables llegue a cero.",
+        "Escribir el resultado con las dos cifras: contactos totales y contactos que no debieron ocurrir."
+      ],
+      "aceptacion": [
+        { "check": "La semana está registrada con las dos cifras", "comando": "grep -nE 'contactos: [0-9]+ .*evitables: [0-9]+' docs/entrega/sin-nosotros.md", "espera": "1+ líneas, la última con evitables en 0" },
+        { "check": "Cada contacto evitable terminó en un arreglo", "comando": "grep -nE '^\\|[^|]+\\| *evitable *\\| *(\\?|pendiente|) *\\|' docs/entrega/sin-nosotros.md", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/entrega/sin-nosotros.md"],
+      "cerebro": ["tema:documentos-para-personas", "tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "prod.capacitacion.sesion-con-las-manos-de-la-persona",
+      "titulo": "Enseñarlo con las manos de la persona, no mostrándolo en pantalla",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una demostración se entiende y no se aprende: al día siguiente, sola frente al mostrador, la persona no recuerda dónde estaba el botón. De diez proyectos de la casa hay cero conocimiento escrito de capacitación, y por eso cada entrega arranca de cero.",
+      "queHacer": [
+        "Preparar el guion de la sesión como el día real en el orden en que ocurre: entrar, la primera venta, el caso raro, cerrar.",
+        "La persona hace cada paso con sus manos en el equipo donde va a trabajar; nosotros no tocamos el teclado en toda la sesión.",
+        "Anotar en vivo dónde dudó, qué palabra de la pantalla no entendió y qué hizo distinto de lo esperado.",
+        "Terminar con ella ejecutando el flujo completo una vez, sin guion y sin preguntas.",
+        "Dejar el guion guardado: la siguiente persona se capacita con el mismo, no con la memoria del que estuvo."
+      ],
+      "aceptacion": [
+        { "check": "El guion existe y sigue el día real", "comando": "grep -c '^## ' docs/capacitacion/sesion-de-arranque.md", "espera": "4+ secciones en orden de jornada" },
+        { "check": "La sesión ocurrió y quedó anotado quién y cuándo", "comando": "grep -nE 'Sesi(ó|o)n con .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/capacitacion/sesion-de-arranque.md", "espera": "1+ líneas" },
+        { "check": "Las dudas observadas quedaron escritas", "comando": "grep -c '^| ' docs/capacitacion/sesion-de-arranque.md", "espera": "1+ filas de duda observada con qué se hizo" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/capacitacion/sesion-de-arranque.md"],
+      "cerebro": ["tema:documentos-para-personas", "tema:acceso-roles-y-puestos"]
+    },
+    {
+      "id": "prod.capacitacion.prueba-de-manejo-por-puesto",
+      "titulo": "Hacerle a {{rol}} una prueba de manejo sin ayuda y anotar qué falló",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Capacitar sin comprobar deja a todos creyendo que la persona sabe, hasta el día en que se equivoca con plata o con un cliente delante. Una prueba de manejo convierte «quedó capacitada» en un hecho con fecha.",
+      "queHacer": [
+        "Escribir las cinco o seis tareas que {{rol}} tiene que poder hacer solo para trabajar: las de todos los días más las dos que dan miedo.",
+        "Sentar a la persona a ejecutarlas sin ayuda, sin manual abierto y sin nosotros hablando; cronometrar.",
+        "Marcar cada tarea como lograda o no, y anotar en qué punto exacto se trabó la que no.",
+        "Lo que falló dos personas seguidas no es problema de la persona: es problema de la pantalla y se anota como tal.",
+        "Repetir la prueba hasta que las tareas de todos los días salgan todas, y dejar la fecha."
+      ],
+      "aceptacion": [
+        { "check": "La prueba existe con tareas listadas y resultado", "comando": "grep -c '^| ' docs/capacitacion/prueba-{{rol}}.md", "espera": "5+ filas, cada una con lograda sí/no y minutos" },
+        { "check": "No quedan tareas diarias sin lograr", "comando": "grep -nE '^\\|[^|]+\\| *diaria *\\| *no *\\|' docs/capacitacion/prueba-{{rol}}.md", "espera": "0 líneas" },
+        { "check": "Lo que falló repetido pasó a la lista de pantalla", "comando": "grep -c 'ARREGLAR EN PANTALLA' docs/capacitacion/prueba-{{rol}}.md", "espera": "tantas como fallas repetidas; 0 si no hubo ninguna repetida" }
+      ],
+      "aplicaSi": { "roles": ["*"], "equipo": "orion+humanos" },
+      "porCada": "rol",
+      "posee": ["docs/capacitacion/prueba-{{rol}}.md"],
+      "cerebro": ["tema:acceso-roles-y-puestos", "tema:documentos-para-personas"]
+    },
+    {
+      "id": "prod.capacitacion.segunda-vuelta-a-los-quince-dias",
+      "titulo": "Volver a los quince días a recoger lo que se olvidó",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Lo que se enseña el primer día se olvida en dos semanas, y lo que se olvida se reemplaza por un atajo inventado que nadie revisó: cobrar por fuera, anotar en papel, dejar la sesión abierta. La segunda vuelta es donde se ven los atajos.",
+      "queHacer": [
+        "Volver entre el día 10 y el 20 y mirar cómo lo están usando de verdad, sin avisar qué se viene a mirar.",
+        "Anotar los atajos que aparecieron y por qué los inventaron: casi siempre son un paso incómodo del sistema, no pereza.",
+        "Repasar solo lo que se olvidó, no la capacitación entera.",
+        "Cada atajo que evita un control se resuelve arreglando el sistema o escribiéndolo como regla, nunca regañando.",
+        "Anotar la fecha y lo encontrado; si no hubo atajos, también se anota."
+      ],
+      "aceptacion": [
+        { "check": "La visita ocurrió dentro de la ventana", "comando": "grep -nE 'Segunda vuelta el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/capacitacion/segunda-vuelta.md", "espera": "1 línea, entre 10 y 20 días después de la sesión de arranque" },
+        { "check": "Los atajos observados están escritos con su causa", "comando": "grep -c '^| ' docs/capacitacion/segunda-vuelta.md", "espera": "1+ filas con atajo, causa y qué se hizo; o la línea que declara 0 atajos" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/capacitacion/segunda-vuelta.md"],
+      "cerebro": ["tema:documentos-para-personas", "tema:caja-y-turnos"]
+    },
+    {
+      "id": "prod.capacitacion.el-dueno-capacita-al-siguiente",
+      "titulo": "Dejar al dueño capaz de entrenar solo al próximo empleado",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "En estos negocios la gente rota, y si cada persona nueva exige una sesión nuestra, el costo de la rotación lo pagamos nosotros gratis o el empleado nuevo trabaja sin saber. El sistema solo está entregado cuando el negocio puede enseñarlo sin nosotros.",
+      "queHacer": [
+        "Escribir el guion de entrenamiento en el lenguaje del dueño, listo para que lo siga él: qué mostrar, en qué orden y qué hacer probar.",
+        "Incluir la lista de lo que hay que crear para alguien nuevo —usuario, PIN propio, permisos— y quién lo hace.",
+        "Recordar la regla dura: nadie entra con el usuario de otro, y el PIN de la persona que se va se apaga el mismo día.",
+        "Hacer que el dueño entrene a alguien con el guion mientras miramos, y anotar dónde se atascó él.",
+        "Corregir el guion con eso; el guion bueno es el que ya funcionó una vez sin nosotros."
+      ],
+      "aceptacion": [
+        { "check": "El guion existe y no usa jerga nuestra", "comando": "grep -niE 'endpoint|deploy|commit|payload|backend|token' docs/capacitacion/ensenar-al-siguiente.md", "espera": "0 líneas" },
+        { "check": "El dueño ya entrenó a alguien con él", "comando": "grep -nE '.+ entren(ó|o) a .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/capacitacion/ensenar-al-siguiente.md", "espera": "1+ líneas" },
+        { "check": "Está escrito cómo se crea y se apaga un usuario", "comando": "grep -ciE 'crear usuario|apagar|dar de baja|PIN' docs/capacitacion/ensenar-al-siguiente.md", "espera": "2+ líneas" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos", "multiUsuario": true },
+      "porCada": null,
+      "posee": ["docs/capacitacion/ensenar-al-siguiente.md"],
+      "cerebro": ["tema:acceso-roles-y-puestos", "tema:documentos-para-personas"]
+    }
+  ]
+}

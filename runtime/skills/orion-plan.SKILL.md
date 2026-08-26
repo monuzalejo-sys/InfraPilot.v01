@@ -128,7 +128,7 @@ Edítalas directamente en `plan.json` (subiendo `version`) o con `agregar`.
 ```bash
 node "$ORION_HOME/tools/plan.mjs" validar "<plan.json>"     # forma ejecutable de RFC-0008 §5
 node "$ORION_HOME/tools/plan.mjs" md "<plan.json>"          # PLAN.md, generado
-node "$ORION_HOME/tools/baul.mjs" empujar --plan "<plan.json>"
+node "$ORION_HOME/tools/baul.mjs" empujar --proyecto <projectId> --sin-export
 ```
 
 Si `validar` da INVÁLIDO, **arréglalo antes de enseñar el plan**. Los errores

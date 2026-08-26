@@ -17,6 +17,7 @@
  *   node tools/runtime.mjs recoger  [--solo <n>]  ~/.claude → runtime/  (rescate)
  *   node tools/runtime.mjs empaquetar             runtime/ → payload del instalador
  *   node tools/runtime.mjs sincronizar            instalar + empaquetar + estado
+ *   node tools/runtime.mjs comprobar              que los comandos citados existan
  *
  * Cero dependencias.
  */
@@ -163,11 +164,55 @@ function empaquetar() {
   console.log(`  ${nombres}`)
 }
 
-if (cmd === "estado") process.exit(estado() ? 1 : 0)
+/* Un skill que le dice a un agente que corra un comando inexistente no falla al
+   escribirlo: falla a las 3 de la mañana, dentro de un subagente, y se cobra
+   como un fallo del modelo. Esto lo caza en el repo. Nació de un error propio:
+   `orion-plan` citaba `baul.mjs empujar --plan`, y esa bandera nunca existió. */
+function comprobar() {
+  const problemas = []
+  const comandosDe = (herramienta) => {
+    const ruta = join(ORION, "tools", herramienta)
+    if (!existsSync(ruta)) return null
+    const src = readFileSync(ruta, "utf8")
+    const set = new Set()
+    for (const m of src.matchAll(/^const CMD = \{([^}]*)\}/gm))
+      for (const n of m[1].split(",")) { const k = n.split(":")[0].trim(); if (k) set.add(k) }
+    for (const m of src.matchAll(/^const COMANDOS = \{([\s\S]*?)^\}/gm))
+      for (const n of m[1].split(",")) { const k = n.split(":")[0].trim(); if (k) set.add(k) }
+    for (const m of src.matchAll(/cmd === "([a-záéíóúñ-]+)"/g)) set.add(m[1])
+    return set
+  }
+  const cache = {}
+  const archivos = []
+  for (const sub of ["skills", "agents"]) {
+    const d = join(ORION, "runtime", sub)
+    if (existsSync(d)) for (const f of readdirSync(d)) if (f.endsWith(".md")) archivos.push(join(d, f))
+  }
+  let citas = 0
+  for (const f of archivos) {
+    const txt = readFileSync(f, "utf8")
+    for (const m of txt.matchAll(/tools[\\/]([a-z-]+\.mjs)"?\s+([a-záéíóúñ-]+)/g)) {
+      const [, herramienta, sub] = m
+      citas++
+      const disponibles = (cache[herramienta] ??= comandosDe(herramienta))
+      if (disponibles === null) { problemas.push(`${basename(f)}: cita tools/${herramienta}, que no existe`); continue }
+      /* Se ignoran los marcadores del propio texto: `<memory-dir>`, `<plan.json>`… */
+      if (sub.startsWith("<")) continue
+      if (!disponibles.has(sub)) problemas.push(`${basename(f)}: \`${herramienta} ${sub}\` no es un comando de esa herramienta (tiene: ${[...disponibles].sort().join(", ")})`)
+    }
+  }
+  console.log(`comprobadas ${citas} invocaciones citadas en ${archivos.length} skills y agentes`)
+  if (!problemas.length) { console.log("todas apuntan a un comando que existe."); return 0 }
+  for (const p of problemas) console.log(`  ✗ ${p}`)
+  return problemas.length
+}
+
+if (cmd === "comprobar") process.exit(comprobar() ? 1 : 0)
+else if (cmd === "estado") process.exit(estado() ? 1 : 0)
 else if (cmd === "instalar") instalar()
 else if (cmd === "recoger") recoger()
 else if (cmd === "empaquetar") empaquetar()
-else if (cmd === "sincronizar") { instalar(); console.log(""); empaquetar(); console.log(""); estado() }
+else if (cmd === "sincronizar") { instalar(); console.log(""); empaquetar(); console.log(""); comprobar(); console.log(""); estado() }
 else {
   const ls = readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n")
   console.log(ls.slice(2, ls.indexOf(" */")).map((l) => l.replace(/^ \* ?/, "")).join("\n"))

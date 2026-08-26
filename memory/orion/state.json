@@ -1,7 +1,7 @@
 {
   "projectId": "orion",
-  "snapshotDate": "2026-08-26T06:45:00.000Z",
-  "version": 2,
+  "snapshotDate": "2026-08-26T07:15:00.000Z",
+  "version": 3,
   "lastAmmRun": "2026-08-26T06:30:00.000Z",
   "objects": [
     {
@@ -292,6 +292,21 @@
       "risk": "Bajar de tier leyendo mal la estadistica: que opus pase 102 de 107 veces NO significa que sobre, significa que la rubrica le esta dando lo dificil. Bajarlo todo de golpe convierte un ahorro en una tanda de ciclos de correccion, que cuestan mas que el ahorro.",
       "probability": "Medium",
       "mitigation": "Bajar por TIPO DE TRABAJO con historial limpio y muestra suficiente, uno cada vez, y dejar que un FAIL real lo suba solo. Y nunca poner hechos de negocio ni copy publico en el tier barato aunque salga ok: verdict ok mide que el spawn aterrizo, no que acerto (_permanent/KN-016)."
+    },
+    {
+      "id": "KN-009",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-08-26T07:15:00.000Z",
+      "updated": "2026-08-26T07:15:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "SEGUNDA FORMA DE MORIR DE UN BUILDER, distinta del limite de sesion: el TOPE DE SALIDA. Medido 2026-08-26 construyendo el catalogo: cinco builders escribian un JSON grande cada uno; cuatro entregaron (122, 142, 147 y 85 KB) y uno murio con 'Claude's response exceeded the 64000 output token maximum' dejando el disco VACIO. La diferencia no fue el modelo ni el tamano final -el que murio iba a ser el mas pequeno- sino que los que sobrevivieron escribieron POR TANDAS (20 y 31 llamadas de herramienta) y el que murio intento un solo volcado. Se reconoce al instante porque no deja NADA: no es un archivo a medias, es un archivo que no existe.",
+      "context": "Remedio: en todo encargo que produzca un archivo generado grande, pedir explicitamente escritura por tandas con comprobacion entre una y otra (para JSON, que siga parseando). Como cualquier muerte de infraestructura, NO es fallo de capacidad y no debe subir el tier del modelo. El relanzamiento fue seguro precisamente porque el disco estaba vacio: se audito antes, segun la doctrina.",
+      "source": "sesion 2026-08-26, builder de catalogo/datos.json"
     }
   ],
   "archives": []
