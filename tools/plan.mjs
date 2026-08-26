@@ -17,6 +17,7 @@
  *   node tools/plan.mjs hecho <plan.json> T-042 --evidencia "..." [--tokens 71000]
  *   node tools/plan.mjs bloquear <plan.json> T-042 --por "falta decidir hosting"
  *   node tools/plan.mjs agregar <plan.json> --json '<PlanTask>'   (o --archivo x.json)
+ *   node tools/plan.mjs narrar <plan.json> --archivo narrativa.json   resumen, hitos, escalabilidad
  *   node tools/plan.mjs validar <plan.json>
  *   node tools/plan.mjs tanda <plan.json> [--n 10] [salida.md]   lo de AHORA, legible
  *   node tools/plan.mjs md <plan.json> [salida.md]                el plan entero
@@ -546,6 +547,65 @@ function cmdAgregar() {
   if (huerfanas.length) console.log(`${huerfanas.length} dependencia(s) que no apuntan a nada y se descartaron:\n  ${huerfanas.join("\n  ")}`)
 }
 
+/* Las cuatro cosas que ningún agente sabe y que hacen que el plan se LEA:
+   el resumen, la meta y la condición de salida de cada nivel, los hitos que le
+   importan al dueño, y qué se hace después de terminar. Entran por aquí y no a
+   mano sobre el JSON: editar un plan de 400 tareas con un editor de texto es
+   como se corrompe un registro. */
+function cmdNarrar() {
+  const ruta = posicional[0] ?? morir("falta <plan.json>")
+  const plan = leerJSON(ruta)
+  const bruto = val("archivo") ? readFileSync(val("archivo"), "utf8") : val("json")
+  if (!bruto) morir(`pasa --archivo narrativa.json (o --json '<…>') con alguna de estas claves:
+  resumen        string[]   el plan entero en una lectura, 3-8 líneas
+  niveles        [{id, meta, salida}]   qué persigue cada nivel y con qué se sale de él
+  hitos          [{id, nombre, criterio, requiere:[ids]}]
+  escalabilidad  [{id, titulo, disparador, cuando, tareas:[ids]}]
+  objetivo       string
+  negocio        {…}        la forma Negocio de RFC-0008 §1.5`)
+  let n
+  try { n = JSON.parse(bruto) } catch (e) { morir(`JSON inválido: ${e.message}`) }
+
+  const tocado = []
+  if (n.objetivo) { plan.objetivo = n.objetivo; tocado.push("objetivo") }
+  if (n.resumen) { plan.resumen = n.resumen; tocado.push(`resumen (${n.resumen.length} líneas)`) }
+  if (n.negocio) { plan.negocio = n.negocio; tocado.push("negocio") }
+  if (n.niveles) {
+    for (const x of n.niveles) {
+      const nivel = plan.niveles.find((y) => y.id === x.id)
+      if (!nivel) { console.log(`  aviso: nivel ${x.id} no existe, ignorado`); continue }
+      if (x.meta) nivel.meta = x.meta
+      if (x.salida) nivel.salida = x.salida
+    }
+    tocado.push(`${n.niveles.length} niveles`)
+  }
+  const ids = new Set(plan.tareas.map((t) => t.id))
+  const porTitulo = new Map(plan.tareas.map((t) => [t.titulo.toLowerCase().replace(/[.,]/g, "").trim(), t.id]))
+  /* Los ids se pueden dar por título, igual que en `agregar`: quien escribe la
+     narrativa piensa en tareas, no en numeración. */
+  const resolver = (lista, donde) => (lista ?? []).map((d) => {
+    if (ids.has(d)) return d
+    const enc = porTitulo.get(String(d).toLowerCase().replace(/[.,]/g, "").trim())
+    if (!enc) console.log(`  aviso: ${donde} apunta a "${String(d).slice(0, 40)}", que no existe`)
+    return enc ?? null
+  }).filter(Boolean)
+  if (n.hitos) {
+    plan.hitos = n.hitos.map((h) => ({ ...h, requiere: resolver(h.requiere, `hito ${h.id ?? h.nombre}`) }))
+    tocado.push(`${plan.hitos.length} hitos`)
+  }
+  if (n.escalabilidad) {
+    for (const m of n.escalabilidad) if (!m.disparador)
+      morir(`la mejora "${m.titulo ?? m.id}" no tiene disparador observable: sin él es un deseo y no se agenda (N8-R6)`)
+    plan.escalabilidad = n.escalabilidad.map((m) => ({ ...m, tareas: resolver(m.tareas, `mejora ${m.id ?? m.titulo}`) }))
+    tocado.push(`${plan.escalabilidad.length} mejoras`)
+  }
+  if (!tocado.length) morir("no había ninguna clave reconocible en lo que pasaste")
+  const v = guardar(ruta, plan)
+  console.log(`narrativa aplicada (v${v}): ${tocado.join(" · ")}`)
+  const sinCriterio = (plan.hitos ?? []).filter((h) => !h.criterio)
+  if (sinCriterio.length) console.log(`aviso: ${sinCriterio.length} hito(s) sin criterio comprobable — un hito que no se puede comprobar no se puede celebrar.`)
+}
+
 /* La forma ejecutable de RFC-0008 §5. */
 function cmdValidar() {
   const ruta = posicional[0] ?? morir("falta <plan.json>")
@@ -811,7 +871,7 @@ function cmdCatalogo() {
 const COMANDOS = {
   nuevo: cmdNuevo, perfil: cmdPerfil, generar: cmdGenerar, siguiente: cmdSiguiente,
   ola: cmdOla, brief: cmdBrief, estado: cmdEstado, hecho: cmdHecho,
-  bloquear: cmdBloquear, agregar: cmdAgregar, validar: cmdValidar, md: cmdMd, tanda: cmdTanda,
+  bloquear: cmdBloquear, agregar: cmdAgregar, validar: cmdValidar, md: cmdMd, tanda: cmdTanda, narrar: cmdNarrar,
   catalogo: cmdCatalogo,
 }
 

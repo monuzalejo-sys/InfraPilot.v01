@@ -121,7 +121,18 @@ que son las que hacen que el plan se lea:
    **disparador observable** (N8-R6): «cuando pasen 500 pedidos al día», no
    «más adelante». Una mejora sin disparador es un deseo y no se agenda.
 
-Edítalas directamente en `plan.json` (subiendo `version`) o con `agregar`.
+Escríbelas en un archivo y entra con un comando — **no edites `plan.json` a
+mano**: retocar un registro de 400 tareas con un editor de texto es como se
+corrompe:
+
+```bash
+node "$ORION_HOME/tools/plan.mjs" narrar "<plan.json>" --archivo narrativa.json
+```
+
+Los ids de `hitos[].requiere` y `escalabilidad[].tareas` se pueden dar **por
+título**: el comando los resuelve y avisa de los que no existen. Y rechaza una
+mejora sin disparador, que es la forma de que N8-R6 no dependa de que alguien
+se acuerde.
 
 ## 7. Comprobar y publicar
 

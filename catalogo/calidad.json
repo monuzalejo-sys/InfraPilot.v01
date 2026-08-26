@@ -1,0 +1,1069 @@
+{
+  "categoria": "calidad",
+  "nombre": "Calidad",
+  "meta": "Que un veredicto de \"hecho\" signifique que se comprobó, no que el trabajo simplemente corrió sin lanzar una excepción.",
+  "arquetipos": [
+    {
+      "id": "qa.base.ci-corre-el-mismo-verificar-que-el-local",
+      "titulo": "Hacer que CI corra exactamente el mismo verificar que corre en local",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si CI ejecuta una lista de comandos distinta a `npm run verificar`, un paso que solo vive en el yml se vuelve invisible para quien programa: pasa en su máquina, y el rojo aparece minutos después en la pantalla del PR, cuando ya nadie está mirando.",
+      "queHacer": [
+        "Leer el script `verificar` de package.json y listar sus pasos en orden.",
+        "Reemplazar en el archivo de CI cualquier lista paralela de comandos por una sola línea: `npm run verificar`.",
+        "Si CI necesita un paso adicional (ej. levantar un contenedor), que viva ANTES de esa línea, nunca como un comando separado que la sustituye.",
+        "Añadir a verificar cualquier paso que hoy solo corre en CI, para que quien programa lo vea fallar en su máquina antes de subir el PR.",
+        "Confirmar corriendo npm run verificar en local y comparando la salida contra la del último run de CI."
+      ],
+      "aceptacion": [
+        { "check": "El yml de CI invoca el script de la casa, no una lista propia", "comando": "grep -n 'npm run verificar' .github/workflows/*.yml", "espera": "1+ líneas" },
+        { "check": "Ningún paso de CI corre fuera de verificar", "comando": "grep -nE 'npm (run|test)|npx ' .github/workflows/*.yml | grep -v verificar", "espera": "0 líneas fuera del paso de instalar dependencias" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [".github/workflows/verificar.yml", "package.json"],
+      "cerebro": ["tema:que-es-estar-verificado"]
+    },
+    {
+      "id": "qa.base.rama-protegida-exige-verificar-en-verde",
+      "titulo": "Bloquear la fusión a main mientras el check de verificar no esté en verde",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Sin el bloqueo real, un apuro humano fusiona con el check en rojo \"solo esta vez\", y ese \"solo esta vez\" es siempre la noche en que el cobro se rompe en producción.",
+      "queHacer": [
+        "Activar en la rama principal la regla que exige el status check de verificar antes de fusionar.",
+        "Quitar cualquier excepción para administradores: la regla aplica incluso a quien la configuró.",
+        "Intentar fusionar un PR con el check en rojo y confirmar que la interfaz lo impide.",
+        "Documentar en un archivo de una línea quién puede cambiar esta regla y por qué canal se avisa si se cambia."
+      ],
+      "aceptacion": [
+        { "check": "La rama principal exige el check de verificar", "comando": "gh api repos/:owner/:repo/branches/main/protection --jq '.required_status_checks.contexts'", "espera": "la lista incluye el nombre del check de verificar" },
+        { "check": "Un PR con el check en rojo no se puede fusionar desde la interfaz", "comando": null, "espera": "el botón de fusión aparece bloqueado con el check en rojo; captura pegada en el documento" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/qa/rama-protegida.md"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.base.instalacion-limpia-desde-el-lockfile",
+      "titulo": "Correr verificar tras una instalación limpia desde el lockfile, no desde cache",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una dependencia instalada a mano y nunca declarada en package.json pasa en la máquina de quien programó para siempre, y truena en la primera máquina nueva, que casi siempre es la de producción.",
+      "queHacer": [
+        "Añadir al pipeline un paso que borre node_modules antes de instalar.",
+        "Instalar con npm ci, que respeta el lockfile al pie de la letra y falla si package.json y el lockfile no coinciden.",
+        "Correr npm run verificar inmediatamente después, sin ningún paso manual entre medio.",
+        "Provocar el caso: instalar una librería con npm install sin guardarla en package.json, confirmar que npm ci la deja fuera."
+      ],
+      "aceptacion": [
+        { "check": "El pipeline instala con npm ci, no con npm install", "comando": "grep -n 'npm ci' .github/workflows/*.yml", "espera": "1+ líneas" },
+        { "check": "Una dependencia no declarada rompe la instalación limpia", "comando": "rm -rf node_modules && npm ci && npm run verificar; echo EXIT=$?", "espera": "EXIT=0 solo si toda dependencia usada está en package.json" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [".github/workflows/verificar.yml"],
+      "cerebro": ["tema:entorno-de-la-maquina"]
+    },
+    {
+      "id": "qa.base.verificar-tiene-techo-de-tiempo",
+      "titulo": "Poner un límite de tiempo a verificar para que un cuelgue falle solo",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un test que se cuelga esperando una promesa que nunca resuelve deja el pipeline en gris para siempre, y un pipeline gris no lo audita nadie: se cierra la pestaña y se olvida, no se investiga.",
+      "queHacer": [
+        "Fijar un timeout al job de CI completo (ej. 10 minutos) y otro más corto por test individual en la config de Vitest o Jest.",
+        "Hacer que el timeout termine el proceso con código de salida distinto de 0, nunca en verde por omisión.",
+        "Anotar en el README el tiempo normal de verificar y el techo elegido, para saber cuánto margen queda.",
+        "Provocar un cuelgue a propósito (una promesa sin resolver) y confirmar que el job corta solo, sin intervención manual."
+      ],
+      "aceptacion": [
+        { "check": "El job y los tests tienen timeout configurado", "comando": "grep -n 'timeout-minutes' .github/workflows/verificar.yml; grep -n 'testTimeout' vitest.config.ts", "espera": "1+ líneas en cada archivo" },
+        { "check": "Un test colgado corta el proceso en vez de quedarse corriendo", "comando": "npm test -- test-colgado-deliberado; echo EXIT=$?", "espera": "EXIT distinto de 0 en menos del techo configurado" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["vitest.config.ts", ".github/workflows/verificar.yml"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.base.la-lentitud-de-verificar-se-mide-corrida-a-corrida",
+      "titulo": "Registrar cuánto tarda verificar y alertar si la tendencia sube",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un verificar que se vuelve un segundo más lento cada semana nunca cruza ninguna alarma; a los ocho meses tarda 20 minutos, cada corrección se prueba menos veces porque cada corrida cuesta un café, y la lentitud se volvió cultura antes de que alguien la midiera.",
+      "queHacer": [
+        "Guardar en un archivo versionado la fecha y los segundos que tardó verificar en cada corrida de CI.",
+        "Escribir un script que compare el tiempo de la corrida actual contra el promedio de las últimas 10.",
+        "Si sube más de 20% sobre ese promedio, imprimir una advertencia visible en la salida del pipeline, no solo un número perdido en el log.",
+        "Revisar mensualmente la tendencia y abrir una tarea cuando el techo del arquetipo de timeout esté a menos del 20% de alcanzarse."
+      ],
+      "aceptacion": [
+        { "check": "El historial de tiempos existe y crece con cada corrida", "comando": "wc -l docs/qa/tiempos-verificar.csv", "espera": "el conteo de líneas sube respecto a la corrida anterior" },
+        { "check": "Una corrida muy por encima del promedio dispara la advertencia", "comando": "node scripts/qa/vigilar-tiempo-verificar.mjs --simular-segundos=9999", "espera": "salida con la palabra ADVERTENCIA y exit 0" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["scripts/qa/vigilar-tiempo-verificar.mjs", "docs/qa/tiempos-verificar.csv"],
+      "cerebro": ["tema:que-es-estar-verificado"]
+    },
+    {
+      "id": "qa.unidad.nombre-de-test-dice-la-conducta-y-el-limite",
+      "titulo": "Nombrar cada test unitario por la conducta y el caso límite, no por la función",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "\"test1 pasa\" no dice nada; cuando un test falla a las 7 de la noche alguien tiene que abrir el archivo, leer el código y adivinar qué se esperaba, y cada minuto ahí es un minuto con el cliente esperando en el mostrador.",
+      "queHacer": [
+        "Revisar los nombres de it()/test() existentes y listar los que solo repiten el nombre de la función.",
+        "Reescribirlos con la forma \"hace X cuando Y\", nombrando la conducta esperada y el caso límite si aplica.",
+        "Prohibir nombres genéricos (test1, funciona, works) en las reglas de lint de los archivos de test.",
+        "Confirmar que el reporte de un test rojo, leído solo, alcanza para saber qué se rompió sin abrir el archivo."
+      ],
+      "aceptacion": [
+        { "check": "No quedan nombres de test genéricos", "comando": "grep -rnE 'it\\(|test\\(' tests/ | grep -iE 'test[0-9]+|works|funciona'", "espera": "0 líneas" },
+        { "check": "Los nombres describen conducta, no un número", "comando": "npm test -- --reporter=verbose 2>&1 | head -20", "espera": "cada línea describe una conducta y su caso" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["tests/**"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.unidad.deterministico-sin-reloj-ni-azar-real",
+      "titulo": "Congelar la fecha y la semilla aleatoria en los tests unitarios",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un test que pasa 29 de 30 días del mes y falla el día 31 se descarta como flaky y se ignora justo el día que estaba detectando un bug real de fin de mes.",
+      "queHacer": [
+        "Revisar los tests en busca de new Date(), Date.now() o Math.random() usados sin congelar.",
+        "Reemplazarlos por el reloj y el generador de la casa, inyectados con un valor fijo en cada test.",
+        "Añadir un caso que corra el mismo test con TZ=America/Bogota y con TZ=UTC y compare el resultado exacto.",
+        "Dejar un grep de guardia contra el reloj y el azar reales dentro de tests/."
+      ],
+      "aceptacion": [
+        { "check": "Ningún test usa el reloj o el azar reales sin congelar", "comando": "grep -rn 'new Date()\\|Date.now()\\|Math.random(' tests/ | grep -v reloj-fijo", "espera": "0 líneas" },
+        { "check": "El mismo test da igual resultado con dos zonas horarias", "comando": "TZ=UTC npm test -- fecha-de-negocio && TZ=America/Bogota npm test -- fecha-de-negocio", "espera": "las dos corridas terminan en exit 0 con el mismo resultado" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["tests/apoyo/reloj-fijo.ts", "tests/apoyo/semilla-fija.ts"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "qa.unidad.mata-al-mutante-en-las-funciones-de-dinero",
+      "titulo": "Probar que invertir una condición de dinero hace fallar su test",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un test que solo confirma el camino feliz sigue en verde aunque alguien invierta un < por un <= o cambie un límite: la cobertura sube y el bug de un peso pasa exactamente igual a producción.",
+      "queHacer": [
+        "Elegir las funciones de dinero y de reglas de negocio con un límite numérico (redondeo, tope, comparación de totales).",
+        "Por cada una, invertir a mano un operador (ej. cambiar >= por >) en una copia temporal.",
+        "Correr la suite contra esa copia y confirmar que al menos un test falla.",
+        "Restaurar el archivo original y dejar registrado en un comentario cuál mutación mata y cuál no todavía.",
+        "Para la mutación que ningún test mata, escribir el test que falta antes de cerrar la tarea."
+      ],
+      "aceptacion": [
+        { "check": "Invertir el operador del redondeo hace fallar la suite", "comando": "sed -i 's/>= total/> total/' lib/dominio/cuadre.ts && npm test -- cuadra-total; echo EXIT=$?; git checkout -- lib/dominio/cuadre.ts", "espera": "EXIT distinto de 0 antes de restaurar el archivo" },
+        { "check": "Las mutaciones sin test quedan listadas", "comando": "grep -rn 'mutacion sin cubrir' lib/dominio/", "espera": "0 líneas al cerrar la tarea" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["tests/dominio/mutaciones-dinero.md"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "qa.integracion.la-ruta-se-prueba-contra-una-base-real",
+      "titulo": "Probar {{ruta}} contra una base real, no contra un doble del cliente de datos",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Mockear el cliente de base confirma que el código llama bien a la función que se mockeó, no que la consulta real funciona; el error de sintaxis en la consulta se descubre en producción, con el cliente esperando en el mostrador.",
+      "queHacer": [
+        "Levantar una base de prueba real (o un esquema aparte) antes de correr los tests de integración.",
+        "Llamar a {{ruta}} de verdad (handler real o HTTP real) sin sustituir el cliente de base por un doble.",
+        "Verificar el efecto en la base tras la llamada, no solo la respuesta HTTP: leer la fila que debió quedar escrita.",
+        "Limpiar los datos creados al final del test, dejando la base de prueba como estaba."
+      ],
+      "aceptacion": [
+        { "check": "El test de {{ruta}} no usa un doble del cliente de base", "comando": "grep -n 'jest.mock\\|vi.mock' tests/integracion{{ruta}}.test.ts", "espera": "0 líneas" },
+        { "check": "La llamada real deja la fila esperada en la base de prueba", "comando": "npm test -- integracion{{ruta}}", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "superficies": ["api"] },
+      "porCada": "ruta",
+      "posee": ["tests/integracion{{ruta}}.test.ts"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "qa.integracion.migracion-se-prueba-contra-copia-real",
+      "titulo": "Aplicar cada migración contra una copia real, no contra una base vacía",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una migración que solo se probó contra una base vacía puede truncar una columna que en producción ya tiene 40.000 filas con datos que no caben en el nuevo tipo, y eso no se ve hasta que corre contra los datos de verdad.",
+      "queHacer": [
+        "Restaurar el respaldo más reciente en una base de prueba desechable.",
+        "Aplicar la migración nueva contra esa copia, no contra una base recién creada.",
+        "Contar las filas de cada tabla afectada antes y después de la migración.",
+        "Confirmar que el conteo no cambió salvo donde la migración lo pretendía, y anotar el motivo si sí cambió."
+      ],
+      "aceptacion": [
+        { "check": "La migración corre contra una copia con datos reales", "comando": "npm run migrar -- --contra=copia-de-prueba; echo EXIT=$?", "espera": "EXIT=0" },
+        { "check": "El conteo de filas antes y después coincide donde no debía cambiar", "comando": "node scripts/qa/contar-filas.mjs --antes --despues", "espera": "conteos iguales salvo en las tablas que la migración declaró modificar" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase", "sqlite", "mysql"] },
+      "porCada": null,
+      "posee": ["scripts/qa/contar-filas.mjs", "docs/qa/migraciones-probadas.md"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "qa.integracion.la-cache-no-esconde-el-dato-recien-escrito",
+      "titulo": "Probar que leer por la ruta pública tras escribir no devuelve el valor viejo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con el framework cacheando agresivo por defecto, cambiar un precio en el panel y seguir viendo el viejo en la caja es un bug de integración invisible para un test unitario que llama la función del dominio directo, sin pasar por ninguna capa de cache.",
+      "queHacer": [
+        "Escribir un dato a través de la ruta que lo modifica, no directo a la base.",
+        "Leer ese mismo dato inmediatamente a través de la ruta pública que lo expone.",
+        "Comparar el valor leído contra el valor escrito, no contra lo que había antes.",
+        "Repetir el mismo test para cada mecanismo de cache o revalidación que el proyecto use."
+      ],
+      "aceptacion": [
+        { "check": "El valor leído tras escribir coincide con el valor escrito", "comando": "npm test -- cache-no-esconde-dato", "espera": "exit 0" },
+        { "check": "Todo revalidate distinto de 0 está justificado", "comando": "grep -rn 'revalidate' app/ | grep -v 'revalidate: 0\\|revalidate = 0'", "espera": "cada línea tiene un comentario de motivo junto" }
+      ],
+      "aplicaSi": { "stack": ["nextjs"] },
+      "porCada": null,
+      "posee": ["tests/integracion/cache.test.ts"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.integracion.carga-simultanea-del-pico-real-del-negocio",
+      "titulo": "Probar el flujo crítico con la concurrencia real de la hora pico",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "La suite normal corre con una petición a la vez; la hora de más venta del negocio real son varios cajeros y varios clientes públicos al mismo tiempo, y ahí es donde una fila sin índice o un archivo compartido sin bloqueo se cae, nunca en el test de un usuario solo.",
+      "queHacer": [
+        "Definir el número real de usuarios simultáneos en la hora pico, a partir del histórico real de turnos o pedidos.",
+        "Escribir un script de carga que reproduzca ese número contra el flujo crítico completo, no contra un endpoint suelto.",
+        "Correrlo contra un entorno con datos y tamaño de base representativos del real, no contra una base vacía.",
+        "Medir latencia p95, tasa de error y si algún recurso compartido se corrompió bajo concurrencia.",
+        "Fijar un techo de latencia y de errores en el documento, y repetir la prueba cuando el negocio crezca de escala."
+      ],
+      "aceptacion": [
+        { "check": "El flujo crítico aguanta la concurrencia real sin error 500", "comando": "node scripts/qa/carga-pico.mjs --concurrencia=40 --duracion=60s", "espera": "0 errores 500 y p95 bajo el techo de docs/qa/carga.md" },
+        { "check": "El consecutivo no se duplica bajo concurrencia", "comando": "node scripts/qa/carga-pico.mjs --concurrencia=40 --verificar-consecutivo", "espera": "0 consecutivos repetidos entre los documentos creados" }
+      ],
+      "aplicaSi": { "multiUsuario": true },
+      "porCada": null,
+      "posee": ["scripts/qa/carga-pico.mjs", "docs/qa/carga.md"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.e2e.el-flujo-que-cobra-se-prueba-con-clics-reales",
+      "titulo": "Probar en navegador real, con clics reales, el flujo que termina en un cobro",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un test que llama la API directo prueba el servidor, no la pantalla; el bug de los lotes de producto en 0 gramos del punto de venta lo vio el e2e en navegador, no la revisión de código, porque nadie más miraba lo que el selector de peso de verdad mostraba en pantalla.",
+      "queHacer": [
+        "Escribir el recorrido completo con node ORION/tools/edge-cdp.mjs (o el runner de e2e del proyecto): abrir la pantalla, hacer clic en cada paso, teclear como lo haría la persona real.",
+        "Terminar el recorrido en el paso que de verdad genera el cobro o el documento, no un paso antes.",
+        "Leer en pantalla, no en la respuesta HTTP, el monto final y compararlo contra el esperado.",
+        "Dejar una captura del paso final como evidencia, guardada junto al test."
+      ],
+      "aceptacion": [
+        { "check": "El recorrido completo hasta el cobro pasa en navegador real", "comando": "node ORION/tools/edge-cdp.mjs tests/e2e/cobro-completo.mjs", "espera": "exit 0 y el monto en pantalla igual al esperado" },
+        { "check": "El paso de cobro usa clics reales, no una llamada directa a la API", "comando": "grep -n 'fetch(\\|axios' tests/e2e/cobro-completo.mjs", "espera": "0 líneas dentro del bloque que ejecuta el cobro" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "publico"] },
+      "porCada": null,
+      "posee": ["tests/e2e/cobro-completo.mjs"],
+      "cerebro": ["tema:cobro-a-clientes"]
+    },
+    {
+      "id": "qa.e2e.el-e2e-crea-sus-propios-datos-no-depende-del-seed",
+      "titulo": "Hacer que el e2e cree sus propios datos, sin depender del seed",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un e2e que depende de \"el producto con id 7\" se rompe el día que alguien reordena el seed, y el reporte dice que el checkout falló cuando en realidad falló el dato de prueba, media hora perdida buscando en el lugar equivocado.",
+      "queHacer": [
+        "Al principio del test, crear por la propia interfaz (o por la API pública) el dato que el recorrido necesita.",
+        "No referenciar ningún id fijo de la semilla dentro del cuerpo del test.",
+        "Al final, dejar el test limpiando lo que creó, o marcado de forma que no interfiera con la próxima corrida.",
+        "Correr la suite completa con el seed vacío y con el seed reordenado, y confirmar que el resultado no cambia."
+      ],
+      "aceptacion": [
+        { "check": "Ningún test e2e referencia un id fijo del seed", "comando": "grep -rnE \"id.?:.?[0-9]+\" tests/e2e/ | grep -v creadoEnElTest", "espera": "0 líneas" },
+        { "check": "El resultado no cambia con el seed reordenado", "comando": "npm run sembrar -- --orden=inverso && npm test -- e2e", "espera": "exit 0, mismo resultado que con el orden normal" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["tests/e2e/**"],
+      "cerebro": ["tema:cero-datos-inventados"]
+    },
+    {
+      "id": "qa.e2e.la-red-se-cae-a-media-venta-y-la-pantalla-avisa",
+      "titulo": "Simular una caída de red a mitad del flujo y comprobar el mensaje en pantalla",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Todos los e2e prueban el camino feliz; el camino roto es el que ve la persona del mostrador cuando el internet del local se cae a media venta, y ese caso casi nunca se ensaya hasta que pasa de verdad con un cliente esperando.",
+      "queHacer": [
+        "En el punto medio del recorrido crítico, cortar la respuesta de red a propósito (abortar la petición o forzar un 500 o timeout).",
+        "Confirmar que la pantalla muestra el mensaje de error de la casa, no una pantalla en blanco ni un error técnico crudo.",
+        "Confirmar que lo ya tecleado no se pierde: la persona puede reintentar sin volver a empezar.",
+        "Repetir el mismo corte en al menos dos puntos distintos del recorrido."
+      ],
+      "aceptacion": [
+        { "check": "La pantalla muestra el mensaje de la casa tras el corte de red", "comando": "node ORION/tools/edge-cdp.mjs tests/e2e/red-caida.mjs", "espera": "exit 0 y el texto del mensaje de error de la casa visible" },
+        { "check": "Lo tecleado antes del corte sigue en el formulario tras el error", "comando": "grep -n 'valorConservado' tests/e2e/red-caida.mjs", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "superficies": ["caja", "publico"] },
+      "porCada": null,
+      "posee": ["tests/e2e/red-caida.mjs"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    {
+      "id": "qa.e2e.smoke-contra-la-url-real-recien-desplegada",
+      "titulo": "Correr un smoke en navegador contra la URL real tras cada despliegue",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Verificar en CI corre contra localhost con datos de prueba; el despliegue real puede fallar por una variable de entorno faltante en el proveedor, un dominio mal apuntado o un build distinto, y nada de eso lo prueba una suite que nunca tocó la URL pública.",
+      "queHacer": [
+        "Tras cada despliegue a producción o staging, correr node ORION/tools/edge-cdp.mjs contra la URL real, no contra localhost.",
+        "Recorrer al menos el flujo de entrada y el flujo crítico contra esa URL.",
+        "Confirmar el código HTTP de la página principal y que el elemento que solo aparece con datos reales carga.",
+        "Si el smoke falla, revertir el despliegue antes de avisar que quedó, no después.",
+        "Dejar la salida del smoke (capturas y códigos HTTP) como evidencia adjunta al despliegue."
+      ],
+      "aceptacion": [
+        { "check": "La URL real responde y carga el flujo crítico", "comando": "node ORION/tools/edge-cdp.mjs --url=https://produccion.real tests/e2e/smoke-produccion.mjs", "espera": "exit 0 y código HTTP 200 en cada paso" },
+        { "check": "El smoke corre automáticamente después de cada despliegue", "comando": "grep -n 'smoke-produccion' .github/workflows/desplegar.yml", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["tests/e2e/smoke-produccion.mjs", ".github/workflows/desplegar.yml"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.regresion.el-conteo-de-tests-no-baja-sin-explicacion",
+      "titulo": "Comparar el número de tests contra la corrida anterior y bloquear la baja",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una suite bajó de 644 a 626 tests y nadie lo notó hasta perseguir esos 18: resultó que algo había movido la rama del repositorio a mitad del trabajo. Una cifra medida que no cuadra es señal, no ruido, y sin esta comparación la señal se pierde en el scroll del log.",
+      "queHacer": [
+        "Guardar el número total de tests corridos al final de cada npm run verificar exitoso, versionado junto al código.",
+        "En la corrida siguiente, comparar el conteo nuevo contra el guardado antes de dar el resultado por bueno.",
+        "Si el conteo baja, cortar el pipeline y exigir un motivo escrito en el PR, no dejar pasar el número menor en silencio.",
+        "Si el conteo sube, actualizar el número guardado como parte del mismo PR."
+      ],
+      "aceptacion": [
+        { "check": "El conteo de tests queda registrado tras cada corrida", "comando": "cat docs/qa/conteo-tests.txt", "espera": "un número entero, igual o mayor al de la corrida anterior en git log" },
+        { "check": "Una baja de tests sin motivo corta el pipeline", "comando": "node scripts/qa/comparar-conteo-tests.mjs --actual=626 --anterior=644", "espera": "exit distinto de 0 sin un motivo declarado" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["scripts/qa/comparar-conteo-tests.mjs", "docs/qa/conteo-tests.txt"],
+      "cerebro": ["tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "qa.regresion.todo-bug-cerrado-deja-un-test-que-lo-repite",
+      "titulo": "Cerrar todo bug reportado con un test que falla sin el arreglo y pasa con él",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin el test, el mismo bug vuelve en el siguiente refactor y el dueño lo reporta dos veces; la segunda vez ya no confía en que \"está arreglado\" signifique algo.",
+      "queHacer": [
+        "Antes de tocar el código, escribir el test que reproduce el bug reportado y confirmar que falla.",
+        "Corregir el código y confirmar que el mismo test pasa, sin cambiar el test para que pase.",
+        "Nombrar el test con el número o la fecha del reporte, para poder rastrearlo después.",
+        "Incluir en el mismo commit o PR el test y el arreglo, nunca en PRs separados."
+      ],
+      "aceptacion": [
+        { "check": "El test añadido falla si se revierte solo el arreglo", "comando": "git stash -- lib/dominio/*.ts && npm test -- bug-$(cat .ultimo-bug); echo EXIT=$?; git stash pop", "espera": "EXIT distinto de 0 con el arreglo revertido" },
+        { "check": "El commit trae el test y el arreglo juntos", "comando": "git show --stat HEAD | grep -c test", "espera": "1+ archivo de test tocado en el mismo commit que el de dominio" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["tests/regresion/**"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.regresion.cifra-de-referencia-congelada-para-el-calculo-que-paga",
+      "titulo": "Fijar una cifra exacta de referencia para el cálculo que decide el cobro",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un refactor del cálculo de comisión que cambia el redondeo por un peso pasa todos los tests de camino feliz porque ninguno fija el número exacto esperado; el descuadre lo encuentra el dueño en el arqueo de la noche, no el CI por la tarde.",
+      "queHacer": [
+        "Elegir el cálculo que de verdad decide plata (comisión, costo de ventas, total de un cierre) y un conjunto de datos de entrada fijo.",
+        "Calcular a mano el resultado exacto esperado y congelarlo en el test.",
+        "Comparar por igualdad exacta, no por rango ni por aproximación, en cada corrida.",
+        "Repetir con un segundo conjunto de datos donde el redondeo por línea difiere del redondeo al total."
+      ],
+      "aceptacion": [
+        { "check": "El resultado del cálculo coincide con la cifra congelada", "comando": "npm test -- referencia-calculo", "espera": "exit 0, comparación por igualdad exacta" },
+        { "check": "La comparación no usa un margen de tolerancia", "comando": "grep -n 'toBeCloseTo' tests/regresion/referencia-calculo.test.ts", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["tests/regresion/referencia-calculo.test.ts"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "qa.regresion.la-suite-completa-corre-contra-cada-entorno-real",
+      "titulo": "Correr la suite completa contra cada entorno real antes de una versión mayor",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "CI corre contra localhost; un entorno real (staging con datos parecidos a producción) tiene configuración, versiones y datos que localhost no reproduce, y ahí aparece el bug que solo pasa en el entorno de verdad.",
+      "queHacer": [
+        "Antes de cada versión mayor, apuntar la suite completa, no solo el smoke, contra el entorno de staging con datos representativos.",
+        "Ejecutar los mismos comandos de verificar que corren en CI, cambiando solo la URL y las credenciales de entorno.",
+        "Registrar cualquier diferencia de resultado entre correr contra localhost y correr contra staging.",
+        "Bloquear la versión mayor si la suite contra staging falla, aunque CI contra localhost haya pasado en verde."
+      ],
+      "aceptacion": [
+        { "check": "La suite completa corre contra staging antes de la versión mayor", "comando": "ENTORNO=staging npm run verificar; echo EXIT=$?", "espera": "EXIT=0 registrado en el documento de la versión" },
+        { "check": "Toda diferencia entre localhost y staging queda anotada", "comando": "diff docs/qa/resultado-localhost.txt docs/qa/resultado-staging.txt", "espera": "0 líneas de diferencia, o cada línea con su explicación en el documento" }
+      ],
+      "aplicaSi": { "etapa": ["N3", "N4"] },
+      "porCada": null,
+      "posee": ["docs/qa/resultado-localhost.txt", "docs/qa/resultado-staging.txt"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.regresion.todo-incidente-cerrado-tiene-su-test-rastreable",
+      "titulo": "Confirmar que todo incidente cerrado tiene su test de regresión rastreable",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un bug corregido sin test de regresión es un bug que se corrige otra vez, con el mismo cliente al otro lado; la segunda vez ya no pregunta cuánto tarda en arreglarse, pregunta por qué debería seguir confiando en el sistema.",
+      "queHacer": [
+        "Mantener la lista de incidentes reales cerrados, no solo bugs de PR, con su identificador.",
+        "Etiquetar el test de regresión de cada incidente con ese mismo identificador en el nombre o en un comentario.",
+        "Escribir un script que cruce la lista de incidentes contra las etiquetas presentes en tests/regresion/.",
+        "Correrlo antes de cada cierre de sesión y convertir en tarea cualquier incidente sin test encontrado."
+      ],
+      "aceptacion": [
+        { "check": "Cada incidente cerrado tiene un test con su identificador", "comando": "node scripts/qa/cruzar-incidentes-y-tests.mjs", "espera": "0 incidentes sin test listados en la salida" },
+        { "check": "El script corre como parte del cierre de sesión", "comando": "grep -n 'cruzar-incidentes-y-tests' package.json", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["scripts/qa/cruzar-incidentes-y-tests.mjs", "docs/qa/incidentes.md"],
+      "cerebro": ["tema:memoria-y-cierre"]
+    },
+    {
+      "id": "qa.datos.la-semilla-se-mide-por-contenido-no-por-el-exit-code",
+      "titulo": "Verificar la siembra por su contenido, no solo por el código de salida",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "verdict: ok mide que el trabajo terminó, no que acertó: un seed puede terminar en verde y haber sembrado una fila vacía, un campo en cero o nada en absoluto si la condición de siembra nunca se cumplió, y nadie lo nota porque el código de salida era 0.",
+      "queHacer": [
+        "Tras correr el script de siembra, contar las filas que quedaron por tabla.",
+        "Comparar ese conteo contra el número esperado, declarado de antemano en el propio script.",
+        "Hacer que el script termine con código distinto de 0 si algún conteo esperado no se cumple, no solo si lanza una excepción.",
+        "Imprimir el conteo por tabla en la salida, para que quede pegado como evidencia del run."
+      ],
+      "aceptacion": [
+        { "check": "El script de siembra falla si el conteo esperado no se cumple", "comando": "npm run sembrar; echo EXIT=$?", "espera": "EXIT=0 solo si el conteo impreso coincide con el esperado declarado" },
+        { "check": "El conteo por tabla queda impreso, no solo el mensaje de éxito", "comando": "npm run sembrar 2>&1 | grep -c 'filas en'", "espera": "1 línea por tabla sembrada" }
+      ],
+      "aplicaSi": { "modo": "genesis" },
+      "porCada": null,
+      "posee": ["scripts/sembrar.ts"],
+      "cerebro": ["tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "qa.datos.ningun-campo-de-negocio-sembrado-en-cero-imposible",
+      "titulo": "Rechazar en la siembra un campo numérico de {{entidad}} fuera de rango real",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un seed con lotes de producto en 0 gramos quedó marcado ok porque el script terminó sin error; el problema lo vio el e2e del punto de venta, no la revisión de código, porque nadie miró el VALOR sembrado, solo que la siembra había corrido.",
+      "queHacer": [
+        "Declarar en el script de siembra el rango real de cada campo numérico de negocio de {{entidad}}: mínimo y máximo posibles.",
+        "Generar los valores de prueba dentro de ese rango, nunca en 0 cuando 0 no es un valor real del negocio.",
+        "Añadir una comprobación que recorra lo sembrado y cuente filas fuera de rango antes de dar la siembra por buena.",
+        "Provocar el caso a propósito, forzando un valor en 0, y confirmar que la comprobación lo detecta."
+      ],
+      "aceptacion": [
+        { "check": "Ninguna fila de {{entidad}} sembrada queda fuera de su rango declarado", "comando": "node scripts/qa/rango-de-siembra.mjs --entidad={{entidad}}", "espera": "0 filas fuera de rango" },
+        { "check": "Un valor en cero forzado se detecta", "comando": "node scripts/qa/rango-de-siembra.mjs --entidad={{entidad}} --forzar-cero; echo EXIT=$?", "espera": "EXIT distinto de 0" }
+      ],
+      "aplicaSi": { "entidades": ["*"] },
+      "porCada": "entidad",
+      "posee": ["scripts/qa/rango-de-siembra.mjs"],
+      "cerebro": ["tema:cero-datos-inventados"]
+    },
+    {
+      "id": "qa.datos.fixtures-en-su-propio-espacio-nunca-en-produccion",
+      "titulo": "Aislar los datos de prueba para que nunca toquen producción",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un test que corre contra la base real por una variable de entorno mal puesta puede anular facturas reales de un cliente real mientras alguien solo quería correr la suite antes de salir.",
+      "queHacer": [
+        "Usar una base, esquema o prefijo exclusivo para los datos de prueba, declarado en una sola variable de entorno.",
+        "Hacer que el runner de tests rechace arrancar si esa variable apunta a algo que no contenga la palabra test o prueba en el nombre.",
+        "Añadir una comprobación adicional: antes de escribir, confirmar que el nombre de la base actual no coincide con el de producción.",
+        "Probar el caso adverso: apuntar a mano la variable a la URL de producción y confirmar el rechazo antes de escribir una fila."
+      ],
+      "aceptacion": [
+        { "check": "Los tests rechazan correr contra una base que no es de prueba", "comando": "DATABASE_URL=postgres://produccion npm test; echo EXIT=$?", "espera": "EXIT distinto de 0 antes de escribir ninguna fila" },
+        { "check": "La base de prueba tiene un nombre distinguible", "comando": "grep -n 'DATABASE_URL' .env.test", "espera": "1 línea con test o prueba en el nombre de la base" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [".env.test", "tests/apoyo/guardia-de-entorno.ts"],
+      "cerebro": ["tema:entorno-de-la-maquina"]
+    },
+    {
+      "id": "qa.datos.generador-por-entidad-con-su-caso-limite",
+      "titulo": "Dejar un generador de datos de {{entidad}} que incluya su caso límite",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin generador compartido, cada test inventa su propio dato de ejemplo a mano y termina probando veinte veces el mismo caso típico, mientras el caso límite real, el que rompe en producción, nunca se generó ni una sola vez.",
+      "queHacer": [
+        "Escribir en tests/generadores/{{entidad}}.ts una función que produzca un {{entidad}} típico con valores aleatorios dentro de rango.",
+        "Añadir a la misma función un modo que produzca el caso límite: el máximo, el mínimo permitido, el texto con tilde o carácter especial.",
+        "Hacer que todos los tests de {{entidad}} usen este generador en vez de construir el objeto a mano.",
+        "Documentar en un comentario cuál es el caso límite elegido y por qué ese y no otro."
+      ],
+      "aceptacion": [
+        { "check": "El generador de {{entidad}} expone el caso límite", "comando": "grep -n 'casoLimite' tests/generadores/{{entidad}}.ts", "espera": "1+ líneas" },
+        { "check": "Los tests de {{entidad}} usan el generador, no un objeto armado a mano", "comando": "grep -L 'generadores/{{entidad}}' tests/dominio/{{entidad}}.test.ts", "espera": "0 archivos" }
+      ],
+      "aplicaSi": { "entidades": ["*"] },
+      "porCada": "entidad",
+      "posee": ["tests/generadores/{{entidad}}.ts"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.datos.migracion-cronometrada-con-el-volumen-real",
+      "titulo": "Cronometrar cada migración contra un volumen de datos igual al real",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Una migración que tarda 200 ms contra 500 filas de prueba puede tardar 40 minutos bloqueando la tabla contra las 800.000 filas reales de producción, y esos 40 minutos son 40 minutos sin poder cobrar.",
+      "queHacer": [
+        "Generar o copiar un volumen de datos igual o mayor al de la tabla real en producción, en el entorno de ensayo.",
+        "Correr la migración contra ese volumen y medir el tiempo total, no solo si terminó.",
+        "Medir también cuánto tiempo la tabla quedó bloqueada para escrituras, si el motor de base lo bloquea.",
+        "Fijar en el documento un techo de minutos aceptable según la ventana de mantenimiento real del negocio.",
+        "Si se pasa del techo, partir la migración en lotes antes de aplicarla contra producción."
+      ],
+      "aceptacion": [
+        { "check": "El tiempo de la migración contra volumen real queda medido", "comando": "node scripts/qa/cronometrar-migracion.mjs --volumen=800000", "espera": "minutos impresos, comparados contra el techo en docs/qa/migraciones-probadas.md" },
+        { "check": "La migración no se aplica a producción sin este ensayo", "comando": "grep -n 'cronometrar-migracion' .github/workflows/desplegar.yml", "espera": "1+ líneas antes del paso de aplicar la migración" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase", "mysql"] },
+      "porCada": null,
+      "posee": ["scripts/qa/cronometrar-migracion.mjs", "docs/qa/migraciones-probadas.md"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "qa.adversarial.ronda-hostil-separada-del-verificador-normal",
+      "titulo": "Correr una ronda adversarial con dos revisores, aparte del verificador normal",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "En una revisión real el verificador normal ya había dado FAIL, y aun así dos revisores adversariales dedicados encontraron 16 hallazgos que los smokes no vieron, incluido un PIN de administrador filtrado en un comentario del código: los smokes prueban que el camino feliz funciona, nada en ese camino busca lo que alguien hostil buscaría.",
+      "queHacer": [
+        "Asignar la ronda adversarial a dos revisores independientes entre sí y del verificador normal, cada uno sin ver el reporte del otro antes de terminar.",
+        "Darles el objetivo de romper el sistema a propósito: escalar permisos, mandar datos imposibles, buscar secretos filtrados, no confirmar que funciona.",
+        "Que cada hallazgo quede con archivo, línea y el paso exacto para reproducirlo.",
+        "Unir los dos reportes al final y quitar duplicados, sin descartar un hallazgo solo porque un revisor no lo vio.",
+        "Cerrar la ronda con el conteo total de hallazgos, no con una impresión general."
+      ],
+      "aceptacion": [
+        { "check": "Existen dos reportes adversariales independientes con sus hallazgos", "comando": "ls docs/qa/adversarial-*.md | wc -l", "espera": "2+ archivos" },
+        { "check": "El conteo de hallazgos queda con archivo y línea por cada uno", "comando": "grep -cE '^\\s*-\\s.+:[0-9]+' docs/qa/adversarial-*.md", "espera": "1+ por archivo" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/qa/adversarial-*.md"],
+      "cerebro": ["tema:olas-de-agentes"]
+    },
+    {
+      "id": "qa.adversarial.grep-de-secretos-dentro-de-comentarios",
+      "titulo": "Buscar contraseñas y PIN escritos en comentarios de código, no en config",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un PIN de administrador filtrado en un comentario del código no lo encuentra un linter normal porque un comentario no es una variable ni un archivo .env; solo lo encuentra alguien que va buscando ese descuido a propósito, y hasta entonces cualquiera que lea el código lo tiene.",
+      "queHacer": [
+        "Escribir un grep que busque, dentro de líneas de comentario, patrones de PIN, clave o contraseña seguidos de un valor literal.",
+        "Correrlo sobre todo el repositorio, no solo sobre los archivos tocados en el último PR.",
+        "Añadirlo a la ronda adversarial, no al verificador normal, que no está pensado para buscar esto.",
+        "Ante cada hallazgo, rotar el secreto expuesto además de borrar el comentario: borrar el comentario no invalida el valor si ya se filtró."
+      ],
+      "aceptacion": [
+        { "check": "Ningún comentario del código trae un secreto literal", "comando": "grep -rniE '(pin|password|clave|secret)[^a-zA-Z]{0,3}[:=][^a-zA-Z]{0,3}[0-9A-Za-z]{4,}' --include=*.ts --include=*.tsx lib/ app/ | grep -E '//|/\\*'", "espera": "0 líneas" },
+        { "check": "El grep corre como parte de la ronda adversarial", "comando": "grep -n secretos-en-comentarios docs/qa/checklist-adversarial.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/qa/checklist-adversarial.md"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.adversarial.intentar-desde-cada-rol-lo-que-no-le-toca",
+      "titulo": "Intentar con sesión de {{rol}} la acción que a {{rol}} no le toca",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un test que solo prueba lo que cada rol SÍ puede hacer nunca ejercita la puerta que falta; la escalada de privilegio se descubre por accidente, en producción, el día que alguien la usa para ver o cambiar lo que no le correspondía.",
+      "queHacer": [
+        "Listar, para {{rol}}, las tres acciones de mayor radio de daño que NO le corresponden.",
+        "Iniciar sesión real como {{rol}} e intentar cada una contra la ruta correspondiente.",
+        "Confirmar el código de rechazo exacto (401 o 403), no solo que la pantalla no mostró un botón.",
+        "Repetir intentando la acción directo por API, sin pasar por la pantalla que la esconde."
+      ],
+      "aceptacion": [
+        { "check": "{{rol}} recibe rechazo explícito en las tres acciones fuera de su alcance", "comando": "npm test -- adversarial-permisos-{{rol}}", "espera": "exit 0; los tres intentos devuelven 401 o 403" },
+        { "check": "El rechazo ocurre también llamando la API directo", "comando": "curl -s -o /dev/null -w '%{http_code}' -H 'Authorization: Bearer {{rol}}' -X POST localhost:3000/api/accion-restringida", "espera": "401 o 403" }
+      ],
+      "aplicaSi": { "roles": ["*"] },
+      "porCada": "rol",
+      "posee": ["tests/adversarial/permisos-{{rol}}.test.ts"],
+      "cerebro": ["tema:acceso-roles-y-puestos"]
+    },
+    {
+      "id": "qa.adversarial.mandar-a-cada-ruta-el-dato-que-no-deberia-caber",
+      "titulo": "Mandar a {{ruta}} un valor fuera de rango y confirmar que no se guarda",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La validación feliz prueba que el número normal entra bien; el número que una persona nunca teclearía a mano pero un script sí puede mandar es exactamente el que un formulario nunca ensaya y una API pública sí recibe todos los días.",
+      "queHacer": [
+        "Preparar una lista de valores adversariales para {{ruta}}: negativo, gigante, con emoji, con etiquetas HTML, vacío, con un objeto en vez de un número.",
+        "Mandar cada uno por separado contra {{ruta}} con una sesión válida.",
+        "Confirmar que ninguno resulta en 200 ni en una fila nueva en la base.",
+        "Confirmar que el servidor no cae ni deja una excepción sin capturar en el log."
+      ],
+      "aceptacion": [
+        { "check": "Ningún valor adversarial se guarda en {{ruta}}", "comando": "node scripts/qa/adversarial-entrada.mjs --ruta={{ruta}}", "espera": "0 filas nuevas tras los valores adversariales; todos devuelven 400" },
+        { "check": "Ninguno tumba el servidor", "comando": "curl -s -o /dev/null -w '%{http_code}' localhost:3000/salud", "espera": "200 después de mandar todos los valores adversariales" }
+      ],
+      "aplicaSi": { "superficies": ["api"] },
+      "porCada": "ruta",
+      "posee": ["scripts/qa/adversarial-entrada.mjs"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.adversarial.leer-el-informe-generado-buscando-el-dato-imposible",
+      "titulo": "Leer un informe generado buscando el dato que no puede ser cierto",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una ciudad inventada en las keywords SEO y un género gramatical equivocado en documentos del equipo pasaron como ok porque nadie leyó el CONTENIDO buscando el error: solo se confirmó que el generador había corrido. El verificador que solo mira si corrió nunca atrapa esto.",
+      "queHacer": [
+        "Elegir un informe o contenido generado que nadie leyó línea por línea desde que se generó.",
+        "Leerlo completo buscando, a propósito, un dato imposible: un lugar que no existe en la lista real de sedes, un género gramatical equivocado, una cifra que no cuadra con la fuente.",
+        "Contrastar cada dato de hecho contra su fuente real, no contra lo verosímil que suene.",
+        "Dejar constancia explícita de cuántos puntos se revisaron y cuántos hallazgos aparecieron, aunque sean cero."
+      ],
+      "aceptacion": [
+        { "check": "Cada ciudad o lugar mencionado existe en la lista real de sedes", "comando": "grep -oE '\\b[A-Z][a-záéíóú]+\\b' contenido-generado.md | sort -u | comm -23 - docs/sedes-reales.txt", "espera": "0 líneas de lugares no declarados" },
+        { "check": "La revisión de contenido queda con constancia de puntos revisados", "comando": "grep -n 'puntos revisados' docs/qa/revision-contenido.md", "espera": "1 línea con un número" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/qa/revision-contenido.md"],
+      "cerebro": ["tema:cero-datos-inventados", "tema:pantalla-publica"]
+    },
+    {
+      "id": "qa.adversarial.la-ronda-hostil-se-repite-en-produccion-por-calendario",
+      "titulo": "Repetir la ronda adversarial en producción con fecha fija, no solo al lanzar",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "El sistema revisado hostilmente antes de lanzar acumula superficies nuevas con cada función agregada después; sin una segunda ronda programada, todo lo construido después del lanzamiento nunca pasó por un revisor hostil, y crece exactamente donde nadie está mirando.",
+      "queHacer": [
+        "Fijar una cadencia, cada versión mayor o cada trimestre, lo que ocurra primero, para repetir la ronda adversarial completa.",
+        "Incluir en cada ronda toda función agregada desde la ronda anterior, no solo el módulo más reciente.",
+        "Asignarla de nuevo a revisores que no construyeron lo que están revisando.",
+        "Registrar la fecha de la última ronda y la próxima programada en un documento que se consulte al planear el trabajo."
+      ],
+      "aceptacion": [
+        { "check": "La próxima ronda adversarial está programada dentro del periodo", "comando": "grep -n 'proxima-ronda' docs/qa/calendario-adversarial.md", "espera": "1 fecha, no más de 90 días después de la última ronda" },
+        { "check": "La última ronda cubrió lo agregado desde la anterior", "comando": "git log --since=$(grep -oP 'ultima-ronda: \\K.*' docs/qa/calendario-adversarial.md) --name-only | wc -l", "espera": "el número de archivos tocados coincide con lo declarado cubierto en el reporte" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/qa/calendario-adversarial.md"],
+      "cerebro": ["tema:memoria-y-cierre"]
+    },
+    {
+      "id": "qa.evidencia.todo-veredicto-cita-el-comando-y-pega-su-salida",
+      "titulo": "Exigir que todo veredicto cite el comando y pegue su salida real",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Un veredicto sin evidencia observable no es un veredicto; \"ok\" escrito a mano es indistinguible de \"ok\" medido, y las tres veces que costó caro (el seed en 0 gramos, la ciudad inventada, el género equivocado) el reporte decía ok sin que nadie pudiera repetir cómo se llegó a esa palabra.",
+      "queHacer": [
+        "Añadir a la plantilla de reporte de tareas un campo obligatorio: comando corrido y su salida real, junto a cada veredicto.",
+        "Rechazar en la revisión cualquier listo o verificado que no traiga ese bloque.",
+        "Exigir que la salida pegada sea la real de la corrida, no un resumen escrito de memoria.",
+        "Dar un ejemplo correcto y uno incorrecto en la propia plantilla, para que no haya dos lecturas."
+      ],
+      "aceptacion": [
+        { "check": "La plantilla exige comando y salida junto al veredicto", "comando": "grep -n 'comando\\|salida' docs/qa/plantilla-reporte.md", "espera": "2+ líneas" },
+        { "check": "Ningún reporte reciente dice listo sin un bloque de comando junto", "comando": "grep -B2 -iE '\\blisto\\b|\\bverificado\\b' docs/qa/reportes/*.md | grep -c '```'", "espera": "igual al número de veces que aparece listo o verificado" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/qa/plantilla-reporte.md"],
+      "cerebro": ["tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "qa.evidencia.captura-del-paso-final-del-cobro",
+      "titulo": "Adjuntar al PR una captura de pantalla del paso final del cobro",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin la captura, \"probé que cobra\" es una frase; con la captura, cualquiera, incluido el dueño del negocio que no lee un log, ve el recibo con sus propios ojos y confía en que la plata sí quedó registrada.",
+      "queHacer": [
+        "Al final del test e2e del flujo que cobra, tomar una captura de pantalla del paso de confirmación o recibo.",
+        "Guardar la captura con un nombre que incluya la fecha y el identificador del PR.",
+        "Adjuntar la captura al PR o al reporte de la tarea, no solo dejarla en el disco local.",
+        "Confirmar que la captura muestra el monto y no una pantalla de carga a medias."
+      ],
+      "aceptacion": [
+        { "check": "La captura del paso final existe y no está vacía", "comando": "node ORION/tools/edge-cdp.mjs tests/e2e/cobro-completo.mjs --capturar; ls -la capturas/cobro-*.png", "espera": "1+ archivo con tamaño mayor a 0" },
+        { "check": "La captura está adjunta al PR", "comando": "gh pr view --json files | grep -c capturas/cobro", "espera": "1+" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["capturas/**"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.evidencia.el-reporte-trae-la-cifra-de-antes-y-la-de-despues",
+      "titulo": "Exigir en el reporte la cifra de antes y la de después, no solo la última",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "\"626 cuando debían ser 644\" solo se nota si alguien anotó que antes eran 644; sin la cifra de referencia, una pérdida de 18 tests se lee igual que un número cualquiera y nadie la persigue.",
+      "queHacer": [
+        "Añadir a la plantilla de reporte una fila obligatoria para toda cifra que la tarea cambie: valor de antes y valor de después.",
+        "Exigir que ambas cifras vengan de un comando corrido, no de memoria ni de un commit anterior sin verificar.",
+        "Si la cifra baja donde se esperaba que subiera o se mantuviera, exigir una línea explicando por qué.",
+        "Aplicar esto a conteos de tests, filas de tablas, tamaño de bundle y cualquier número que la tarea declare vigilar."
+      ],
+      "aceptacion": [
+        { "check": "El reporte trae dos cifras para cada número vigilado", "comando": "grep -cE 'antes: [0-9]+.*despues: [0-9]+' docs/qa/reportes/*.md", "espera": "1+ por reporte que declare un número vigilado" },
+        { "check": "Una baja sin explicación no pasa la revisión", "comando": "grep -B1 -A1 'despues: [0-9]+' docs/qa/reportes/ultimo.md", "espera": "cuando despues es menor que antes, aparece una línea de motivo en el contexto" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/qa/plantilla-reporte.md"],
+      "cerebro": ["tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "qa.evidencia.el-codigo-http-pegado-es-el-de-una-llamada-real",
+      "titulo": "Exigir que el código HTTP citado como evidencia venga de una llamada real",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un veredicto que asume el código de respuesta sin haberlo llamado asume exactamente lo que un curl real desmentiría en diez segundos; \"debería devolver 200\" no es evidencia, es una expectativa sin comprobar.",
+      "queHacer": [
+        "Prohibir en los reportes la frase \"debería devolver\" sin un comando junto que lo confirme.",
+        "Exigir que todo código HTTP citado venga de una llamada real: curl, fetch de test, o captura de red del navegador.",
+        "Incluir el comando exacto usado, para que se pueda repetir la llamada después.",
+        "Marcar como incompleto cualquier reporte que cite un código sin el comando correspondiente."
+      ],
+      "aceptacion": [
+        { "check": "Ningún reporte usa 'debería devolver' sin comando junto", "comando": "grep -B1 -iE 'deberia (responder|devolver)' docs/qa/reportes/*.md | grep -c 'curl\\|fetch'", "espera": "igual al número de apariciones de la frase" },
+        { "check": "El código HTTP citado corresponde a una llamada real", "comando": "curl -s -o /dev/null -w '%{http_code}' localhost:3000/api/salud", "espera": "el código impreso coincide con el citado en el reporte" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/qa/plantilla-reporte.md"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.evidencia.el-manual-se-camina-contra-el-sistema-vivo",
+      "titulo": "Caminar el manual de soporte contra el sistema y anotar lo que ya no coincide",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un manual que nadie vuelve a caminar contra el sistema real describe una pantalla que ya cambió tres versiones atrás; el día que la persona del mostrador lo necesita de verdad, sigue instrucciones que ya no llevan a ningún lado.",
+      "queHacer": [
+        "Seguir el manual de soporte paso a paso contra el sistema en su versión actual, sin saltarse ninguno.",
+        "Anotar cada paso donde lo que dice el manual ya no coincide con lo que aparece en pantalla.",
+        "Corregir el manual en el mismo momento, con las palabras exactas que hoy salen en pantalla.",
+        "Repetir este ensayo cada vez que la pantalla que describe cambie, y anotar la fecha del último ensayo en el propio manual."
+      ],
+      "aceptacion": [
+        { "check": "El manual tiene fecha de último ensayo contra el sistema real", "comando": "grep -n 'ultimo ensayo' docs/manual.md", "espera": "1 fecha, no mayor a 3 meses de antigüedad" },
+        { "check": "Cada discrepancia encontrada quedó corregida", "comando": "grep -c 'discrepancia sin corregir' docs/manual.md", "espera": "0" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/manual.md"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    {
+      "id": "qa.revision.quien-aprueba-no-es-quien-escribio-el-codigo",
+      "titulo": "Exigir que quien aprueba el PR sea distinto de quien escribió el código",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Quien escribió el código ya decidió que su propia solución es correcta; pedirle que también sea quien la revisa es pedirle que encuentre su propio punto ciego, y el punto ciego es, por definición, lo que esa persona no ve.",
+      "queHacer": [
+        "Configurar en el repositorio que el autor del PR no pueda aprobarse a sí mismo.",
+        "Asignar la revisión a una identidad distinta: otra persona, u otro agente en una sesión separada sin el contexto de construcción.",
+        "Exigir que quien revisa corra al menos un comando de verificación por su cuenta, no que confíe en el reporte del autor.",
+        "Dejar registrado en el PR quién construyó y quién aprobó, con marca de tiempo de cada uno."
+      ],
+      "aceptacion": [
+        { "check": "El autor del PR no figura como su propio aprobador", "comando": "gh pr view --json author,reviews --jq '.author.login as $a | .reviews[] | select(.author.login == $a)'", "espera": "0 líneas" },
+        { "check": "La aprobación exige un check corrido de forma independiente", "comando": "gh pr checks --json | grep -c revisor-independiente", "espera": "1+" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/qa/checklist-revision.md"],
+      "cerebro": ["tema:olas-de-agentes"]
+    },
+    {
+      "id": "qa.revision.cada-casilla-de-la-plantilla-exige-su-comando",
+      "titulo": "Exigir en la plantilla de PR un comando junto a cada casilla, no de palabra",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "Una casilla marcada de memoria se marca siempre, hasta el día que el gate real está roto y nadie lo notó porque marcar la casilla no costaba nada.",
+      "queHacer": [
+        "Por cada gate de la plantilla de PR (typecheck, tests, build, e2e del flujo crítico), añadir el comando exacto que la marca.",
+        "Quitar cualquier casilla que solo diga revisado o probado sin comando junto.",
+        "Pedir que se pegue la última línea de salida del comando, no solo que se marque la casilla.",
+        "Revisar un PR reciente contra la plantilla nueva y confirmar que ninguna casilla quedó sin su comando."
+      ],
+      "aceptacion": [
+        { "check": "Cada casilla de la plantilla trae su comando", "comando": "grep -c '\\- \\[ \\]' .github/PULL_REQUEST_TEMPLATE.md; grep -c '```' .github/PULL_REQUEST_TEMPLATE.md", "espera": "el número de bloques de comando es igual o mayor al de casillas" },
+        { "check": "Ninguna casilla dice solo revisado o probado", "comando": "grep -iE '\\- \\[.\\] (revisado|probado) *$' .github/PULL_REQUEST_TEMPLATE.md", "espera": "0 líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [".github/PULL_REQUEST_TEMPLATE.md"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.revision.el-cierre-relee-cada-criterio-de-aceptacion-por-separado",
+      "titulo": "Releer al cerrar la tarea cada criterio de aceptación original, uno por uno",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin releer la lista original, es fácil aprobar una tarea que cumplió 3 de 5 criterios porque los 3 que se probaron se veían bien y los otros 2 se dieron por hechos sin comprobarlos.",
+      "queHacer": [
+        "Al cerrar la tarea, copiar la lista de criterios de aceptación tal como se escribió al principio.",
+        "Frente a cada uno, escribir la comprobación puntual que lo confirma, con comando y salida, no una frase general.",
+        "Si algún criterio no se puede comprobar todavía, dejarlo explícito como pendiente, no marcarlo junto a los demás.",
+        "Contar los criterios originales y las comprobaciones escritas: deben coincidir en número."
+      ],
+      "aceptacion": [
+        { "check": "Cada criterio original tiene su comprobación puntual", "comando": "grep -c '^- ' docs/qa/aceptacion-original.md; grep -c '^- ' docs/qa/aceptacion-verificada.md", "espera": "los dos conteos son iguales" },
+        { "check": "Ningún criterio queda aprobado sin su comando", "comando": "grep -B1 APROBADO docs/qa/aceptacion-verificada.md | grep -c '```'", "espera": "igual al número de apariciones de APROBADO" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/qa/aceptacion-verificada.md"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.revision.doble-aprobacion-en-dinero-permisos-y-borrado",
+      "titulo": "Exigir dos aprobaciones en cambios a dinero, permisos o borrado irreversible",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "El radio de daño de un error en el cálculo de comisión o en la matriz de permisos no es un texto por corregir: es plata mal cobrada o una cuenta viendo lo que no le toca durante semanas antes de que alguien lo note.",
+      "queHacer": [
+        "Etiquetar en el PR los cambios que tocan cálculo de dinero, reglas de permisos o cualquier operación irreversible.",
+        "Exigir para esos PR dos aprobaciones de dos identidades distintas, además del autor.",
+        "Que las dos revisiones sean independientes entre sí: cada una corre su propia verificación antes de ver la del otro.",
+        "Bloquear la fusión en el repositorio mientras falte cualquiera de las dos aprobaciones."
+      ],
+      "aceptacion": [
+        { "check": "Los PR etiquetados de alto riesgo exigen dos aprobaciones", "comando": "gh api repos/:owner/:repo/branches/main/protection --jq '.required_pull_request_reviews.required_approving_review_count'", "espera": "2 o más" },
+        { "check": "Un PR de alto riesgo con una sola aprobación no se fusiona", "comando": "gh pr view --json mergeable,reviews", "espera": "mergeable en falso mientras solo haya 1 aprobación" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/qa/checklist-revision.md"],
+      "cerebro": ["tema:invariantes-contables", "tema:acceso-roles-y-puestos"]
+    },
+    {
+      "id": "qa.cobertura.lista-por-entidad-de-la-operacion-sin-ningun-test",
+      "titulo": "Listar por comando qué operación de {{entidad}} no tiene ningún test",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "\"80% de cobertura\" no dice si el 20% que falta es un botón cosmético o el botón de anular una factura; la lista por operación sí lo dice, con nombre y apellido de la función que nadie probó todavía.",
+      "queHacer": [
+        "Listar las funciones exportadas del módulo de dominio de {{entidad}}: crear, editar, anular, listar, exportar.",
+        "Cruzar esa lista contra los describe/it de sus tests, buscando cuáles funciones no aparecen mencionadas en ninguno.",
+        "Escribir el resultado como una lista de nombres, no como un número.",
+        "Pegar esa lista en el documento de cobertura de {{entidad}}, no borrarla hasta que quede vacía."
+      ],
+      "aceptacion": [
+        { "check": "La lista de operaciones sin test de {{entidad}} se genera por comando", "comando": "node scripts/qa/operaciones-sin-test.mjs --entidad={{entidad}}", "espera": "una lista de nombres de función, puede ser vacía, nunca un porcentaje" },
+        { "check": "Toda función listada como sin test no aparece en ningún it()", "comando": "grep -c anularFactura tests/dominio/{{entidad}}.test.ts", "espera": "0, si anularFactura está en la lista de sin test" }
+      ],
+      "aplicaSi": { "entidades": ["*"] },
+      "porCada": "entidad",
+      "posee": ["scripts/qa/operaciones-sin-test.mjs", "docs/qa/cobertura-{{entidad}}.md"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.cobertura.tantos-tests-de-rechazo-como-de-exito-por-modulo",
+      "titulo": "Confirmar que cada camino feliz probado tiene su rechazo probado",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Es fácil probar diez veces que la venta correcta se guarda y ninguna que el pago que no cuadra se rechaza; el camino que protege la plata es justo el que casi nunca se ensaya porque no debería pasar.",
+      "queHacer": [
+        "Por cada módulo de dominio, contar cuántos tests confirman un camino feliz (acepta, guarda, aprueba) y cuántos confirman un rechazo (rechaza, falla, deniega).",
+        "Listar las funciones con camino feliz probado y ningún rechazo probado.",
+        "Para cada una de esa lista, escribir el test de rechazo que falta antes de cerrar la tarea.",
+        "Dejar el conteo de ambos lados en el documento de cobertura, no solo el total de tests."
+      ],
+      "aceptacion": [
+        { "check": "El conteo de tests de rechazo y de éxito por módulo queda medido", "comando": "node scripts/qa/conteo-exito-vs-rechazo.mjs", "espera": "dos números por módulo, ninguno en 0 si el módulo declara reglas de rechazo" },
+        { "check": "Ninguna función con regla de rechazo declarada queda sin su test", "comando": "grep -c 'rechazo pendiente' docs/qa/cobertura-modulos.md", "espera": "0" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["scripts/qa/conteo-exito-vs-rechazo.mjs", "docs/qa/cobertura-modulos.md"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.cobertura.el-limite-numerico-tiene-un-test-en-el-borde-exacto",
+      "titulo": "Confirmar que cada límite numérico declarado tiene un test en su borde exacto",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El bug casi nunca vive en el medio del rango; vive en el borde exacto, y un test con un valor cualquiera que pasa nunca pisa el borde donde el < debía ser <=.",
+      "queHacer": [
+        "Listar cada límite numérico declarado en el dominio: mínimo, máximo, cero permitido o no.",
+        "Para cada uno, buscar en los tests un caso que use exactamente ese valor límite, no un valor cercano.",
+        "Marcar los límites sin ese test exacto como huecos, con el archivo y la línea donde vive el límite.",
+        "Cerrar cada hueco con el test del borde exacto antes de dar la tarea por terminada."
+      ],
+      "aceptacion": [
+        { "check": "Cada límite declarado tiene un test en su valor exacto", "comando": "node scripts/qa/limites-sin-test-exacto.mjs", "espera": "lista vacía de límites sin test exacto" },
+        { "check": "El test del borde usa el valor límite literal", "comando": "grep -n limiteExacto tests/dominio/*.test.ts", "espera": "1+ líneas por límite declarado" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["scripts/qa/limites-sin-test-exacto.mjs"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.cobertura.lista-de-rutas-sin-ningun-test-generada-por-comando",
+      "titulo": "Generar por comando la lista de rutas sin ningún test, no de memoria",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Sin la lista, \"la mayoría de las rutas están probadas\" es una impresión; con la lista, la próxima persona sabe exactamente cuáles rutas nadie ha tocado nunca con un test, y puede decidir si eso es aceptable o no.",
+      "queHacer": [
+        "Listar todos los archivos route.ts de app/api/.",
+        "Cruzarlos contra los archivos de test que los mencionan por su ruta.",
+        "Imprimir la lista de rutas sin ningún test que las llame.",
+        "Correr el comando como parte de verificar, sin bloquear el build, solo para que la lista quede visible en cada corrida."
+      ],
+      "aceptacion": [
+        { "check": "La lista de rutas sin test se genera por comando", "comando": "node scripts/qa/rutas-sin-test.mjs", "espera": "una lista de rutas, puede ser vacía, impresa por el comando" },
+        { "check": "El comando corre en cada verificar", "comando": "grep -n rutas-sin-test package.json", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "superficies": ["api"] },
+      "porCada": null,
+      "posee": ["scripts/qa/rutas-sin-test.mjs"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.cobertura.matriz-rol-por-accion-marca-que-combinacion-no-se-ha-atacado",
+      "titulo": "Mantener una matriz rol por acción de qué combinación no se ha probado",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Probar que el cajero no puede editar precios no dice nada sobre si el mesero tampoco puede; cada casilla vacía de la matriz es una combinación que nadie ha intentado romper todavía, y ahí vive la escalada de privilegio que nadie vio venir.",
+      "queHacer": [
+        "Construir la matriz con cada rol del sistema en las filas y cada acción sensible en las columnas.",
+        "Marcar cada casilla como probada solo si existe un test adversarial real que la intentó y confirmó el rechazo.",
+        "Dejar visibles, sin rellenar de forma verosímil, las casillas donde ese test todavía no existe.",
+        "Priorizar el cierre de las casillas de mayor radio de daño, dinero y datos personales, antes que las cosméticas."
+      ],
+      "aceptacion": [
+        { "check": "La matriz lista, con nombre, las combinaciones no probadas", "comando": "grep -c 'sin probar' docs/qa/matriz-roles.md", "espera": "el número impreso coincide con el conteo real de casillas vacías" },
+        { "check": "Toda casilla marcada como probada tiene su test real", "comando": "grep -A1 'probado: si' docs/qa/matriz-roles.md | grep -c tests/adversarial", "espera": "igual al número de casillas marcadas probada" }
+      ],
+      "aplicaSi": { "roles": ["*"] },
+      "porCada": null,
+      "posee": ["docs/qa/matriz-roles.md"],
+      "cerebro": ["tema:acceso-roles-y-puestos"]
+    },
+    {
+      "id": "qa.cobertura.test-flaky-en-cuarentena-con-dueno-y-plazo",
+      "titulo": "Poner en cuarentena con dueño y plazo el test que falla de forma intermitente",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un test flaky que nadie arregla se termina ignorando siempre, incluso el día que su fallo intermitente es un bug real de condición de carrera; la cuarentena sin plazo es una forma elegante de borrar la evidencia sin decidir nada.",
+      "queHacer": [
+        "Al detectar un test que falla de forma intermitente, marcarlo en cuarentena en vez de borrarlo o ignorarlo en silencio.",
+        "Asignarle un dueño responsable de investigarlo y una fecha límite, ambos escritos junto al test.",
+        "Que la cuarentena no lo excluya del reporte: debe seguir apareciendo como pendiente en cada corrida hasta resolverse.",
+        "Si se pasa la fecha límite sin resolución, escalar la tarea en vez de extender el plazo en silencio."
+      ],
+      "aceptacion": [
+        { "check": "Todo test en cuarentena tiene dueño y fecha límite", "comando": "grep -B1 '@cuarentena' tests/**/*.test.ts | grep -c 'dueno:.*plazo:'", "espera": "igual al número de tests marcados @cuarentena" },
+        { "check": "Ningún test en cuarentena pasó su plazo sin escalar", "comando": "node scripts/qa/cuarentena-vencida.mjs", "espera": "0 tests vencidos sin tarea de escalamiento asociada" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["scripts/qa/cuarentena-vencida.mjs", "docs/qa/cuarentena.md"],
+      "cerebro": []
+    },
+    {
+      "id": "qa.cobertura.la-lista-de-huecos-se-revisa-en-persona-con-el-dueno",
+      "titulo": "Revisar con el dueño la lista de operaciones sin test, no decidirla solo",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien programó decide con criterio técnico qué probar primero; el dueño sabe qué hueco le puede costar una venta perdida y cuál nunca se va a usar, y sin esa conversación el esfuerzo de pruebas se reparte donde es más fácil programarlas, no donde más importa.",
+      "queHacer": [
+        "Tomar la lista de operaciones sin test, del arquetipo de cobertura por entidad, y presentarla al dueño del negocio, una fila a la vez.",
+        "Anotar la decisión del dueño para cada hueco: se prueba ahora, se acepta el riesgo, o no aplica al negocio real.",
+        "Fechar la revisión y guardar quién participó.",
+        "Convertir en tarea concreta cada hueco que el dueño marcó como se prueba ahora."
+      ],
+      "aceptacion": [
+        { "check": "Cada hueco de la lista original tiene una decisión del dueño", "comando": "grep -c '^- ' docs/qa/huecos-sin-test.md; grep -c 'decision:' docs/qa/huecos-revisados-con-dueno.md", "espera": "los dos conteos son iguales" },
+        { "check": "La revisión tiene fecha y participantes", "comando": "grep -nE 'fecha:|participo:' docs/qa/huecos-revisados-con-dueno.md", "espera": "2+ líneas" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/qa/huecos-revisados-con-dueno.md"],
+      "cerebro": ["tema:encargos-verificables"]
+    }
+  ]
+}

@@ -72,6 +72,17 @@ autonomous — no per-step approval needed). Order matters:
    the parent repo `C:\Users\Kalel\ORION`, InfraPilot.v01) with a message like
    `orion: session close — memory curation (vN)`. Do NOT push — remind the
    user of any commits pending push via GitHub Desktop.
+4b. **Mira dónde se fue el gasto.** Un solo comando, ~0 tokens:
+
+   ```bash
+   node C:\Users\Kalel\ORION\tools\costos.mjs fugas
+   ```
+
+   Da las tres fugas medidas —muertes de agente, tier de más, ceremonia de más—
+   con su número actual. Incluye UNA línea suya en el reporte. Una
+   recomendación sin cifra no cambia una costumbre; la cifra sí, y por eso se
+   mira al cerrar y no cuando ya duele.
+
 5. **Report** (≤15 lines, user's language): objects merged/archived, active
    count before → after, new version, validation result, commits made, and
    the top open Pending items for next session.
