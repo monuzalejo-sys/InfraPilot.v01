@@ -1,0 +1,1405 @@
+{
+  "categoria": "accesibilidad",
+  "nombre": "Accesibilidad y uso real",
+  "meta": "Que la persona real —la que cuenta a ciegas, teclea con guantes o no ve bien el sol de las 11— pueda usar el sistema completo, y que eso se compruebe observándola, no adivinándolo.",
+  "arquetipos": [
+    {
+      "id": "acc.contraste.no-solo-color",
+      "titulo": "Dar a cada estado un icono o texto, no solo un color",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien no distingue rojo de verde (deuteranopia, cerca de 1 de cada 12 hombres) ve la misma pastilla gris en \"pagado\" y \"vencido\"; llama a preguntar o cobra dos veces algo que ya estaba pagado.",
+      "queHacer": [
+        "Listar los estados que hoy se distinguen solo por color: pagado/vencido, en stock/agotado, activo/inactivo, correcto/con error.",
+        "Añadir a cada pastilla o badge un icono o una palabra fija, no solo la clase de color (ej. \"Pagado ✓\" / \"Vencido !\").",
+        "Verificar cada uno desaturado (escala de grises) y confirmar que el icono o la palabra sigue presente.",
+        "Dejar el color como refuerzo visual, nunca como el único canal."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los estados llevan icono o texto propio, no solo la clase de color",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-estado]')].filter(e=>!e.textContent.trim() && !e.querySelector('svg')).length\"",
+          "espera": "eval: 0"
+        },
+        {
+          "check": "El estado se distingue sin color",
+          "comando": null,
+          "espera": "captura desaturada (grayscale 100%) de pagado y vencido con texto o icono distinto presente en cada una"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "components/ui/estado.tsx",
+        "components/ui/badge.tsx"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "acc.contraste.nada-de-color-suelto-fuera-del-token",
+      "titulo": "Sacar del código todo color de texto que no pase por el token medido",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien puso a mano text-gray-300 para una nota de ayuda nunca corrió el script de contraste; esa nota se vuelve invisible bajo el sol de las 11 justo para el que ya lee más despacio.",
+      "queHacer": [
+        "Poner un grep de guardia sobre app/ y components/ que busque utilidades de color sueltas (text-gray-, text-slate-, color:#, text-[#).",
+        "Reemplazar cada hallazgo por una variable de app/globals.css ya medida por scripts/contraste.mjs.",
+        "Encender el grep dentro de npm run verificar para que ningún color nuevo entre sin pasar por el token.",
+        "Confirmar que el texto de placeholder y el de ayuda (hint) también usan el token, no un gris \"solo para eso\"."
+      ],
+      "aceptacion": [
+        {
+          "check": "No queda color de texto fuera del sistema de tokens",
+          "comando": "grep -rnE \"text-(gray|slate|zinc|neutral)-[0-9]+|color:\\s*#[0-9a-fA-F]{3,6}|text-\\[#\" app/ components/ --include=*.tsx",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El grep está encadenado en la verificación",
+          "comando": "grep -n \"text-gray\\|color suelto\" package.json",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "app/globals.css",
+        "scripts/contraste.mjs"
+      ],
+      "cerebro": [
+        "tema:generadores-de-diseno",
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "acc.teclado.todo-clic-tiene-tecla",
+      "titulo": "Hacer que todo elemento con onClick responda también al teclado",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien no puede sostener el mouse, o usa el teclado porque tiene las dos manos ocupadas con el producto, no puede activar un div con onClick así lo tenga el dedo encima; para ella ese botón no existe.",
+      "queHacer": [
+        "Recorrer app/ y components/ y listar cada elemento no nativo (div, span, li) con onClick.",
+        "Convertirlo en <button> real donde se pueda; donde no, añadirle role=\"button\", tabIndex=\"0\" y el manejador de Enter y de espacio.",
+        "Confirmar que el cursor-pointer nunca aparece sin su contraparte de teclado.",
+        "Dejar un grep de guardia que falle si aparece un onClick nuevo sobre un elemento no interactivo sin tabIndex."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún elemento no nativo con onClick queda fuera del teclado",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[onclick],[data-clickable]')].filter(e=>!['BUTTON','A'].includes(e.tagName) && e.getAttribute('tabindex')===null).length\"",
+          "espera": "eval: 0"
+        },
+        {
+          "check": "Enter activa lo mismo que el clic",
+          "comando": null,
+          "espera": "en 3 controles no nativos elegidos al azar, Enter dispara la misma acción que el clic, comprobado a mano"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "components/ui/tarjeta-tocable.tsx"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "acc.teclado.enlace-de-salto",
+      "titulo": "Poner un enlace de salto al contenido principal antes del menú",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Quien navega con teclado tiene que pasar por cada enlace del menú, uno por uno, antes de llegar al primer producto; en una tienda con veinte categorías son veinte tabulaciones perdidas antes de empezar.",
+      "queHacer": [
+        "Añadir como primer elemento enfocable del layout un enlace \"Saltar al contenido\" que apunte a #contenido.",
+        "Mantenerlo oculto visualmente hasta que reciba foco (no display:none, que también lo oculta del teclado).",
+        "Poner id=\"contenido\" en el <main> de cada plantilla."
+      ],
+      "aceptacion": [
+        {
+          "check": "El primer elemento enfocable de la página es el enlace de salto",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 1280 --height 800 --eval \"(()=>{const f=[...document.querySelectorAll('a,button,input,[tabindex]')].find(e=>e.tabIndex>=0);return f && f.getAttribute('href')==='#contenido'})()\"",
+          "espera": "eval: true"
+        },
+        {
+          "check": "El destino existe",
+          "comando": "grep -n \"id=\\\"contenido\\\"\" app/layout.tsx",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/ui/salto-a-contenido.tsx",
+        "app/layout.tsx"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "acc.teclado.orden-no-se-invierte-por-css",
+      "titulo": "No invertir con CSS el orden de tabulación respecto al orden visual",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien navega con teclado espera que Tab siga la lectura de izquierda a derecha y de arriba abajo; un order o un row-reverse que solo mueve el dibujo deja el foco saltando de la última tarjeta a la primera y la persona pierde la cuenta de dónde va.",
+      "queHacer": [
+        "Poner un grep de guardia sobre app/ y components/ buscando order: o flex-direction: row-reverse/column-reverse aplicados a contenedores con hijos interactivos.",
+        "Donde el diseño de verdad necesite ese orden visual, reordenar también el HTML, no solo el CSS.",
+        "Medir en el navegador: comparar el orden geométrico (de izquierda a derecha) de los controles contra el orden real de tabulación.",
+        "Corregir cualquier fila donde los dos órdenes no coincidan."
+      ],
+      "aceptacion": [
+        {
+          "check": "El orden geométrico coincide con el orden de tabulación",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 1280 --height 800 --eval \"(()=>{const el=[...document.querySelectorAll('a,button,input,select,[tabindex]')].filter(e=>e.tabIndex>=0);const geo=[...el].sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top||a.getBoundingClientRect().left-b.getBoundingClientRect().left);return el.every((e,i)=>e===geo[i])})()\"",
+          "espera": "eval: true"
+        },
+        {
+          "check": "Nadie invierte el orden solo por CSS",
+          "comando": "grep -rnE \"flex-direction:\\s*(row|column)-reverse|order:\\s*-?[0-9]+\" app/ components/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "app/globals.css"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "acc.teclado.nada-atrapa-fuera-de-dialogos",
+      "titulo": "Garantizar que ningún control atrape el foco fuera de un diálogo modal",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Quien cae con Tab dentro de un desplegable, un selector de fecha o un panel flotante que no sea un modal, y no puede salir ni con Tab ni con Escape, queda encerrado en un control y abandona la pantalla completa, no solo ese campo.",
+      "queHacer": [
+        "Listar todo componente que abra un overlay o panel flotante (desplegable, selector de fecha, autocompletar) que NO sea un diálogo modal declarado.",
+        "Confirmar en cada uno que Tab, al llegar al último elemento interno, sigue hacia el siguiente control de la página, no se queda dando vueltas.",
+        "Confirmar que Escape cierra el panel abierto y devuelve el foco a quien lo abrió, en todos, no solo en los diálogos.",
+        "Dejar el recorrido de prueba (qué componentes se revisaron y con qué resultado) en docs/foco-fuera-de-modales.md."
+      ],
+      "aceptacion": [
+        {
+          "check": "Escape cierra el panel no modal y devuelve el foco a quien lo abrió",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 1280 --height 800 --eval \"(async()=>{const t=document.querySelector('[data-desplegable-trigger]');if(!t)return 'sin desplegable';t.click();await new Promise(r=>setTimeout(r,150));document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));await new Promise(r=>setTimeout(r,150));return document.activeElement===t})()\"",
+          "espera": "eval: true (o \"sin desplegable\" si el proyecto no tiene ninguno)"
+        },
+        {
+          "check": "El recorrido queda documentado",
+          "comando": "grep -c \"^| \" docs/foco-fuera-de-modales.md",
+          "espera": "1+ filas por componente flotante del proyecto"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/foco-fuera-de-modales.md",
+        "components/ui/desplegable.tsx"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "acc.teclado.atajos-no-chocan-con-lector-de-pantalla",
+      "titulo": "Desactivar los atajos de una sola tecla mientras el lector de pantalla los necesita",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El lector de pantalla usa letras sueltas (h, b, t) para saltar entre encabezados, botones y tablas; si el mostrador tiene un atajo de una tecla activo todo el tiempo, quien navega por sonido pierde esa navegación entera y no puede volver a usar el sistema sin ayuda de otra persona.",
+      "queHacer": [
+        "Revisar lib/atajos.ts y confirmar que ningún atajo de una sola tecla se dispara mientras el foco está fuera del lienzo de venta (ya se exige que no se dispare dentro de un campo de texto).",
+        "Dar a cada atajo una alternativa con modificador (Alt+tecla) además de la tecla suelta, y usar la suelta solo cuando el foco está confirmadamente dentro del lienzo de venta.",
+        "Documentar en docs/manual.md cómo apagar los atajos de una tecla desde la propia pantalla, para quien los necesite apagados siempre.",
+        "Probar la pantalla de venta completa con el lector de pantalla activo y confirmar que ninguna letra de navegación del lector dispara una acción de cobro."
+      ],
+      "aceptacion": [
+        {
+          "check": "Existe un apagado de atajos de una tecla",
+          "comando": "grep -n \"atajosActivos\\|desactivarAtajos\" lib/atajos.ts",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Ningún atajo se dispara con el lector activo fuera del lienzo de venta",
+          "comando": null,
+          "espera": "recorrido con lector de pantalla activo: 0 activaciones de atajo al navegar con h/b/t sobre encabezados y botones"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/atajos.ts",
+        "docs/manual.md"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "acc.lector.icono-solo-con-nombre",
+      "titulo": "Dar nombre accesible a todo botón que solo muestra un icono",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien usa lector de pantalla escucha \"botón\" sin más en un icono de basura o de lápiz; no sabe si eso borra la venta o la edita, y en una pantalla de cobro no se arriesga a tocar sin saber.",
+      "queHacer": [
+        "Listar cada botón cuyo contenido es solo un icono (SVG o fuente de iconos), sin texto visible.",
+        "Añadir aria-label con el verbo de la acción en las palabras del negocio (\"Eliminar producto\", no \"Delete\" ni \"icon-trash\").",
+        "Cuando el icono va acompañado de tooltip, usar el mismo texto en el aria-label, no uno distinto.",
+        "Dejar un grep de guardia que falle si aparece un <button> sin texto y sin aria-label."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún botón de solo icono queda sin nombre",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('button')].filter(b=>!b.textContent.trim() && !b.getAttribute('aria-label')).length\"",
+          "espera": "eval: 0"
+        },
+        {
+          "check": "Los nombres usan palabras del negocio, no el nombre del icono",
+          "comando": "grep -rniE \"aria-label=\\\"(icon-|svg-|delete|edit)\" components/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "components/ui/boton-icono.tsx"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "acc.lector.imagen-con-alternativa",
+      "titulo": "Dar texto alternativo real a cada imagen que informa y vaciar el de la decorativa",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien no ve la foto del producto en la vitrina depende del alt para saber qué está por pedir; una imagen sin alt, o con el nombre del archivo, la deja adivinando entre la bandeja paisa y el sancocho.",
+      "queHacer": [
+        "Escribir en cada imagen de producto un alt que describa el plato o producto, no el nombre de archivo ni \"imagen\".",
+        "Vaciar el alt (alt=\"\") de las imágenes puramente decorativas (fondos, separadores) para que el lector las salte.",
+        "Prohibir con un grep de guardia el alt genérico (\"foto\", \"imagen1\", el nombre de archivo con guiones).",
+        "Revisar también los iconos usados como <img> con el mismo criterio."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna imagen de producto queda sin alt descriptivo",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('img[data-producto]')].filter(i=>!i.alt || i.alt.trim().length<3).length\"",
+          "espera": "eval: 0"
+        },
+        {
+          "check": "No quedan alt genéricos",
+          "comando": "grep -rniE \"alt=\\\"(imagen|foto|img|picture)[0-9]*\\\"|alt=\\\".*\\.(jpg|png|webp)\\\"\" app/ components/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "publico": true
+      },
+      "porCada": null,
+      "posee": [
+        "components/producto-tarjeta.tsx"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica",
+        "tema:cero-datos-inventados"
+      ]
+    },
+    {
+      "id": "acc.lector.estructura-de-encabezados",
+      "titulo": "Dejar un solo h1 por {{ruta}} y encabezados sin saltos de nivel",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien navega por encabezados con el lector de pantalla (así explora quien no ve, en vez de leer todo de corrido) se pierde si hay tres h1 o si un h4 aparece sin su h3 antes; deja de entender qué es el título de la sección y qué es una nota.",
+      "queHacer": [
+        "Revisar {{ruta}} y confirmar que existe exactamente un h1, el título real de la pantalla.",
+        "Ordenar los demás encabezados sin saltar niveles (h2 antes que h3, nunca h1 seguido de h4).",
+        "Dejar de usar un encabezado solo para que se vea grande: eso es el paso `subtitulo` de la escala tipográfica, no una etiqueta h.",
+        "Marcar <main>, <nav> y <header> como landmarks reales, no como div con clase."
+      ],
+      "aceptacion": [
+        {
+          "check": "{{ruta}} tiene un solo h1",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 390 --height 844 --mobile --eval \"document.querySelectorAll('h1').length\"",
+          "espera": "eval: 1"
+        },
+        {
+          "check": "Los niveles de encabezado no saltan",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 390 --height 844 --mobile --eval \"(()=>{const n=[...document.querySelectorAll('h1,h2,h3,h4,h5,h6')].map(h=>+h.tagName[1]);return n.every((v,i)=>i===0||v-n[i-1]<=1)})()\"",
+          "espera": "eval: true"
+        },
+        {
+          "check": "Existen los landmarks principales",
+          "comando": "grep -n \"<main\\|<nav\\|<header\" app{{ruta}}/page.tsx",
+          "espera": "1+ líneas por landmark"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": "ruta",
+      "posee": [
+        "app{{ruta}}/page.tsx"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "acc.lector.cambio-de-valor-se-anuncia",
+      "titulo": "Anunciar por lector de pantalla cuando cambia el total o aparece un aviso",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien no ve la pantalla no se entera de que el total subió al agregar un producto, ni de que apareció el aviso de \"venta cobrada\", si nada lo anuncia; para ella la venta parece que no hizo nada.",
+      "queHacer": [
+        "Envolver el total de la venta en una región con aria-live=\"polite\" para que cada cambio se anuncie sin mover el foco.",
+        "Dar a los avisos de éxito y de error role=\"status\" o role=\"alert\" según corresponda (alert para lo urgente, status para lo informativo).",
+        "Anunciar solo el cambio que importa (el nuevo total, el mensaje), no repetir toda la pantalla en cada actualización.",
+        "Probar con el lector de pantalla activo agregando tres productos seguidos y confirmar que cada total nuevo se escucha."
+      ],
+      "aceptacion": [
+        {
+          "check": "El total está en una región viva",
+          "comando": "grep -rn \"aria-live\" components/ app/",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Los avisos declaran su rol",
+          "comando": "grep -rnE \"role=\\\"(status|alert)\\\"\" components/ui/aviso.tsx",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Cada total nuevo se anuncia",
+          "comando": null,
+          "espera": "con el lector de pantalla activo, agregar 3 productos produce 3 anuncios de total, uno por cada cambio"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/ui/aviso.tsx",
+        "components/caja/total.tsx"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:cobro-a-clientes"
+      ]
+    },
+    {
+      "id": "acc.lector.estado-de-control-se-expone",
+      "titulo": "Exponer el estado de cada control propio con el atributo aria que le toca",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien usa lector de pantalla en un interruptor, una pestaña o un acordeón que solo cambia de color al activarse no se entera de si quedó prendido o apagado, ni de qué pestaña está viendo; tiene que adivinar y confirmar tocando dos veces.",
+      "queHacer": [
+        "Listar los controles propios con dos o más estados: interruptores, pestañas, acordeones, casillas con apariencia de botón.",
+        "Dar a cada uno el atributo aria que le corresponde: aria-pressed en interruptores, aria-expanded en acordeones, aria-selected en pestañas.",
+        "Actualizar ese atributo en el mismo cambio que actualiza el estilo, nunca por separado.",
+        "Confirmar con el lector de pantalla que cada cambio de estado se escucha al navegar al control, no solo al activarlo."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los controles con estado declaran su atributo aria",
+          "comando": "grep -rnE \"aria-(pressed|expanded|selected)\" components/ui/",
+          "espera": "1+ líneas por tipo de control con estado"
+        },
+        {
+          "check": "El atributo cambia junto con el estilo",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/panel --width 1280 --height 800 --eval \"(()=>{const t=document.querySelector('[role=tab]');if(!t)return 'sin pestanas';t.click();return t.getAttribute('aria-selected')})()\"",
+          "espera": "eval: \"true\" (o \"sin pestanas\")"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/ui/interruptor.tsx",
+        "components/ui/pestanas.tsx",
+        "components/ui/acordeon.tsx"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "acc.lector.tabla-con-encabezados",
+      "titulo": "Asociar cada columna de la tabla con su encabezado real",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien recorre una tabla de movimientos con lector de pantalla, celda por celda, necesita escuchar \"Total: doce mil quinientos\", no solo \"doce mil quinientos\"; sin el th asociado, cada número queda sin decir de qué es.",
+      "queHacer": [
+        "Confirmar que toda tabla de datos usa <th scope=\"col\"> en el encabezado de columna y <th scope=\"row\"> cuando la primera celda identifica la fila.",
+        "No usar <td> con estilo de encabezado (negrita, fondo) donde el marcado real debería ser <th>.",
+        "Dar a la tabla un <caption> con lo que muestra, aunque esté oculto visualmente.",
+        "Repetir la comprobación en la versión de tabla que sobrevive en escritorio (panel-interno), no en las tarjetas de móvil."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las columnas usan th con scope",
+          "comando": "grep -rn \"th scope=\\\"col\\\"\" components/ui/tabla.tsx",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "La tabla tiene caption",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/movimientos --width 1280 --height 800 --eval \"!!document.querySelector('table caption')\"",
+          "espera": "eval: true"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/ui/tabla.tsx"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "acc.lector.ensayo-con-lector-de-pantalla",
+      "titulo": "Completar una venta entera con el lector de pantalla activo y la pantalla apagada",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Todo el QA hasta hoy es de un agente que lee el DOM directamente; nadie comprobó si la persona que de verdad depende del sonido puede cobrar sola. Sin este ensayo, \"cumple ARIA\" y \"se puede usar\" son dos cosas distintas y solo se mide la primera.",
+      "queHacer": [
+        "Activar el lector de pantalla del sistema (Narrador en Windows, VoiceOver en Mac) y apagar el monitor o cerrar los ojos.",
+        "Completar de principio a fin una venta de 3 productos guiándose solo por lo que el lector dice.",
+        "Anotar en docs/ensayo-lector.md cada punto donde el lector no dijo nada, dijo \"botón\" sin más, o repitió algo sin sentido.",
+        "Convertir cada silencio o confusión anotada en una tarea con el archivo y el componente responsable.",
+        "Repetir el ensayo después de corregir y dejar las dos listas (antes/después) en el mismo documento."
+      ],
+      "aceptacion": [
+        {
+          "check": "La venta se completó solo con el lector",
+          "comando": null,
+          "espera": "venta de 3 productos cerrada de principio a fin sin mirar la pantalla, anotada en docs/ensayo-lector.md"
+        },
+        {
+          "check": "Cada silencio quedó convertido en tarea",
+          "comando": "grep -cE \"^- \\[ \\] \" docs/ensayo-lector.md",
+          "espera": "1 tarea por cada punto sin anunciar encontrado"
+        },
+        {
+          "check": "El ensayo se repitió después de corregir",
+          "comando": "grep -c \"^## repetición\" docs/ensayo-lector.md",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/ensayo-lector.md"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:que-es-estar-verificado"
+      ]
+    },
+    {
+      "id": "acc.lector.auditoria-automatica-en-verificar",
+      "titulo": "Encadenar una auditoría automática de accesibilidad dentro de npm run verificar",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien depende del lector de pantalla para cobrar sola vuelve a quedar bloqueada apenas alguien borre sin querer un aria-label en un cambio futuro; sin un guardia automático nadie lo nota hasta que ella misma se topa con el silencio en pleno mostrador.",
+      "queHacer": [
+        "Instalar y configurar un auditor automático (axe-core o pa11y) contra las rutas críticas: vitrina, caja, cierre de turno.",
+        "Escribir scripts/a11y.mjs que lo corra headless contra esas rutas y falle con código distinto de 0 si hay violaciones critical o serious.",
+        "Encadenarlo dentro de npm run verificar, después de los tests, antes de dar por buena la corrida.",
+        "Dejar en docs/a11y-excepciones.md las violaciones moderate aceptadas a propósito, con su razón y fecha, para que no se cuelen sin explicación."
+      ],
+      "aceptacion": [
+        {
+          "check": "La auditoría corre y pasa en limpio",
+          "comando": "node scripts/a11y.mjs",
+          "espera": "exit 0; 0 violaciones critical o serious en las rutas revisadas"
+        },
+        {
+          "check": "Está encadenada en la verificación",
+          "comando": "grep -n \"a11y\" package.json",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Falla de verdad cuando se rompe algo",
+          "comando": null,
+          "espera": "quitar un aria-label a mano hace fallar scripts/a11y.mjs con código distinto de 0; se restaura después"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "scripts/a11y.mjs",
+        "docs/a11y-excepciones.md",
+        "package.json"
+      ],
+      "cerebro": [
+        "tema:que-es-estar-verificado",
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "acc.foco.primer-campo-al-entrar",
+      "titulo": "Poner el foco en el primer campo útil al entrar a una tarea nueva",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Quien navega con teclado y abre \"nueva venta\" o \"nuevo producto\" tiene que tabular desde el principio de la pantalla cada vez si nadie movió el foco; en doscientas ventas al día eso son doscientas tabulaciones de más.",
+      "queHacer": [
+        "Al montar la pantalla de una tarea nueva (nueva venta, nuevo producto, nuevo turno), mover el foco por código al primer campo que se llena.",
+        "No mover el foco al título ni al contenedor general: tiene que caer en un campo o control real.",
+        "No hacerlo en pantallas de solo lectura, donde mover el foco sin razón desorienta más de lo que ayuda."
+      ],
+      "aceptacion": [
+        {
+          "check": "El foco cae en el primer campo al abrir la tarea",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja/nueva --width 390 --height 844 --mobile --eval \"document.activeElement.tagName\"",
+          "espera": "eval: \"INPUT\" o \"SELECT\""
+        },
+        {
+          "check": "Las pantallas de solo lectura no mueven el foco",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ordenes --width 390 --height 844 --mobile --eval \"document.activeElement===document.body\"",
+          "espera": "eval: true"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/hooks/usar-foco-inicial.ts"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "acc.foco.no-se-pierde-al-actualizar",
+      "titulo": "Mantener el foco en un lugar con sentido cuando la pantalla cambia sola",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien borra una línea de la venta o ve desaparecer un aviso automático pierde el foco en el body si nadie lo reubica; su siguiente Tab empieza otra vez desde arriba de toda la pantalla, como si nunca hubiera avanzado.",
+      "queHacer": [
+        "Listar las acciones que quitan de la pantalla un elemento con foco: borrar una línea, cerrar un aviso automático, terminar una carga.",
+        "Al quitar el elemento, mover el foco al que ocupó su lugar (la siguiente línea) o, si no hay uno natural, al contenedor de la lista con tabIndex=\"-1\".",
+        "Confirmar que el foco nunca queda en document.body después de una de estas acciones.",
+        "Repetirlo para la actualización que llega sola por red (precio o existencia que cambia mientras la persona está en la pantalla): el foco no se mueve si la persona no lo pidió."
+      ],
+      "aceptacion": [
+        {
+          "check": "Borrar una línea no manda el foco al body",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(async()=>{document.querySelector('[data-quitar-linea]')?.click();await new Promise(r=>setTimeout(r,300));return document.activeElement!==document.body})()\"",
+          "espera": "eval: true"
+        },
+        {
+          "check": "Una actualización que llega sola no mueve el foco",
+          "comando": null,
+          "espera": "con foco puesto a mano en un campo, una actualización de precio por red no cambia document.activeElement"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/caja/linea-venta.tsx"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "acc.foco.orden-visual-coincide-con-tabulacion",
+      "titulo": "Auditar en {{ruta}} que el recorrido de tabulación coincida con el visual",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "La pantalla de cobro ya mide esto; sin repetirlo en el resto del sistema, el mismo problema —el foco salta de una esquina a otra sin avisar— reaparece en cada pantalla nueva que un agente distinto construyó a su manera, y quien navega con teclado no puede confiar en el patrón que ya aprendió.",
+      "queHacer": [
+        "Comparar en {{ruta}} el orden geométrico (arriba-abajo, izquierda-derecha) de los controles contra el orden real de Tab.",
+        "Marcar la ruta como conforme o no conforme en docs/tabulacion-por-ruta.md.",
+        "Corregir las no conformes moviendo el HTML, no solo el CSS.",
+        "Repetir esta auditoría cada vez que se agregue una ruta nueva, no solo una vez."
+      ],
+      "aceptacion": [
+        {
+          "check": "{{ruta}} tiene el orden geométrico igual al de tabulación",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 1280 --height 800 --eval \"(()=>{const el=[...document.querySelectorAll('a,button,input,select,[tabindex]')].filter(e=>e.tabIndex>=0);const geo=[...el].sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top||a.getBoundingClientRect().left-b.getBoundingClientRect().left);return el.every((e,i)=>e===geo[i])})()\"",
+          "espera": "eval: true"
+        },
+        {
+          "check": "La ruta queda registrada",
+          "comando": "grep -c \"{{ruta}}\" docs/tabulacion-por-ruta.md",
+          "espera": "1 línea"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": "ruta",
+      "posee": [
+        "docs/tabulacion-por-ruta.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "acc.formulario.etiqueta-real-no-placeholder",
+      "titulo": "Asociar cada campo con una etiqueta real, nunca solo con el placeholder",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El placeholder desaparece en cuanto la persona empieza a escribir y muchos lectores de pantalla no lo anuncian como nombre del campo; quien usa lector de pantalla, o quien simplemente olvida qué campo era al volver a mirarlo, se queda sin saber qué está llenando.",
+      "queHacer": [
+        "Dar a cada campo un <label for=\"...\"> visible, unido al id real del input, no un <div> que solo parece etiqueta.",
+        "Donde el diseño exige un campo sin etiqueta visible (un buscador con icono), usar aria-label con el mismo texto que llevaría la etiqueta.",
+        "Dejar los placeholders solo como ejemplo del formato (\"ej. 3005551234\"), nunca como la única etiqueta del campo.",
+        "Dejar un grep de guardia que falle si aparece un input sin label ni aria-label asociado."
+      ],
+      "aceptacion": [
+        {
+          "check": "Todo campo tiene nombre accesible",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('input,select,textarea')].filter(i=>!i.labels?.length && !i.getAttribute('aria-label')).length\"",
+          "espera": "eval: 0"
+        },
+        {
+          "check": "El placeholder no es la única etiqueta",
+          "comando": null,
+          "espera": "revisión campo por campo: 0 campos con placeholder como única etiqueta"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "components/ui/campo.tsx"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "acc.formulario.obligatorio-anunciado",
+      "titulo": "Marcar los campos obligatorios visual y programáticamente a la vez",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Un asterisco que solo se ve no le dice nada a quien usa lector de pantalla, y un required solo en el código no lo ve quien mira la pantalla corriendo; sin las dos señales juntas, alguien entrega el formulario incompleto y lo rebota el servidor sin que sepa por qué campo fue.",
+      "queHacer": [
+        "Marcar cada campo obligatorio con un asterisco visible Y con required (o aria-required=\"true\") en el mismo elemento.",
+        "Escribir una sola vez, al principio del formulario, qué significa el asterisco.",
+        "Confirmar que los campos opcionales no llevan ninguna de las dos marcas, para que el asterisco siga siendo información."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada obligatorio lleva las dos señales",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/contacto --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[required],[aria-required=true]')].filter(e=>!e.closest('[data-campo]')?.textContent.includes('*')).length\"",
+          "espera": "eval: 0"
+        },
+        {
+          "check": "El significado del asterisco está escrito una vez",
+          "comando": "grep -nE \"\\*.*obligatorio|obligatorio.*\\*\" app/contacto/page.tsx components/formulario-contacto.tsx",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "components/ui/campo.tsx"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "acc.formulario.grupo-con-leyenda",
+      "titulo": "Agrupar radios y checkboxes relacionados bajo un fieldset con leyenda",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien usa lector de pantalla y llega a un radio de \"efectivo\" suelto no sabe que forma parte de un grupo de medio de pago junto a \"tarjeta\" y \"transferencia\"; escucha una opción aislada y no la pregunta completa.",
+      "queHacer": [
+        "Detectar los grupos de radios o checkboxes que se presentan como una sola decisión (medio de pago, tipo de entrega, días de la semana).",
+        "Envolver cada grupo en <fieldset> con su <legend> diciendo la pregunta completa (\"Medio de pago\").",
+        "Quitar cualquier título visual que hiciera ese papel sin ser un legend real.",
+        "Confirmar que el lector de pantalla anuncia la pregunta del grupo al entrar a la primera opción."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los grupos de opciones usan fieldset y legend",
+          "comando": "grep -rn \"<fieldset\" components/",
+          "espera": "1+ líneas por grupo de opciones del proyecto"
+        },
+        {
+          "check": "Cada legend tiene la pregunta completa",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('fieldset')].filter(f=>!f.querySelector('legend')?.textContent.trim()).length\"",
+          "espera": "eval: 0"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/ui/grupo-opciones.tsx"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "acc.formulario.autocompletar-datos-personales",
+      "titulo": "Declarar autocomplete en los campos de datos personales del formulario público",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien llena el pedido a domicilio desde el teléfono, con una mano, espera que el nombre y la dirección se rellenen solos porque el teléfono ya los tiene; sin autocomplete correcto, además de perder ese atajo, el lector de pantalla no anuncia para qué es cada campo.",
+      "queHacer": [
+        "Poner autoComplete=\"name\", \"tel\", \"street-address\" o \"email\" según corresponda en cada campo de datos personales.",
+        "No reemplazar el propósito real por uno parecido (usar \"tel\" en el campo de teléfono, no \"text\").",
+        "Probar en el teléfono real que el sistema operativo ofrece autocompletar con esos campos."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los campos de datos personales declaran autoComplete",
+          "comando": "grep -rn \"autoComplete=\" components/formulario-contacto.tsx",
+          "espera": "1+ líneas por campo de dato personal"
+        },
+        {
+          "check": "Ningún campo de dato personal usa un valor genérico",
+          "comando": "grep -rnE \"autoComplete=\\\"(on|off|text)\\\"\" components/formulario-contacto.tsx",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "publico": true,
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "components/formulario-contacto.tsx"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "acc.movimiento.interno-respeta-preferencia",
+      "titulo": "Apagar también en caja y panel interno las animaciones cuando el sistema pide menos movimiento",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La vitrina pública ya respeta movimiento reducido; el mostrador no. Quien activó esa preferencia por una razón médica y trabaja cobrando ve igual el spinner que gira sin parar y el aviso que se desliza en cada venta, doscientas veces al día.",
+      "queHacer": [
+        "Revisar cada spinner de carga, transición entre pantallas y aviso deslizante de caja y panel-interno.",
+        "Envolver sus animaciones en la misma media query prefers-reduced-motion ya usada en la vitrina, con un reemplazo estático (aparecer/desaparecer sin desplazamiento) cuando está activa.",
+        "No apagar la animación que informa progreso real (una barra de carga con porcentaje), solo el movimiento decorativo (rebote, deslizamiento).",
+        "Medir con y sin la preferencia activa en la pantalla de caja, igual que ya se mide en la vitrina."
+      ],
+      "aceptacion": [
+        {
+          "check": "Con movimiento reducido, caja no corre animaciones",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --reduce",
+          "espera": "metrics.reducedMotion = true y metrics.animations = 0"
+        },
+        {
+          "check": "Sin la preferencia, caja sí anima",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile",
+          "espera": "metrics.animations ≥1"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/ui/spinner.tsx",
+        "components/ui/aviso.tsx"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "acc.movimiento.nada-parpadea-3-veces-por-segundo",
+      "titulo": "No dejar ningún elemento parpadeando más de 3 veces por segundo",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un aviso urgente que destella rápido puede desencadenar una crisis en alguien con epilepsia fotosensible; eso no es una preferencia de gusto, es un riesgo físico para quien lo mira de frente en el mostrador.",
+      "queHacer": [
+        "Listar toda animación de parpadeo o destello usada para llamar la atención (badge de \"urgente\", borde de error, notificación).",
+        "Medir su frecuencia real (ciclos por segundo) en la definición de la animación CSS.",
+        "Bajar cualquiera que pase de 3 destellos por segundo, o reemplazarla por un cambio de color sostenido sin parpadeo.",
+        "Documentar en app/globals.css junto a la animación el límite y por qué existe."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna animación declarada parpadea más de 3 veces por segundo",
+          "comando": "grep -rnE \"animation-duration:\\s*0\\.(0|1|2|3)[0-9]*s\" app/globals.css",
+          "espera": "0 líneas por debajo de 333ms de ciclo"
+        },
+        {
+          "check": "El límite está documentado",
+          "comando": "grep -n \"3 veces por segundo\\|destellos\" app/globals.css",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "app/globals.css"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "acc.texto.zoom-200-sin-recorte",
+      "titulo": "Duplicar el tamaño de letra base y confirmar que {{ruta}} no recorta ni desborda",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Quien no ve bien de cerca sube el tamaño de letra del navegador al doble; si el diseño fija alturas en píxeles, esa persona ve el precio cortado a la mitad de la caja o dos líneas montadas una sobre otra, justo el dato que necesitaba más grande.",
+      "queHacer": [
+        "Abrir {{ruta}} y duplicar el font-size del elemento raíz por código (de 16px a 32px), simulando el zoom de texto del navegador.",
+        "Confirmar que ningún contenedor con altura fija en píxeles recorta su contenido.",
+        "Confirmar que no aparece desplazamiento horizontal nuevo que no existiera antes de duplicar.",
+        "Corregir cambiando alturas fijas por mínimas (min-height) y unidades de texto de px a rem."
+      ],
+      "aceptacion": [
+        {
+          "check": "{{ruta}} no recorta texto al doble de tamaño",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 1280 --height 800 --eval \"document.documentElement.style.fontSize='32px';new Promise(r=>setTimeout(()=>r([...document.querySelectorAll('p,h1,h2,button,label')].filter(e=>e.scrollHeight>e.clientHeight+2).length),200))\"",
+          "espera": "eval: 0"
+        },
+        {
+          "check": "No aparece scroll horizontal nuevo",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 1280 --height 800 --eval \"document.documentElement.style.fontSize='32px';new Promise(r=>setTimeout(()=>r(document.documentElement.scrollWidth<=document.documentElement.clientWidth+1),200))\"",
+          "espera": "eval: true"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": "ruta",
+      "posee": [
+        "app{{ruta}}/page.tsx",
+        "app/globals.css"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "acc.texto.no-se-trunca-lo-importante",
+      "titulo": "No truncar con puntos suspensivos el total, el precio ni el nombre que hay que decir en voz alta",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un nombre de producto largo o un total con muchos dígitos cortado en \"Bandeja pai...\" obliga a la cajera a tocar para abrir el detalle solo para leerle el nombre completo al cliente, y eso es un toque que se paga cien veces al día.",
+      "queHacer": [
+        "Listar los campos que la persona necesita leer completos en voz alta: nombre de producto en el ticket, total, nombre del cliente en el pedido.",
+        "Quitar de esos campos cualquier text-overflow: ellipsis, truncate o line-clamp.",
+        "Donde el espacio de verdad no alcanza, envolver el texto a una segunda línea en vez de cortarlo.",
+        "Dejar los que sí pueden truncarse (descripciones largas, notas internas) con su propia marca para no confundirlos con los anteriores."
+      ],
+      "aceptacion": [
+        {
+          "check": "El total y el nombre en el ticket no llevan truncado",
+          "comando": "grep -rnE \"truncate|text-overflow:\\s*ellipsis|line-clamp\" components/ticket.tsx components/caja/total.tsx",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Un nombre largo se ve completo",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(()=>{const e=document.querySelector('[data-nombre-producto]');return e?e.scrollWidth<=e.clientWidth+1:true})()\"",
+          "espera": "eval: true"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/ticket.tsx",
+        "components/caja/total.tsx"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes"
+      ]
+    },
+    {
+      "id": "acc.toque.doble-toque-no-duplica",
+      "titulo": "Bloquear el segundo toque en Cobrar mientras el primero todavía se procesa",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien tiene un temblor en la mano, o simplemente tiene prisa con el cliente esperando, toca Cobrar dos veces seguidas; sin bloqueo, eso puede registrar la misma venta dos veces y descuadrar la caja al cierre de turno.",
+      "queHacer": [
+        "Deshabilitar visualmente el botón de Cobrar (y cualquier acción que escriba dinero) apenas se registra el primer toque, hasta que la respuesta del servidor vuelva.",
+        "Ignorar en el servidor, además, una segunda venta idéntica que llegue en los siguientes segundos (idempotencia), por si el bloqueo visual falla.",
+        "Dar una señal inmediata de que el toque se registró (cambio de texto o spinner en el botón) para que la persona no vuelva a tocar creyendo que no pasó nada.",
+        "Probar tocando Cobrar dos veces seguidas rápido y confirmar en la base que se creó una sola venta."
+      ],
+      "aceptacion": [
+        {
+          "check": "El botón se deshabilita en el primer toque",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(()=>{const b=document.querySelector('[data-cobrar]');b.click();return b.disabled})()\"",
+          "espera": "eval: true"
+        },
+        {
+          "check": "Dos toques rápidos no crean dos ventas",
+          "comando": null,
+          "espera": "tocar Cobrar dos veces en menos de 1 segundo deja 1 sola venta registrada, confirmado en la base"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ],
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "components/caja/boton-cobrar.tsx"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "acc.toque.cancelable-al-soltar",
+      "titulo": "Disparar la acción al soltar el dedo, no al tocar, y permitir cancelar deslizando afuera",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Quien roza sin querer el botón de anular venta con la palma mientras acomoda el producto necesita poder arrastrar el dedo fuera del botón antes de soltar y que no pase nada; si la acción se dispara al tocar, ya es tarde para arrepentirse.",
+      "queHacer": [
+        "Confirmar que las acciones irreversibles usan pointerup/click y no pointerdown/touchstart para disparar.",
+        "Añadir en esas acciones el estado visual de \"presionado\" desde el down, y cancelarlo si el puntero sale del elemento antes de soltar.",
+        "Confirmar que deslizar el dedo fuera del botón antes de soltar no dispara la acción.",
+        "Dejar esta regla escrita junto al componente de botón para que no se reintroduzca por accidente en una acción nueva."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna acción irreversible dispara en touchstart o pointerdown",
+          "comando": "grep -rnE \"onPointerDown|onTouchStart\" components/ui/boton.tsx components/caja/",
+          "espera": "0 líneas en botones marcados data-destructiva"
+        },
+        {
+          "check": "Deslizar afuera antes de soltar cancela",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(()=>{const b=document.querySelector('[data-destructiva]');const r=b.getBoundingClientRect();b.dispatchEvent(new PointerEvent('pointerdown',{clientX:r.left+5,clientY:r.top+5,bubbles:true}));b.dispatchEvent(new PointerEvent('pointerup',{clientX:r.left-50,clientY:r.top-50,bubbles:true}));return !document.querySelector('[data-confirmado]')})()\"",
+          "espera": "eval: true"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/ui/boton.tsx"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "acc.toque.gesto-tiene-alternativa",
+      "titulo": "Dar un botón visible a cada acción que hoy solo se hace con gesto",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quien no puede deslizar con precisión (una mano ocupada, un guante, un temblor) no puede usar el swipe-para-borrar ni el mantener-presionado-para-más-opciones; para ella esa acción no existe, aunque exista para todos los demás.",
+      "queHacer": [
+        "Listar toda acción que hoy depende de arrastrar (swipe-para-borrar), mantener presionado (long-press) o gestos de dos dedos.",
+        "Añadir a cada una un botón o menú visible que haga lo mismo con un solo toque.",
+        "No quitar el gesto para quien lo prefiere: la alternativa se suma, no reemplaza.",
+        "Confirmar que la acción completa (borrar, ver más opciones) se puede terminar sin ejecutar el gesto ni una sola vez."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada fila con swipe-para-borrar tiene también un botón de borrar",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-swipe-borrar]')].filter(f=>!f.querySelector('[data-borrar-boton]')).length\"",
+          "espera": "eval: 0"
+        },
+        {
+          "check": "El long-press tiene alternativa de un toque",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-long-press]')].filter(e=>!e.querySelector('[data-mas-opciones]') && !e.parentElement.querySelector('[data-mas-opciones]')).length\"",
+          "espera": "eval: 0"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "components/caja/linea-venta.tsx"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "acc.condiciones.legible-a-sol-directo",
+      "titulo": "Subir el contraste de caja por encima del mínimo AA para uso a sol directo",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "La cajera de un puesto de mercado abierto lee la pantalla a las 11 de la mañana con el sol de frente; el 4.5:1 que basta en una oficina se lava por completo al aire libre, y ahí el precio deja de leerse aunque el script de contraste ya haya pasado en verde.",
+      "queHacer": [
+        "Identificar qué superficies se usan al aire libre o con luz directa frecuente (caja de un puesto abierto, vitrina exterior) frente a las que viven en interior.",
+        "Para esas superficies, exigir un contraste de cuerpo y cifra de al menos 7:1, no el 4.5:1 general del resto del sistema.",
+        "Dejar el umbral más alto como una variante del script de contraste, no como una excepción sin medir.",
+        "Medir con un fotómetro o la app de luz del teléfono el nivel real del punto de venta y anotarlo junto al ratio calculado ese día."
+      ],
+      "aceptacion": [
+        {
+          "check": "La superficie a sol directo exige 7:1",
+          "comando": "node scripts/contraste.mjs --superficie caja-exterior",
+          "espera": "exit 0; 0 pares por debajo de 7:1"
+        },
+        {
+          "check": "El umbral alto está aplicado en el CSS de esa superficie",
+          "comando": "grep -n \"7:1\\|--texto-cuerpo-exterior\" app/globals.css",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Se registró una medición real de luz",
+          "comando": null,
+          "espera": "lux medido y ratio de contraste calculado ese día, anotados juntos en docs/contraste-exterior.md"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/contraste.mjs",
+        "docs/contraste-exterior.md"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "acc.condiciones.una-mano-con-la-otra-ocupada",
+      "titulo": "Completar la venta con una sola mano mientras la otra sostiene el producto",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La persona del mostrador tiene casi siempre una mano ocupada —la bolsa, el pollo, la balanza— y solo la otra libre para el teléfono o la tablet; un flujo que pide pellizcar con dos dedos o sostener el aparato con una mano y tocar lejos con la otra no se puede completar así, y ella lo sabe antes de intentarlo dos veces.",
+      "queHacer": [
+        "Confirmar que ninguna acción de la venta exige un gesto de dos dedos (pellizcar para zoom, rotar) como único camino.",
+        "Revisar que la acción principal cae dentro del alcance del pulgar también cuando el dispositivo se sostiene con una sola mano, no las dos.",
+        "Evitar acciones que pidan sostener un botón con una mano mientras se toca otro con la otra.",
+        "Grabar una venta completa sosteniendo el teléfono con una sola mano y sin apoyarlo en ninguna superficie, y anotar el resultado en docs/ensayo-una-mano.md."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna acción exige gesto de dos dedos",
+          "comando": "grep -rn \"onGestureStart\" components/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La venta se completó sosteniendo el teléfono con una sola mano",
+          "comando": null,
+          "espera": "venta de 3 productos cerrada sujetando el teléfono con una mano, sin apoyarlo; 0 acciones que requirieron la segunda mano, anotado en docs/ensayo-una-mano.md"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/ensayo-una-mano.md"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "acc.condiciones.toque-confiable-con-pantalla-sucia-o-guantes",
+      "titulo": "Dar un modo de toque más tolerante para pantalla sucia o manos con guantes",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "En un asadero o una carnicería la pantalla se ensucia de grasa y las manos a veces llevan guante; la capacitiva falla el toque o lo registra dos veces, y quien más necesita cobrar rápido es quien menos control fino tiene sobre el vidrio en ese momento.",
+      "queHacer": [
+        "Subir el área tocable de las acciones de cobro por encima del mínimo general de 44 px (a 56 px o más) específicamente en la superficie de caja.",
+        "Dar confirmación visual inmediata de que un toque se registró, para que un toque fallido por suciedad se note al instante y se repita sin dudar.",
+        "Filtrar los toques fantasma (dos activaciones en menos de 150 ms sobre el mismo control) como un solo toque, típico de una pantalla húmeda o sucia.",
+        "Probar con la pantalla real deliberadamente sucia (harina, grasa) o con guantes de nitrilo puestos, no solo en limpio."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los controles de cobro miden 56 px o más en caja",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-accion-cobro]')].filter(e=>{const r=e.getBoundingClientRect();return r.width<56||r.height<56}).length\"",
+          "espera": "eval: 0"
+        },
+        {
+          "check": "Dos activaciones casi simultáneas cuentan como una",
+          "comando": "grep -n \"150\\|debounce\\|dedupe\" lib/toque.ts",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Se probó con la pantalla sucia o con guantes",
+          "comando": null,
+          "espera": "venta de 3 productos completada con la pantalla untada de grasa o con guantes de nitrilo puestos; 0 toques fallidos en el conteo manual"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/toque.ts",
+        "app/globals.css"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "acc.condiciones.modo-alto-contraste-o-letra-grande",
+      "titulo": "Dar al dueño un interruptor de contraste alto y letra grande que se recuerde por dispositivo",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cumplir el 4.5:1 mínimo no ayuda al dueño de sesenta y tantos años que de verdad necesita más; sin un interruptor que él mismo pueda prender, la única opción para leer mejor es pedirle a otro que lo revise por él.",
+      "queHacer": [
+        "Construir un interruptor visible (no escondido en un menú de tres niveles) que active un tema de contraste más alto y un paso de letra más grande que el por defecto.",
+        "Guardar la preferencia por dispositivo (localStorage) para que no haya que activarla de nuevo cada vez que se abre la aplicación.",
+        "Medir que el modo alto contraste sube el ratio de cada token por encima de 7:1, no solo que cambia de color.",
+        "Probar que el modo de letra grande no recorta ningún contenedor, con la misma prueba de zoom-200-sin-recorte activa."
+      ],
+      "aceptacion": [
+        {
+          "check": "El interruptor existe y es visible sin abrir submenús",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"!!document.querySelector('[data-modo-alto-contraste]')\"",
+          "espera": "eval: true"
+        },
+        {
+          "check": "La preferencia se recuerda entre visitas",
+          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"(()=>{document.querySelector('[data-modo-alto-contraste]').click();return localStorage.getItem('alto-contraste')})()\"",
+          "espera": "eval: valor no vacío"
+        },
+        {
+          "check": "El modo alto contraste supera 7:1",
+          "comando": "node scripts/contraste.mjs --tema alto-contraste",
+          "espera": "exit 0; 0 pares por debajo de 7:1"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "components/ui/interruptor-contraste.tsx",
+        "app/globals.css"
+      ],
+      "cerebro": [
+        "tema:generadores-de-diseno"
+      ]
+    },
+    {
+      "id": "acc.condiciones.observar-20-operaciones-y-contar-errores",
+      "titulo": "Observar 20 operaciones reales y contar los errores, no los segundos",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Ya existe un ensayo que mide segundos y toques; nadie ha contado cuántas veces la persona se equivoca por una barrera —no ve el contraste, no entiende la palabra, falla el toque— porque hasta hoy el único QA fue de un agente que nunca confunde un botón, nunca tiene sol en la pantalla y nunca deja de entender una palabra.",
+      "queHacer": [
+        "Sentar a la persona real, en su puesto real y con su luz real, a hacer 20 operaciones normales de su turno, sin ayudar ni corregir.",
+        "Por cada error (tocó el botón equivocado, no encontró una palabra, leyó mal un número, perdió su lugar en la pantalla), anotar en docs/ensayo-accesibilidad.md la operación, qué pasó y a cuál causa se debió: contraste, tamaño de toque, lenguaje o foco perdido.",
+        "Calcular el total de errores sobre las 20 operaciones y dejarlo como un número, no como impresión.",
+        "Convertir en tarea cada causa que se repita 2 o más veces.",
+        "Repetir el ensayo después de corregir y dejar los dos números (antes/después) lado a lado."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las 20 operaciones quedan registradas con su causa de error cuando la hubo",
+          "comando": "grep -cE \"^\\| op[0-9]+ \\|\" docs/ensayo-accesibilidad.md",
+          "espera": "20 filas"
+        },
+        {
+          "check": "El total de errores está calculado",
+          "comando": "grep -nE \"errores: [0-9]+/20\" docs/ensayo-accesibilidad.md",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Las causas repetidas se convirtieron en tarea",
+          "comando": "grep -cE \"^- \\[ \\] \" docs/ensayo-accesibilidad.md",
+          "espera": "1 tarea por cada causa con 2 o más apariciones"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/ensayo-accesibilidad.md"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:que-es-estar-verificado"
+      ]
+    },
+    {
+      "id": "acc.lenguaje.sigla-explicada-o-evitada",
+      "titulo": "No usar una sigla en pantalla sin haberla explicado antes o sin poder evitarla",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Quien no maneja PIN, IVA o SKU como palabras de todos los días —y en el mostrador esa persona es la mayoría— ve una sigla y no sabe si es un error del sistema o algo que tiene que saber de memoria; se queda callada en vez de preguntar.",
+      "queHacer": [
+        "Listar toda sigla que aparece en botones, títulos y mensajes: PIN, IVA, SKU, POS, ID.",
+        "Para cada una, decidir si se puede reemplazar por la palabra completa en el espacio disponible (\"clave\" en vez de \"PIN\") o si de verdad hace falta.",
+        "La que de verdad haga falta, explicarla la primera vez que aparece en cada pantalla (\"IVA (el impuesto que ya está incluido)\").",
+        "Dejar la decisión de cada sigla (se reemplaza / se explica y por qué) en docs/siglas.md, citando la fila del vocabulario general si ya existe."
+      ],
+      "aceptacion": [
+        {
+          "check": "No quedan siglas sin decisión tomada",
+          "comando": "grep -rniE \"\\b(PIN|SKU|POS|IVA)\\b\" app/ components/ --include=*.tsx",
+          "espera": "cada aparición tiene su fila en docs/siglas.md"
+        },
+        {
+          "check": "La decisión está documentada",
+          "comando": "grep -ciE \"PIN|SKU|POS|IVA\" docs/siglas.md",
+          "espera": "1+ líneas por sigla usada en pantalla"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/siglas.md"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "acc.lenguaje.jerga-tecnica-fuera-de-pantalla",
+      "titulo": "Barrer toda la interfaz visible en busca de jerga técnica que no sea del negocio",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Ya se limpian los mensajes de error y ya se cambian los sustantivos del sistema por los del negocio en otras tareas; queda toda palabra técnica que se cuela en botones, ayudas y estados vacíos por fuera de esas dos —\"sincronizar\", \"backend\", \"query\", \"config\"— y esa palabra deja fuera exactamente a quien nunca tuvo una clase de computación.",
+      "queHacer": [
+        "Armar la lista de jerga técnica que no debe aparecer en ninguna pantalla: sincronizar, backend, query, config, deploy, endpoint, caché.",
+        "Escribir scripts/jerga.mjs que la busque en todo app/ y components/, no solo en los mensajes de error ni en el vocabulario de sustantivos ya cubierto.",
+        "Reemplazar cada hallazgo por la palabra que usaría alguien del negocio, o quitarlo si no aporta nada que la persona necesite saber.",
+        "Encadenar scripts/jerga.mjs en npm run verificar."
+      ],
+      "aceptacion": [
+        {
+          "check": "No queda jerga técnica en pantalla",
+          "comando": "node scripts/jerga.mjs",
+          "espera": "exit 0; 0 coincidencias de jerga técnica en app/ y components/"
+        },
+        {
+          "check": "El script está encadenado en la verificación",
+          "comando": "grep -n \"jerga\" package.json",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "scripts/jerga.mjs",
+        "package.json"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "acc.lenguaje.frase-corta-en-pantalla",
+      "titulo": "Medir y acortar las frases de ayuda a una idea por oración",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una instrucción con dos comas y un \"siempre que\" en medio hace que quien lee más despacio, o quien la escucha por lector de pantalla mientras hace otra cosa, pierda el hilo a la mitad y actúe con la mitad de la instrucción.",
+      "queHacer": [
+        "Escribir scripts/frases.mjs que lea los textos visibles de ayuda, vacíos y confirmación y cuente palabras y comas por oración.",
+        "Marcar como larga cualquier oración de más de 20 palabras o con más de una coma subordinante.",
+        "Reescribir cada una marcada en dos oraciones cortas, una idea por oración.",
+        "Encadenar el script en npm run verificar para que una frase nueva larga no se cuele."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna frase visible pasa de 20 palabras",
+          "comando": "node scripts/frases.mjs",
+          "espera": "exit 0; 0 oraciones por encima de 20 palabras"
+        },
+        {
+          "check": "El script está encadenado en la verificación",
+          "comando": "grep -n \"frases\" package.json",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "scripts/frases.mjs"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
+    }
+  ]
+}

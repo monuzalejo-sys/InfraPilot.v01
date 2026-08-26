@@ -1,0 +1,2060 @@
+{
+  "categoria": "rendimiento",
+  "nombre": "Rendimiento",
+  "meta": "Que cada afirmación de rendimiento venga con una medición propia, antes y después, en vez de una opinión.",
+  "arquetipos": [
+    {
+      "id": "perf.medicion.linea-base-documentada",
+      "titulo": "Documentar la línea base de tiempo antes de optimizar nada",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin un número escrito de cómo estaba ANTES, cualquier optimización se discute de memoria: dentro de un mes nadie sabe si de verdad se mejoró o si el que lo cambió solo se acuerda de que \"ahora se siente mejor\".",
+      "queHacer": [
+        "Listar las pantallas y rutas que la gente usa todos los días (panel-interno, caja, vitrina, api).",
+        "Para cada una, medir con la herramienta real (curl -w para APIs, node ORION/tools/edge-cdp.mjs para pantallas) el tiempo actual: ms de respuesta o ms hasta que la pantalla es usable.",
+        "Escribir esos números en docs/rendimiento/linea-base.md con fecha, commit y el comando exacto con el que se midió cada uno.",
+        "Marcar cuál de esos números es el que más le duele al negocio hoy — no todos pesan igual."
+      ],
+      "aceptacion": [
+        {
+          "check": "El archivo de línea base existe con fecha, commit y 3+ mediciones numéricas",
+          "comando": "grep -cE \"[0-9]+ ?ms|[0-9]+ ?s\\b\" docs/rendimiento/linea-base.md",
+          "espera": "3+ líneas con una cifra de tiempo"
+        },
+        {
+          "check": "Cada medición cita el comando exacto con el que se obtuvo",
+          "comando": "grep -c '```' docs/rendimiento/linea-base.md",
+          "espera": "2+ bloques de comando"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/linea-base.md"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "perf.medicion.percentil-no-promedio",
+      "titulo": "Reportar p95, no el promedio, en toda medición de tiempo",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El promedio esconde la cola lenta: si 9 de cada 10 peticiones tardan 80 ms y una tarda 4 s, el promedio dice 470 ms y parece fino, pero uno de cada diez clientes sí espera los 4 segundos completos.",
+      "queHacer": [
+        "Tomar al menos 50 mediciones consecutivas de la ruta o pantalla medida, no una sola.",
+        "Calcular p50 y p95 (no solo el promedio) con un script que ordene el arreglo y tome la posición correspondiente.",
+        "Reportar siempre los dos números juntos: \"p50 X ms, p95 Y ms\", nunca un promedio solo.",
+        "Guardar el script de cálculo en el proyecto para que la próxima medición use el mismo método."
+      ],
+      "aceptacion": [
+        {
+          "check": "El script de percentiles corre sobre una muestra real",
+          "comando": "node scripts/perf/percentiles.mjs docs/rendimiento/muestras.json",
+          "espera": "imprime p50 y p95 en ms, ambos > 0"
+        },
+        {
+          "check": "Ningún reporte de rendimiento usa solo promedio",
+          "comando": "grep -rniE \"promedio|average\" docs/rendimiento/ | grep -viE \"p95|p50|percentil\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "scripts/perf/percentiles.mjs",
+        "docs/rendimiento/*.md"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "perf.medicion.con-la-herramienta-real-en-390x844",
+      "titulo": "Medir con la herramienta de navegador real a 390×844, no a ojo",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un `--screenshot` corriente tiene piso de viewport de ~492 px y el modo reducido de movimiento activado por defecto: mide un teléfono que no existe. Sin CDP real, cada número de rendimiento móvil es una suposición hecha en la laptop del que la escribió.",
+      "queHacer": [
+        "Levantar la pantalla o ruta a medir en local (npm run dev o equivalente).",
+        "Correr node ORION/tools/edge-cdp.mjs --url <url> --width 390 --height 844 --mobile --eval con una expresión que lea scrollHeight, animaciones y fuentes.",
+        "Anotar del JSON de salida: alto del documento, alto del primer bloque visible, elementos animados y cuántos tienen will-change permanente.",
+        "Repetir la misma medición después del cambio y poner las dos filas una junto a la otra en el documento."
+      ],
+      "aceptacion": [
+        {
+          "check": "La medición se hizo con la herramienta real, no con una captura simple",
+          "comando": "node ORION/tools/edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile",
+          "espera": "JSON con viewport 390x844 y scrollHeight numérico distinto de null"
+        },
+        {
+          "check": "El documento de rendimiento tiene la medición antes y después",
+          "comando": "grep -cE \"scrollHeight|docHeight\" docs/rendimiento/*.md",
+          "espera": "2+ apariciones (antes y después)"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "vitrina",
+          "landing",
+          "panel-interno",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/*.md"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina",
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "perf.medicion.bajo-carga-simulada-no-en-serie",
+      "titulo": "Medir {{ruta}} bajo carga simulada, no con una sola petición suelta",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una sola petición contra un servidor libre siempre sale rápida; el problema real aparece cuando 20 cajeras piden lo mismo a la vez y el proceso empieza a hacer cola. Medir en serie mide un negocio que nunca existe.",
+      "queHacer": [
+        "Elegir una herramienta de carga simple (autocannon, k6 o script propio) que mande peticiones concurrentes a {{ruta}}.",
+        "Definir la concurrencia real esperada (10-20 peticiones simultáneas, el número de puestos de cobro) y correr contra ella, no contra 1.",
+        "Registrar p50 y p95 bajo esa concurrencia, y compararlos contra los mismos percentiles medidos en serie.",
+        "Si el p95 bajo carga es más del doble que en serie, dejarlo anotado como hallazgo con la cifra exacta."
+      ],
+      "aceptacion": [
+        {
+          "check": "{{ruta}} se midió con concurrencia real, no en serie",
+          "comando": "npx autocannon -c 15 -d 10 http://localhost:3000{{ruta}}",
+          "espera": "reporte con p50 y p95 en ms a 15 conexiones simultáneas"
+        },
+        {
+          "check": "La diferencia entre serie y carga queda escrita con las dos cifras",
+          "comando": null,
+          "espera": "línea con 'serie: X ms, carga: Y ms' en docs/rendimiento/linea-base.md"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "caja"
+        ]
+      },
+      "porCada": "ruta",
+      "posee": [
+        "docs/rendimiento/linea-base.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.medicion.regresion-rompe-el-verificar",
+      "titulo": "Hacer que una regresión de tiempo rompa verificar, no solo el ojo",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Un rendimiento que solo se nota \"a ojo\" se degrada 5% por semana sin que nadie lo apruebe ni lo rechace, hasta que un día alguien pregunta por qué la caja tarda 3 segundos y nadie sabe desde cuándo.",
+      "queHacer": [
+        "Guardar la línea base de p95 por ruta crítica en un archivo versionado (docs/rendimiento/linea-base.json).",
+        "Añadir un paso a verificar que vuelva a medir esas rutas y compare contra el archivo.",
+        "Definir el margen tolerado (+20% de p95) y fallar con código de salida distinto de 0 si se supera.",
+        "Hacer que actualizar la línea base sea un cambio explícito y revisado, no automático.",
+        "Probar el mecanismo metiendo a propósito un sleep de 300 ms en una ruta y confirmar que verificar lo detiene."
+      ],
+      "aceptacion": [
+        {
+          "check": "verificar falla cuando una ruta se pone más lenta que el margen",
+          "comando": "node -e \"require('fs').appendFileSync('app/api/ventas/route.ts','\\nawait new Promise(r=>setTimeout(r,300));')\" && npm run verificar; echo EXIT=$?",
+          "espera": "EXIT distinto de 0"
+        },
+        {
+          "check": "verificar pasa en limpio contra la línea base actual",
+          "comando": "npm run verificar",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "nextjs",
+          "node"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/perf/comparar-linea-base.mjs",
+        "docs/rendimiento/linea-base.json"
+      ],
+      "cerebro": [
+        "tema:que-es-estar-verificado"
+      ]
+    },
+    {
+      "id": "perf.medicion.tendencia-no-solo-el-ultimo-numero",
+      "titulo": "Guardar la tendencia de rendimiento, no solo la última medición",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una degradación de 3% por release es invisible comparando solo contra la medición anterior, pero acumulada seis meses es una caja que pasó de 2 a 4 segundos sin que ninguna medición individual la delatara.",
+      "queHacer": [
+        "En cada medición de línea base, anexar la fila al histórico (docs/rendimiento/historico.csv: fecha, commit, ruta, p50, p95) en vez de sobrescribir.",
+        "Después de 6+ mediciones, generar una tabla o gráfico simple que muestre la tendencia por ruta.",
+        "Poner una regla: si la tendencia de una ruta empeora 3 mediciones seguidas, aunque cada una pase el margen de verificar, se abre un hallazgo.",
+        "Revisar la tendencia una vez al mes, no solo cuando alguien se queja."
+      ],
+      "aceptacion": [
+        {
+          "check": "El histórico tiene 6+ filas por ruta crítica y no se sobrescribe",
+          "comando": "node -e \"console.log(require('fs').readFileSync('docs/rendimiento/historico.csv','utf8').trim().split('\\n').length)\"",
+          "espera": "7+ líneas (encabezado + 6 mediciones o más)"
+        },
+        {
+          "check": "Existe la regla de 3 mediciones seguidas empeorando",
+          "comando": "grep -n \"3 medicion\" docs/rendimiento/*.md",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/historico.csv",
+        "docs/rendimiento/tendencia.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.consulta.indice-en-columna-de-filtro-frecuente",
+      "titulo": "Indexar la columna por la que {{entidad}} se filtra todos los días",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin índice, cada consulta de {{entidad}} por esa columna escanea la tabla entera; a los pocos miles de filas la pantalla que antes cargaba en 50 ms empieza a tardar segundos, y nadie tocó el código, solo creció la tabla.",
+      "queHacer": [
+        "Identificar la columna (o combinación) por la que {{entidad}} se filtra u ordena en la consulta más frecuente (fecha, sede, estado).",
+        "Correr EXPLAIN ANALYZE de esa consulta ANTES del índice y anotar filas escaneadas y ms.",
+        "Crear el índice sobre esa columna.",
+        "Correr el mismo EXPLAIN ANALYZE después y anotar la nueva cifra.",
+        "Confirmar que el plan ya no dice \"Seq Scan\" sobre esa tabla para esa consulta."
+      ],
+      "aceptacion": [
+        {
+          "check": "El plan de {{entidad}} deja de escanear la tabla completa",
+          "comando": "psql -c \"EXPLAIN ANALYZE SELECT * FROM {{entidad}} WHERE sede_id = 1 ORDER BY creado_en DESC LIMIT 20;\"",
+          "espera": "0 apariciones de 'Seq Scan' sobre la tabla {{entidad}}"
+        },
+        {
+          "check": "El tiempo de ejecución bajó de forma medible",
+          "comando": null,
+          "espera": "ms antes vs. después escritos en docs/rendimiento/linea-base.md; reducción de 70%+"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql",
+          "sqlite"
+        ],
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": "entidad",
+      "posee": [
+        "docs/rendimiento/linea-base.md"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "perf.consulta.leer-el-plan-no-adivinar",
+      "titulo": "Leer el plan de ejecución de las 3 consultas más lentas, no adivinar",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin ver el plan real, se optimiza a ciegas: se añade un índice que Postgres ni siquiera usa, mientras la consulta lenta de verdad sigue haciendo un escaneo completo de una tabla de 200.000 filas.",
+      "queHacer": [
+        "Sacar de los logs o de pg_stat_statements las 3 consultas con más tiempo total acumulado, no solo la más lenta una vez.",
+        "Correr EXPLAIN (ANALYZE, BUFFERS) de cada una contra datos reales, no contra la base vacía de desarrollo.",
+        "Anotar para cada una: filas estimadas vs. reales, y si aparece Seq Scan sobre una tabla de más de 10.000 filas.",
+        "Escribir junto a cada plan la acción concreta que corresponde (índice, reescritura, paginación)."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las 3 consultas más caras tienen su EXPLAIN guardado",
+          "comando": "grep -c 'EXPLAIN' docs/rendimiento/planes.md",
+          "espera": "3+ planes pegados"
+        },
+        {
+          "check": "Ninguna tabla de más de 10.000 filas queda con Seq Scan sin resolver",
+          "comando": "grep -B2 'Seq Scan' docs/rendimiento/planes.md | grep -c 'RESUELTO'",
+          "espera": "igual al número de Seq Scan encontrados"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/planes.md"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "perf.consulta.limite-de-consultas-por-peticion",
+      "titulo": "Poner techo al número de consultas que dispara {{ruta}}",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El patrón N+1 no se nota con 5 filas de prueba: se nota con 500, cuando una lista que debía costar 1 consulta cuesta 501 y la pantalla que abría en 100 ms pasa a tardar 4 segundos sin que el código haya cambiado.",
+      "queHacer": [
+        "Instrumentar un contador de consultas por petición (middleware o wrapper del cliente de base de datos) para {{ruta}}.",
+        "Fijar el techo esperado (5 consultas, sin importar cuántas filas devuelva la lista).",
+        "Escribir un test que pida {{ruta}} con un volumen realista (200 filas relacionadas) y falle si se pasa del techo.",
+        "Corregir con join o carga por lote lo que dispare una consulta por fila, hasta que el contador quede fijo sin importar el número de filas."
+      ],
+      "aceptacion": [
+        {
+          "check": "{{ruta}} con 200 filas relacionadas no pasa de 5 consultas",
+          "comando": "npm test -- limite-consultas {{ruta}}",
+          "espera": "test verde; contador ≤5 consultas con 200 filas de datos"
+        },
+        {
+          "check": "El número de consultas no crece con el número de filas",
+          "comando": null,
+          "espera": "mismo conteo de consultas con 10 filas que con 200"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql",
+          "sqlite"
+        ]
+      },
+      "porCada": "ruta",
+      "posee": [
+        "lib/servidor/contador-consultas.ts",
+        "tests/rendimiento{{ruta}}.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "perf.consulta.cursor-en-vez-de-offset",
+      "titulo": "Cambiar a paginación por cursor cuando OFFSET empieza a doler",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "OFFSET obliga a la base a contar y descartar todas las filas anteriores a la página pedida: en una tabla de 100.000 filas, pedir la página 500 puede tardar más que toda la primera carga de la aplicación, y empeora cada semana que la tabla crece.",
+      "queHacer": [
+        "Medir el tiempo de pedir una página lejana (página 500 de 50 filas) con el OFFSET actual, contra datos reales.",
+        "Diseñar la clave de cursor (id o fecha de creación, con desempate estable) para el listado más grande del sistema.",
+        "Reescribir el endpoint para aceptar ?despues_de=<cursor> en vez de ?pagina=N, devolviendo el cursor siguiente en la respuesta.",
+        "Migrar la interfaz que consume ese listado a \"cargar más\" en vez de números de página, si el patrón de uso lo permite.",
+        "Medir de nuevo la página \"500\" equivalente con cursor y confirmar que el tiempo no depende de qué tan lejos se pida."
+      ],
+      "aceptacion": [
+        {
+          "check": "El tiempo de traer una página lejana no crece con la profundidad",
+          "comando": "curl -w '%{time_total}\\n' -o /dev/null -s \"http://localhost:3000/api/ventas?despues_de=CURSOR_EN_LA_FILA_25000\"",
+          "espera": "tiempo total ≤120 ms, dentro del 20% del tiempo medido en la primera página"
+        },
+        {
+          "check": "El OFFSET grande desaparece del código migrado",
+          "comando": "grep -rn \"OFFSET\\|offset:\" app/api/ lib/servidor/ | grep -v cursor",
+          "espera": "0 líneas en las rutas migradas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql",
+          "sqlite"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/paginacion-cursor.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "perf.consulta.conteo-aproximado-en-vez-de-total-exacto",
+      "titulo": "Cambiar el conteo total exacto por uno mantenido o estimado",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "COUNT(*) sobre una tabla grande escanea todas las filas solo para mostrar un número en una esquina de la pantalla; a los cientos de miles de registros ese conteo tarda más que el resto de la consulta junta, por un dato decorativo.",
+      "queHacer": [
+        "Ubicar cada pantalla que muestra un total exacto de filas calculado con COUNT(*) en cada carga.",
+        "Medir cuánto tarda ese COUNT(*) solo, contra datos reales, separado del resto de la consulta.",
+        "Reemplazarlo por un contador mantenido (columna incrementada al insertar/anular) o por una estimación del planificador (reltuples) cuando el número exacto no cambia una decisión de negocio.",
+        "Dejar claro en la interfaz cuándo el número es exacto y cuándo es aproximado (ej.: \"~3.480\"), para no inventar precisión que no existe."
+      ],
+      "aceptacion": [
+        {
+          "check": "El tiempo de mostrar el total bajó de forma medible",
+          "comando": null,
+          "espera": "ms del COUNT antes vs. después en docs/rendimiento/linea-base.md; reducción de 80%+"
+        },
+        {
+          "check": "El conteo mantenido coincide con la realidad dentro de un margen conocido",
+          "comando": "npm test -- conteo-mantenido",
+          "espera": "test verde; diferencia contra COUNT(*) real ≤1%"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/contador-mantenido.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "perf.consulta.la-mas-cara-tiene-dueno",
+      "titulo": "Dar dueño y meta de milisegundos a la consulta más cara del sistema",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una consulta cara que es responsabilidad de todos no es responsabilidad de nadie: sigue ahí, midiéndose una vez al año en una auditoría, mientras cada mes le cuesta al servidor más CPU que las otras cien consultas juntas.",
+      "queHacer": [
+        "Identificar, con pg_stat_statements o el log de tiempos, la consulta con mayor tiempo TOTAL acumulado (tiempo por ejecución × ejecuciones, no la más lenta una vez).",
+        "Ponerle un nombre, un dueño (persona o módulo) y una meta explícita de ms objetivo.",
+        "Dejarla vigilada en el archivo único de presupuestos con su cifra actual y su meta.",
+        "Revisar cada trimestre si sigue siendo la más cara o si otra la superó, y actualizar el dueño si cambia."
+      ],
+      "aceptacion": [
+        {
+          "check": "La consulta más cara tiene dueño y meta escritos",
+          "comando": "grep -n \"dueno:\\|meta_ms:\" docs/rendimiento/consulta-mas-cara.md",
+          "espera": "1+ dueño y 1+ meta_ms numérica"
+        },
+        {
+          "check": "El presupuesto la incluye con su cifra actual",
+          "comando": "grep -n \"consulta-mas-cara\" docs/rendimiento/presupuestos.md",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/consulta-mas-cara.md"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "perf.carga.sin-libreria-completa-por-una-funcion",
+      "titulo": "Prohibir importar una librería completa para usar una sola función",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Importar toda una librería de fechas o utilidades para usar una función de 10 líneas mete al paquete del navegador cientos de KB que el teléfono de la cajera tiene que descargar y parsear antes de poder cobrar la primera venta.",
+      "queHacer": [
+        "Listar las librerías pesadas conocidas que se importan completas en el proyecto (lodash, moment, la librería de iconos completa).",
+        "Cambiar cada import completo por el import específico de la función (lodash/debounce en vez de lodash) o por una función propia cuando la librería entera no se justifica.",
+        "Añadir un grep de guardia que avise si vuelve a aparecer un import completo de esas librerías.",
+        "Medir el KB del paquete de JavaScript antes y después del cambio."
+      ],
+      "aceptacion": [
+        {
+          "check": "No quedan imports completos de las librerías pesadas conocidas",
+          "comando": "grep -rnE \"from ['\\\"](lodash|moment)['\\\"]\" app/ components/ lib/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El paquete de JavaScript pesa menos",
+          "comando": null,
+          "espera": "KB del bundle antes vs. después en docs/rendimiento/linea-base.md; reducción de 20%+"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "nextjs",
+          "react",
+          "next"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "package.json"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.carga.imagenes-en-formato-moderno-con-techo-de-kb",
+      "titulo": "Servir cada imagen en formato moderno con un techo de KB",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una foto de producto en JPEG sin comprimir puede pesar 2 MB; en la red del barrio eso son varios segundos solo para ver el producto, y se paga esa espera en cada visita, no una vez.",
+      "queHacer": [
+        "Fijar un techo de KB por imagen según su rol (miniatura ≤30 KB, foto de producto ≤150 KB, portada ≤250 KB).",
+        "Convertir las imágenes existentes a WebP o AVIF con calidad suficiente para el uso (producto, no arte).",
+        "Configurar el paso de build o el componente de imagen para que comprima automáticamente cualquier imagen nueva que se pase del techo.",
+        "Medir el KB de las 10 imágenes más pesadas antes y después de la conversión."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna imagen de producto supera su techo de KB",
+          "comando": "find public -iname '*.webp' -o -iname '*.jpg' -o -iname '*.png' | xargs -I{} du -k {} | awk '$1>150{print}'",
+          "espera": "0 líneas por encima de 150 KB en imágenes de producto"
+        },
+        {
+          "check": "El peso total de imágenes bajó de forma medible",
+          "comando": null,
+          "espera": "KB total antes vs. después; reducción de 50%+"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "vitrina",
+          "landing"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "public/**/*.webp",
+        "docs/rendimiento/linea-base.md"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "perf.carga.fuente-sin-bloqueo-de-texto",
+      "titulo": "Cargar la tipografía sin dejar el texto invisible mientras llega",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con el comportamiento por defecto del navegador, el texto queda invisible hasta que la fuente termina de descargar (FOIT); en una red lenta eso es una pantalla en blanco con el producto ya cargado pero sin una sola palabra legible.",
+      "queHacer": [
+        "Declarar font-display: swap (u optional si el salto de layout importa más) en toda fuente cargada.",
+        "Subconjuntar la fuente a los caracteres que el proyecto realmente usa (latín + ñ + signo de pesos), no el archivo completo con todos los alfabetos.",
+        "Precargar (<link rel=\"preload\">) la única fuente que se usa arriba del pliegue.",
+        "Medir el KB del archivo de fuente y el tiempo hasta el primer texto visible, antes y después."
+      ],
+      "aceptacion": [
+        {
+          "check": "Toda fuente declara font-display",
+          "comando": "grep -rc \"font-display\" app/globals.css",
+          "espera": "1+ apariciones por cada @font-face declarado"
+        },
+        {
+          "check": "El archivo de fuente pesa menos tras el subconjunto",
+          "comando": null,
+          "espera": "KB antes vs. después del subconjuntado; reducción de 40%+"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "vitrina",
+          "landing",
+          "panel-interno",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/globals.css",
+        "public/fonts/**"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.carga.comprimir-lo-que-viaja-como-texto",
+      "titulo": "Servir con gzip o brotli todo lo que viaja como texto",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "JS, CSS, HTML y las respuestas JSON de la API son texto que comprime muy bien; sin compresión de transporte, cada respuesta viaja 3 a 5 veces más pesada de lo necesario por un ajuste de un renglón en el servidor.",
+      "queHacer": [
+        "Confirmar que el servidor o la plataforma de despliegue sirve JS/CSS/HTML con compresión (gzip como mínimo, brotli si está disponible).",
+        "Activar la misma compresión para las respuestas JSON de la API, no solo para los archivos estáticos.",
+        "Medir con curl el tamaño transferido vs. el tamaño real del recurso, con y sin Accept-Encoding.",
+        "Confirmar en las cabeceras de respuesta que Content-Encoding está presente."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las respuestas grandes van comprimidas",
+          "comando": "curl -s -H 'Accept-Encoding: gzip' -D - -o /dev/null http://localhost:3000/api/productos | grep -i content-encoding",
+          "espera": "1 línea con 'gzip' o 'br'"
+        },
+        {
+          "check": "El tamaño transferido es menor que el tamaño del recurso",
+          "comando": null,
+          "espera": "bytes transferidos ≤40% del tamaño sin comprimir en respuestas JSON de 10 KB o más"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "nextjs",
+          "next",
+          "node"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "next.config.js"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.carga.dividir-el-paquete-por-ruta",
+      "titulo": "Dividir el paquete de JavaScript por ruta en vez de mandarlo entero",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin división por ruta, la pantalla de caja descarga también el código del panel de reportes y de la administración de usuarios que esa cajera nunca va a abrir, pagando en KB una funcionalidad que no le sirve.",
+      "queHacer": [
+        "Medir con el analizador de bundle qué rutas cargan código de otras secciones que no usan.",
+        "Separar por import() dinámico o por los límites naturales de rutas del framework los módulos pesados que no son necesarios en el primer render (editores, gráficas, exportadores).",
+        "Confirmar que cada ruta descarga solo el código que su pantalla usa, más lo compartido de verdad.",
+        "Medir el KB de JavaScript que baja la ruta de caja antes y después de la división."
+      ],
+      "aceptacion": [
+        {
+          "check": "La ruta de caja no descarga el código del panel de reportes",
+          "comando": "npx next build && grep -c \"reportes\" .next/static/chunks/pages/caja*.js",
+          "espera": "0 apariciones del chunk de reportes en el bundle de caja"
+        },
+        {
+          "check": "El KB de JavaScript de la ruta de caja bajó",
+          "comando": null,
+          "espera": "KB antes vs. después; reducción de 30%+"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "nextjs",
+          "next",
+          "react"
+        ],
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "next.config.js"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.carga.precargar-lo-que-siempre-se-usa",
+      "titulo": "Precargar y preconectar lo que la pantalla más visitada siempre necesita",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin preconexión, el navegador descubre que necesita el origen de la API o la fuente principal solo cuando el HTML ya llegó, y gasta ida y vuelta de DNS y TLS que pudo haber empezado 300 ms antes, en paralelo con todo lo demás.",
+      "queHacer": [
+        "Identificar en la pantalla más visitada los 2-3 recursos que SIEMPRE se piden (fuente principal, primer llamado a la API, imagen de portada).",
+        "Añadir <link rel=\"preconnect\"> al origen de la API y <link rel=\"preload\"> a la fuente y a la imagen de portada.",
+        "No preconectar ni precargar más de esos 2-3 recursos: precargar todo anula el beneficio de priorizar.",
+        "Medir el Largest Contentful Paint antes y después con la herramienta de medición del navegador."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los recursos críticos tienen preload o preconnect",
+          "comando": "grep -c 'rel=\"preload\"\\|rel=\"preconnect\"' app/layout.tsx",
+          "espera": "2-3 líneas, no más de 4"
+        },
+        {
+          "check": "El Largest Contentful Paint bajó",
+          "comando": "node ORION/tools/edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"performance.getEntriesByType('largest-contentful-paint').at(-1)?.startTime\"",
+          "espera": "LCP ≤2500 ms, y menor que la medición anterior"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "vitrina",
+          "landing"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/layout.tsx"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "perf.render.sin-literales-nuevos-en-cada-pintura",
+      "titulo": "No crear arreglos ni objetos nuevos dentro del render en cada pintura",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un style={{...}} o un .filter() escrito directo en el render crea un valor nuevo en cada pintura; eso rompe cualquier memoización del componente hijo y lo obliga a repintarse aunque nada de lo que de verdad le importa haya cambiado.",
+      "queHacer": [
+        "Buscar en los componentes más repintados (lista de venta, tabla de productos) objetos, arreglos o funciones creados directo en el JSX del render.",
+        "Sacarlos con useMemo/useCallback o, mejor, a fuera del componente cuando no dependen de props ni estado.",
+        "Confirmar con el profiler de React que el componente hijo ya no se repinta cuando el padre se repinta por una razón que no le concierne.",
+        "Dejar un comentario que explique el porqué, para que no vuelva a aparecer en el próximo componente parecido."
+      ],
+      "aceptacion": [
+        {
+          "check": "El componente hijo no se repinta ante un cambio que no le concierne",
+          "comando": "npm test -- render-count lista-de-venta",
+          "espera": "test verde; 0 repintados del hijo tras cambiar un estado no relacionado del padre"
+        },
+        {
+          "check": "No quedan objetos literales nuevos en las props de los componentes de lista",
+          "comando": "grep -rnE \"style=\\{\\{|\\.filter\\(.*=>.*\\)\\}\" components/venta/ | wc -l",
+          "espera": "0 en los componentes ya revisados"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "react",
+          "nextjs"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/venta/**"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.render.memoizar-lo-caro-no-todo",
+      "titulo": "Memoizar el cálculo caro y la fila que no cambió, no memoizar todo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Recalcular el total de una venta de 40 líneas en cada tecla que se escribe en un campo sin relación, o repintar las 200 filas de una tabla porque una sola cambió, convierte una interacción de teclado en algo que el dedo nota como pesado.",
+      "queHacer": [
+        "Medir con el profiler cuántas veces se recalcula el total de la venta por cada tecla escrita en un campo que no lo afecta.",
+        "Envolver ese cálculo derivado en useMemo con las dependencias exactas que sí lo afectan.",
+        "Medir cuántas filas de la tabla se repintan cuando cambia una sola (ej.: se anula un ítem).",
+        "Memoizar el componente de fila (React.memo o equivalente) con una comparación que solo mire sus propios datos.",
+        "Repetir ambas mediciones y confirmar la baja en el número de recálculos/repintados."
+      ],
+      "aceptacion": [
+        {
+          "check": "El total no se recalcula por una tecla que no lo afecta",
+          "comando": "npm test -- render-count total-venta",
+          "espera": "test verde; 0 recálculos del total tras escribir en un campo no relacionado"
+        },
+        {
+          "check": "Cambiar una fila no repinta las demás",
+          "comando": null,
+          "espera": "en una lista de 200 filas, cambiar 1 repinta 1, medido con el profiler antes (200) y después (1)"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "react",
+          "nextjs"
+        ],
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/venta/**",
+        "components/tabla/**"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.render.auditoria-de-animados-y-will-change",
+      "titulo": "Auditar cuántos elementos animados y con will-change permanente hay en pantalla",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cada will-change permanente reserva su propia capa en la GPU; en un teléfono de gama baja, siete capas vivas todo el tiempo compiten por la misma memoria de video que necesita el scroll de la lista de productos, y el que pierde es el scroll.",
+      "queHacer": [
+        "Medir con la herramienta de navegador cuántos elementos animados y cuántos con will-change permanente (en reposo, no solo durante la animación) tiene la pantalla más visitada.",
+        "Fijar un techo razonable (≤3 will-change permanentes) según el hallazgo de referencia de la casa (14 animados, 7 con will-change permanente era demasiado).",
+        "Quitar will-change de todo lo que no esté animándose en ese instante; aplicarlo justo antes de la animación y retirarlo al terminar.",
+        "Volver a medir y confirmar que se bajó del techo."
+      ],
+      "aceptacion": [
+        {
+          "check": "El número de will-change permanentes está bajo el techo",
+          "comando": "node ORION/tools/edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('*')].filter(e=>getComputedStyle(e).willChange!=='auto').length\"",
+          "espera": "≤3 elementos, contra los 7 de la medición de referencia"
+        },
+        {
+          "check": "El número de elementos animados en reposo bajó",
+          "comando": null,
+          "espera": "conteo antes vs. después; de 14 a un número menor, escrito en docs/rendimiento/linea-base.md"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "vitrina",
+          "landing"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/globals.css",
+        "docs/rendimiento/linea-base.md"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "perf.render.interaccion-bajo-volumen-real",
+      "titulo": "Medir el tiempo de respuesta al toque con el volumen real de datos, no con 5 filas",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Una interacción que responde en 20 ms con la tabla de prueba de 5 filas puede tardar 400 ms con las 3.000 filas reales de un mes de ventas, y esa es justo la pantalla que la cajera tiene abierta todo el turno.",
+      "queHacer": [
+        "Cargar en un entorno de prueba el volumen real (o proyectado a 6-12 meses) de la pantalla más pesada.",
+        "Medir con la herramienta del navegador el tiempo entre el toque y la siguiente pintura (Interaction to Next Paint o equivalente) para la acción más común.",
+        "Fijar un número máximo aceptable (200 ms) y comparar contra la medición.",
+        "Si se pasa del número, aplicar la técnica que corresponda (virtualizar la lista, mover el filtro al servidor, memoizar) y volver a medir contra el mismo volumen."
+      ],
+      "aceptacion": [
+        {
+          "check": "La interacción principal responde bajo el número máximo con volumen real",
+          "comando": "node ORION/tools/edge-cdp.mjs --url http://localhost:3000/panel/ventas --width 390 --height 844 --mobile --eval \"performance.mark('t0')\"",
+          "espera": "tiempo entre toque y pintura ≤200 ms con 3000+ filas cargadas"
+        },
+        {
+          "check": "La medición se hizo con volumen real, no con datos de prueba",
+          "comando": "grep -n \"filas de prueba\\|seed vacio\" docs/rendimiento/linea-base.md",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/linea-base.md"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "perf.render.animacion-en-el-hilo-compuesto",
+      "titulo": "Mover las animaciones permanentes a transform/opacity para que corran en el hilo compuesto",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Animar width, top o left obliga al navegador a recalcular el layout en cada cuadro sobre el hilo principal, el mismo hilo que tiene que responder al toque de la cajera; una animación de fondo mal hecha compite por ese hilo con el cobro.",
+      "queHacer": [
+        "Listar las animaciones permanentes o de larga duración de la pantalla y qué propiedad CSS animan.",
+        "Medir con el navegador el tiempo de hilo principal ocupado (scripting + rendering) durante 3 segundos de esa animación.",
+        "Reescribir las que animan propiedades de layout (width, top, left, margin) para que animen transform y opacity en su lugar.",
+        "Volver a medir el tiempo de hilo principal ocupado durante la misma ventana de 3 segundos."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las animaciones permanentes ya no tocan propiedades de layout",
+          "comando": "grep -rnE \"@keyframes[^}]*\\b(width|top|left|margin)\\s*:\" app/globals.css",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El tiempo de hilo principal ocupado durante la animación bajó",
+          "comando": null,
+          "espera": "ms de scripting+rendering en 3 s, antes vs. después; reducción de 40%+"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "vitrina",
+          "landing"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/globals.css"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "perf.red.techo-de-peticiones-por-pantalla",
+      "titulo": "Poner techo al número de peticiones que dispara {{ruta}} al abrir",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cada petición de red en la tienda del barrio paga un viaje de ida y vuelta completo antes de traer un solo byte; 30 peticiones sueltas para pintar una pantalla son 30 viajes que en una red mala se sienten uno por uno.",
+      "queHacer": [
+        "Abrir {{ruta}} con las herramientas de red del navegador y contar cuántas peticiones dispara antes de quedar usable.",
+        "Fijar un techo razonable (≤10 peticiones) para esa pantalla.",
+        "Agrupar lo que se pueda en una sola petición y diferir lo que no es necesario para el primer pintado.",
+        "Volver a contar y confirmar que se quedó bajo el techo."
+      ],
+      "aceptacion": [
+        {
+          "check": "{{ruta}} no pasa del techo de peticiones al abrir",
+          "comando": "node ORION/tools/edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 390 --height 844 --mobile",
+          "espera": "≤10 peticiones de red hasta quedar usable"
+        },
+        {
+          "check": "El número de peticiones bajó respecto a la medición anterior",
+          "comando": null,
+          "espera": "conteo antes vs. después en docs/rendimiento/linea-base.md"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": "ruta",
+      "posee": [
+        "docs/rendimiento/linea-base.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.red.cascada-en-paralelo",
+      "titulo": "Convertir la cascada de peticiones secuenciales en peticiones en paralelo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando la petición B solo empieza después de que A regresa, y C solo después de B, tres llamadas de 200 ms cada una tardan 600 ms en total aunque ninguna dependa realmente de la anterior; es tiempo que se regala por cómo se escribió el código, no por la red.",
+      "queHacer": [
+        "Revisar con las herramientas de red cuáles peticiones de la pantalla más lenta se disparan en cascada.",
+        "Confirmar cuáles de verdad dependen del resultado de la anterior y cuáles solo están escritas en secuencia por comodidad.",
+        "Disparar en paralelo (Promise.all o equivalente) las que no dependen entre sí.",
+        "Medir el tiempo total hasta que la pantalla queda usable, antes y después."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las peticiones independientes salen en paralelo, no en cascada",
+          "comando": "grep -n \"await.*fetch\" app/panel/**/*.tsx | wc -l",
+          "espera": "las llamadas independientes ya no están en awaits consecutivos sin Promise.all"
+        },
+        {
+          "check": "El tiempo total hasta usable bajó",
+          "comando": null,
+          "espera": "ms antes vs. después; 3 llamadas de 200 ms en cascada (600 ms) bajan a ~200 ms en paralelo"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "caja",
+          "vitrina"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/panel/**"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.red.cache-http-en-lo-que-no-cambia",
+      "titulo": "Poner Cache-Control real a lo que no cambia entre visitas",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin cabeceras de caché, el navegador vuelve a pedir el mismo logo, la misma hoja de estilos y el mismo catálogo de categorías en cada visita, aunque no hayan cambiado en semanas, gastando la red del cliente en descargar lo mismo otra vez.",
+      "queHacer": [
+        "Clasificar los recursos estáticos y las respuestas de API por qué tan seguido cambian de verdad (nunca, rara vez, cada visita).",
+        "Poner Cache-Control con un máximo de edad real a lo que casi no cambia (assets con hash: un año; catálogo de categorías: minutos u horas con stale-while-revalidate).",
+        "Usar ETag o Last-Modified para lo que cambia pero donde vale la pena preguntar antes de volver a descargar completo.",
+        "Medir con curl en una segunda visita cuántos recursos llegan con 304 o desde caché."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los assets con hash tienen caché de largo plazo",
+          "comando": "curl -sI http://localhost:3000/_next/static/chunks/main.js | grep -i cache-control",
+          "espera": "max-age de 31536000 (un año) o similar en assets con hash"
+        },
+        {
+          "check": "La segunda visita reutiliza recursos sin descargarlos completos",
+          "comando": null,
+          "espera": "conteo de respuestas 304/desde-caché en la segunda carga; 3+ recursos reutilizados"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "nextjs",
+          "next",
+          "node"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "next.config.js"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.red.payload-sin-campos-de-mas",
+      "titulo": "Devolver de la API de {{entidad}} solo los campos que esa pantalla usa",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Devolver el objeto completo de {{entidad}} — con sus 40 columnas — cuando la lista solo pinta nombre y precio, infla cada respuesta con datos que se descargan, se parsean y se tiran a la basura en cada carga.",
+      "queHacer": [
+        "Medir el KB de la respuesta actual del endpoint de listado de {{entidad}}.",
+        "Listar los campos que la pantalla realmente pinta o usa.",
+        "Cambiar la consulta o el mapeo de salida para devolver solo esos campos (proyección explícita, no SELECT * seguido de JSON.stringify del objeto completo).",
+        "Medir el KB de la respuesta después del recorte, con el mismo número de filas."
+      ],
+      "aceptacion": [
+        {
+          "check": "La respuesta del listado de {{entidad}} no trae campos que la pantalla no usa",
+          "comando": "curl -s http://localhost:3000/api/{{entidad}} | node -e \"const d=JSON.parse(require('fs').readFileSync(0));console.log(Object.keys(d[0]||{}))\"",
+          "espera": "solo los campos que la pantalla efectivamente lee"
+        },
+        {
+          "check": "El KB de la respuesta bajó con el mismo número de filas",
+          "comando": null,
+          "espera": "KB antes vs. después con las mismas filas; reducción de 40%+"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": "entidad",
+      "posee": [
+        "app/api/{{entidad}}/route.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.red.el-cobro-resiste-la-red-mala",
+      "titulo": "Completar el cobro dentro de un tiempo máximo aunque la red esté mala",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "La vitrina pública puede permitirse ser lenta en una red mala sin que nadie pierda plata; la pantalla de cobro no: si el cobro se cuelga con la red del barrio, hay un cliente parado en el mostrador y una fila detrás esperando a que algo responda.",
+      "queHacer": [
+        "Throttlear la conexión a un perfil realista de red lenta del barrio contra la pantalla de cobro, no contra la vitrina.",
+        "Completar de principio a fin un cobro típico (armar venta + cobrar) bajo ese throttling y medir el tiempo total.",
+        "Fijar un máximo tolerable (≤5 segundos de principio a fin, o una respuesta clara de \"reintentando\" antes de ese tiempo).",
+        "Si se pasa del máximo, añadir reintento automático con aviso visible, para que la cajera sepa que el sistema sigue intentando y no repita el cobro a mano.",
+        "Repetir la medición bajo el mismo throttling tras el cambio."
+      ],
+      "aceptacion": [
+        {
+          "check": "El cobro completo bajo red lenta queda dentro del máximo o avisa que reintenta",
+          "comando": null,
+          "espera": "tiempo total del cobro bajo throttling ≤5000 ms, o aviso de reintento visible antes de ese tiempo"
+        },
+        {
+          "check": "Un cobro no se duplica si la red falla a mitad de camino",
+          "comando": "npm test -- cobro-red-lenta",
+          "espera": "test verde; con la respuesta simulada perdida y reintentada, el cobro se registra una sola vez"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ],
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/cobro.ts",
+        "components/caja/**"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos",
+        "tema:cobro-a-clientes"
+      ]
+    },
+    {
+      "id": "perf.memoria.techo-de-proceso-declarado",
+      "titulo": "Declarar el techo de memoria del proceso y medir dónde está hoy",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Sin un techo declarado, el proceso crece hasta que el sistema operativo lo mata en el peor momento posible — a mitad de un cobro — y la primera noticia del problema es el negocio parado, no una alerta.",
+      "queHacer": [
+        "Medir el uso de memoria (RSS) del proceso en reposo y bajo la carga típica de un turno.",
+        "Declarar un techo explícito (512 MB) según el límite real del plan de hosting o del servidor.",
+        "Configurar el proceso o el orquestador para registrar una advertencia cuando se pase del 80% del techo.",
+        "Dejar los dos números — el actual y el techo — escritos en el archivo de presupuestos."
+      ],
+      "aceptacion": [
+        {
+          "check": "El uso de memoria actual está medido y escrito",
+          "comando": "node -e \"console.log(process.memoryUsage().rss / 1024 / 1024, 'MB')\"",
+          "espera": "cifra en MB, menor al techo declarado"
+        },
+        {
+          "check": "El techo está declarado en el presupuesto",
+          "comando": "grep -n \"techo_memoria\\|memoria_mb\" docs/rendimiento/presupuestos.md",
+          "espera": "1+ líneas con una cifra en MB"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/presupuestos.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.memoria.cache-con-limite-y-expulsion",
+      "titulo": "Poner límite de tamaño y expulsión a toda caché en memoria",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una caché en memoria sin límite es una fuga de memoria con buena intención: crece con cada clave nueva (cada producto, cada sesión, cada búsqueda) y nunca suelta nada, hasta que el proceso se queda sin memoria y se cae.",
+      "queHacer": [
+        "Ubicar cada Map, objeto o librería usada como caché en memoria en el código del servidor.",
+        "Ponerle un tamaño máximo de entradas y una política de expulsión (LRU es la más simple de razonar).",
+        "Medir el uso de memoria del proceso bajo tráfico variado durante 15 minutos antes y después del límite.",
+        "Confirmar que el número de entradas de la caché nunca pasa del máximo, incluso bajo el tráfico más variado que se pueda simular."
+      ],
+      "aceptacion": [
+        {
+          "check": "La caché nunca supera su tamaño máximo",
+          "comando": "npm test -- limite-cache",
+          "espera": "test verde; tras 10.000 claves distintas insertadas, el tamaño de la caché no supera el máximo declarado"
+        },
+        {
+          "check": "La memoria del proceso se estabiliza bajo tráfico sostenido",
+          "comando": null,
+          "espera": "RSS medido cada minuto durante 15 min; sin crecimiento sostenido tras el límite (antes: crecía sin freno)"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/cache.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.memoria.fuga-detectada-en-ensayo-sostenido",
+      "titulo": "Ensayar 30 minutos de tráfico sostenido y confirmar que la memoria no crece sola",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Una fuga de memoria no se ve en una prueba de 30 segundos: se ve a los 30 minutos, cuando el proceso que empezó en 150 MB ya va en 900 MB sin que el tráfico haya cambiado, y en producción eso significa un reinicio forzado a media tarde con clientes en fila.",
+      "queHacer": [
+        "Montar un ensayo de tráfico sostenido y variado durante al menos 30 minutos contra un entorno desechable.",
+        "Medir el RSS del proceso cada minuto durante el ensayo.",
+        "Confirmar que la memoria sube y luego se estabiliza (patrón normal del recolector de basura), no que sube todo el tiempo sin techo.",
+        "Si hay crecimiento sostenido, usar un heap snapshot para encontrar qué colección crece sin límite, y corregirla.",
+        "Repetir el ensayo completo tras la corrección y guardar las dos curvas de memoria (antes/después)."
+      ],
+      "aceptacion": [
+        {
+          "check": "La memoria se estabiliza en vez de crecer sin freno durante 30 minutos",
+          "comando": null,
+          "espera": "RSS por minuto durante 30 min, antes vs. después; tras la corrección, el RSS de los últimos 10 min no crece más de 5% respecto al minuto 10"
+        },
+        {
+          "check": "El ensayo corrió el tiempo declarado, no una muestra corta",
+          "comando": "grep -c '^' docs/rendimiento/ensayo-memoria.csv",
+          "espera": "31+ filas (1 por minuto durante 30 min o más)"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/ensayo-memoria.csv",
+        "docs/rendimiento/ensayo-memoria.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.memoria.el-trabajo-pesado-no-carga-todo-a-la-vez",
+      "titulo": "Hacer que el trabajo pesado procese por partes, no cargue todo a la vez en RAM",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Generar un informe o una exportación cargando la tabla completa en un arreglo en memoria funciona con 2.000 filas y revienta el proceso con 200.000; el día que más se necesita el informe (cierre de mes) es el día que más filas hay.",
+      "queHacer": [
+        "Identificar los procesos que cargan una colección completa en memoria antes de procesarla (informes, exportaciones, migraciones de datos).",
+        "Medir el RSS pico del proceso al correr esa tarea contra el volumen actual.",
+        "Reescribir el proceso para leer y procesar por lotes o con un stream/cursor, sin tener nunca la colección completa en memoria a la vez.",
+        "Medir el RSS pico de nuevo contra el mismo volumen, y proyectar a 10× ese volumen."
+      ],
+      "aceptacion": [
+        {
+          "check": "El RSS pico no crece proporcional al volumen procesado",
+          "comando": null,
+          "espera": "RSS pico con volumen actual vs. con 10x; con streaming, el pico crece menos del 20% aunque el volumen crezca 10 veces"
+        },
+        {
+          "check": "El código ya no materializa la colección completa antes de procesar",
+          "comando": "grep -n \"\\.findAll(\\|SELECT \\* FROM\" lib/servidor/informes.ts",
+          "espera": "0 líneas sin límite ni cursor en el proceso de informes"
+        }
+      ],
+      "aplicaSi": {
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/informes.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "perf.arranque.medir-frio-vs-caliente",
+      "titulo": "Medir por separado el arranque en frío y la respuesta en caliente",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Confundir los dos números esconde el problema real: un servidor que responde en 50 ms una vez caliente pero tarda 8 segundos en la primera petición después de cada despliegue hace que cada actualización se sienta como una caída, aunque 'en promedio' esté bien.",
+      "queHacer": [
+        "Medir el tiempo de la primera petición después de un arranque limpio del proceso (frío).",
+        "Medir el tiempo de una petición idéntica después de que el proceso ya lleva un rato corriendo (caliente).",
+        "Escribir los dos números por separado, nunca mezclados en un solo promedio.",
+        "Repetir la medición en frío tres veces para confirmar que no es un dato suelto."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los dos números están medidos y escritos por separado",
+          "comando": "grep -c \"arranque_frio_ms\\|arranque_caliente_ms\" docs/rendimiento/linea-base.md",
+          "espera": "2 líneas, una por cada número"
+        },
+        {
+          "check": "El arranque en frío se midió más de una vez",
+          "comando": null,
+          "espera": "3 mediciones en frío escritas, no una sola"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node",
+          "nextjs"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/linea-base.md"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "perf.arranque.dependencias-fuera-del-camino-critico",
+      "titulo": "Sacar del camino crítico de arranque lo que no hace falta para responder la primera petición",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cargar y conectar todo (colas, integraciones externas, trabajos programados) antes de aceptar la primera petición hace que el arranque en frío tarde lo que tarde la dependencia más lenta de conectar, aunque esa dependencia no la necesite la primera petición.",
+      "queHacer": [
+        "Listar qué se inicializa antes de que el servidor empiece a aceptar peticiones (conexiones, colas, integraciones, trabajos programados).",
+        "Medir cuánto tarda cada inicialización por separado.",
+        "Mover a inicialización perezosa (bajo demanda, en la primera vez que de verdad se usa) lo que no es indispensable para responder la primera petición HTTP.",
+        "Medir el arranque en frío completo antes y después del cambio."
+      ],
+      "aceptacion": [
+        {
+          "check": "El arranque en frío bajó de forma medible",
+          "comando": null,
+          "espera": "ms de arranque en frío antes vs. después; reducción de 30%+"
+        },
+        {
+          "check": "Lo movido a perezoso se sigue inicializando correctamente cuando se usa",
+          "comando": "npm test -- inicializacion-perezosa",
+          "espera": "test verde"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node",
+          "nextjs"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/arranque.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.arranque.techo-al-tiempo-de-build",
+      "titulo": "Poner techo al tiempo de build para que no crezca sin que nadie lo note",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un build que crece 10 segundos por mes no lo nota nadie build a build, pero al año son varios minutos añadidos a cada despliegue, y ese tiempo lo paga cada vez que hay que corregir algo urgente y hay que esperar a que termine de compilar.",
+      "queHacer": [
+        "Medir el tiempo de build actual en limpio (sin caché) tres veces y tomar la mediana.",
+        "Fijar un techo con margen razonable (+25% sobre la mediana actual).",
+        "Añadir un paso que mida el tiempo de build y falle o avise cuando se pase del techo.",
+        "Revisar el techo cada vez que el proyecto crezca de forma intencional, no dejarlo relajarse solo."
+      ],
+      "aceptacion": [
+        {
+          "check": "El build en limpio está medido con su mediana",
+          "comando": "for i in 1 2 3; do time npm run build; done",
+          "espera": "3 mediciones; mediana escrita en docs/rendimiento/linea-base.md"
+        },
+        {
+          "check": "Superar el techo se nota",
+          "comando": "grep -n \"techo_build_s\\|TECHO_BUILD\" scripts/perf/techo-build.mjs",
+          "espera": "1+ líneas con la cifra del techo en segundos"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "nextjs",
+          "next"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/perf/techo-build.mjs"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.arranque.cache-de-build-entre-despliegues",
+      "titulo": "Reutilizar la caché de build entre despliegues en vez de partir de cero",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Sin caché entre despliegues, cada corrección de una línea recompila el proyecto completo desde cero; a medida que el proyecto crece, ese tiempo de espera crece con él, y un cambio urgente de un carácter puede tardar minutos en llegar a producción.",
+      "queHacer": [
+        "Confirmar si la plataforma de despliegue actual conserva o descarta la caché de dependencias y de build entre despliegues.",
+        "Configurar la conservación de esa caché (node_modules, compilación del framework) entre despliegues del mismo proyecto.",
+        "Medir el tiempo de despliegue de un cambio pequeño (una línea) con caché fría y con caché tibia.",
+        "Documentar cuándo se debe invalidar la caché a propósito (cambios de versión de dependencias mayores) para no quedar con un build corrupto por caché vieja."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un cambio pequeño despliega más rápido con caché tibia",
+          "comando": null,
+          "espera": "minutos de despliegue con caché fría vs. tibia para un cambio de una línea; reducción de 40%+"
+        },
+        {
+          "check": "La caché se invalida a propósito cuando corresponde",
+          "comando": "grep -n \"invalidar cache\\|cache-version\" docs/rendimiento/despliegue.md",
+          "espera": "1+ líneas con el criterio escrito"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/despliegue.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.volumen.ensayo-a-10x-antes-de-lanzar",
+      "titulo": "Ensayar {{entidad}} a 10 veces su volumen actual antes de lanzar la funcionalidad",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una funcionalidad que se probó con 200 filas de {{entidad}} y se lanza así, sin ensayar el volumen que va a tener en un año, traslada el descubrimiento del problema de rendimiento del ambiente de pruebas — barato de arreglar — a producción con clientes esperando.",
+      "queHacer": [
+        "Contar cuántas filas tiene hoy {{entidad}} en el entorno más parecido a producción disponible.",
+        "Generar (o copiar y multiplicar de forma realista) 10 veces ese volumen en un entorno desechable.",
+        "Correr contra ese volumen los flujos que usan {{entidad}}: crear, listar, filtrar, exportar.",
+        "Medir ms de cada flujo a 10× y comparar contra la medición al volumen actual.",
+        "Si algún flujo se degrada más de lo lineal (10× datos, más de 15× tiempo), dejarlo como hallazgo antes de lanzar, no después."
+      ],
+      "aceptacion": [
+        {
+          "check": "El ensayo se corrió con 10x el volumen actual de {{entidad}}, no con el volumen de prueba de siempre",
+          "comando": "node scripts/perf/ensayo-volumen.mjs {{entidad}} --factor 10",
+          "espera": "reporte con ms por flujo a 1x y a 10x"
+        },
+        {
+          "check": "Ningún flujo se degrada más que lo lineal",
+          "comando": null,
+          "espera": "factor de degradación ≤15x cuando el volumen creció 10x, para cada flujo medido"
+        }
+      ],
+      "aplicaSi": {
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": "entidad",
+      "posee": [
+        "scripts/perf/ensayo-volumen.mjs",
+        "docs/rendimiento/ensayo-10x-{{entidad}}.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.volumen.json-en-disco-tiene-techo-y-fecha-de-migracion",
+      "titulo": "Ponerle techo de filas y fecha de migración al almacenamiento en JSON sobre disco",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Un archivo JSON en disco que se lee y se reescribe completo en cada operación funciona perfecto con 500 registros, y dejar de servir es una certeza matemática, no un riesgo: a los 50.000 registros, cada escritura ya está leyendo y serializando un archivo de varios MB para cambiar una sola línea.",
+      "queHacer": [
+        "Medir hoy, con el número real de registros, cuánto tarda leer el archivo completo, parsearlo y volver a escribirlo tras un solo cambio.",
+        "Repetir la misma medición generando el archivo a 10× y a 50× el volumen actual.",
+        "Con esas tres mediciones, calcular en qué número de filas el tiempo de escritura cruza un umbral que ya afecta al usuario (500 ms).",
+        "Escribir ese número exacto como la fecha de vencimiento del almacenamiento en JSON: \"migrar a base de datos real antes de llegar a N filas\", con dueño asignado.",
+        "Dejar ese número vigilado: un chequeo que avise cuando el archivo real se acerque al 70% del umbral encontrado."
+      ],
+      "aceptacion": [
+        {
+          "check": "El umbral de filas donde el JSON deja de servir está medido y escrito",
+          "comando": "node scripts/perf/medir-json-disco.mjs --factores 1,10,50",
+          "espera": "tabla con ms de lectura+escritura a 1x/10x/50x, y el número de filas donde supera 500 ms"
+        },
+        {
+          "check": "Hay una alerta antes de llegar al umbral, no solo el número documentado",
+          "comando": "grep -n \"70%\\|umbral_filas\" lib/servidor/almacen-json.ts",
+          "espera": "1+ líneas con el chequeo del umbral"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "json-en-disco"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/almacen-json.ts",
+        "docs/rendimiento/json-en-disco.md"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:dominio-migraciones-y-copias"
+      ]
+    },
+    {
+      "id": "perf.volumen.crecimiento-no-lineal-en-el-camino-caliente",
+      "titulo": "Confirmar que ninguna función del camino caliente crece peor que lineal con los datos",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una comparación de cada fila contra todas las demás (un .find() dentro de un .map(), por ejemplo) cuesta poco con 100 filas y se vuelve impagable con 10.000: el tiempo no crece 100 veces, crece 10.000 veces, y nadie lo ve venir porque el código nunca cambió.",
+      "queHacer": [
+        "Identificar las funciones del camino caliente que recorren una colección dentro de otro recorrido de la misma colección o de otra grande.",
+        "Medir su tiempo con el volumen actual (N) y con 10×N.",
+        "Calcular la razón: si el tiempo creció ~10 veces, es lineal (bien); si creció ~100 veces, es cuadrático (mal).",
+        "Reescribir lo cuadrático usando un mapa/índice en memoria en vez de una búsqueda anidada.",
+        "Repetir la medición a 10×N y confirmar que ya crece lineal."
+      ],
+      "aceptacion": [
+        {
+          "check": "El tiempo crece proporcional a los datos, no al cuadrado",
+          "comando": "node scripts/perf/medir-complejidad.mjs",
+          "espera": "razón de tiempo (10x-datos / 1x-datos) entre 8 y 15, no por encima de 20"
+        },
+        {
+          "check": "No quedan búsquedas anidadas en el camino caliente",
+          "comando": "grep -n \"\\.map(.*=>.*\\.find(\\|\\.forEach(.*=>.*\\.filter(\" lib/dominio/venta.ts",
+          "espera": "0 líneas sin un índice ya construido antes del recorrido"
+        }
+      ],
+      "aplicaSi": {
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/venta.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.volumen.no-traer-todo-para-filtrar-en-el-cliente",
+      "titulo": "Dejar de traer {{entidad}} completa para filtrarla en el cliente pasado cierto volumen",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Traer las 800 filas completas de {{entidad}} y filtrarlas con JavaScript en el navegador funciona mientras son 800; a las 20.000 el navegador de un teléfono de gama baja se congela solo descargando y recorriendo el arreglo, antes incluso de mostrar el primer resultado.",
+      "queHacer": [
+        "Ubicar las pantallas que traen la colección completa de {{entidad}} y filtran o buscan del lado del cliente.",
+        "Medir el KB descargado y el tiempo de filtrado en el cliente con el volumen actual y proyectado a 10×.",
+        "Fijar el número de filas a partir del cual ese patrón deja de ser viable (2.000).",
+        "Mover el filtro/búsqueda al servidor (parámetros de consulta) antes de llegar a ese número, dejando el filtrado en cliente solo para lo que ya bajó acotado.",
+        "Escribir el número límite en el documento de presupuestos para que la siguiente entidad que crezca se revise a tiempo."
+      ],
+      "aceptacion": [
+        {
+          "check": "El límite de filas para filtrar en cliente está escrito y vigilado",
+          "comando": "grep -n \"limite_filtro_cliente\" docs/rendimiento/presupuestos.md",
+          "espera": "1+ líneas con una cifra de filas"
+        },
+        {
+          "check": "Por encima del límite, el filtro ya corre en el servidor",
+          "comando": "npm test -- filtro-servidor-por-volumen",
+          "espera": "test verde; con 5000 filas simuladas, la petición manda el filtro como parámetro, no trae las 5000"
+        }
+      ],
+      "aplicaSi": {
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": "entidad",
+      "posee": [
+        "app/api/{{entidad}}/route.ts",
+        "docs/rendimiento/presupuestos.md"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "perf.volumen.restaurar-a-escala-cabe-en-la-ventana",
+      "titulo": "Confirmar que restaurar el respaldo a 10x el volumen sigue cabiendo en la ventana de recuperación",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Una restauración que hoy tarda 8 minutos con el volumen actual puede tardar 2 horas cuando los datos crezcan 10 veces, y ese número solo se descubre el día de una caída real si nadie lo midió antes — el peor momento posible para enterarse.",
+      "queHacer": [
+        "Medir cuánto tarda hoy restaurar el respaldo más reciente en una base vacía y desechable.",
+        "Generar o simular un respaldo con 10× el volumen actual y medir su restauración en las mismas condiciones.",
+        "Comparar ese tiempo contra la ventana de recuperación que el negocio puede tolerar (el negocio no puede estar cerrado más de 30 minutos).",
+        "Si a 10× se pasa de la ventana, cambiar la estrategia (respaldos incrementales, restauración paralela) antes de que el volumen real la alcance.",
+        "Anotar la fecha del ensayo: pasado un trimestre, se vuelve a correr porque el volumen real ya se movió."
+      ],
+      "aceptacion": [
+        {
+          "check": "La restauración a 10x el volumen está medida contra la ventana tolerada",
+          "comando": null,
+          "espera": "minutos de restauración a 1x y a 10x, y la ventana tolerada en minutos, las tres cifras escritas"
+        },
+        {
+          "check": "A 10x, la restauración sigue cabiendo en la ventana",
+          "comando": "grep -n \"minutos_restauracion_10x\\|ventana_tolerada\" docs/rendimiento/restauracion.md",
+          "espera": "minutos_restauracion_10x menor o igual a ventana_tolerada"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql",
+          "sqlite"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/restauracion.md"
+      ],
+      "cerebro": [
+        "tema:dominio-migraciones-y-copias"
+      ]
+    },
+    {
+      "id": "perf.volumen.exportar-el-todo-no-bloquea-a-los-demas",
+      "titulo": "Confirmar que exportar todo el histórico no bloquea a los demás cuando la tabla crece",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Un 'exportar todo a Excel' que hoy corre en 3 segundos sin que nadie lo note puede, a 10 veces el volumen, mantener bloqueada la tabla o saturado el servidor el tiempo suficiente para que la cajera que está cobrando en ese momento sienta la pantalla congelada.",
+      "queHacer": [
+        "Medir la latencia de otras peticiones normales (registrar una venta) mientras corre una exportación completa, con el volumen actual.",
+        "Repetir la misma medición con el volumen simulado a 10×.",
+        "Fijar un límite tolerable de esa latencia cruzada (las demás peticiones no deben pasar de 500 ms p95 mientras la exportación corre).",
+        "Si a 10× se pasa el límite, mover la exportación a un trabajo de fondo con su propia conexión/límite de recursos, en vez de competir en línea con el tráfico normal.",
+        "Repetir la medición cruzada tras el cambio y confirmar que las demás peticiones ya no lo sienten."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las demás peticiones no se degradan más allá del límite mientras exporta, incluso a 10x volumen",
+          "comando": null,
+          "espera": "p95 de una venta normal durante la exportación a 10x: ≤500 ms"
+        },
+        {
+          "check": "La exportación corre fuera del camino de las peticiones normales",
+          "comando": "grep -n \"trabajo de fondo\\|cola.*exportar\" lib/servidor/exportar.ts",
+          "espera": "1+ líneas confirmando que no corre en la misma conexión que sirve peticiones normales"
+        }
+      ],
+      "aplicaSi": {
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/exportar.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "perf.volumen.el-ensayo-de-10x-caduca",
+      "titulo": "Repetir el ensayo de volumen cada trimestre, porque el 10x de hoy es el 1x de mañana",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un ensayo de volumen de hace un año midió un escenario que ya pasó: si el negocio creció como se esperaba, el '10x' de entonces puede ser el volumen real de hoy, y nadie ha vuelto a mirar qué se degrada a partir de ahí.",
+      "queHacer": [
+        "Revisar la fecha del último ensayo de 10x guardado en cada arquetipo de volumen ya aplicado.",
+        "Comparar el volumen real actual contra el volumen que en su momento se simuló como \"10x\".",
+        "Si el volumen real ya alcanzó o superó el escenario simulado, repetir el ensayo completo con un nuevo 10x sobre el volumen de hoy.",
+        "Dejar la fecha del ensayo más reciente visible junto a cada hallazgo de volumen, para que se note cuando pasen más de tres meses."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún ensayo de volumen tiene más de tres meses",
+          "comando": "grep -rn \"fecha_ensayo:\" docs/rendimiento/*.md",
+          "espera": "todas las fechas dentro de los últimos 3 meses"
+        },
+        {
+          "check": "El volumen real no superó al último volumen ensayado sin que se note",
+          "comando": null,
+          "espera": "volumen_real menor o igual a volumen_ensayado en cada entidad vigilada; si no, hallazgo abierto con fecha"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/*.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.percibido.optimista-antes-de-confirmar",
+      "titulo": "Mostrar el resultado antes de que el servidor confirme, y corregir si falla",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Esperar la respuesta del servidor para pintar algo tan simple como 'producto agregado' hace que cada toque se sienta con el retraso completo de la red, aunque la operación casi nunca falle; ese medio segundo repetido cien veces al día es el que se nota.",
+      "queHacer": [
+        "Elegir una acción frecuente y de bajo riesgo de fallo real (agregar producto a la venta, marcar una tarea).",
+        "Actualizar la interfaz de inmediato al toque, antes de que la respuesta del servidor llegue.",
+        "Confirmar en silencio cuando el servidor responde bien; si responde mal, revertir el cambio visual y avisar con claridad qué no se guardó.",
+        "Medir el tiempo entre el toque y el cambio visible, antes (esperando servidor) y después (optimista)."
+      ],
+      "aceptacion": [
+        {
+          "check": "El cambio visual aparece antes de que la respuesta del servidor llegue",
+          "comando": "npm test -- ui-optimista agregar-producto",
+          "espera": "test verde; el elemento aparece en el DOM en menos de 50 ms, antes de que se resuelva el fetch simulado (400 ms)"
+        },
+        {
+          "check": "Si el servidor rechaza, la interfaz revierte y avisa",
+          "comando": null,
+          "espera": "con el fetch simulando error, el elemento optimista se retira y aparece el aviso, medido en el mismo test"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/venta/**"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "perf.percibido.progreso-con-numero-no-espiral-ciega",
+      "titulo": "Mostrar progreso con número real en toda operación de más de unos segundos",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un espiral de carga sin número, pasados unos segundos, se lee igual a una pantalla congelada; la persona no sabe si faltan 2 segundos o 2 minutos, y sin esa información lo normal es que refresque la página y duplique la operación.",
+      "queHacer": [
+        "Ubicar las operaciones que típicamente pasan de 3-5 segundos (exportar, importar, generar un informe grande).",
+        "Reemplazar el espiral indefinido por progreso con número real (filas procesadas / total, o porcentaje) cuando la operación pueda reportarlo.",
+        "Si la operación no puede reportar progreso real, mostrar al menos un tiempo estimado o un mensaje que cambie cada pocos segundos, para probar que sigue viva.",
+        "Medir cada cuántos segundos se actualiza el indicador durante la operación real."
+      ],
+      "aceptacion": [
+        {
+          "check": "El progreso se actualiza con frecuencia, no se queda fijo",
+          "comando": "npm test -- progreso-exportacion",
+          "espera": "test verde; el indicador cambia de valor al menos cada 3 s durante una exportación simulada de 20 s"
+        },
+        {
+          "check": "El progreso muestra un número, no solo un spinner",
+          "comando": "grep -c \"%\\|de [0-9]* filas\" components/exportar/progreso.tsx",
+          "espera": "1+ líneas con formato numérico de progreso"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/exportar/progreso.tsx"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.percibido.lo-importante-llega-primero",
+      "titulo": "Priorizar que lo importante de la pantalla llegue antes que lo secundario",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el widget secundario de la esquina (una gráfica, una notificación) compite por la misma red y el mismo hilo que el precio y el botón de cobrar, la parte que de verdad importa puede terminar llegando después que un adorno, y la persona espera por lo que no necesitaba primero.",
+      "queHacer": [
+        "Identificar en la pantalla más visitada qué contenido es imprescindible para actuar (precio, botón de acción) y qué es secundario (gráficas, sugerencias, widgets).",
+        "Cargar y pintar primero lo imprescindible; diferir la petición y el render de lo secundario a después de que lo primero esté listo (o a que el usuario haga scroll hasta ahí).",
+        "Medir el Largest Contentful Paint del contenido imprescindible contra el momento en que la red queda completamente inactiva (load completo).",
+        "Confirmar que existe una brecha clara: lo importante se ve mucho antes de que todo haya terminado de cargar."
+      ],
+      "aceptacion": [
+        {
+          "check": "Lo imprescindible se pinta antes de que la red termine de cargar todo",
+          "comando": "node ORION/tools/edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"performance.getEntriesByType('largest-contentful-paint').at(-1)?.startTime\"",
+          "espera": "LCP del contenido principal al menos 500 ms antes del evento load completo"
+        },
+        {
+          "check": "Lo secundario está explícitamente diferido",
+          "comando": "grep -c \"defer\\|loading=\\\"lazy\\\"\\|dynamic(\" app/panel/**/*.tsx",
+          "espera": "1+ apariciones sobre los widgets secundarios identificados"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "vitrina",
+          "landing"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/panel/**"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.percibido.trabajo-pesado-fuera-del-hilo-principal",
+      "titulo": "Sacar del hilo principal el cálculo pesado que bloquea el toque",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Mientras el hilo principal está ocupado ordenando 5.000 filas o parseando un archivo grande, ningún toque en pantalla responde: el dedo golpea el botón de cobrar y no pasa nada hasta que el cálculo termina, y esa espera se siente como que el sistema se congeló.",
+      "queHacer": [
+        "Identificar el cálculo del lado del cliente más pesado (ordenar/filtrar una lista grande, parsear un archivo, generar un PDF en el navegador).",
+        "Medir cuánto tiempo bloquea el hilo principal (Total Blocking Time o medición directa) mientras corre.",
+        "Moverlo a un Web Worker o dividirlo en tandas pequeñas que cedan el hilo entre una y otra.",
+        "Medir el tiempo de respuesta al toque mientras el cálculo corre, antes y después del cambio."
+      ],
+      "aceptacion": [
+        {
+          "check": "El toque sigue respondiendo mientras corre el cálculo pesado",
+          "comando": null,
+          "espera": "tiempo de respuesta al toque durante el cálculo: antes >500 ms, después ≤100 ms"
+        },
+        {
+          "check": "El cálculo pesado corre fuera del hilo principal",
+          "comando": "grep -rn \"new Worker(\" lib/cliente/",
+          "espera": "1+ líneas para el cálculo identificado"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/cliente/**"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.percibido.precalentar-lo-siguiente-probable",
+      "titulo": "Precargar en segundo plano la pantalla siguiente más probable",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin precarga, cada navegación paga su propio viaje de red completo desde cero, aunque el destino más probable ya se podía adivinar (el detalle del producto que la persona está mirando en la lista); esa espera evitable se siente como lentitud del sistema, no de la red.",
+      "queHacer": [
+        "Identificar la navegación más predecible del flujo (de la lista de productos al detalle, del listado de ventas al recibo).",
+        "Precargar los datos (y el código, si el framework lo permite) del destino cuando la persona muestra intención (hover en escritorio, primer toque/scroll cercano en móvil) o cuando la pantalla actual queda inactiva.",
+        "No precargar más de 1-2 destinos probables a la vez, para no competir por ancho de banda con lo que sí se está viendo.",
+        "Medir el tiempo de navegación-a-contenido-visible antes y después de la precarga."
+      ],
+      "aceptacion": [
+        {
+          "check": "El tiempo de navegación al destino precargado bajó",
+          "comando": null,
+          "espera": "ms de navegación-a-contenido antes vs. después; reducción de 50%+ cuando el destino ya estaba precargado"
+        },
+        {
+          "check": "No se precargan más de 2 destinos a la vez",
+          "comando": "grep -c \"prefetch(\" components/lista-productos.tsx",
+          "espera": "invocaciones activas ≤2 simultáneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "vitrina",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/lista-productos.tsx"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.percibido.campo-no-solo-laboratorio",
+      "titulo": "Medir con datos de campo reales, no solo con la máquina de quien construyó",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Una medición de laboratorio en la laptop rápida del desarrollador, con buen wifi, puede decir 'todo perfecto' mientras el cliente real, en un teléfono de tres años y datos móviles, vive una experiencia completamente distinta que nadie está viendo.",
+      "queHacer": [
+        "Instrumentar la recolección de métricas reales de usuario (RUM): al menos Largest Contentful Paint e Interaction to Next Paint, enviadas desde el navegador real de cada visita.",
+        "Guardar el p75 de campo por separado del número de laboratorio, sin mezclarlos en el mismo reporte.",
+        "Comparar ambos: si el de campo es mucho peor que el de laboratorio, el problema típico es la red o los dispositivos reales, no el código medido en local.",
+        "Usar el número de campo, no el de laboratorio, para decidir si una optimización realmente hizo diferencia a los clientes reales."
+      ],
+      "aceptacion": [
+        {
+          "check": "Existen métricas de campo separadas de las de laboratorio",
+          "comando": "grep -rn \"p75_campo\\|RUM\" docs/rendimiento/*.md lib/cliente/metricas.ts",
+          "espera": "1+ referencias a una métrica de campo distinta de la de laboratorio"
+        },
+        {
+          "check": "El p75 de campo está por debajo del umbral aceptable",
+          "comando": null,
+          "espera": "LCP p75 de campo ≤4000 ms, INP p75 de campo ≤500 ms"
+        }
+      ],
+      "aplicaSi": {
+        "publico": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/cliente/metricas.ts",
+        "docs/rendimiento/campo-vs-laboratorio.md"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "perf.presupuesto.archivo-unico-con-numeros-reales",
+      "titulo": "Dejar un solo archivo con todos los presupuestos de rendimiento y su número actual",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando cada presupuesto vive en la cabeza de quien lo puso, nadie puede responder en un minuto si el proyecto está dentro de lo prometido; el presupuesto que no se puede consultar en un lugar es un presupuesto que nadie vigila.",
+      "queHacer": [
+        "Reunir en un solo archivo (docs/rendimiento/presupuestos.md) cada límite de rendimiento que el proyecto ya tiene o debería tener: ms por ruta, KB por pantalla, consultas por petición, MB de memoria.",
+        "Junto a cada límite, escribir el valor medido actualmente, con fecha.",
+        "Marcar con claridad cuáles están dentro del límite y cuáles ya lo pasaron, aunque hoy nada los detenga automáticamente.",
+        "No inventar un límite sin haber medido primero el valor actual: si no hay medición, el presupuesto queda como pendiente, no como un número al azar."
+      ],
+      "aceptacion": [
+        {
+          "check": "El archivo único de presupuestos existe con valor actual y límite por cada uno",
+          "comando": "grep -cE \"limite:|actual:\" docs/rendimiento/presupuestos.md",
+          "espera": "6+ líneas (3 presupuestos o más, cada uno con su límite y su actual)"
+        },
+        {
+          "check": "Ningún límite quedó sin su medición actual",
+          "comando": "grep -A1 \"limite:\" docs/rendimiento/presupuestos.md | grep -c \"actual: pendiente\"",
+          "espera": "0 líneas (0 presupuestos con límite puesto pero sin medir)"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/presupuestos.md"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "perf.presupuesto.romper-el-presupuesto-rompe-el-verificar",
+      "titulo": "Hacer que pasarse de cualquier presupuesto declarado rompa verificar",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Un presupuesto que solo se revisa cuando alguien se acuerda es, en la práctica, decorativo: el proyecto se pasa de los KB, los ms o el número de consultas durante meses hasta que una auditoría lo nota, y para entonces corregirlo cuesta mucho más que cuando se pasó por primera vez.",
+      "queHacer": [
+        "Tomar el archivo único de presupuestos y darle una forma que un script pueda leer (docs/rendimiento/presupuestos.json).",
+        "Escribir el chequeo de cada tipo de presupuesto (tiempo, KB, consultas, memoria) que ya se construyó en los arquetipos correspondientes de esta categoría.",
+        "Encadenar todos esos chequeos a npm run verificar, cortando con código de salida distinto de 0 en el primero que falle.",
+        "Probar el mecanismo pasando a propósito un presupuesto (bajar el límite de KB por debajo del actual) y confirmar que verificar para ahí.",
+        "Restaurar el presupuesto real después de la prueba."
+      ],
+      "aceptacion": [
+        {
+          "check": "verificar falla cuando un presupuesto se pasa",
+          "comando": "node -e \"const fs=require('fs');const p='docs/rendimiento/presupuestos.json';const d=JSON.parse(fs.readFileSync(p));d[0].limite=1;fs.writeFileSync(p,JSON.stringify(d));\" && npm run verificar; echo EXIT=$?",
+          "espera": "EXIT distinto de 0"
+        },
+        {
+          "check": "verificar pasa en limpio con los presupuestos reales",
+          "comando": "git checkout -- docs/rendimiento/presupuestos.json && npm run verificar",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "scripts/perf/chequear-presupuestos.mjs",
+        "docs/rendimiento/presupuestos.json"
+      ],
+      "cerebro": [
+        "tema:que-es-estar-verificado"
+      ]
+    },
+    {
+      "id": "perf.presupuesto.se-endurece-no-se-relaja",
+      "titulo": "Endurecer el presupuesto cuando sobra margen, en vez de dejarlo flojo para siempre",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un presupuesto puesto una vez y nunca vuelto a mirar se convierte en un sello de goma: si el límite es 500 ms y el proyecto lleva un año en 180 ms, ese presupuesto ya no protege nada — dejaría pasar una degradación de 300 ms sin que nadie se entere.",
+      "queHacer": [
+        "Revisar cada presupuesto del archivo único contra su valor medido real de los últimos meses.",
+        "Si el valor real se mantiene con margen amplio (por debajo del 50% del límite durante 3 mediciones seguidas), bajar el límite hacia el valor real más un margen razonable, no dejarlo donde estaba.",
+        "Nunca subir un límite para que un código más lento \"pase\": si el límite se incumple, se corrige el código o se abre un hallazgo explícito con dueño.",
+        "Dejar registrado cada cambio de límite con la fecha y el motivo (endurecido por margen / hallazgo aceptado con dueño)."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún presupuesto con margen amplio sostenido sigue con el límite original",
+          "comando": "node scripts/perf/revisar-margenes.mjs",
+          "espera": "0 presupuestos con actual ≤50% del límite durante 3+ mediciones sin haberse endurecido"
+        },
+        {
+          "check": "Todo cambio de límite queda registrado con motivo",
+          "comando": "grep -c \"motivo:\" docs/rendimiento/historial-presupuestos.md",
+          "espera": "1 línea de motivo por cada cambio de límite registrado"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/historial-presupuestos.md",
+        "scripts/perf/revisar-margenes.mjs"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.presupuesto.basado-en-percentil-de-uso-real",
+      "titulo": "Basar cada límite en el percentil de uso real, no en un número elegido por sentir",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un límite puesto 'porque suena bien' (500 ms, 1 MB) no tiene relación con lo que de verdad pasa en producción; puede ser demasiado laxo para lo que el negocio necesita, o imposible de cumplir para el volumen real, y en ambos casos el número no sirve para decidir nada.",
+      "queHacer": [
+        "Para cada presupuesto del archivo único, sacar la distribución real de los últimos periodos (p50, p75, p95) desde las mediciones o desde monitoreo real, no desde una sola muestra.",
+        "Fijar el límite sobre esa distribución real (el límite es el p95 real más un margen del 20%, no un número redondo inventado).",
+        "Volver a derivar el límite cada vez que el tráfico o el volumen cambien de forma significativa (nueva sede, campaña, temporada alta).",
+        "Dejar escrito de dónde salió cada límite (qué percentil, de qué periodo de datos), para que se pueda auditar después."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada límite cita el percentil y el periodo de datos de donde salió",
+          "comando": "grep -c \"derivado_de: p9[0-9]\" docs/rendimiento/presupuestos.md",
+          "espera": "1+ líneas por cada presupuesto con su origen citado"
+        },
+        {
+          "check": "Ningún límite es un número redondo sin origen medido",
+          "comando": "grep -B2 \"limite:\" docs/rendimiento/presupuestos.md | grep -c \"derivado_de:\"",
+          "espera": "igual al número de límites declarados"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/presupuestos.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.presupuesto.aviso-antes-del-limite-duro",
+      "titulo": "Avisar al 80% del presupuesto, no solo romper verificar en el 100%",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el único momento en que el equipo se entera de un presupuesto es cuando ya lo rompió y verificar está en rojo, cada corrección llega apurada y sin margen; un aviso temprano convierte una alarma de última hora en una nota que se revisa con calma en la siguiente tarea.",
+      "queHacer": [
+        "A cada presupuesto del archivo único, además del límite duro, ponerle un umbral de aviso (80% del límite).",
+        "Hacer que cruzar el umbral de aviso deje una nota visible (en el reporte de verificar, o en el archivo de presupuestos) sin cortar la ejecución.",
+        "Hacer que cruzar el límite duro sí corte, como ya hace el chequeo de presupuestos en verificar.",
+        "Confirmar que los dos umbrales quedan visibles uno junto al otro para cada presupuesto, no solo el duro."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada presupuesto tiene umbral de aviso además del límite duro",
+          "comando": "grep -cE \"limite:|aviso_80:\" docs/rendimiento/presupuestos.json",
+          "espera": "el doble de líneas que presupuestos declarados (una de límite, una de aviso, por cada uno)"
+        },
+        {
+          "check": "Cruzar el aviso no corta verificar, cruzar el límite sí",
+          "comando": "node scripts/perf/chequear-presupuestos.mjs --simular-aviso; echo EXIT=$?",
+          "espera": "EXIT=0 con nota de aviso impresa, sin cortar"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/presupuestos.json",
+        "scripts/perf/chequear-presupuestos.mjs"
+      ],
+      "cerebro": []
+    }
+  ]
+}

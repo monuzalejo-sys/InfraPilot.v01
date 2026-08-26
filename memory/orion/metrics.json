@@ -19,8 +19,8 @@
       "objectsPromoted": 0,
       "objectsDemoted": 0,
       "outcome": "DONE",
-      "fixCycles": 0,
-      "notes": "ORION v4. Se anade RFC-0008 (planes de ejecucion como registro consultable) con tools/plan.mjs como implementacion de referencia; el catalogo de arquetipos por categoria y nivel de madurez; cuatro agentes nuevos (orion-traductor, orion-bibliotecario, orion-arquitecto, orion-estratega) y dos skills (orion-plan, orion-baul); el comando `ruta` del cerebro, que devuelve coordenadas en vez de texto y ademas barre las notas escritas a mano en la boveda; tools/costos.mjs, que suma por primera vez los 39,37 M de tokens medidos que vivian repartidos en once metrics.json; tools/baul.mjs, la pasarela que sube planes, historial y encargos a Obsidian; y tools/runtime.mjs, que arregla la deriva a tres bandas del runtime (KN-001). Todo el runtime queda bajo el prefijo orion-. La prueba de regresion del cerebro se mantuvo en 46/46 antes y despues.",
+      "fixCycles": 1,
+      "notes": "ORION v4. Se anade RFC-0008 (planes de ejecucion como registro consultable) con tools/plan.mjs como implementacion de referencia; el catalogo de arquetipos por categoria y nivel de madurez; cuatro agentes nuevos (orion-traductor, orion-bibliotecario, orion-arquitecto, orion-estratega) y dos skills (orion-plan, orion-baul); el comando `ruta` del cerebro, que devuelve coordenadas en vez de texto y ademas barre las notas escritas a mano en la boveda; tools/costos.mjs, que suma por primera vez los 39,37 M de tokens medidos que vivian repartidos en once metrics.json; tools/baul.mjs, la pasarela que sube planes, historial y encargos a Obsidian; y tools/runtime.mjs, que arregla la deriva a tres bandas del runtime (KN-001). Todo el runtime queda bajo el prefijo orion-. La prueba de regresion del cerebro se mantuvo en 46/46 antes y despues. VERIFICACION: 12 condiciones comprobadas por orion-verifier — 11 PASS, 1 FAIL (deriva del runtime, arreglada con `runtime.mjs sincronizar`) y 1 observacion fuera de alcance (la boveda aun no tenia planes, arreglada con `baul.mjs empujar`). Primer plan de ejecucion real: villa-broaster, 176 tareas, VALIDO.",
       "measurement_mode": "MEASURED",
       "modelOutcomes": [
         {
@@ -58,6 +58,20 @@
           "tokens": 0,
           "infraDeath": true,
           "notes": "catalogo/datos.json - murio por tope de salida de 64k, disco vacio, relanzado con instruccion de escribir por tandas. NO es fallo de capacidad (KN-009)."
+        },
+        {
+          "phase": "analysis",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 164753,
+          "notes": "orion-arquitecto sobre villa-broaster: perfil observado + 18 tareas propias. Corrigio el brief que se le dio (la memoria del proyecto llevaba 3 dias desactualizada) y encontro dos defectos reales."
+        },
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "fail",
+          "tokens": 41923,
+          "notes": "QA de ORION v4, 12 condiciones: 11 PASS y 1 FAIL real (deriva de orion-arquitecto tras editarlo despues del ultimo sync). Arreglado con un comando. El verificador hizo bien su trabajo."
         }
       ]
     }

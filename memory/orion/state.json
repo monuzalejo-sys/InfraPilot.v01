@@ -1,7 +1,7 @@
 {
   "projectId": "orion",
-  "snapshotDate": "2026-08-26T07:15:00.000Z",
-  "version": 3,
+  "snapshotDate": "2026-08-26T08:00:00.000Z",
+  "version": 4,
   "lastAmmRun": "2026-08-26T06:30:00.000Z",
   "objects": [
     {
@@ -307,6 +307,40 @@
       "fact": "SEGUNDA FORMA DE MORIR DE UN BUILDER, distinta del limite de sesion: el TOPE DE SALIDA. Medido 2026-08-26 construyendo el catalogo: cinco builders escribian un JSON grande cada uno; cuatro entregaron (122, 142, 147 y 85 KB) y uno murio con 'Claude's response exceeded the 64000 output token maximum' dejando el disco VACIO. La diferencia no fue el modelo ni el tamano final -el que murio iba a ser el mas pequeno- sino que los que sobrevivieron escribieron POR TANDAS (20 y 31 llamadas de herramienta) y el que murio intento un solo volcado. Se reconoce al instante porque no deja NADA: no es un archivo a medias, es un archivo que no existe.",
       "context": "Remedio: en todo encargo que produzca un archivo generado grande, pedir explicitamente escritura por tandas con comprobacion entre una y otra (para JSON, que siga parseando). Como cualquier muerte de infraestructura, NO es fallo de capacidad y no debe subir el tier del modelo. El relanzamiento fue seguro precisamente porque el disco estaba vacio: se audito antes, segun la doctrina.",
       "source": "sesion 2026-08-26, builder de catalogo/datos.json"
+    },
+    {
+      "id": "KN-010",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-08-26T08:00:00.000Z",
+      "updated": "2026-08-26T08:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "DEC-002"
+      ],
+      "fact": "PRIMER PLAN DE EJECUCION REAL (villa-broaster, 2026-08-26): 176 tareas — 18 de auditar el repo mas 158 del catalogo para N0 y N1, los niveles hoy abiertos. VALIDO. Lo mas valioso no fueron las tareas del catalogo sino que el arquitecto CORRIGIO el brief que se le dio: la memoria del proyecto llevaba tres dias desactualizada (daba PEND-006 y PEND-007 por abiertos cuando estaban hechos, 68 tests cuando eran 176, 5 pestanas cuando eran 7). Y encontro dos defectos que nadie habia visto: cuadrarTurnos/resumirConTurnos/resumenPorLocalConTurnos con tests verdes y CERO consumidores -el dueno no puede ver su propio cuadre-, y la ruta publica de una orden devolviendo telefono y direccion del cliente protegida solo por un uuid, con ese enlace reenviandose por WhatsApp.",
+      "context": "La leccion de proceso: un agente que OBSERVA el repo vale mas que el brief que se le da, y por eso su contrato le exige citar rutas reales en vez de fiarse de lo que le cuenten. El corolario incomodo: la memoria de un proyecto activo caduca en dias, no en meses.",
+      "source": "sesion 2026-08-26, orion-arquitecto sobre villa-broaster"
+    },
+    {
+      "id": "KN-011",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-08-26T08:00:00.000Z",
+      "updated": "2026-08-26T08:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "DEC-002"
+      ],
+      "fact": "Un plan completo NO es un documento legible: 176 tareas son 823 lineas de PLAN.md, y 432 tareas son 1.820. Por eso `plan.mjs tanda` escribe otra cosa: el resumen del proyecto arriba y solo las N tareas siguientes detalladas abajo, cada una con su porque, sus pasos, sus archivos, sus comprobaciones y como lanzarla. Ese es el formato que se lee de verdad; PLAN.md es el archivo.",
+      "context": "Peticion literal del dueno 2026-08-26: 'un plan de que vamos a hacer resumidamente y el numero de tareas abajo detalladamente'. El registro sirve a la maquina, la tanda a la persona, y ambos salen del mismo plan.json.",
+      "source": "sesion 2026-08-26, tools/plan.mjs comando tanda"
     }
   ],
   "archives": []

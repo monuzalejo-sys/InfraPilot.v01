@@ -755,6 +755,601 @@
       "porCada": null,
       "posee": ["docs/capacitacion/ensenar-al-siguiente.md"],
       "cerebro": ["tema:acceso-roles-y-puestos", "tema:documentos-para-personas"]
+    },
+    {
+      "id": "prod.manual.una-hoja-por-puesto",
+      "titulo": "Dejar una sola hoja imprimible para {{rol}}, con su nombre y su turno",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un manual genérico de treinta páginas no lo lee nadie de pie a las siete de la noche; una hoja con lo suyo se pega al lado del equipo y se consulta. El documento se escribe para UNA persona con nombre, no para «el usuario».",
+      "queHacer": [
+        "Encabezar la hoja con la persona y su turno reales, no con el rol abstracto.",
+        "Cara uno: el día normal de {{rol}} en el orden en que ocurre, con los botones nombrados como se ven en pantalla.",
+        "Cara dos: los cinco líos que sí van a pasar en ese puesto y qué se toca en cada uno.",
+        "Cerrar con la única regla de oro de ese puesto y a quién se llama cuando nada de lo anterior sirvió.",
+        "Revisar a mano antes de entregar: género correcto, nombre correcto y ningún resto de plantilla sin reemplazar."
+      ],
+      "aceptacion": [
+        { "check": "Cabe en una hoja", "comando": "wc -l docs/manual/{{rol}}.md", "espera": "≤120 líneas" },
+        { "check": "Va dirigida a una persona con turno", "comando": "grep -nE '^Para: .+ · turno .+' docs/manual/{{rol}}.md", "espera": "1 línea" },
+        { "check": "No usa jerga que no salga en pantalla ni restos de plantilla", "comando": "grep -niE 'endpoint|deploy|commit|payload|backend|token|\\{\\$?[a-z]+\\}' docs/manual/{{rol}}.md", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "roles": ["*"], "equipo": "orion+humanos" },
+      "porCada": "rol",
+      "posee": ["docs/manual/{{rol}}.md"],
+      "cerebro": ["tema:documentos-para-personas", "tema:acceso-roles-y-puestos"]
+    },
+    {
+      "id": "prod.manual.avisos-de-pantalla-en-tabla",
+      "titulo": "Poner en tabla cada aviso que la pantalla puede mostrar",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando sale un aviso que la persona no entiende, para el mostrador y llama; y lo que necesita saber son dos cosas: si puede seguir trabajando y si el problema es suyo o de otro. Sin esa tabla, cada aviso es una llamada.",
+      "queHacer": [
+        "Recorrer el código y sacar los avisos tal como se ven, citados textualmente, no parafraseados.",
+        "Armar la tabla con cuatro columnas: aviso, qué pasó, puede seguir trabajando sí/no, qué hacer y de quién es.",
+        "Escribir qué hacer con verbos de la persona, y cuando el arreglo es del dueño, decirlo así de claro.",
+        "Comparar la tabla contra los avisos del código: ninguno puede quedar fuera, y ninguno de la tabla puede haber desaparecido del código.",
+        "Marcar cuáles se verificaron abriendo la pantalla y cuáles solo se leyeron en el código."
+      ],
+      "aceptacion": [
+        { "check": "Todos los avisos del código están en la tabla", "comando": "grep -rhoE '(toast|alert|mensaje)\\([\"'\\''][^\"'\\'']+' app/ components/ lib/ | sed -E 's/.*[\"'\\'']//' | sort -u | while read m; do grep -qF \"$m\" docs/manual/avisos.md || echo \"FALTA: $m\"; done", "espera": "0 líneas" },
+        { "check": "Cada fila dice si puede seguir trabajando", "comando": "grep -nE '^\\|[^|]+\\|[^|]+\\| *(s(í|i)|no) *\\|' docs/manual/avisos.md | wc -l; grep -c '^| ' docs/manual/avisos.md", "espera": "las dos cifras coinciden menos la cabecera" },
+        { "check": "Cada fila declara cómo se verificó", "comando": "grep -cE 'en vivo|contra c(ó|o)digo' docs/manual/avisos.md", "espera": "tantas como filas" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/manual/avisos.md"],
+      "cerebro": ["tema:documentos-para-personas", "tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "prod.manual.pie-de-verificacion-por-seccion",
+      "titulo": "Cerrar cada sección del manual diciendo cómo se verificó",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un manual escrito leyendo el código describe lo que el programa debería hacer, no lo que la pantalla hace; y la persona que sigue una instrucción falsa pierde la confianza en todo el documento. Escribir el pie obliga a abrir la pantalla, y ahí es donde aparecen los bugs.",
+      "queHacer": [
+        "Recorrer sección por sección haciendo el flujo en la aplicación real, con datos de prueba.",
+        "Fijar la forma exacta del pie —verificado en vivo el <fecha>, o verificado contra código el <fecha>, prueba en vivo pendiente— y que lo escriba quien escribe cada sección, no este documento.",
+        "Anotar aparte lo que se descubrió al verificar: casi siempre sale una diferencia entre lo escrito y lo que hace la pantalla.",
+        "Las diferencias que son fallas del producto se abren como tarea, no se maquillan en el texto.",
+        "Llevar la cuenta de cuántas secciones están en vivo y cuántas contra código, en el índice."
+      ],
+      "aceptacion": [
+        { "check": "Ninguna sección queda sin pie", "comando": "for f in docs/manual/*.md; do tail -3 \"$f\" | grep -qE 'Verificado (en vivo|contra c(ó|o)digo) 20[0-9]{2}-[0-9]{2}-[0-9]{2}' || echo \"SIN PIE: $f\"; done", "espera": "0 líneas" },
+        { "check": "El índice lleva la cuenta", "comando": "grep -nE '[0-9]+ en vivo.*[0-9]+ contra c(ó|o)digo' docs/manual/verificacion.md", "espera": "1 línea con las dos cifras" },
+        { "check": "Lo descubierto al verificar quedó como tarea", "comando": "grep -c 'HALLAZGO' docs/manual/verificacion.md", "espera": "1+ líneas, cada una con la tarea abierta; 0 solo si todas las secciones son en vivo" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/manual/verificacion.md"],
+      "cerebro": ["tema:documentos-para-personas", "tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "prod.manual.lo-que-se-relee-se-arregla-en-pantalla",
+      "titulo": "Convertir en cambio de pantalla lo que la gente tiene que releer",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si la persona necesita el manual para no equivocarse en un paso, el arreglo no va en el manual: va en la interfaz. Cada sección que se relee cada semana es una pantalla mal hecha que está cobrando su peaje todos los días.",
+      "queHacer": [
+        "Preguntar cuáles secciones se releen y anotarlo con nombre y frecuencia; lo que se consulta seguido es la lista de trabajo.",
+        "Por cada una, decidir qué cambio en pantalla la haría innecesaria: un aviso, un valor por defecto, un botón menos, una palabra distinta.",
+        "Hacer el cambio y borrar o acortar la sección del manual: el manual encogiendo es la señal de que la pantalla mejoró.",
+        "Anotar en la tabla la fecha del cambio y las líneas que se quitaron del manual.",
+        "Repetir cada trimestre; si el manual creció, es que se está resolviendo en papel lo que toca resolver en pantalla."
+      ],
+      "aceptacion": [
+        { "check": "Las secciones más releídas tienen su cambio", "comando": "grep -nE '^\\|[^|]+\\|[^|]*\\| *(pendiente|\\?|) *\\|' docs/manual/deuda-de-pantalla.md", "espera": "0 líneas" },
+        { "check": "El manual encogió", "comando": "cat docs/manual/*.md | wc -l", "espera": "menos líneas que en la revisión anterior; ambas cifras anotadas en docs/manual/deuda-de-pantalla.md" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/manual/deuda-de-pantalla.md"],
+      "cerebro": ["tema:documentos-para-personas", "tema:pantalla-publica"]
+    },
+    {
+      "id": "prod.soporte.un-canal-donde-la-persona-ya-esta",
+      "titulo": "Abrir un canal de soporte donde la persona ya escribe",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el canal de soporte es un correo o un formulario, la persona del mostrador no lo usa: llama al celular del que construyó el sistema, y ese teléfono se vuelve la única infraestructura de soporte que existe. Hoy no hay una sola línea escrita de soporte en diez proyectos.",
+      "queHacer": [
+        "Elegir el canal que el negocio ya usa todos los días y dejarlo escrito con el número o cuenta exacta.",
+        "Escribir quién responde, en qué horario, y qué pasa fuera de ese horario.",
+        "Decir qué hay que mandar para que la respuesta sea rápida: qué pantalla, qué decía el aviso, a qué hora pasó, foto de la pantalla.",
+        "Poner el canal donde la persona lo va a ver cuando lo necesite: en la hoja del puesto y dentro del sistema, no solo en un documento.",
+        "Probarlo escribiendo desde el teléfono del negocio y pegar la hora del mensaje y la de la respuesta."
+      ],
+      "aceptacion": [
+        { "check": "El canal está escrito con responsable y horario", "comando": "grep -cE 'canal|responde|horario' docs/soporte/canal.md", "espera": "3+ líneas, con nombre y franja horaria" },
+        { "check": "El canal aparece dentro del sistema", "comando": "grep -rn 'soporte' app/ components/ | grep -iE 'wa\\.me|tel:|whatsapp'", "espera": "1+ líneas" },
+        { "check": "La prueba de contacto tiene las dos horas", "comando": "grep -nE 'escrito [0-9]{2}:[0-9]{2}.*respondido [0-9]{2}:[0-9]{2}' docs/soporte/canal.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/soporte/canal.md"],
+      "cerebro": ["tema:documentos-para-personas", "tema:acceso-roles-y-puestos"]
+    },
+    {
+      "id": "prod.soporte.tiempos-por-gravedad-escritos",
+      "titulo": "Escribir en cuánto se responde según lo que esté roto",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "«Cuando pueda» significa cosas distintas para el que espera con la caja parada y para el que contesta el lunes. Sin tiempos escritos, la caja caída y el color de un botón compiten por la misma atención, y el cliente aprende que escribir no sirve de nada.",
+      "queHacer": [
+        "Definir tres gravedades con ejemplos del negocio: no se puede vender, se puede vender con trabajo extra, molesta pero no para.",
+        "Ponerle a cada una un tiempo de primera respuesta y un tiempo de solución o de plan, en horas de negocio.",
+        "Escribir qué hace la persona mientras tanto en la gravedad más alta: el camino manual para seguir vendiendo.",
+        "Prometer solo lo que se puede cumplir estando solos: un tiempo incumplido erosiona más que un tiempo largo.",
+        "Medir cada mes lo cumplido contra lo prometido y anotarlo, con la cuenta de incumplidos."
+      ],
+      "aceptacion": [
+        { "check": "Las tres gravedades tienen tiempo con número", "comando": "grep -cE '^\\| *(1|2|3|alta|media|baja)[^|]*\\|[^|]*[0-9]+ *(h|horas|d(í|i)as)' docs/soporte/tiempos.md", "espera": "3+ líneas" },
+        { "check": "La gravedad alta tiene camino manual escrito", "comando": "grep -niE 'mientras tanto|camino manual|a mano' docs/soporte/tiempos.md", "espera": "1+ líneas" },
+        { "check": "El cumplimiento del mes está medido", "comando": "grep -nE '20[0-9]{2}-[0-9]{2}.*cumplidos [0-9]+ de [0-9]+' docs/soporte/tiempos.md", "espera": "1+ líneas del mes anterior" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/soporte/tiempos.md"],
+      "cerebro": ["tema:caja-y-turnos", "tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.soporte.bitacora-de-cada-llamada",
+      "titulo": "Anotar cada llamada de soporte con lo que se hizo para arreglarla",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin bitácora, el mismo problema se resuelve tres veces desde cero y nadie sabe cuánto soporte consume este cliente al mes — que es justo el número que dice si el precio está bien. En diez proyectos de la casa no existe ni una bitácora.",
+      "queHacer": [
+        "Una fila por contacto: fecha y hora, quién escribió, qué estaba haciendo, qué se hizo, cuánto tiempo tomó.",
+        "Clasificar la causa en pocas categorías estables: falla del sistema, falta de capacitación, dato mal cargado, petición nueva.",
+        "Anotar si el arreglo quedó permanente o fue un parche; los parches se cuentan aparte.",
+        "Sumar al cierre de mes el total de contactos y las horas, y llevar ese número al costo del cliente.",
+        "Revisar la clasificación cada mes: la categoría que más crece dice qué hay que arreglar."
+      ],
+      "aceptacion": [
+        { "check": "Cada fila tiene causa y tiempo", "comando": "grep -nE '^\\|[^|]+\\|[^|]*\\| *(\\?|) *\\|' docs/soporte/bitacora.md", "espera": "0 líneas" },
+        { "check": "El total del mes está sumado", "comando": "grep -nE '20[0-9]{2}-[0-9]{2}: [0-9]+ contactos, [0-9.]+ h' docs/soporte/bitacora.md", "espera": "1+ líneas" },
+        { "check": "Las horas del mes llegaron al costo del cliente", "comando": "grep -niE 'soporte' docs/negocio/costo-mensual.md", "espera": "1+ líneas con las horas del mes anterior" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/soporte/bitacora.md"],
+      "cerebro": ["tema:memoria-y-cierre", "tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.soporte.lo-que-mas-se-pregunta-se-arregla",
+      "titulo": "Arreglar cada mes lo que más se preguntó el mes pasado",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Responder siempre lo mismo con paciencia es pagar cada mes el mismo impuesto: el problema no se resuelve, solo se atiende. La pregunta repetida es un defecto de producto que ya está medido y solo hay que leer.",
+      "queHacer": [
+        "Ordenar la bitácora del mes por causa repetida y tomar las tres primeras.",
+        "Por cada una decidir el arreglo definitivo: cambio en pantalla, valor por defecto, permiso, o frase en la hoja del puesto.",
+        "Hacerlo dentro del mes y anotar la fecha; si no se hace, se anota por qué, no se pasa en silencio al siguiente mes.",
+        "Comprobar el mes siguiente que esa causa bajó, con el número de contactos antes y después.",
+        "Si una causa vuelve a subir tras el arreglo, el arreglo era un parche: se reabre."
+      ],
+      "aceptacion": [
+        { "check": "Las tres causas del mes tienen arreglo con fecha", "comando": "grep -cE '^\\|[^|]+\\|[^|]*\\| *20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/soporte/repetidas.md", "espera": "3+ líneas del mes en curso" },
+        { "check": "La causa bajó de verdad", "comando": "grep -nE 'antes [0-9]+ .*despu(é|e)s [0-9]+' docs/soporte/repetidas.md", "espera": "1+ líneas por causa arreglada, con la segunda cifra menor" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/soporte/repetidas.md"],
+      "cerebro": ["tema:memoria-y-cierre", "tema:documentos-para-personas"]
+    },
+    {
+      "id": "prod.soporte.que-pasa-si-el-que-lo-construyo-no-esta",
+      "titulo": "Dejar por escrito cómo se atiende si el que lo construyó no está",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Hoy el respaldo de soporte de los proyectos de la casa es una sola persona y una sola máquina: si esa persona no puede contestar una semana, el negocio del cliente queda sin nadie y sin llaves. No hay conocimiento escrito de respaldo en ninguno de los diez proyectos.",
+      "queHacer": [
+        "Listar lo que hace falta para atender: dónde vive el código, dónde el hosting, dónde las llaves, dónde los respaldos y quién tiene acceso hoy.",
+        "Nombrar a la segunda persona o el mecanismo de acceso de emergencia, y decir cómo obtiene las llaves sin que estén copiadas en un chat.",
+        "Escribir el instructivo de los tres arreglos más probables en pasos que ejecute alguien que no construyó el sistema.",
+        "Ensayarlo: que esa segunda persona resuelva un caso real o simulado sin nuestra ayuda, y cronometrarlo.",
+        "Decirle al cliente a quién escribe si no contestamos; una promesa de respaldo que el cliente no conoce no existe."
+      ],
+      "aceptacion": [
+        { "check": "El inventario de accesos está completo", "comando": "grep -c '^| ' docs/soporte/relevo.md", "espera": "1 fila por acceso (código, hosting, base, dominio, llaves, respaldos), todas con quién y cómo" },
+        { "check": "El ensayo ocurrió y está cronometrado", "comando": "grep -nE 'Ensayado por .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}.*[0-9]+ *min' docs/soporte/relevo.md", "espera": "1+ líneas" },
+        { "check": "Ninguna llave quedó pegada en el documento", "comando": "grep -rnE 'sk-|eyJ|password *=|SUPABASE_[A-Z_]*KEY *=' docs/soporte/relevo.md", "espera": "0 líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/soporte/relevo.md"],
+      "cerebro": ["tema:entorno-de-la-maquina", "tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "prod.legal.factura-o-comprobante-decidido",
+      "titulo": "Averiguar y decidir si este negocio emite factura electrónica",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "La respuesta cambia el modelo de datos, el camino de anulación y hasta el precio del proyecto, y en la casa hay cero lecciones escritas sobre esto mientras cuatro productos ya tocan plata. Decidirlo después de construir el módulo de ventas es rehacerlo entero.",
+      "queHacer": [
+        "Averiguar la situación real de ESTE negocio ante la DIAN —si ya factura electrónicamente, con qué proveedor, o si emite otro documento— preguntándoselo al dueño o a su contador, no suponiéndolo.",
+        "Escribir la respuesta con su fuente citada: quién la dio, cuándo, y el enlace o documento en que se apoya. Nada de citar artículos de memoria.",
+        "Escribir las dos consecuencias en el sistema según la respuesta: qué documento emite el sistema, y si necesita numeración autorizada y consecutivo controlado.",
+        "Marcar en el documento la opción DECIDIDA con la fecha y quién decidió; la otra queda escrita como descartada, para que nadie la reabra por olvido.",
+        "Si el dueño no puede responder todavía, queda como HUECO que bloquea el módulo de ventas: no se elige por él."
+      ],
+      "aceptacion": [
+        { "check": "La decisión está marcada con fecha y quién decidió", "comando": "grep -nE 'DECIDIDA por .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/legal/factura-electronica.md", "espera": "1 línea; si no la hay, existe la línea HUECO y la tarea de ventas está bloqueada" },
+        { "check": "La respuesta tiene fuente, no memoria", "comando": "grep -ciE 'fuente:|seg(ú|u)n .+ el 20[0-9]{2}' docs/legal/factura-electronica.md", "espera": "1+ líneas" },
+        { "check": "Las dos opciones están escritas, una descartada", "comando": "grep -cE 'DECIDIDA|DESCARTADA' docs/legal/factura-electronica.md", "espera": "2 líneas" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/legal/factura-electronica.md"],
+      "cerebro": ["tema:invariantes-contables", "tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.legal.anulacion-decidida-y-una-sola-en-el-codigo",
+      "titulo": "Forzar la decisión de cómo se anula, y que el código tenga un solo camino",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "En la casa conviven hoy dos posturas opuestas sin resolver: un proyecto conserva un borrado destructivo que reutiliza consecutivo y otro le quitó al servidor el permiso de borrar para que un gasto no se pueda borrar jamás. Mientras la decisión no esté escrita, cada proyecto la toma solo y el que se equivoca lo descubre en una revisión fiscal.",
+      "queHacer": [
+        "Escribir las dos opciones con su consecuencia real, sin elegir por el dueño: anular dejando el documento con su número y una nota de anulación, o borrar reutilizando el consecutivo.",
+        "Nombrar en el mismo documento qué se pierde con cada una: rastro para el contador, posibilidad de cuadrar el mes, y qué pasa si el número ya se reportó.",
+        "Llevárselo al dueño y anotar cuál eligió, con fecha; si el negocio emite factura electrónica, la decisión anterior ya condiciona ésta y se dice explícitamente.",
+        "Dejar en el código un solo camino: el elegido. El otro se borra, no se comenta ni se deja detrás de una bandera.",
+        "Escribir en la hoja del puesto qué ve y qué hace la persona cuando tiene que anular."
+      ],
+      "aceptacion": [
+        { "check": "La decisión está tomada por el dueño con fecha", "comando": "grep -nE 'DECIDIDA por .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/legal/anulacion.md", "espera": "1 línea, y la opción descartada escrita al lado" },
+        { "check": "En el código no sobrevive el camino descartado", "comando": "grep -rniE 'delete from (ventas|facturas)|hard ?delete|reutiliz(ar|a) consecutivo' app/ lib/ scripts/", "espera": "0 líneas si se eligió anular; se pega la salida si se eligió lo contrario" },
+        { "check": "El invariante del consecutivo está protegido por un test", "comando": "npm test -- consecutivo", "espera": "test verde: no se repite ni se salta un número tras anular" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/legal/anulacion.md"],
+      "cerebro": ["tema:invariantes-contables", "tema:caja-y-turnos"]
+    },
+    {
+      "id": "prod.legal.autorizacion-en-el-punto-de-captura",
+      "titulo": "Pedir autorización donde se captura el dato de la persona",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Se están guardando teléfonos de clientes reales sin una sola línea escrita sobre la ley colombiana de datos personales (Ley 1581), y el responsable ante la autoridad es el dueño del negocio, no nosotros. La autorización se pide cuando se toma el dato: después ya no se puede.",
+      "queHacer": [
+        "Listar cada punto donde el sistema toma un dato de una persona: formulario público, pedido, factura, registro de cliente, mensajería.",
+        "Escribir en cada punto, en una frase que quepa en pantalla, para qué se va a usar el dato y quién lo guarda, con enlace a la política.",
+        "Guardar la constancia de la autorización junto al dato: cuándo se dio y en qué versión del texto; sin constancia, no hay autorización.",
+        "Averiguar y dejar citado —con su fuente— qué exige la ley para este caso concreto, en vez de repetir artículos de memoria.",
+        "No capturar lo que no se usa: el dato que no hace falta es el más barato de proteger."
+      ],
+      "aceptacion": [
+        { "check": "Cada punto de captura tiene su aviso", "comando": "grep -rlE '<form|onSubmit|input .*(tel|celular|correo|c(é|e)dula)' app/ components/ | while read f; do grep -qiE 'autoriz|pol(í|i)tica de datos' \"$f\" || echo \"SIN AVISO: $f\"; done", "espera": "0 líneas" },
+        { "check": "La constancia se guarda con fecha y versión", "comando": "npm test -- autorizacion-datos", "espera": "test verde: cada registro nuevo trae fecha y versión del texto aceptado" },
+        { "check": "La respuesta legal está citada, no supuesta", "comando": "grep -ciE 'fuente:' docs/legal/autorizacion.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "datosPersonales": true },
+      "porCada": null,
+      "posee": ["docs/legal/autorizacion.md"],
+      "cerebro": ["tema:donde-vive-el-dato", "tema:cero-datos-inventados"]
+    },
+    {
+      "id": "prod.legal.politica-publicada-y-alcanzable",
+      "titulo": "Publicar la política de datos y que se pueda llegar a ella",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una política guardada en un documento interno no protege a nadie: la persona que entrega su teléfono tiene que poder leer qué se hace con él, y el negocio tiene que poder demostrar que estaba publicada. Hoy no existe ni el documento.",
+      "queHacer": [
+        "Escribirla en español llano y corto, diciendo quién es el responsable con su nombre real y su contacto, qué datos se guardan, para qué, por cuánto tiempo y con quién se comparten.",
+        "Incluir cómo pide una persona ver, corregir o borrar lo suyo, y por qué canal se atiende esa solicitud.",
+        "Publicarla en una dirección estable y enlazarla desde cada punto donde se captura un dato.",
+        "Ponerle fecha de versión: cuando cambie, la anterior se conserva para poder saber qué aceptó cada quien.",
+        "Contrastar la lista de datos de la política contra lo que el sistema realmente guarda; si guarda algo que no está listado, se agrega o se deja de guardar."
+      ],
+      "aceptacion": [
+        { "check": "La política está publicada y enlazada", "comando": "grep -rn 'politica-de-datos\\|/legal/datos' app/ components/ | wc -l", "espera": "1+ líneas, incluyendo el pie de página" },
+        { "check": "Nombra responsable, finalidad, plazo y canal", "comando": "grep -ciE 'responsable|finalidad|conserva|solicitud' docs/legal/politica-datos.md", "espera": "4+ líneas" },
+        { "check": "Lo listado coincide con lo que se guarda", "comando": "node scripts/inventario-datos-personales.mjs --comparar docs/legal/politica-datos.md", "espera": "exit 0 y 0 campos guardados sin declarar" }
+      ],
+      "aplicaSi": { "datosPersonales": true, "publico": true },
+      "porCada": null,
+      "posee": ["docs/legal/politica-datos.md", "scripts/inventario-datos-personales.mjs"],
+      "cerebro": ["tema:donde-vive-el-dato", "tema:pantalla-publica"]
+    },
+    {
+      "id": "prod.legal.terminos-que-dicen-quien-responde",
+      "titulo": "Escribir los términos del servicio diciendo quién responde por qué",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando un pedido sale mal, un precio estaba desactualizado o el sistema se cayó en hora pico, alguien tiene que responder — y si no está escrito, la discusión ocurre con el cliente enojado delante. Sin términos, el que pone la cara es el dueño y el que pone la culpa es el software.",
+      "queHacer": [
+        "Escribir qué ofrece el servicio y qué no: horarios de atención, cobertura, formas de pago, cambios y devoluciones si aplica.",
+        "Decir quién responde por el contenido publicado (el negocio) y quién por que el sistema esté al aire (nosotros), sin adornos.",
+        "Escribir qué pasa cuando el sistema no está disponible: qué hace el negocio mientras tanto y qué se le dice al cliente.",
+        "Ponerles fecha de vigencia y publicarlos donde se vean antes de comprar, no después.",
+        "Que el dueño los lea y confirme que puede sostener cada frase."
+      ],
+      "aceptacion": [
+        { "check": "Los términos están publicados con fecha de vigencia", "comando": "grep -nE 'Vigente desde 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/legal/terminos.md", "espera": "1 línea" },
+        { "check": "Dicen quién responde por cada cosa", "comando": "grep -ciE 'responde|responsabilidad' docs/legal/terminos.md", "espera": "2+ líneas, una por cada lado" },
+        { "check": "El dueño los aprobó", "comando": "grep -nE 'Aprobado por .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/legal/terminos.md", "espera": "1 línea" }
+      ],
+      "aplicaSi": { "publico": true },
+      "porCada": null,
+      "posee": ["docs/legal/terminos.md"],
+      "cerebro": ["tema:pantalla-publica", "tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.legal.acuerdo-firmado-con-permanencia",
+      "titulo": "Firmar el acuerdo con permanencia, alcance y qué pasa al final",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Entrar sin cobro de instalación y sin permanencia escrita es prestarle plata al cliente: si se va al tercer mes, el trabajo de arranque no se recupera. Un acuerdo de palabra solo se recuerda igual mientras nadie se moleste.",
+      "queHacer": [
+        "Recoger en un solo documento lo ya decidido: modelo de cobro, qué incluye la cuota, qué no, tope de consumo, tiempos de soporte y qué pasa si deja de pagar.",
+        "Escribir la permanencia mínima con su número de meses y qué pasa si se va antes.",
+        "Escribir a nombre de quién quedan el dominio, las cuentas y los datos, durante y después: si esto no está claro, se pelea justo el día de la salida.",
+        "Decir cómo se avisa el fin del acuerdo por cualquiera de las dos partes y con cuánta anticipación.",
+        "Firmarlo los dos, guardar la copia con fecha, y entregarle una al cliente."
+      ],
+      "aceptacion": [
+        { "check": "El acuerdo está firmado por ambos con fecha", "comando": "grep -nE 'Firmado por .+ y .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/negocio/contrato.md", "espera": "1 línea" },
+        { "check": "La permanencia tiene número", "comando": "grep -nE 'permanencia[^0-9]{0,20}[0-9]+ meses' docs/negocio/contrato.md", "espera": "1 línea" },
+        { "check": "Dice a nombre de quién quedan dominio, cuentas y datos", "comando": "grep -ciE 'dominio|cuentas|datos del cliente' docs/negocio/contrato.md", "espera": "3+ líneas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/negocio/contrato.md"],
+      "cerebro": ["tema:cobro-a-clientes", "tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "prod.medicion.el-numero-de-antes",
+      "titulo": "Anotar el número de antes, antes de encender el sistema",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin el número de antes no se puede probar el después, y la conversación de renovación se vuelve una discusión de percepciones que gana el que hable más bonito. El «antes» solo se puede tomar una vez, y es antes.",
+      "queHacer": [
+        "Elegir dos o tres números que el negocio ya conoce y que este sistema debería mover: pedidos al mes, tiempo de una tarea, comisión pagada, merma, cuadre de caja.",
+        "Tomarlos de la fuente del negocio con el dueño delante, no de nuestra estimación, y anotar de dónde salió cada uno.",
+        "Anotar también cómo se mide cada uno, para que dentro de tres meses se mida igual y la comparación valga.",
+        "Congelar el documento con fecha: lo que se corrija después se anota como corrección, no se reescribe.",
+        "Si un número no existe porque el negocio no lo mide, escribir eso mismo: la primera medición es el hallazgo."
+      ],
+      "aceptacion": [
+        { "check": "Hay al menos dos números con origen y fecha", "comando": "grep -c '^| ' docs/medicion/linea-base.md", "espera": "2+ filas, cada una con valor, origen y fecha" },
+        { "check": "Cada número dice cómo se mide", "comando": "grep -nE '^\\|[^|]+\\|[^|]+\\|[^|]+\\| *(\\?|) *\\|' docs/medicion/linea-base.md", "espera": "0 líneas" },
+        { "check": "Se tomó antes de encender", "comando": "grep -nE 'Tomada el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/medicion/linea-base.md", "espera": "1 línea con fecha anterior a la de puesta en marcha" }
+      ],
+      "aplicaSi": { "modo": "genesis" },
+      "porCada": null,
+      "posee": ["docs/medicion/linea-base.md"],
+      "cerebro": ["tema:verificar-con-evidencia", "tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.medicion.un-numero-que-el-sistema-saca-solo",
+      "titulo": "Hacer que el sistema calcule solo el número que le importa al dueño",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un número que hay que armar a mano cada mes se arma dos veces y se abandona; y el mes que no se arma es justo el mes en que el cliente estaba dudando de la cuota. Lo que no se calcula solo, no se mide.",
+      "queHacer": [
+        "Tomar los números de la línea base y ver cuáles puede calcular el propio sistema con lo que ya guarda.",
+        "Escribir el cálculo en un script que se corra con un comando y devuelva el número del periodo pedido.",
+        "Fijar la definición exacta —qué entra y qué no entra en el conteo— dentro del propio script, y que quede impresa con el resultado.",
+        "Compararlo una vez a mano contra la fuente del negocio y anotar la diferencia; si no cuadra, cuadra primero, publica después.",
+        "Dejarlo donde el dueño lo vea sin pedirlo."
+      ],
+      "aceptacion": [
+        { "check": "El número sale de un comando", "comando": "node scripts/medir.mjs --mes-anterior", "espera": "exit 0 e imprime cada número con su definición" },
+        { "check": "Cuadra con la fuente del negocio", "comando": "grep -nE 'contraste: sistema [0-9.,]+ vs negocio [0-9.,]+' docs/medicion/tablero.md", "espera": "1+ líneas, diferencia explicada si no es 0" },
+        { "check": "El dueño lo ve sin pedirlo", "comando": "grep -rn 'medir\\|tablero' app/ components/ | wc -l", "espera": "1+ líneas: el número aparece en su pantalla o le llega solo" }
+      ],
+      "aplicaSi": { "entidades": ["*"] },
+      "porCada": null,
+      "posee": ["docs/medicion/tablero.md", "scripts/medir.mjs"],
+      "cerebro": ["tema:verificar-con-evidencia", "tema:invariantes-contables"]
+    },
+    {
+      "id": "prod.medicion.uso-real-no-logins",
+      "titulo": "Medir si el sistema se está usando de verdad, no cuántos entraron",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un sistema puede tener sesiones abiertas todos los días y estar sirviendo para nada: se abre, se mira y se sigue anotando en el cuaderno. Ese es el patrón que precede a la cancelación, y se ve tres meses antes si se mide bien.",
+      "queHacer": [
+        "Definir qué es un día de uso real para ESTE producto: una venta registrada, una caja cerrada, un pedido tomado — un hecho del negocio, no un login.",
+        "Medir días con uso real por semana y por persona, no totales acumulados que esconden a quien no lo usa.",
+        "Medir también lo que se dejó de usar: la pantalla que nadie abre, la función que se pidió y no se toca.",
+        "Fijar el umbral por debajo del cual hay que ir a mirar qué pasa, y ponerle fecha de revisión.",
+        "Anotar cada mes las dos cifras y la acción tomada si bajó."
+      ],
+      "aceptacion": [
+        { "check": "El uso real se calcula con un comando", "comando": "node scripts/medir.mjs --uso --mes-anterior", "espera": "exit 0: días con uso real por persona y pantallas sin abrir" },
+        { "check": "El umbral está escrito", "comando": "grep -nE 'umbral[^0-9]{0,20}[0-9]+' docs/medicion/adopcion.md", "espera": "1 línea" },
+        { "check": "Hay al menos dos meses comparables", "comando": "grep -cE '^\\| *20[0-9]{2}-[0-9]{2}' docs/medicion/adopcion.md", "espera": "2+ filas" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/medicion/adopcion.md"],
+      "cerebro": ["tema:verificar-con-evidencia", "tema:caja-y-turnos"]
+    },
+    {
+      "id": "prod.medicion.reporte-mensual-de-una-pagina",
+      "titulo": "Mandar cada mes una página con lo que pasó y lo que se hizo",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El reporte mensual es lo más barato de dar y lo que más retiene: es la única prueba periódica de que la cuota compra algo. Sin él, el cliente solo se acuerda del sistema cuando falla, y la cancelación llega sin aviso.",
+      "queHacer": [
+        "Una página, no más: los números del mes contra el mes anterior, lo que se hizo, lo que se atendió y lo que viene.",
+        "Escribirlo en el idioma del dueño: pesos, pedidos, minutos; nunca despliegues, tickets ni versiones.",
+        "Incluir lo malo también —lo que se cayó, cuánto duró, qué se hizo para que no vuelva—: el reporte que solo trae buenas noticias deja de leerse.",
+        "Generarlo con un comando a partir de los números que ya se miden solos, para que cueste minutos y no se salte ningún mes.",
+        "Mandarlo por el canal donde el dueño lee, el mismo día de cada mes, y anotar la fecha de envío."
+      ],
+      "aceptacion": [
+        { "check": "El reporte se genera con un comando", "comando": "node scripts/reporte-mensual.mjs --mes-anterior", "espera": "exit 0 y un archivo en docs/medicion/reportes/" },
+        { "check": "No se ha saltado ningún mes", "comando": "ls docs/medicion/reportes/ | wc -l", "espera": "un archivo por mes desde la puesta en marcha, sin huecos" },
+        { "check": "Cabe en una página y no usa jerga", "comando": "wc -l docs/medicion/reportes/*.md | tail -1; grep -rniE 'deploy|commit|sprint|ticket|bug' docs/medicion/reportes/", "espera": "≤60 líneas por reporte y 0 líneas de jerga" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/medicion/reportes/**", "scripts/reporte-mensual.mjs"],
+      "cerebro": ["tema:cobro-a-clientes", "tema:documentos-para-personas"]
+    },
+    {
+      "id": "prod.medicion.preguntarle-al-que-lo-usa",
+      "titulo": "Preguntarle a quien lo usa todos los días, no solo al dueño",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "El dueño dice que va bien porque ve los totales; la persona del mostrador es la que sabe que hay que dar tres toques de más en cada venta y que a las siete de la noche la pantalla no se lee. Todo el veredicto registrado hasta hoy en la casa es del dueño: ningún trabajador ha opinado por escrito.",
+      "queHacer": [
+        "Preguntarle a la persona que opera, sola y sin el dueño delante, tres cosas: qué le quita tiempo, qué le da miedo tocar, y qué haría si pudiera cambiar una cosa.",
+        "Anotar sus respuestas textuales, con su nombre y la fecha; no resumirlas en nuestras palabras.",
+        "Convertir en tarea lo que aparezca dos veces entre dos personas distintas.",
+        "Contarle después qué se cambió por lo que dijo: si no ve efecto, la segunda vez no dice nada."
+      ],
+      "aceptacion": [
+        { "check": "Hay respuestas textuales con nombre y fecha", "comando": "grep -cE '^> ' docs/medicion/voz-del-mostrador.md", "espera": "3+ citas textuales" },
+        { "check": "Lo repetido se volvió tarea", "comando": "grep -c 'TAREA' docs/medicion/voz-del-mostrador.md", "espera": "1+ líneas, o la línea que declara que nada se repitió" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["docs/medicion/voz-del-mostrador.md"],
+      "cerebro": ["tema:documentos-para-personas", "tema:caja-y-turnos"]
+    },
+    {
+      "id": "prod.medicion.decidir-la-renovacion-con-el-numero",
+      "titulo": "Llegar a la renovación con el número, no con la sensación",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "porQue": "La conversación de renovación se gana o se pierde en los cinco minutos en que el cliente pregunta «y esto para qué me sirvió»: llegar con la comparación contra el número de antes convierte esa pregunta en una respuesta. Sin el número, la decisión la toma el ánimo del mes.",
+      "queHacer": [
+        "Poner lado a lado el número de antes y el de ahora, con la misma definición de medición.",
+        "Escribir en una línea qué parte de esa diferencia es atribuible al sistema y qué parte no: exagerar aquí se paga con la confianza.",
+        "Sumar lo que costó el año al cliente y ponerlo al lado, para que la cuenta se vea completa.",
+        "Llevar la decisión escrita —renueva, renueva con cambios, o se va— con su fecha y su respuesta textual.",
+        "Si se va, escribir el motivo tal como lo dijo: es el dato más caro que produce este proyecto."
+      ],
+      "aceptacion": [
+        { "check": "La comparación antes/ahora está escrita", "comando": "grep -nE 'antes [0-9.,]+ .*ahora [0-9.,]+' docs/medicion/renovacion.md", "espera": "1+ líneas, una por número de la línea base" },
+        { "check": "La decisión tiene fecha y frase del cliente", "comando": "grep -nE '(Renueva|No renueva).*20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/medicion/renovacion.md", "espera": "1 línea, más la cita textual del motivo" }
+      ],
+      "aplicaSi": { "modo": "evolucion" },
+      "porCada": null,
+      "posee": ["docs/medicion/renovacion.md"],
+      "cerebro": ["tema:cobro-a-clientes", "tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "prod.evolucion.buzon-de-peticiones-con-fecha-y-nombre",
+      "titulo": "Recoger en un solo sitio lo que el cliente pide después",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Las peticiones llegan por chat entre fotos de pedidos y se pierden: se construye la que se acuerda quien lea, y la que de verdad importaba se reclama tres meses después con razón. Lo que no queda escrito el día que se pide, se pierde o se construye por accidente.",
+      "queHacer": [
+        "Un solo sitio para todas, aunque lleguen por tres canales distintos: quien las reciba las copia ahí el mismo día.",
+        "Cada una con la fecha, quién la pidió y las palabras con que la pidió; la traducción a lenguaje técnico va aparte, debajo.",
+        "Anotar para qué la pide —qué problema tiene hoy—, porque a veces la solución buena no es la que pidió.",
+        "Repasarlas con el dueño una vez al mes y ordenarlas juntos: el orden lo pone él, no nosotros.",
+        "Nada se construye si no está ahí primero."
+      ],
+      "aceptacion": [
+        { "check": "Cada petición trae fecha, quién y sus palabras", "comando": "grep -nE '^\\|[^|]+\\| *(\\?|) *\\|' docs/evolucion/peticiones.md", "espera": "0 líneas" },
+        { "check": "Lo construido salió del buzón", "comando": "git log --since='2 months ago' --format='%s' | wc -l; grep -c 'construido' docs/evolucion/peticiones.md", "espera": "cada cambio funcional tiene su petición; se pega la correspondencia" },
+        { "check": "Hubo repaso con el dueño en el último mes", "comando": "grep -nE 'Repasado con .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/evolucion/peticiones.md", "espera": "1+ líneas, la última de menos de 5 semanas" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/evolucion/peticiones.md"],
+      "cerebro": ["tema:memoria-y-cierre", "tema:cobro-a-clientes"]
+    },
+    {
+      "id": "prod.evolucion.dentro-de-la-cuota-o-cotizado-aparte",
+      "titulo": "Decidir con una regla escrita qué entra en la cuota y qué se cotiza",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin regla, cada petición se negocia de nuevo y la respuesta depende del ánimo: el cliente aprende que insistiendo consigue gratis lo que otro día le costó. La regla escrita protege a los dos y evita la conversación incómoda cada vez.",
+      "queHacer": [
+        "Escribir la regla en tres o cuatro líneas, con ejemplos reales de este cliente en cada lado.",
+        "Fijar el criterio de tamaño con una unidad medible —una tarde de trabajo, media jornada— y no con adjetivos.",
+        "Definir qué se hace con lo que cae en la frontera: se estima primero, se muestra el estimado y decide el cliente.",
+        "Aplicarla a las últimas diez peticiones ya resueltas y ver si la regla habría dado la misma respuesta; si no, la regla está mal escrita.",
+        "Que el dueño la conozca: una regla que solo conocemos nosotros no evita ninguna discusión."
+      ],
+      "aceptacion": [
+        { "check": "La regla tiene ejemplos de los dos lados", "comando": "grep -cE '^- (Dentro|Aparte):' docs/evolucion/decision.md", "espera": "4+ líneas, al menos 2 por lado" },
+        { "check": "La regla reproduce las decisiones pasadas", "comando": "grep -cE '^\\| *[0-9]+ *\\|.*\\| *(coincide|NO coincide)' docs/evolucion/decision.md", "espera": "10 filas, 0 con 'NO coincide' sin explicación" },
+        { "check": "El cliente la conoce", "comando": "grep -nE 'Explicada a .+ el 20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/evolucion/decision.md", "espera": "1 línea" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["docs/evolucion/decision.md"],
+      "cerebro": ["tema:cobro-a-clientes", "tema:encargos-verificables"]
+    },
+    {
+      "id": "prod.evolucion.no-romperle-el-dia-al-que-ya-trabaja",
+      "titulo": "Cambiar el sistema en producción sin romperle el día a quien lo usa",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Con el cliente ya vendiendo, un cambio publicado a las once de la mañana que mueve un botón deja a la cajera buscándolo con cola en el mostrador, y el costo lo paga el negocio. La mejora que rompe el día de hoy no se percibe como mejora.",
+      "queHacer": [
+        "Fijar la ventana en que se publica: la franja de menos movimiento de ESTE negocio, escrita, no la que nos convenga.",
+        "Avisar antes lo que va a cambiar de lo que la persona ve, con una frase y en su canal, no con notas de versión.",
+        "Antes de publicar, correr la verificación completa y el flujo principal de cada puesto tal como lo hace la persona.",
+        "Tener escrito cómo se vuelve atrás y cuánto tarda; si no hay vuelta atrás rápida, el cambio no sale un día de operación.",
+        "Después de publicar, mirar el sistema en vivo el resto de la franja y anotar lo que apareció."
+      ],
+      "aceptacion": [
+        { "check": "La ventana y la vuelta atrás están escritas con tiempos", "comando": "grep -cE 'ventana|volver atr(á|a)s|[0-9]+ *min' docs/evolucion/cambios-en-produccion.md", "espera": "3+ líneas" },
+        { "check": "Lo que ya funcionaba sigue funcionando", "comando": "npm run verificar", "espera": "exit 0, con el mismo número de tests que antes del cambio o más" },
+        { "check": "Cada publicación quedó registrada con hora y aviso previo", "comando": "grep -cE '^\\| *20[0-9]{2}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}' docs/evolucion/cambios-en-produccion.md", "espera": "1 fila por publicación, todas con columna 'avisado' llena" }
+      ],
+      "aplicaSi": { "modo": "evolucion" },
+      "porCada": null,
+      "posee": ["docs/evolucion/cambios-en-produccion.md"],
+      "cerebro": ["tema:caja-y-turnos", "tema:verificar-con-evidencia"]
+    },
+    {
+      "id": "prod.evolucion.apagar-lo-que-nadie-usa",
+      "titulo": "Apagar cada trimestre lo que se construyó y nadie usa",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cada pantalla que nadie abre sigue costando: hay que probarla, mantenerla, explicarla en el manual y esquivarla en cada cambio. El sistema que solo crece se vuelve caro de sostener y confuso de usar, y las dos cosas las paga el cliente.",
+      "queHacer": [
+        "Sacar del medidor de uso las pantallas y funciones sin uso real en el trimestre.",
+        "Preguntar antes de apagar: a veces no se usa porque nadie supo que existía o porque estaba mal puesta.",
+        "Apagar lo que se decida apagar de verdad —fuera del menú y fuera del código—, no esconderlo detrás de una bandera que nadie quitará.",
+        "Quitar del manual y de la capacitación lo apagado, el mismo día.",
+        "Anotar qué se apagó, por qué y en qué fecha: si alguien lo reclama, esa nota es la respuesta."
+      ],
+      "aceptacion": [
+        { "check": "Lo apagado ya no está en el código ni en el menú", "comando": "grep -rn \"$(grep -oE '^\\| *[a-z0-9/-]+' docs/evolucion/desuso.md | tr -d '| ' | head -5 | paste -sd'|')\" app/ components/", "espera": "0 líneas" },
+        { "check": "El manual ya no lo menciona", "comando": "grep -rniE \"$(grep -oE '^\\| *[a-z0-9/-]+' docs/evolucion/desuso.md | tr -d '| ' | head -5 | paste -sd'|')\" docs/manual/", "espera": "0 líneas" },
+        { "check": "Cada apagado tiene motivo y fecha", "comando": "grep -nE '^\\|[^|]+\\|[^|]*\\| *20[0-9]{2}-[0-9]{2}-[0-9]{2}' docs/evolucion/desuso.md", "espera": "1 fila por función apagada" }
+      ],
+      "aplicaSi": { "modo": "evolucion" },
+      "porCada": null,
+      "posee": ["docs/evolucion/desuso.md"],
+      "cerebro": ["tema:verificar-con-evidencia", "tema:documentos-para-personas"]
     }
   ]
 }

@@ -34,6 +34,19 @@ entidades y las rutas son propuestas tuyas y las marcas como tales.
 concreto no entra en el perfil. El plan instancia tareas por cada entidad; una
 entidad inventada genera trabajo inventado, y ese trabajo se hace.
 
+**Y hay dos campos con vocabulario CERRADO.** El catálogo decide qué arquetipos
+aplican comparando contra estos valores exactos; un sinónimo tuyo —por
+descriptivo que sea— hace que esos arquetipos no entren y el plan salga corto
+sin que nadie se entere:
+
+- `superficies`: `web-publica` · `panel-interno` · `caja` · `api` · `movil`
+- `equipo`: `solo-orion` · `orion+humanos`
+
+Lo descriptivo (que el panel sea una PWA instalable, que haya comprobante
+impreso) va en tu prosa, donde se lee, **no en el perfil**, donde se compara.
+Los demás campos (`stack`, `entidades`, `rutas`, `roles`) son abiertos: ahí
+manda lo que diga el repo.
+
 ## 2. Decide la estructura
 
 Escribe la arquitectura en **≤12 líneas**, con esta forma y nada más:

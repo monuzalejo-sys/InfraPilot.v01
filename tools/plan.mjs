@@ -18,7 +18,8 @@
  *   node tools/plan.mjs bloquear <plan.json> T-042 --por "falta decidir hosting"
  *   node tools/plan.mjs agregar <plan.json> --json '<PlanTask>'   (o --archivo x.json)
  *   node tools/plan.mjs validar <plan.json>
- *   node tools/plan.mjs md <plan.json> [salida.md]
+ *   node tools/plan.mjs tanda <plan.json> [--n 10] [salida.md]   lo de AHORA, legible
+ *   node tools/plan.mjs md <plan.json> [salida.md]                el plan entero
  *   node tools/plan.mjs catalogo [--validar] [--listar] [--categoria seguridad]
  *
  * Cero dependencias. Toda escritura sube `version` y sella `updatedAt`.
@@ -64,7 +65,11 @@ function presupuestar(t) {
 /* ── utilidades ───────────────────────────────────────────────────────── */
 const ARGV = process.argv.slice(2)
 const cmd = ARGV[0]
-const posicional = ARGV.slice(1).filter((a) => !a.startsWith("--"))
+/* Un posicional es lo que no empieza por `--` Y no es el VALOR de una bandera
+   anterior. Sin la segunda condición, `tanda plan.json --n 8` tomaba el «8»
+   como nombre del archivo de salida y escribía un archivo llamado «8». */
+const posicional = ARGV.slice(1).filter((a, i, xs) =>
+  !a.startsWith("--") && !(i > 0 && xs[i - 1].startsWith("--")))
 const flag = (n) => ARGV.includes(`--${n}`)
 const val = (n, def) => { const i = ARGV.indexOf(`--${n}`); return i >= 0 && ARGV[i + 1] && !ARGV[i + 1].startsWith("--") ? ARGV[i + 1] : def }
 const vals = (n) => ARGV.reduce((acc, a, i) => (a === `--${n}` && ARGV[i + 1] ? [...acc, ARGV[i + 1]] : acc), [])
@@ -518,8 +523,27 @@ function cmdAgregar() {
     t.presupuesto = presupuestar(t)
     plan.tareas.push(t); añadidas.push(t)
   }
+
+  /* Quien escribe las tareas no sabe qué ids le van a tocar, así que declara
+     las dependencias por TÍTULO. Resolverlas es trabajo de la herramienta: si
+     se dejan pasar, el plan queda inválido y la culpa parece del agente. */
+  const porTitulo = new Map(plan.tareas.map((t) => [t.titulo.toLowerCase().replace(/[.,]/g, "").trim(), t.id]))
+  const ids = new Set(plan.tareas.map((t) => t.id))
+  let resueltas = 0
+  const huerfanas = []
+  for (const t of añadidas) {
+    t.dependeDe = (t.dependeDe ?? []).map((d) => {
+      if (ids.has(d)) return d
+      const encontrado = porTitulo.get(String(d).toLowerCase().replace(/[.,]/g, "").trim())
+      if (encontrado) { resueltas++; return encontrado }
+      huerfanas.push(`${t.id} → "${String(d).slice(0, 50)}"`)
+      return null
+    }).filter(Boolean)
+  }
   const v = guardar(ruta, plan)
   console.log(`+${añadidas.length} tareas propias del proyecto (v${v}): ${añadidas.map((t) => t.id).join(", ")}`)
+  if (resueltas) console.log(`${resueltas} dependencia(s) declaradas por título, resueltas a su id.`)
+  if (huerfanas.length) console.log(`${huerfanas.length} dependencia(s) que no apuntan a nada y se descartaron:\n  ${huerfanas.join("\n  ")}`)
 }
 
 /* La forma ejecutable de RFC-0008 §5. */
@@ -658,6 +682,70 @@ function cmdMd() {
   console.log(`PLAN.md escrito → ${salida} (${L.length} líneas, ${T.length} tareas)`)
 }
 
+/* El documento que de verdad se lee: LA TANDA. `md` escribe el plan entero
+   —1.800 líneas para 432 tareas— y eso sirve de archivo, no de lectura. Una
+   tanda es «lo que vamos a hacer ahora»: el resumen arriba y las N tareas
+   siguientes detalladas abajo, cada una con qué hacer y cómo se comprueba.
+   Es el formato que el dueño pidió, y cabe en una sentada. */
+function cmdTanda() {
+  const ruta = posicional[0] ?? morir("falta <plan.json>")
+  const plan = leerJSON(ruta)
+  const n = Number(val("n", 10))
+  const salida = posicional[1] ?? join(dirname(ruta), "TANDA.md")
+  const cands = listas(plan)
+    .filter((t) => !lista("categoria") || lista("categoria").includes(t.categoria))
+    .sort((a, b) => NIVELES.indexOf(a.nivel) - NIVELES.indexOf(b.nivel) || a.id.localeCompare(b.id))
+    .slice(0, n)
+  if (!cands.length) morir("no hay tareas listas: mira `estado` para ver qué las bloquea")
+
+  const hechas = plan.tareas.filter((t) => t.estado === "hecho").length
+  const total = cands.reduce((s, t) => s + t.presupuesto, 0)
+  const porCat = {}
+  for (const t of cands) (porCat[t.categoria] ??= []).push(t)
+
+  const L = [`# ${plan.projectId} — la tanda de ahora`, ""]
+  L.push(`> ${cands.length} tareas, de ${plan.tareas.length} que tiene el plan (${hechas} hechas).`,
+    `> Generado de \`plan.json\` v${plan.version}. Se regenera con \`plan.mjs tanda\`.`, "")
+  L.push(`## Lo que vamos a hacer`, "")
+  if (plan.objetivo) L.push(`**Objetivo del proyecto.** ${plan.objetivo}`, "")
+  L.push(`**Esta tanda, en una línea por área:**`, "")
+  for (const [c, ts] of Object.entries(porCat).sort())
+    L.push(`- **${c}** (${ts.length}) — ${ts.map((t) => t.titulo.replace(/\.$/, "")).join("; ")}.`)
+  L.push("",
+    `**Cuesta** ${Math.round(total / 1000)}k tokens de subagente${plan.modo === "evolucion" ? " y va en modo evolución: cada tarea lleva su chequeo de regresión, porque hay un sistema vivo." : "."}`, "")
+  const conHueco = cands.filter((t) => /<[a-záéíóúñ][a-záéíóúñ0-9-]{2,}>/i.test(JSON.stringify(t.aceptacion)))
+  if (conHueco.length) L.push(`**Antes de empezar hacen falta datos** que solo tú tienes, en ${conHueco.length} de estas tareas (van marcados abajo). Pregúntalos: un valor verosímil ahí es una mentira que después nadie encuentra.`, "")
+  L.push(`---`, "")
+
+  cands.forEach((t, i) => {
+    L.push(`## ${i + 1}. ${t.titulo}`, "")
+    L.push(`\`${t.id}\` · ${t.categoria} · nivel ${t.nivel} (${NIVEL_NOMBRE[t.nivel]}) · dificultad ${t.dificultad} · ${t.ceremonia === "inline" ? "se hace inline" : t.ceremonia === "ola" ? "necesita varios agentes" : "un constructor"}${t.presupuesto ? ` · ~${Math.round(t.presupuesto / 1000)}k tokens` : ""}`, "")
+    L.push(`**Por qué.** ${t.porQue}`, "")
+    if (t.queHacer?.length) {
+      L.push(`**Qué hay que hacer.**`, "")
+      t.queHacer.forEach((p, j) => L.push(`${j + 1}. ${p}`))
+      L.push("")
+    }
+    if (t.posee?.length) L.push(`**Archivos que toca (y nadie más):** \`${t.posee.join("` · `")}\``, "")
+    if (t.intocable?.length) L.push(`**No se tocan:** \`${t.intocable.join("` · `")}\``, "")
+    L.push(`**Cómo sabremos que quedó bien.**`, "")
+    for (const a of t.aceptacion) {
+      L.push(`- ${a.check} → **${a.espera}**`)
+      if (a.comando) L.push(`  \`\`\`bash\n  ${a.comando}\n  \`\`\``)
+    }
+    const marcadores = [...new Set(JSON.stringify(t.aceptacion).match(/<[a-záéíóúñ][a-záéíóúñ0-9-]{2,}>/gi) ?? [])]
+    if (marcadores.length) L.push("", `> **Falta un dato tuyo:** ${marcadores.map((m) => `\`${m}\``).join(", ")}. Sin él la tarea queda bloqueada — no se rellena a ojo.`)
+    if (t.cerebro?.length) L.push("", `_Ya sabemos algo de esto:_ ${t.cerebro.map((c) => c.startsWith("tema:") ? `\`${c.slice(5)}\`` : `\`${c}\``).join(" · ")}`)
+    L.push("", `**Lanzar:** \`/orion ${t.id}\``, "")
+  })
+
+  L.push(`---`, "", `Cuando termine una: \`plan.mjs hecho ${basename(ruta)} <id> --evidencia "<lo que se vio>" --tokens <medidos>\`.`,
+    `Para la siguiente tanda: \`plan.mjs tanda ${basename(ruta)} --n ${n}\`.`)
+  writeFileSync(salida, L.join("\n") + "\n")
+  console.log(`TANDA escrita → ${salida} (${cands.length} tareas, ${L.length} líneas, ${Math.round(total / 1000)}k tokens)`)
+  for (const t of cands) console.log(`  ${t.id} · ${t.categoria} · ${t.titulo}`)
+}
+
 function cmdCatalogo() {
   const cat = cargarCatalogo()
   const soloCat = val("categoria")
@@ -670,7 +758,9 @@ function cmdCatalogo() {
       : null
     for (const a of cat) {
       const d = `${a._archivo}:${a.id ?? "?"}`
-      if (!a.id || !/^[a-z]+(\.[a-z0-9-]+)+$/.test(a.id)) errores.push(`${d}: id mal formado`)
+      /* Dígitos permitidos después de la primera letra: `a11y` es una
+         abreviatura estándar y prohibirla era una regla arbitraria mía. */
+      if (!a.id || !/^[a-z][a-z0-9]*(\.[a-z0-9-]+)+$/.test(a.id)) errores.push(`${d}: id mal formado`)
       if (vistos.has(a.id)) errores.push(`${d}: id duplicado`)
       vistos.add(a.id)
       if (!NIVELES.includes(a.nivel)) errores.push(`${d}: nivel inválido`)
@@ -721,7 +811,7 @@ function cmdCatalogo() {
 const COMANDOS = {
   nuevo: cmdNuevo, perfil: cmdPerfil, generar: cmdGenerar, siguiente: cmdSiguiente,
   ola: cmdOla, brief: cmdBrief, estado: cmdEstado, hecho: cmdHecho,
-  bloquear: cmdBloquear, agregar: cmdAgregar, validar: cmdValidar, md: cmdMd,
+  bloquear: cmdBloquear, agregar: cmdAgregar, validar: cmdValidar, md: cmdMd, tanda: cmdTanda,
   catalogo: cmdCatalogo,
 }
 
