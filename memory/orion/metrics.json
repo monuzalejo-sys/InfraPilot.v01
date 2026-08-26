@@ -12,7 +12,7 @@
       "runId": "orion-orion-v4-planes-y-economia",
       "triggeredBy": "TASK_COMPLETED",
       "startedAt": "2026-08-26T04:40:00.000Z",
-      "completedAt": "2026-08-26T07:00:00.000Z",
+      "completedAt": "2026-08-26T09:40:00.000Z",
       "objectsCreated": 18,
       "objectsMerged": 0,
       "objectsArchived": 0,
@@ -20,7 +20,7 @@
       "objectsDemoted": 0,
       "outcome": "DONE",
       "fixCycles": 1,
-      "notes": "ORION v4. Se anade RFC-0008 (planes de ejecucion como registro consultable) con tools/plan.mjs como implementacion de referencia; el catalogo de arquetipos por categoria y nivel de madurez; cuatro agentes nuevos (orion-traductor, orion-bibliotecario, orion-arquitecto, orion-estratega) y dos skills (orion-plan, orion-baul); el comando `ruta` del cerebro, que devuelve coordenadas en vez de texto y ademas barre las notas escritas a mano en la boveda; tools/costos.mjs, que suma por primera vez los 39,37 M de tokens medidos que vivian repartidos en once metrics.json; tools/baul.mjs, la pasarela que sube planes, historial y encargos a Obsidian; y tools/runtime.mjs, que arregla la deriva a tres bandas del runtime (KN-001). Todo el runtime queda bajo el prefijo orion-. La prueba de regresion del cerebro se mantuvo en 46/46 antes y despues. VERIFICACION: 12 condiciones comprobadas por orion-verifier — 11 PASS, 1 FAIL (deriva del runtime, arreglada con `runtime.mjs sincronizar`) y 1 observacion fuera de alcance (la boveda aun no tenia planes, arreglada con `baul.mjs empujar`). Primer plan de ejecucion real: villa-broaster, 176 tareas, VALIDO.",
+      "notes": "ORION v4. Se anade RFC-0008 (planes de ejecucion como registro consultable) con tools/plan.mjs como implementacion de referencia; el catalogo de arquetipos por categoria y nivel de madurez; cuatro agentes nuevos (orion-traductor, orion-bibliotecario, orion-arquitecto, orion-estratega) y dos skills (orion-plan, orion-baul); el comando `ruta` del cerebro, que devuelve coordenadas en vez de texto y ademas barre las notas escritas a mano en la boveda; tools/costos.mjs, que suma por primera vez los 39,37 M de tokens medidos que vivian repartidos en once metrics.json; tools/baul.mjs, la pasarela que sube planes, historial y encargos a Obsidian; y tools/runtime.mjs, que arregla la deriva a tres bandas del runtime (KN-001). Todo el runtime queda bajo el prefijo orion-. La prueba de regresion del cerebro se mantuvo en 46/46 antes y despues. VERIFICACION: 12 condiciones comprobadas por orion-verifier — 11 PASS, 1 FAIL (deriva del runtime, arreglada con `runtime.mjs sincronizar`) y 1 observacion fuera de alcance (la boveda aun no tenia planes, arreglada con `baul.mjs empujar`). Primer plan de ejecucion real: villa-broaster, 176 tareas, VALIDO. CATALOGO COMPLETO: 535 arquetipos en 9 categorias; un proyecto de 12 entidades y 15 rutas instancia ~1.051 tareas concretas. Plan de villa-broaster cerrado en 260 tareas con precio, nicho y 11 supuestos.",
       "measurement_mode": "MEASURED",
       "modelOutcomes": [
         {
@@ -114,6 +114,13 @@
           "verdict": "ok",
           "tokens": 179566,
           "notes": "orion-estratega sobre villa-broaster: 6 comparables con URL, precio con 11 supuestos y una tension declarada. Encontro que todo el nicho resuelve DIAN menos nosotros."
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 323402,
+          "notes": "catalogo/datos.json - 62 arquetipos, RELANZADO tras morir por tope de salida; con instruccion de escribir por tandas entrego sin problema"
         }
       ]
     }

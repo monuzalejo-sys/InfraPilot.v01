@@ -1,7 +1,7 @@
 {
   "projectId": "orion",
-  "snapshotDate": "2026-08-26T09:10:00.000Z",
-  "version": 6,
+  "snapshotDate": "2026-08-26T09:40:00.000Z",
+  "version": 7,
   "lastAmmRun": "2026-08-26T06:30:00.000Z",
   "objects": [
     {
@@ -409,6 +409,41 @@
       "risk": "El precio propuesto para villa-broaster (400.000 COP/mes x 12 = 4,8M) apenas cubre el computo de terminar los niveles N0+N1 (~865k COP) mas el hosting del ano (~420k) mas el soporte. Si el dueno espera que la mensualidad financie ademas el backlog rapido, el numero queda corto y la cuenta se vuelve trabajo a perdida.",
       "probability": "Medium",
       "mitigation": "La decision es del dueno y el estratega no la tomo por el: o se sube la mensualidad, o se estira el calendario de N0+N1, o se recorta explicitamente que entra en la cuota. Lo que NO se puede es dejarlo implicito, que es como se llega a los tres meses trabajando gratis. Piso escrito: 250.000 COP/mes."
+    },
+    {
+      "id": "KN-015",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-08-26T09:40:00.000Z",
+      "updated": "2026-08-26T09:40:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "DEC-002",
+        "KN-006"
+      ],
+      "fact": "CATALOGO COMPLETO 2026-08-26: 535 arquetipos en 9 categorias — seguridad 70, frontend 80, backend 72, datos 62, producto 57, operacion 55, rendimiento 54, calidad 48, accesibilidad 37. De ellos 43 se instancian por entidad/ruta/rol, asi que un proyecto con 12 entidades y 15 rutas saca del orden de 1.051 tareas CONCRETAS sin inventar ninguna. Eso resuelve la peticion literal del dueno ('mil tareas para seguridad, mil para backend, mil para frontend') de la unica forma en que es util: el numero sale de multiplicar arquetipos defendibles por entidades observadas, no de escribir mil lineas de relleno.",
+      "context": "Calidad medida en los 9 archivos: cero `porQue` corto, 3,9-4,9 pasos de media, 2,0-2,8 criterios de aceptacion por arquetipo, y greps que deben dar 0 lineas como forma mas barata de verificar (50 en seguridad, 39 en backend, 37 en frontend). Ocho builders distintos y la vara se sostuvo.",
+      "source": "sesion 2026-08-26, node tools/plan.mjs catalogo --validar"
+    },
+    {
+      "id": "KN-016",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-08-26T09:40:00.000Z",
+      "updated": "2026-08-26T09:40:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "KN-015"
+      ],
+      "fact": "Cuando varios builders escriben catalogos hermanos EN PARALELO, el remedio contra la duplicacion no es coordinarlos por adelantado sino pedirle a cada uno que LEA a los demas antes de escribir. Medido: el builder de `datos` descubrio a mitad de su trabajo que `calidad` y `rendimiento` habian aparecido mientras el escribia, y recorto su propio alcance —de 9 ideas a 3 en `dat.consulta.*`, mas 4 arquetipos eliminados de `semilla` y `migracion`— para no solapar. El de accesibilidad hizo lo mismo contra frontend y lo reporto arquetipo por arquetipo.",
+      "context": "Es lo contrario de la propiedad disjunta de ARCHIVOS, que sigue siendo obligatoria: aqui el solapamiento es de CONTENIDO, y un archivo propio no lo evita. La instruccion que funciona es 'lee a los hermanos y di que recortaste', porque ademas deja la decision auditada en el reporte.",
+      "source": "sesion 2026-08-26, reportes de los builders de datos y accesibilidad"
     }
   ],
   "archives": []

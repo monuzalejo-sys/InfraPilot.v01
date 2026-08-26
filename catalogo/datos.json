@@ -1,0 +1,1371 @@
+{
+  "categoria": "datos",
+  "nombre": "Datos",
+  "meta": "Que el dato sobreviva al tiempo, al volumen y a quien lo edita: modelo correcto, migraciones probadas, integridad que la base impone sola, y una historia que se puede reconstruir.",
+  "arquetipos": [
+    {
+      "id": "dat.modelo.entidad-nueva-trae-tabla-clave-e-indice",
+      "titulo": "Dar a {{entidad}} su tabla, su clave primaria y su índice en la misma migración",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una entidad que llega sin su propia migración se improvisa encima de otra tabla o vive en una columna suelta: el día que {{entidad}} necesita su propio filtro, separar filas ya mezcladas con las de otra cosa cuesta una migración de emergencia contra datos reales.",
+      "queHacer": [
+        "Crear la migración de {{entidad}} con su propia tabla, nunca como columnas añadidas a otra que ya existía.",
+        "Declarar la clave primaria y al menos un índice sobre la columna por la que de verdad se va a filtrar (sede, estado o fecha de negocio).",
+        "Nombrar la tabla como el dueño llama a {{entidad}}, no como la bautizó el primer builder.",
+        "Aplicar la migración contra una base vacía antes de escribir la primera pantalla que la usa."
+      ],
+      "aceptacion": [
+        { "check": "{{entidad}} tiene su propia migración", "comando": "grep -rl '{{entidad}}' supabase/migrations/*.sql | wc -l", "espera": "1+ archivos" },
+        { "check": "La migración declara clave primaria e índice", "comando": null, "espera": "el archivo de {{entidad}} tiene PRIMARY KEY y al menos un CREATE INDEX; se cita la línea" }
+      ],
+      "aplicaSi": { "entidades": ["*"] },
+      "porCada": "entidad",
+      "posee": ["supabase/migrations/**", "docs/modelo-de-datos.md"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.modelo.clave-primaria-no-adivinable-ni-reutilizable",
+      "titulo": "Usar una clave primaria que no se pueda adivinar ni se reutilice al borrar",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un id autoincremental expone cuántos clientes u órdenes hay y deja adivinar el registro del vecino cambiando un número en la URL; si además se reutiliza tras un borrado, un enlace o un PDF viejo apunta un día al registro equivocado sin que nadie lo note.",
+      "queHacer": [
+        "Usar UUID (o un identity interno nunca expuesto en rutas públicas) como clave primaria de toda entidad nueva.",
+        "Confirmar que ningún borrado, físico o lógico, libera su id para que otra fila lo reutilice.",
+        "Separar la clave primaria del consecutivo legible que ve el cliente: el consecutivo es presentación, la clave es identidad.",
+        "Revisar las rutas públicas existentes y marcar como hueco las que hoy exponen un id secuencial."
+      ],
+      "aceptacion": [
+        { "check": "Las tablas nuevas no usan serial como clave primaria", "comando": "grep -rniE 'serial primary key' supabase/migrations/*.sql", "espera": "0 líneas en migraciones nuevas" },
+        { "check": "El id no se reutiliza tras un borrado", "comando": "npm test -- clave-primaria", "espera": "exit 0; borrar y crear de nuevo produce un id distinto" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "tests/datos/clave-primaria.test.ts"],
+      "cerebro": []
+    },
+    {
+      "id": "dat.modelo.marca-de-tiempo-con-zona",
+      "titulo": "Declarar toda columna de instante como timestamptz, nunca timestamp sin zona",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un timestamp sin zona guarda las 11:28 p.m. sin decir de qué huso: restaurado en otro servidor o leído por una librería que asume UTC, la venta se corre de día sin que ninguna consulta cambie, y el síntoma llega meses después en la columna que menos se revisa.",
+      "queHacer": [
+        "Recorrer el esquema y cambiar toda columna de fecha-hora operativa a timestamptz.",
+        "Prohibir timestamp sin zona en migraciones nuevas con una comprobación que se pueda correr sola.",
+        "Guardar siempre el instante en UTC y aplicar la zona del local solo al mostrar, nunca al guardar.",
+        "Probar con una fila creada a las 11:59 p.m. hora Bogotá leída como si el servidor estuviera en UTC: debe seguir siendo el mismo instante."
+      ],
+      "aceptacion": [
+        { "check": "No quedan columnas timestamp sin zona en tablas operativas", "comando": "grep -rnE '\\btimestamp\\b' supabase/migrations/*.sql | grep -v timestamptz", "espera": "0 líneas" },
+        { "check": "El instante sobrevive el cambio de huso del servidor", "comando": "npm test -- timestamptz", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "tests/datos/timestamptz.test.ts"],
+      "cerebro": ["tema:caja-y-turnos"]
+    },
+    {
+      "id": "dat.modelo.tipo-numerico-no-de-punto-flotante-para-cantidades",
+      "titulo": "Guardar cantidades y pesos en un tipo exacto, nunca en punto flotante",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Float acumula error de redondeo silencioso: 200 movimientos de 100.5 gramos guardados en float pueden dar un total de bodega que difiere del kardex en varios gramos, y con miles de movimientos al mes la diferencia deja de ser ruido y se vuelve una merma que nadie puede explicar.",
+      "queHacer": [
+        "Declarar toda columna de cantidad, peso o porcentaje como NUMERIC/DECIMAL con la precisión exacta que el negocio necesita, nunca REAL ni DOUBLE PRECISION.",
+        "Fijar la unidad en el nombre de la columna (pesoGramos, cantidadUnidades), igual que ya se exige para el dinero.",
+        "Migrar cualquier columna float existente que acumule cantidades reales del negocio.",
+        "Añadir una prueba que sume 300 movimientos con decimales exactos y compare contra la suma esperada, sin margen de tolerancia."
+      ],
+      "aceptacion": [
+        { "check": "No hay columnas float/real para cantidades del negocio", "comando": "grep -rniE '(real|double precision)' supabase/migrations/*.sql | grep -viE 'coordenada|lat|lng'", "espera": "0 líneas" },
+        { "check": "300 movimientos suman exacto, sin tolerancia", "comando": "npm test -- suma-exacta-cantidades", "espera": "exit 0; diferencia igual a 0" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "tests/datos/suma-exacta-cantidades.test.ts"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.modelo.columna-obligatoria-no-nace-nullable-por-defecto",
+      "titulo": "Declarar NOT NULL desde la primera migración todo campo que el negocio siempre exige",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una columna de precio o cantidad que nace nullable por comodidad acepta una fila a medio crear; el fallo no aparece ahí sino tres pantallas después, como un cálculo que revienta leyendo null, y para entonces ya hay filas incompletas guardadas que nadie puede completar con certeza.",
+      "queHacer": [
+        "Antes de escribir la migración, listar qué columnas de la entidad el negocio SIEMPRE tiene al momento de crear la fila.",
+        "Declararlas NOT NULL desde el primer CREATE TABLE, no como una restricción que se añade después.",
+        "Donde un valor legítimamente no exista todavía (precio por fijar), modelarlo como su propio estado documentado, no como null silencioso.",
+        "Probar que un INSERT sin ese campo falla en la base, no solo en el formulario."
+      ],
+      "aceptacion": [
+        { "check": "Los campos siempre-presentes son NOT NULL en la migración", "comando": "grep -c 'not null' supabase/migrations/*.sql", "espera": "1+ por cada campo obligatorio declarado en el modelo" },
+        { "check": "Un INSERT incompleto falla en la base", "comando": "npm test -- not-null-desde-el-inicio", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.modelo.un-solo-lugar-declara-el-esquema",
+      "titulo": "Dejar que solo las migraciones versionadas definan el esquema, nunca un cambio a mano",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una columna añadida a mano desde el editor SQL del proveedor existe en la base del dueño y en ninguna otra parte: al restaurar un respaldo o levantar otro entorno desde las migraciones, esa columna no aparece y algo que llevaba meses andando se cae sin ningún commit que lo explique.",
+      "queHacer": [
+        "Prohibir el cambio de esquema fuera de una migración versionada, incluido el editor SQL del panel del proveedor.",
+        "Escribir un script que compare la forma real de la base contra lo que las migraciones producen y liste cualquier diferencia.",
+        "Correrlo antes de cada despliegue y tratar cualquier diferencia como fallo.",
+        "Si algo se cambió a mano por urgencia, escribir de inmediato la migración que lo documenta con la fecha real del cambio."
+      ],
+      "aceptacion": [
+        { "check": "El esquema real coincide con lo que producen las migraciones", "comando": "npm run verificar-esquema", "espera": "exit 0; 0 diferencias" },
+        { "check": "Existe el script de comparación y se corrió contra la base real", "comando": null, "espera": "scripts/verificar-esquema.mjs existe; salida pegada contra la base de producción, no solo una copia" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["scripts/verificar-esquema.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.modelo.estado-como-catalogo-cerrado",
+      "titulo": "Restringir el estado de {{entidad}} a una lista cerrada dentro de la base",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un estado guardado como texto libre deja que un bug o una consulta manual escriba 'cerada' en vez de 'cerrada': la pantalla que filtra por el valor exacto deja de contar esa fila y el reporte del mes queda corto sin que salte ningún error.",
+      "queHacer": [
+        "Crear un ENUM o una restricción CHECK en la base que liste los estados válidos de {{entidad}}, no solo el tipo de la aplicación.",
+        "Migrar la columna existente al tipo restringido, confirmando antes que ninguna fila queda fuera de la lista.",
+        "Probar que un INSERT o UPDATE con un valor fuera de la lista lo rechaza la base, no solo el formulario.",
+        "Documentar en la migración qué significa cada estado, en un comentario que sobreviva a quien la escribió."
+      ],
+      "aceptacion": [
+        { "check": "La columna estado de {{entidad}} tiene ENUM o CHECK en la base", "comando": "grep -A 5 -i 'estado' supabase/migrations/*{{entidad}}*.sql | grep -ciE 'check|enum'", "espera": "1+" },
+        { "check": "Un valor fuera de la lista se rechaza en la base", "comando": "npm test -- estado-cerrado-{{entidad}}", "espera": "exit 0; el INSERT con un estado inventado falla con error de la base" }
+      ],
+      "aplicaSi": { "entidades": ["*"], "stack": ["postgres", "supabase"] },
+      "porCada": "entidad",
+      "posee": ["supabase/migrations/**", "tests/datos/estado-cerrado-{{entidad}}.test.ts"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.modelo.catalogo-controlado-no-texto-libre",
+      "titulo": "Convertir en catálogo controlado los campos de texto que en realidad son opciones fijas",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un método de pago guardado como texto libre entra como 'Efectivo', 'efectivo' y 'EFECTIVO ' en la misma tabla: un reporte que agrupa por ese campo muestra tres filas donde el dueño espera una, y la mezcla no se nota porque cada fila individual se ve correcta.",
+      "queHacer": [
+        "Listar los campos de texto que en realidad representan un conjunto fijo: método de pago, unidad de medida, categoría, tipo de gasto.",
+        "Moverlos a una tabla de catálogo o a un ENUM y referenciarlos por clave foránea desde el resto del esquema.",
+        "Migrar los valores existentes normalizando mayúsculas y espacios antes de aplicar la restricción, anotando cuántas filas se corrigieron.",
+        "Probar que agrupar por el campo controlado da tantos grupos como opciones tiene el catálogo, no más."
+      ],
+      "aceptacion": [
+        { "check": "Los valores coinciden exactamente con el catálogo", "comando": "npm test -- catalogo-controlado", "espera": "exit 0; conteo de valores distintos igual al tamaño del catálogo" },
+        { "check": "No quedan variantes de mayúsculas o espacios", "comando": null, "espera": "consulta de valores distintos normalizados devuelve el mismo número que sin normalizar" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "tests/datos/catalogo-controlado.test.ts"],
+      "cerebro": []
+    },
+    {
+      "id": "dat.modelo.longitud-y-formato-restringidos-en-la-base",
+      "titulo": "Poner en la base el largo y el formato de documento, teléfono y correo",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin restricción en la base, un import masivo o un script de una sola vez puede dejar un teléfono de 3 dígitos o un correo sin arroba: nadie lo nota hasta que el mensaje de cobro no le llega a ese cliente y el reclamo entra por otro lado.",
+      "queHacer": [
+        "Declarar CHECK de longitud y de formato básico para documento, teléfono y correo en la migración, no solo en el formulario.",
+        "Migrar los datos existentes corrigiendo o marcando como incompletos los que no cumplen, antes de activar la restricción.",
+        "Traducir el rechazo de la base a texto de persona en la capa que lo captura, no el error crudo del motor.",
+        "Probar con un valor que pasaría un formulario descuidado y esperar el rechazo de la base."
+      ],
+      "aceptacion": [
+        { "check": "Documento, teléfono y correo tienen restricción de formato en la base", "comando": "grep -ciE 'check.*(documento|telefono|correo)' supabase/migrations/*.sql", "espera": "3+" },
+        { "check": "Un valor con formato inválido se rechaza en la base", "comando": "npm test -- formato-en-la-base", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"], "datosPersonales": true },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "tests/datos/formato-en-la-base.test.ts"],
+      "cerebro": []
+    },
+    {
+      "id": "dat.modelo.columna-generada-por-la-base-no-por-la-app",
+      "titulo": "Usar columnas generadas por la base para valores que nunca deben desviarse de su fórmula",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un total de línea que cada capa de la aplicación recalcula por su cuenta diverge tarde o temprano: un builder nuevo copia la fórmula a mano, se equivoca en un paréntesis, y esa fila queda con un valor que ninguna prueba de dominio ve porque la prueba corre contra su propia copia de la fórmula.",
+      "queHacer": [
+        "Identificar los valores que se calculan siempre a partir de columnas de la MISMA fila (cantidad por precio unitario, nombre normalizado para búsqueda).",
+        "Declararlos como columnas GENERATED ALWAYS AS en la migración, para que el motor los calcule y ninguna escritura pueda contradecirlos.",
+        "Quitar del código de la aplicación cualquier cálculo paralelo de ese mismo valor.",
+        "Probar que un intento de escribir directo sobre la columna generada falla."
+      ],
+      "aceptacion": [
+        { "check": "La columna generada existe y su fórmula está en la migración", "comando": "grep -c 'generated always as' supabase/migrations/*.sql", "espera": "1+" },
+        { "check": "Escribir directo sobre la columna generada falla", "comando": "npm test -- columna-generada", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "tests/datos/columna-generada.test.ts"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.modelo.diccionario-de-datos-generado-del-esquema",
+      "titulo": "Generar el diccionario de datos desde el esquema real, no escribirlo a mano",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un diccionario de datos escrito a mano describe el esquema de hace seis meses: la siguiente persona que necesita saber qué significa una columna termina preguntándole a quien la escribió, si todavía sigue en el proyecto.",
+      "queHacer": [
+        "Escribir un script que lea el esquema real (tablas, columnas, tipos, claves foráneas) y genere docs/diccionario-de-datos.md.",
+        "Completar a mano solo la columna de significado de negocio, que el script no puede inventar; dejarla como hueco visible donde falte.",
+        "Correrlo como parte de verificar y fallar si el documento generado difiere del commiteado.",
+        "Incluir el volumen aproximado de filas por tabla, para que quien lo lea sepa si tocarla ahí es barato o requiere cuidado."
+      ],
+      "aceptacion": [
+        { "check": "El diccionario generado coincide con el commiteado", "comando": "npm run generar-diccionario && git diff --exit-code docs/diccionario-de-datos.md", "espera": "exit 0" },
+        { "check": "Toda tabla del esquema aparece en el diccionario", "comando": "grep -c '^## ' docs/diccionario-de-datos.md", "espera": "conteo igual al número de tablas del esquema" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"], "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["scripts/generar-diccionario.mjs", "docs/diccionario-de-datos.md"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    {
+      "id": "dat.migracion.registro-de-cuales-ya-corrieron",
+      "titulo": "Llevar en la propia base el registro de qué migraciones ya se aplicaron",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin una tabla que registre qué migración ya corrió, el estado se sabe preguntándole al dueño o esperando a que aparezca un error de columna inexistente: funciona con dos migraciones y una persona, y deja de funcionar en la migración número diez.",
+      "queHacer": [
+        "Crear una tabla schema_migrations (o usar la del framework elegido) que registre archivo aplicado y fecha.",
+        "Hacer que el script de aplicar migraciones consulte esa tabla primero y nunca reaplique una ya registrada, salvo que se declare idempotente a propósito.",
+        "Exponer un comando que diga, sin adivinar, qué migraciones faltan por aplicar en el entorno actual.",
+        "Sembrar la tabla con las migraciones ya existentes antes de activar el mecanismo, para no perder el historial real."
+      ],
+      "aceptacion": [
+        { "check": "El comando de estado dice qué falta por aplicar", "comando": "npm run migraciones -- estado", "espera": "exit 0; lista cuántas están aplicadas y cuáles faltan, por nombre de archivo" },
+        { "check": "Una migración ya registrada no se reaplica sola", "comando": "npm test -- registro-de-migraciones", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "scripts/migraciones.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.migracion.reversible-o-declarada-irreversible",
+      "titulo": "Escribir el reverso de cada migración, o declarar por qué no lo tiene",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Ninguna migración de este ecosistema trae hoy un reverso escrito: si una sale mal contra datos reales, no hay procedimiento y la vuelta atrás se improvisa con la caja parada, que es el peor momento para escribir SQL nuevo.",
+      "queHacer": [
+        "Escribir junto a cada migración su reverso: las sentencias que devuelven el esquema al estado anterior sin perder los datos que ya existían antes del cambio.",
+        "Donde el reverso sea imposible de verdad, decirlo en un comentario de cabecera con el motivo, no dejarlo en blanco por omisión.",
+        "Probar el reverso igual que la migración: aplicar, poblar, revertir, y confirmar que los datos anteriores al cambio siguen intactos.",
+        "Guardar el reverso en el mismo commit que la migración, nunca como tarea aparte para después."
+      ],
+      "aceptacion": [
+        { "check": "Toda migración nueva trae su reverso o su declaración de irreversible", "comando": "grep -L 'down\\|irreversible' supabase/migrations/*.sql", "espera": "0 archivos sin ninguna de las dos" },
+        { "check": "El reverso probado no pierde los datos anteriores", "comando": "npm run probar-reverso -- supabase/migrations/<archivo>.sql", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.migracion.idempotente-o-declarada-de-un-solo-uso",
+      "titulo": "Declarar si cada migración es idempotente y probarlo aplicándola dos veces",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Ninguna migración de este ecosistema declara si puede reaplicarse sin romper nada: una que crea una política de seguridad falla la segunda vez que alguien la corre por error, y esa falla llega justo cuando se está tratando de arreglar algo más urgente.",
+      "queHacer": [
+        "Escribir en la cabecera de cada migración si es idempotente o de un solo uso, con el motivo.",
+        "Donde se declare idempotente, usar IF NOT EXISTS / CREATE OR REPLACE / DROP ... IF EXISTS para que reaplicarla no falle.",
+        "Aplicarla dos veces seguidas contra la misma base y confirmar que la segunda corrida no cambia nada ni lanza error.",
+        "Donde de verdad no se pueda hacer idempotente, decirlo explícito y proteger con una comprobación de que no se ha corrido antes."
+      ],
+      "aceptacion": [
+        { "check": "Toda migración declara si es idempotente", "comando": "grep -L 'idempotente\\|un solo uso' supabase/migrations/*.sql", "espera": "0 archivos sin la declaración" },
+        { "check": "Las declaradas idempotentes se aplican dos veces sin error", "comando": "npm run migrar && npm run migrar; echo EXIT=$?", "espera": "EXIT=0" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.migracion.orden-encadenado-y-probado-en-secuencia",
+      "titulo": "Probar la cadena completa de migraciones en orden, no cada una por separado",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Nadie ha corrido en este ecosistema dos migraciones seguidas contra una copia con datos reales: cada una se prueba sola, y el orden en que de verdad se aplican en producción, donde una depende de que la anterior ya corrió, nunca se ejercitó junto.",
+      "queHacer": [
+        "Levantar una base con embedded-postgres y aplicar TODAS las migraciones en el orden real, desde cero, en una sola corrida.",
+        "Repetir la corrida contra una copia sembrada con datos de un estado intermedio real, no solo desde una base vacía.",
+        "Registrar qué migración depende de que otra específica haya corrido antes, y hacer que el runner lo verifique en vez de confiar en el orden alfabético del archivo.",
+        "Dejar la corrida completa dentro de verificar, para que un archivo nuevo fuera de orden se note de inmediato."
+      ],
+      "aceptacion": [
+        { "check": "La cadena completa corre en orden desde cero", "comando": "npm run migrar -- --desde-cero; echo EXIT=$?", "espera": "EXIT=0" },
+        { "check": "La corrida completa está en verificar", "comando": "grep -n 'migrar -- --desde-cero' package.json", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "scripts/probar-cadena-migraciones.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.migracion.no-se-edita-despues-de-aplicada",
+      "titulo": "Tratar una migración ya aplicada como historia: el cambio siguiente es una migración nueva",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Editar el archivo de una migración que ya corrió en un entorno compartido deja ese entorno con una forma y los entornos nuevos, que la reaplican completa, con otra: dos bases que deberían ser iguales terminan con un esquema distinto sin que ningún commit lo explique.",
+      "queHacer": [
+        "Prohibir editar un archivo de migración una vez que corrió en staging o producción, aunque sea solo para arreglar un typo.",
+        "Escribir cualquier corrección posterior como una migración nueva que ajusta lo que quedó mal.",
+        "Guardar el hash del archivo al aplicarse, para poder detectar si alguien lo editó después.",
+        "Correr ese chequeo antes de desplegar y fallar si algún hash cambió."
+      ],
+      "aceptacion": [
+        { "check": "El hash de las migraciones aplicadas no cambió", "comando": "npm run verificar-migraciones-no-editadas; echo EXIT=$?", "espera": "EXIT=0" },
+        { "check": "No hay migraciones editadas después de su fecha de aplicación", "comando": null, "espera": "reporte del script sin ninguna diferencia de hash" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["scripts/verificar-migraciones-no-editadas.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.migracion.cambio-de-tipo-sin-perder-datos",
+      "titulo": "Cambiar tipo o nombre de una columna con expandir-y-contraer, no con un ALTER ciego",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un ALTER TABLE que cambia el tipo de una columna con filas reales puede truncar, redondear o fallar a mitad de camino contra 40.000 filas; sin un paso intermedio que escriba en los dos formatos, el despliegue nuevo y el código viejo que todavía corre en otra pestaña dejan de entenderse por minutos u horas.",
+      "queHacer": [
+        "Añadir la columna nueva en paralelo a la vieja, sin tocar la vieja.",
+        "Escribir un paso de relleno que copie y transforme los datos existentes por lotes, no en una sola transacción gigante.",
+        "Hacer que la aplicación escriba en ambas columnas durante la transición, y lea de la nueva solo cuando el relleno terminó y se verificó.",
+        "Eliminar la columna vieja en una migración aparte, solo después de confirmar que nada la sigue leyendo."
+      ],
+      "aceptacion": [
+        { "check": "El relleno no perdió filas", "comando": "npm run backfill -- --verificar; echo EXIT=$?", "espera": "EXIT=0; conteo de filas antes y después coincide" },
+        { "check": "La columna vieja se borra en una migración separada, después del relleno", "comando": "grep -l 'drop column' supabase/migrations/*.sql", "espera": "el archivo que la borra es posterior al del relleno" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "scripts/backfill.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.migracion.generador-de-migracion-desde-el-diff-de-tipos",
+      "titulo": "Proponer la migración SQL desde el diff entre los tipos declarados y la base real",
+      "nivel": "N4",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Escribir el ALTER a mano desde la memoria es donde se olvida el índice, el NOT NULL o el valor por defecto que la columna nueva necesitaba desde el principio; un generador que compara contra el esquema real no se olvida porque no depende de la memoria de nadie.",
+      "queHacer": [
+        "Escribir un script que lea los tipos declarados en el código y la forma real de la base, y liste las diferencias entre ambos.",
+        "Hacer que proponga el SQL de la migración a partir de esa diferencia, como borrador para revisar, nunca para aplicar sin leerlo.",
+        "Dejar que el desarrollador confirme o edite el borrador antes de guardarlo como archivo de migración versionado.",
+        "Probarlo contra un cambio real y confirmar que el borrador generado es igual de completo que uno escrito a mano."
+      ],
+      "aceptacion": [
+        { "check": "El generador produce un borrador para un cambio de tipo real", "comando": "npm run generar-migracion -- --diff", "espera": "exit 0; imprime el SQL propuesto" },
+        { "check": "El borrador no se aplica solo", "comando": "grep -n 'aplicar automatic' scripts/generar-migracion.mjs", "espera": "0 líneas: el script solo escribe el archivo, nunca lo ejecuta" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"], "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["scripts/generar-migracion.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.integridad.clave-foranea-declarada-en-la-base",
+      "titulo": "Declarar en la base la clave foránea de {{entidad}} hacia sus padres reales",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin una FK real, borrar la sede deja gastos apuntando a un local_id que ya no existe: la pantalla que junta gasto con sede muestra fila vacía o revienta, y para cuando alguien lo nota ya hay cientos de registros huérfanos sin fecha clara de origen.",
+      "queHacer": [
+        "Declarar REFERENCES en la base para toda columna de {{entidad}} que apunte a otra tabla, no solo mantener la convención en el código.",
+        "Elegir el comportamiento ON DELETE a propósito para cada relación, sin dejar el valor por defecto sin revisar.",
+        "Migrar primero los datos existentes que ya tengan una referencia rota, decidiendo con el dueño qué hacer con cada una.",
+        "Probar que un INSERT de {{entidad}} con un padre inexistente lo rechaza la base."
+      ],
+      "aceptacion": [
+        { "check": "{{entidad}} declara sus claves foráneas en la base", "comando": "grep -A 20 'create table.*{{entidad}}' supabase/migrations/*.sql | grep -c references", "espera": "1+ por cada relación real" },
+        { "check": "Un padre inexistente se rechaza al crear {{entidad}}", "comando": "npm test -- fk-{{entidad}}", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "entidades": ["*"], "stack": ["postgres", "supabase"] },
+      "porCada": "entidad",
+      "posee": ["supabase/migrations/**", "tests/datos/fk-{{entidad}}.test.ts"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.integridad.no-hay-huerfanos",
+      "titulo": "Barrer el esquema completo buscando filas que referencian un padre que ya no existe",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una FK agregada después de que el sistema ya tenía datos no valida lo que ya estaba mal: puede quedar activa hacia adelante mientras cientos de filas viejas siguen apuntando a nada, y esas filas revientan la primera pantalla que intenta mostrarlas junto a su padre.",
+      "queHacer": [
+        "Escribir un script que recorra cada relación declarada del esquema y cuente filas cuyo valor de clave foránea no exista en la tabla padre.",
+        "Correrlo contra la base real, no solo contra una copia de prueba recién sembrada.",
+        "Para cada huérfano encontrado, decidir con el dueño si se repara la referencia o se archiva la fila, nunca borrarla en silencio.",
+        "Dejarlo como comprobación recurrente, no como ejercicio de una sola vez."
+      ],
+      "aceptacion": [
+        { "check": "El barrido corre contra la base real", "comando": "node scripts/barrido-huerfanos.mjs", "espera": "exit 0; imprime 0 huérfanos o la lista con tabla y id" },
+        { "check": "Cada huérfano encontrado tiene una decisión escrita", "comando": null, "espera": "tabla huérfano→decisión completa, sin filas sin resolver" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["scripts/barrido-huerfanos.mjs"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.integridad.restriccion-unica-en-la-base-no-solo-el-formulario",
+      "titulo": "Poner en la base, no solo en el formulario, la regla de 'solo uno' de {{entidad}}",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Comprobar en el código que no existe otro antes de insertar no evita la carrera: dos peticiones que llegan con dos milisegundos de diferencia leen las dos que no hay ninguno y las dos insertan; con dinero real, esa carrera es la que deja dos suscripciones activas cobrándole al mismo cliente.",
+      "queHacer": [
+        "Identificar la regla de unicidad real de {{entidad}} (un código por sede, un registro activo por cliente) y expresarla como UNIQUE en la base.",
+        "Usar un índice único parcial cuando la unicidad solo aplica a las filas en cierto estado, no a toda la tabla.",
+        "Dejar cualquier comprobación de 'ya existe' hecha en la aplicación solo como mensaje amable que se apoya en la restricción real, no que la reemplaza.",
+        "Probar con dos inserciones lanzadas en paralelo y esperar que la base rechace la segunda, no que gane la que llegó primero al código."
+      ],
+      "aceptacion": [
+        { "check": "La restricción única de {{entidad}} vive en la base", "comando": "grep -A 15 'create table.*{{entidad}}' supabase/migrations/*.sql | grep -ci unique", "espera": "1+" },
+        { "check": "Dos inserciones en paralelo dejan una sola fila", "comando": "npm test -- unicidad-en-carrera-{{entidad}}", "espera": "exit 0; 1 creada, 1 rechazada con error de restricción" }
+      ],
+      "aplicaSi": { "entidades": ["*"], "stack": ["postgres", "supabase"] },
+      "porCada": "entidad",
+      "posee": ["supabase/migrations/**", "tests/datos/unicidad-en-carrera-{{entidad}}.test.ts"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.integridad.restriccion-de-rango-en-la-base",
+      "titulo": "Poner CHECK de rango en la base para cantidades y porcentajes que no pueden ser cualquier número",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin CHECK en la base, un descuento del 150% o una cantidad de -8 unidades entra por cualquier script o corrección manual que se salte el formulario, y el total negativo que produce llega hasta el reporte del contador antes de que alguien lo vea.",
+      "queHacer": [
+        "Listar los campos numéricos de negocio con rango físico real: cantidad >= 0, porcentaje entre 0 y 100, peso > 0.",
+        "Declarar CHECK con ese rango en la migración de cada columna.",
+        "Migrar primero los datos existentes fuera de rango, corrigiéndolos o marcándolos con el dueño antes de activar la restricción.",
+        "Probar que un valor fuera de rango se rechaza en la base aunque la aplicación lo hubiera dejado pasar por un bug."
+      ],
+      "aceptacion": [
+        { "check": "Los campos con rango físico tienen CHECK en la base", "comando": "grep -c 'check (' supabase/migrations/*.sql", "espera": "1+ por cada campo con rango declarado" },
+        { "check": "Un valor fuera de rango se rechaza en la base", "comando": "npm test -- rango-en-la-base", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "tests/datos/rango-en-la-base.test.ts"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.integridad.escritura-multi-tabla-en-una-sola-transaccion",
+      "titulo": "Envolver en una sola transacción de base de datos toda escritura que toque varias tablas",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una venta que escribe la cabecera, sus líneas y el movimiento de inventario en tres llamadas separadas puede caerse después de la primera: queda una venta sin líneas, o líneas sin el movimiento que debía descontar el stock, y nadie lo nota hasta que el inventario no cuadra con lo vendido.",
+      "queHacer": [
+        "Identificar las operaciones de negocio que escriben en más de una tabla a la vez.",
+        "Envolverlas en BEGIN/COMMIT (o el mecanismo transaccional del cliente) para que las escrituras se apliquen todas o ninguna.",
+        "Probar el caso de fallo a mitad de camino, forzando un error en la segunda escritura, y confirmar que la primera se deshizo.",
+        "Revisar que ningún código fuera de la transacción dependa de leer un estado intermedio mientras la operación no ha terminado."
+      ],
+      "aceptacion": [
+        { "check": "Un fallo a mitad de la operación no deja escritura parcial", "comando": "npm test -- transaccion-multi-tabla", "espera": "exit 0; tras forzar el fallo, 0 filas de ninguna de las tablas involucradas" },
+        { "check": "La operación usa una transacción explícita", "comando": "grep -c 'BEGIN\\|transaction(' lib/servidor/*.ts", "espera": "1+ por cada operación multi-tabla identificada" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["lib/servidor/transacciones.ts", "tests/datos/transaccion-multi-tabla.test.ts"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.integridad.borrado-en-cascada-a-proposito",
+      "titulo": "Elegir a propósito el ON DELETE de cada clave foránea, nunca dejar el valor por defecto sin revisar",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un ORM que crea las relaciones con CASCADE por defecto hace que borrar una categoría se lleve puestos todos sus productos sin ninguna confirmación: el dueño pidió borrar una categoría vacía y de paso perdió cien productos que sí tenían ventas asociadas.",
+      "queHacer": [
+        "Revisar cada clave foránea del esquema y decidir explícitamente su ON DELETE: CASCADE, RESTRICT o SET NULL, según lo que el negocio espera.",
+        "Documentar en la migración el motivo de cada elección, junto a la restricción.",
+        "Para las relaciones donde el borrado del padre nunca debería arrastrar al hijo, usar RESTRICT y forzar una decisión explícita antes de permitirlo.",
+        "Probar cada relación borrando el padre y confirmando que el hijo se comporta como se decidió, no como quedó por defecto."
+      ],
+      "aceptacion": [
+        { "check": "Toda clave foránea declara su ON DELETE explícito", "comando": "grep -c 'references' supabase/migrations/*.sql; grep -c 'on delete' supabase/migrations/*.sql", "espera": "los dos conteos coinciden" },
+        { "check": "El comportamiento al borrar el padre es el decidido", "comando": "npm test -- on-delete-a-proposito", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "tests/datos/on-delete-a-proposito.test.ts"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.integridad.choque-de-restriccion-unica-por-codigo-no-por-texto",
+      "titulo": "Reconocer el choque de una restricción única por su código, nunca por el texto del error",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El mensaje de un choque de unicidad cambia entre versiones del motor y del cliente que lo reporta: un código que compara el texto contra 'duplicate key' deja de reconocerlo el día que el proveedor cambia la redacción, y desde ese día cada choque real se trata como un error genérico de servidor.",
+      "queHacer": [
+        "Detectar el choque de restricción única por su código de estado (SQLSTATE 23505 en Postgres) y el nombre exacto de la restricción, nunca por texto dentro del mensaje.",
+        "Mapear cada nombre de restricción a la acción de negocio que corresponde (renombrar, avisar, reintentar con otro valor), en un solo lugar.",
+        "Probar que dos escrituras con el mismo valor único producen el código esperado y que el sistema responde según el mapeo, no con un 500 genérico.",
+        "Revisar que ningún otro punto del código siga comparando el texto del mensaje de error."
+      ],
+      "aceptacion": [
+        { "check": "El choque se detecta por código y nombre de restricción", "comando": "grep -n '23505' lib/servidor/*.ts", "espera": "1+ líneas" },
+        { "check": "Nadie compara el texto del mensaje de error", "comando": "grep -rniE \"message.*(includes|match).*(duplicate|unique)\" lib/servidor/ app/api/", "espera": "0 líneas" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["lib/servidor/choque-unico.ts", "tests/datos/choque-unico.test.ts"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.integridad.version-de-fila-contra-pisadas-silenciosas",
+      "titulo": "Comprobar la versión de {{entidad}} al actualizar para que dos ediciones no se pisen en silencio",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Dos personas que abren la misma {{entidad}} al tiempo y guardan una después de otra dejan que la segunda escritura borre en silencio lo que la primera acababa de cambiar: nadie recibe ningún error, y el que perdió su cambio solo lo descubre cuando lo busca y ya no está.",
+      "queHacer": [
+        "Añadir una columna de versión o updated_at a {{entidad}} que se incremente o actualice en cada escritura.",
+        "Hacer que el UPDATE incluya WHERE version = <la que se leyó>, y tratar 0 filas afectadas como conflicto, no como éxito silencioso.",
+        "Devolver un rechazo claro cuando el conflicto ocurre, indicando que alguien más editó el registro mientras tanto.",
+        "Probar dos ediciones secuenciales sobre la misma fila leída una sola vez, y esperar que la segunda falle con el conflicto, no que sobrescriba."
+      ],
+      "aceptacion": [
+        { "check": "La escritura de {{entidad}} verifica la versión leída", "comando": "grep -n 'where version' lib/dominio/{{entidad}}.ts", "espera": "1+ líneas" },
+        { "check": "Una edición sobre una versión vieja se rechaza", "comando": "npm test -- version-de-fila-{{entidad}}", "espera": "exit 0; la segunda escritura devuelve conflicto, no éxito" }
+      ],
+      "aplicaSi": { "entidades": ["*"], "stack": ["postgres", "supabase"], "multiUsuario": true },
+      "porCada": "entidad",
+      "posee": ["supabase/migrations/**", "lib/dominio/{{entidad}}.ts", "tests/datos/version-de-fila-{{entidad}}.test.ts"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.integridad.constraint-diferida-para-invariantes-multi-fila",
+      "titulo": "Usar restricciones diferidas cuando una operación viola un invariante a mitad de camino y lo repara antes de terminar",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Intercambiar la posición de dos productos en una vitrina exige, por un instante, que dos filas compartan el mismo número de orden si la restricción única se revisa fila por fila: sin diferir esa comprobación al final de la transacción, reordenar dos filas se vuelve imposible de escribir sin borrar y recrear.",
+      "queHacer": [
+        "Identificar las restricciones que una operación legítima viola de forma temporal a mitad de una transacción, como intercambiar posiciones o renumerar.",
+        "Declararlas DEFERRABLE INITIALLY DEFERRED (o el equivalente del motor) para que se comprueben al final de la transacción.",
+        "Probar la operación que antes exigía un paso intermedio artificial y confirmar que ahora corre en una sola transacción.",
+        "Confirmar que, si la transacción termina sin reparar el invariante, la base la rechaza igual al hacer COMMIT."
+      ],
+      "aceptacion": [
+        { "check": "La restricción está declarada como diferida", "comando": "grep -c 'deferrable' supabase/migrations/*.sql", "espera": "1+" },
+        { "check": "Una transacción que no repara el invariante se rechaza al final", "comando": "npm test -- constraint-diferida", "espera": "exit 0; el COMMIT sin reparar falla, la operación completa pasa" }
+      ],
+      "aplicaSi": { "stack": ["postgres"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "tests/datos/constraint-diferida.test.ts"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.consulta.filtro-de-anulados-consistente-entre-pantallas",
+      "titulo": "Centralizar el filtro de anulados para que ninguna consulta lo repita ni lo olvide",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un reporte que suma ventas sin excluir las anuladas y otro que sí las excluye pueden mostrarle al dueño dos cifras distintas de 'las ventas de hoy' en la misma tarde: nadie sabe cuál creer, y la que resulta mal suele ser la que ya se le mostró al contador.",
+      "queHacer": [
+        "Escribir una única vista o función que aplique el filtro de anulados una sola vez.",
+        "Migrar las consultas de listado y de totales que hoy repiten el filtro a mano para que usen esa vista o función.",
+        "Prohibir por grep un WHERE que mencione la columna de anulación fuera de ese único lugar.",
+        "Probar que dos pantallas distintas que muestran 'las ventas de hoy' devuelven exactamente el mismo número."
+      ],
+      "aceptacion": [
+        { "check": "El filtro de anulados vive en un solo lugar", "comando": "grep -rn 'anulad' supabase/migrations/*.sql lib/servidor/*.ts | grep -v 'lib/servidor/vigentes'", "espera": "0 líneas fuera del lugar central" },
+        { "check": "Dos pantallas dan el mismo total del día", "comando": "npm test -- filtro-anulados-consistente", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "dineroReal": true, "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["lib/servidor/vigentes.ts", "tests/datos/filtro-anulados-consistente.test.ts"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.consulta.la-agregacion-usa-la-misma-definicion-que-el-detalle",
+      "titulo": "Definir una sola vez la regla de un total agregado y que el detalle la reutilice",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un dashboard que dice '47 ventas hoy' calculado con su propio WHERE y un listado detallado que dice '45' calculado con otro dejan al dueño sin saber cuál de los dos números confiar, y el que suele estar mal es justo el que él enseña primero.",
+      "queHacer": [
+        "Escribir la definición de qué cuenta como 'una venta del día' (qué estados, qué campo de fecha, qué filtro de sede) en un solo lugar: una vista o una función SQL.",
+        "Hacer que tanto el total agregado como el listado de detalle consulten esa misma definición, nunca dos WHERE escritos por separado.",
+        "Probar que sumar las filas del detalle da exactamente el número que muestra el agregado, para el mismo filtro.",
+        "Revisar los reportes existentes y migrar los que hoy dupliquen la definición."
+      ],
+      "aceptacion": [
+        { "check": "El total y el detalle usan la misma definición", "comando": "grep -c 'vista_ventas_dia' lib/servidor/reportes.ts", "espera": "2+: una llamada para el total, otra para el detalle" },
+        { "check": "La suma del detalle coincide con el agregado", "comando": "npm test -- agregacion-igual-al-detalle", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "dineroReal": true, "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["lib/servidor/reportes.ts", "tests/datos/agregacion-igual-al-detalle.test.ts"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.consulta.null-no-se-confunde-con-cero-en-los-totales",
+      "titulo": "Distinguir en las sumas un campo que nunca se llenó de uno que se confirmó en cero",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "SUM() salta en silencio las filas con NULL: si una columna de comisión se agregó después y las filas viejas quedaron en NULL en vez de en 0, el promedio de comisión por venta se calcula solo sobre las filas nuevas y sale más alto de lo real, sin que ningún total se vea obviamente roto.",
+      "queHacer": [
+        "Revisar cada SUM/AVG sobre un campo que pueda tener NULL por filas anteriores a que el campo existiera.",
+        "Decidir explícitamente si NULL debe tratarse como 0 (COALESCE) o debe excluir la fila del cálculo, y dejarlo escrito junto a la consulta.",
+        "Migrar las filas viejas a 0 cuando el negocio confirma que NULL ahí significaba 'todavía no aplicaba', no 'sin dato'.",
+        "Probar el caso con filas NULL mezcladas con filas en 0 y confirmar que el total refleja la decisión tomada, no el comportamiento por defecto de SUM."
+      ],
+      "aceptacion": [
+        { "check": "Los SUM/AVG sobre campos nullable declaran su tratamiento de NULL", "comando": "grep -c 'coalesce' lib/servidor/reportes.ts", "espera": "1+ por cada campo nullable agregado" },
+        { "check": "El total con filas NULL mezcladas es el decidido", "comando": "npm test -- null-no-es-cero", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["lib/servidor/reportes.ts", "tests/datos/null-no-es-cero.test.ts"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.semilla.orden-de-insercion-respeta-las-dependencias",
+      "titulo": "Insertar la semilla en el orden que respeta las claves foráneas, y fallar si falta un padre",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Un script de siembra que inserta gastos antes que las sedes que los reciben depende de que el motor no valide la referencia, o falla a mitad de camino dejando la mitad de las tablas sembradas y la otra mitad vacía, sin decir cuál fue la que rompió el orden.",
+      "queHacer": [
+        "Ordenar las inserciones del script de siembra según las dependencias reales del esquema: primero los padres, después los hijos.",
+        "Hacer que el script falle de inmediato y con el nombre de la tabla si intenta insertar un hijo antes que su padre.",
+        "Escribir el orden como una lista explícita en el propio script, no como el orden en que a alguien se le ocurrió escribir las funciones.",
+        "Probar que correr el script contra una base vacía termina con todas las tablas sembradas, no solo las primeras."
+      ],
+      "aceptacion": [
+        { "check": "El script sigue el orden de dependencias", "comando": "node scripts/sembrar.mjs; echo EXIT=$?", "espera": "EXIT=0; todas las tablas declaradas quedan con filas" },
+        { "check": "Insertar un hijo antes que su padre falla con el nombre de la tabla", "comando": "npm test -- orden-de-siembra", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "modo": "genesis" },
+      "porCada": null,
+      "posee": ["scripts/sembrar.mjs"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.semilla.separada-de-los-datos-de-prueba",
+      "titulo": "Mantener el seed de demostración y las fixtures de test como dos scripts distintos",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando el mismo script siembra la demo que ve el cliente y los datos que consumen los tests automáticos, un ajuste para que un test pase le cambia sin aviso los datos que el vendedor muestra en la demo, y al revés: arreglar la demo rompe una suite entera.",
+      "queHacer": [
+        "Separar en dos archivos distintos el script que siembra para mostrar el producto y el que genera fixtures para los tests automáticos.",
+        "Declarar en cada uno su propósito en un comentario de cabecera, para que nadie mezcle uno reutilizando el otro por comodidad.",
+        "Revisar el script de demo y quitar cualquier valor puesto ahí solo para que un test específico pasara.",
+        "Confirmar que los tests no dependen de correr después del seed de demo ni al revés."
+      ],
+      "aceptacion": [
+        { "check": "Existen los dos scripts por separado", "comando": "ls scripts/sembrar-demo.mjs tests/apoyo/fixtures.ts", "espera": "los dos archivos existen" },
+        { "check": "Los tests no dependen del seed de demo", "comando": "npm test", "espera": "exit 0 sin haber corrido sembrar-demo antes" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["scripts/sembrar-demo.mjs", "tests/apoyo/fixtures.ts"],
+      "cerebro": []
+    },
+    {
+      "id": "dat.semilla.reproducible-y-no-duplica-al-repetirse",
+      "titulo": "Generar la semilla con una raíz aleatoria fija y hacer que correrla dos veces no duplique nada",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un seed que usa números aleatorios sin raíz fija genera un caso distinto cada vez que falla en CI, así que el error que alguien vio a las 3 p.m. no se puede reproducir a las 4; y si además no es idempotente, correrlo dos veces por error deja el doble de filas y un total que ya no cuadra con nada.",
+      "queHacer": [
+        "Fijar la raíz del generador aleatorio del seed a un valor constante, para que la misma corrida produzca siempre los mismos datos.",
+        "Hacer que el script use upsert por una clave estable, no insert puro, para que correrlo dos veces no duplique filas.",
+        "Probar corriendo el script dos veces seguidas y comparando el conteo de filas: debe ser el mismo después de la segunda.",
+        "Documentar la raíz usada junto al script, para que un caso que falló se pueda reproducir exacto meses después."
+      ],
+      "aceptacion": [
+        { "check": "Correr la siembra dos veces no cambia el conteo de filas", "comando": "node scripts/sembrar.mjs && node scripts/sembrar.mjs; echo EXIT=$?", "espera": "EXIT=0; mismo conteo tras la segunda corrida" },
+        { "check": "La raíz aleatoria está fija y documentada", "comando": "grep -n 'seed\\|raiz' scripts/sembrar.mjs", "espera": "1+ líneas con un valor constante" }
+      ],
+      "aplicaSi": { "modo": "genesis" },
+      "porCada": null,
+      "posee": ["scripts/sembrar.mjs"],
+      "cerebro": []
+    },
+    {
+      "id": "dat.semilla.cantidad-minima-de-filas-por-entidad-para-que-la-pantalla-tenga-sentido",
+      "titulo": "Sembrar suficientes filas de {{entidad}} para que su lista no se vea como el estado vacío",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un seed con una sola fila de {{entidad}} hace que la lista, el filtro y la paginación nunca se muestren de verdad durante el desarrollo: se construyen a ciegas y el primer cliente real con 200 filas es quien descubre que el filtro no funciona o que la paginación nunca se probó.",
+      "queHacer": [
+        "Fijar un número mínimo de filas de {{entidad}} que el seed debe generar, suficiente para llenar más de una página de lista.",
+        "Variar los valores entre filas, no repetir la misma fila con distinto id, para que ordenar y filtrar tengan algo real que hacer.",
+        "Verificar en el propio script que el conteo sembrado alcanza el mínimo antes de terminar en verde.",
+        "Revisar la pantalla de lista de {{entidad}} contra este seed y confirmar que el filtro y la paginación se ejercitan."
+      ],
+      "aceptacion": [
+        { "check": "{{entidad}} tiene al menos el mínimo de filas sembradas", "comando": "node scripts/sembrar.mjs --entidad={{entidad}} --contar", "espera": "conteo mayor o igual al mínimo declarado" },
+        { "check": "Las filas de {{entidad}} no son la misma repetida", "comando": null, "espera": "valores distintos en al menos dos columnas visibles de la lista" }
+      ],
+      "aplicaSi": { "entidades": ["*"], "modo": "genesis" },
+      "porCada": "entidad",
+      "posee": ["scripts/sembrar.mjs"],
+      "cerebro": []
+    },
+    {
+      "id": "dat.semilla.volumen-realista-para-medir-rendimiento",
+      "titulo": "Dejar un generador que produzca volumen de datos parecido al real, no solo la demo de cinco filas",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con cinco filas de ejemplo cualquier consulta responde instantánea y cualquier pantalla se ve rápida: un problema de índice o de paginación que tarda segundos a los 50.000 registros es invisible hasta que el negocio lleva meses de operación real y ya es tarde para diseñarlo distinto.",
+      "queHacer": [
+        "Escribir un generador aparte del seed de demo que produzca decenas de miles de filas por tabla, con valores variados y realistas.",
+        "Parametrizar cuántas filas generar, para poder subir el volumen progresivamente sin reescribir el script.",
+        "Dejarlo documentado como la herramienta para medir consultas e índices contra volumen, no para mostrarle nada al cliente.",
+        "Confirmar que generar el volumen completo termina en un tiempo razonable y no se vuelve, él mismo, el cuello de botella."
+      ],
+      "aceptacion": [
+        { "check": "El generador produce el volumen pedido", "comando": "node scripts/generar-volumen.mjs --filas=50000; echo EXIT=$?", "espera": "EXIT=0; 50000 filas confirmadas por conteo" },
+        { "check": "Está separado del seed de demo", "comando": "ls scripts/generar-volumen.mjs scripts/sembrar-demo.mjs", "espera": "los dos archivos existen por separado" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["scripts/generar-volumen.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.semilla.un-comando-que-resetea-a-un-punto-conocido",
+      "titulo": "Dejar un solo comando que reinicia la base de desarrollo a un estado conocido y nombrado",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin un reset de un solo paso, reproducir un bug reportado o mostrarle algo limpio a un cliente exige recordar de memoria en qué orden correr tres scripts, y quien no los corre en el orden correcto pasa media hora con datos a medio sembrar antes de darse cuenta.",
+      "queHacer": [
+        "Escribir un comando único que borre la base de desarrollo, aplique todas las migraciones y siembre el seed de demo, en ese orden.",
+        "Darle nombre al estado resultante y documentarlo, para poder pedirlo por nombre en un reporte de bug.",
+        "Hacer que el comando se niegue a correr si detecta que apunta a una base que no es de desarrollo.",
+        "Probarlo de punta a punta y medir cuánto tarda, para saber si es viable usarlo varias veces al día."
+      ],
+      "aceptacion": [
+        { "check": "El comando deja la base en el estado nombrado", "comando": "npm run reset-dev; echo EXIT=$?", "espera": "EXIT=0; termina con el seed de demo aplicado" },
+        { "check": "Se niega a correr contra una base que no es de desarrollo", "comando": "DATABASE_URL=postgres://produccion npm run reset-dev; echo EXIT=$?", "espera": "EXIT distinto de 0, sin tocar ninguna fila" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos" },
+      "porCada": null,
+      "posee": ["scripts/reset-dev.mjs"],
+      "cerebro": ["tema:entorno-de-la-maquina"]
+    },
+    {
+      "id": "dat.historial.decidir-borrar-o-conservar-y-dejarlo-escrito",
+      "titulo": "Decidir, tabla por tabla, si se borra físico, se anula o no se borra nunca, y dejarlo escrito",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "En este ecosistema conviven dos doctrinas reales: un proyecto conserva un borrado destructivo que reutiliza el consecutivo de la fila eliminada, y otro le quitó al servidor el permiso de DELETE para que un gasto no se pueda borrar jamás. Sin una decisión escrita por tabla, cada builder nuevo elige la que le parece y el sistema termina con dos doctrinas mezcladas que nadie decidió.",
+      "queHacer": [
+        "Listar toda tabla que registre dinero, inventario o un hecho que alguien pueda necesitar explicar después.",
+        "Para cada una, escribir en docs/borrado-de-datos.md cuál de las tres doctrinas aplica: borrado físico permitido y por qué, anulación con motivo visible, o borrado imposible para siempre.",
+        "No elegir una sola doctrina por defecto para todas: dejar la pregunta abierta tabla por tabla y bloquear la tarea si nadie la responde, en vez de heredar en silencio lo que hizo el último proyecto.",
+        "Citar en el documento las dos doctrinas reales de este ecosistema como referencia de lo que cada una cuesta, sin recomendar cuál usar."
+      ],
+      "aceptacion": [
+        { "check": "Toda tabla de dinero o hechos tiene su doctrina escrita", "comando": "grep -c '^| ' docs/borrado-de-datos.md", "espera": "conteo igual al número de tablas listadas como sensibles" },
+        { "check": "Ninguna tabla queda sin decisión", "comando": null, "espera": "tabla→doctrina completa, 0 filas en blanco o con signo de pregunta" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/borrado-de-datos.md"],
+      "cerebro": ["tema:invariantes-contables", "tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.historial.permiso-de-borrado-coincide-con-la-decision",
+      "titulo": "Comprobar que el permiso real de la base coincide con la doctrina de borrado decidida",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una decisión escrita en un documento no impide que un builder nuevo, sin haberlo leído, use DELETE en una ruta sobre una tabla que se declaró 'nunca se borra': el documento dice una cosa y la base permite otra, y la primera vez que alguien usa esa vía es la que termina contando.",
+      "queHacer": [
+        "Para cada tabla marcada como 'nunca se borra' en la decisión escrita, revocar el permiso DELETE del rol con el que corre la aplicación.",
+        "Confirmarlo consultando los permisos reales de la base, no solo revisando el código de la aplicación.",
+        "Probar que un intento de DELETE contra esa tabla, con el rol de la aplicación, falla por permisos antes de llegar a cualquier lógica de negocio.",
+        "Repetir la comprobación como parte de verificar, para que un cambio de permisos futuro no pase desapercibido."
+      ],
+      "aceptacion": [
+        { "check": "El rol de la aplicación no tiene DELETE en las tablas protegidas", "comando": "node scripts/verificar-permisos-borrado.mjs", "espera": "exit 0; 0 tablas protegidas con DELETE concedido" },
+        { "check": "Un intento de DELETE contra una tabla protegida falla por permisos", "comando": "npm test -- permiso-de-borrado", "espera": "exit 0; el error es de permisos, no de lógica de negocio" }
+      ],
+      "aplicaSi": { "dineroReal": true, "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["scripts/verificar-permisos-borrado.mjs", "supabase/migrations/**"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.historial.bitacora-de-cambios-por-columna",
+      "titulo": "Guardar el valor anterior y el nuevo de cada cambio sensible de {{entidad}}",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando el dueño pregunta quién cambió un precio y cuál tenía antes, un log de acciones que solo dice 'Juan editó el producto X a las 3pm' no contesta nada: sin el valor anterior guardado, reconstruir qué pasó exige adivinar entre los respaldos diarios cuál fue el momento exacto.",
+      "queHacer": [
+        "Crear una tabla o mecanismo de historial que guarde, para los campos sensibles de {{entidad}}, el valor anterior, el valor nuevo, quién y cuándo.",
+        "Dispararlo automáticamente en cada UPDATE relevante, con un trigger de base o en el módulo único que escribe {{entidad}}, nunca a discreción de cada ruta.",
+        "Excluir del historial los campos que cambian solo por housekeeping, para que no se llene de ruido.",
+        "Probar que cambiar un campo sensible de {{entidad}} deja exactamente una fila de historial con el antes y el después correctos."
+      ],
+      "aceptacion": [
+        { "check": "El cambio de un campo sensible de {{entidad}} queda en el historial", "comando": "npm test -- historial-{{entidad}}", "espera": "exit 0; 1 fila de historial con valor_anterior y valor_nuevo distintos" },
+        { "check": "El historial no se dispara en housekeeping", "comando": "grep -c 'cache\\|vistas' lib/dominio/historial-{{entidad}}.ts", "espera": "0 líneas: esos campos están explícitamente excluidos" }
+      ],
+      "aplicaSi": { "entidades": ["*"], "dineroReal": true, "stack": ["postgres", "supabase"] },
+      "porCada": "entidad",
+      "posee": ["supabase/migrations/**", "lib/dominio/historial-{{entidad}}.ts", "tests/datos/historial-{{entidad}}.test.ts"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    {
+      "id": "dat.historial.borrado-logico-no-rompe-la-restriccion-unica",
+      "titulo": "Usar un índice único parcial para que el borrado lógico no bloquee reusar el mismo código",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Con UNIQUE(sku) a secas, anular un producto y crear uno nuevo con el mismo código lo rechaza la base para siempre, aunque el original ya no esté activo: el dueño necesita reutilizar el código para un producto distinto y el sistema se lo impide citando una fila que ya nadie ve en ninguna pantalla.",
+      "queHacer": [
+        "Sustituir la restricción UNIQUE simple por un índice único parcial que solo aplique a las filas activas.",
+        "Migrar la restricción existente sin perder la protección sobre las filas que sí siguen activas.",
+        "Probar que anular una fila y crear otra con el mismo valor único ahora sí se permite.",
+        "Probar también que dos filas activas con el mismo valor siguen rechazándose, para no perder la protección original."
+      ],
+      "aceptacion": [
+        { "check": "El índice único es parcial sobre las filas activas", "comando": "grep -c 'unique.*where' supabase/migrations/*.sql", "espera": "1+" },
+        { "check": "Reutilizar el código de una fila anulada ahora funciona", "comando": "npm test -- unico-parcial-tras-anular", "espera": "exit 0; dos filas activas con el mismo valor siguen rechazadas" }
+      ],
+      "aplicaSi": { "dineroReal": true, "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "tests/datos/unico-parcial-tras-anular.test.ts"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.historial.bitacora-no-frena-la-escritura-operativa",
+      "titulo": "Confirmar que la bitácora de historial no frena la escritura operativa cuando acumula años de filas",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Un trigger de historial que funciona perfecto con cien filas puede duplicar el tiempo de cada escritura cuando la tabla de historial lleva millones de filas acumuladas: el cajero nota la caja más lenta meses después de que el mecanismo se instaló, y nadie relaciona una cosa con la otra porque el trigger nunca cambió.",
+      "queHacer": [
+        "Sembrar la tabla de historial con un volumen equivalente a varios años de operación real.",
+        "Medir el tiempo de una escritura operativa normal contra esa tabla ya cargada, y compararlo contra el tiempo sin historial.",
+        "Si el historial se vuelve el cuello de botella, moverlo a una tabla aparte con su propio índice por fecha, o particionarlo por período.",
+        "Confirmar que las consultas del día a día sobre la entidad operativa no tienen que atravesar las filas de historial para responder."
+      ],
+      "aceptacion": [
+        { "check": "La escritura operativa con historial cargado se mide", "comando": "node scripts/medir-escritura-con-historial.mjs --anios=3", "espera": "milisegundos impresos, comparados contra la línea base sin historial" },
+        { "check": "La lectura operativa no escanea el historial", "comando": "npm test -- lectura-no-toca-historial", "espera": "exit 0; el plan de la consulta no incluye la tabla de historial" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["scripts/medir-escritura-con-historial.mjs", "tests/datos/lectura-no-toca-historial.test.ts"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.historial.migrar-el-historial-sin-perder-la-cadena",
+      "titulo": "Conservar legible el historial viejo cuando la columna que auditaba cambia de nombre o de forma",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Renombrar una columna auditada sin tocar su historial deja filas viejas que dicen 'cambió precio_compra' cuando esa columna ya no existe con ese nombre: quien reconstruye qué pasó hace un año no puede relacionar la fila del historial con nada del esquema actual.",
+      "queHacer": [
+        "Antes de renombrar o cambiar el tipo de una columna auditada, identificar todas las filas de historial que la mencionan por su nombre viejo.",
+        "Migrar esas referencias al nombre nuevo en el mismo cambio, o guardar un mapa de nombres viejos a nuevos junto al historial.",
+        "Probar que una consulta de qué cambió en esta fila a lo largo del tiempo sigue siendo legible después de la migración, sin huecos ni nombres huérfanos.",
+        "Documentar en la migración qué pasó con las referencias del historial, no solo con la columna operativa."
+      ],
+      "aceptacion": [
+        { "check": "El historial anterior a la migración sigue siendo legible", "comando": "npm test -- historial-sobrevive-renombrar", "espera": "exit 0" },
+        { "check": "No quedan referencias del historial a un nombre de columna inexistente", "comando": "node scripts/verificar-historial-huerfano.mjs", "espera": "exit 0; 0 referencias huérfanas" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["supabase/migrations/**", "scripts/verificar-historial-huerfano.mjs", "tests/datos/historial-sobrevive-renombrar.test.ts"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.historial.linea-de-tiempo-legible-de-un-registro",
+      "titulo": "Mostrar la historia completa de un registro como una línea de tiempo legible, no como filas crudas",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un historial que solo se consulta con una query SQL sirve para el desarrollador, no para el dueño que necesita entender en dos minutos por qué el precio de hoy no es el que él recuerda haber puesto: una tabla de auditoría cruda no contesta esa pregunta sin que alguien la traduzca primero.",
+      "queHacer": [
+        "Construir una vista o pantalla que tome las filas de historial de un registro y las presente como una línea de tiempo legible.",
+        "Traducir cada tipo de cambio a una frase en el idioma del negocio, no al nombre de la columna que cambió.",
+        "Ordenarla del más reciente al más antiguo y permitir filtrar por quién hizo el cambio.",
+        "Probarla contra un registro con varios cambios reales y confirmar que la secuencia se lee sin ayuda de quien construyó el sistema."
+      ],
+      "aceptacion": [
+        { "check": "La línea de tiempo se genera para un registro con varios cambios", "comando": "npm run linea-de-tiempo -- <id>", "espera": "exit 0; imprime cada cambio en una frase legible, ordenado por fecha" },
+        { "check": "No muestra nombres de columna crudos", "comando": "npm run linea-de-tiempo -- <id> | grep -ciE '_id$|_at$'", "espera": "0" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos", "dineroReal": true },
+      "porCada": null,
+      "posee": ["scripts/linea-de-tiempo.mjs"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    {
+      "id": "dat.copia.archivo-de-respaldo-valido-no-solo-presente",
+      "titulo": "Comprobar que el archivo de respaldo de hoy realmente abre, no solo que existe",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un respaldo que se corta a la mitad por un corte de red deja un archivo con la fecha de hoy y un tamaño que parece normal: la comprobación de 'existe y pesa más de 0' pasa en verde mientras el archivo está corrupto, y nadie lo sabe hasta el día que se necesita restaurar de verdad.",
+      "queHacer": [
+        "Después de generar el respaldo diario, intentar abrirlo o parsearlo de verdad, no solo comprobar su tamaño.",
+        "Hacer que el proceso de respaldo falle visiblemente si el archivo generado no pasa esa comprobación.",
+        "Registrar el resultado de la comprobación junto a la fecha del respaldo, para ver la racha sin abrir cada archivo a mano.",
+        "Probar el caso adverso truncando un respaldo a propósito y confirmando que la comprobación lo detecta."
+      ],
+      "aceptacion": [
+        { "check": "El respaldo de hoy pasa la comprobación de validez", "comando": "node scripts/verificar-respaldo.mjs --ultimo", "espera": "exit 0; confirma que el archivo abre y su contenido es interpretable" },
+        { "check": "Un respaldo truncado se detecta", "comando": "npm test -- respaldo-truncado", "espera": "exit 0; el script marca inválido el archivo cortado" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["scripts/verificar-respaldo.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.copia.restaurado-sin-huerfanos",
+      "titulo": "Verificar que la base restaurada del ensayo no quedó con referencias rotas ni filas de menos",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Que la restauración terminó con código de salida 0 dice que el comando corrió, no que el contenido quedó completo: una restauración parcial por un error a mitad de una tabla puede dejar filas huérfanas o una tabla con la mitad de sus registros, y ese hueco solo se ve si alguien lo cuenta.",
+      "queHacer": [
+        "Guardar, antes del respaldo, un manifiesto con el conteo de filas de cada tabla.",
+        "Después de restaurar en el entorno del ensayo, comparar el conteo real contra ese manifiesto, tabla por tabla.",
+        "Correr el barrido de huérfanos contra la base restaurada, no solo contra la base viva.",
+        "Registrar el resultado junto a la fecha del ensayo de restauración, no solo si el comando terminó bien."
+      ],
+      "aceptacion": [
+        { "check": "El conteo restaurado coincide con el manifiesto", "comando": "node scripts/comparar-conteo-restaurado.mjs", "espera": "exit 0; 0 tablas con diferencia de conteo" },
+        { "check": "La base restaurada no tiene huérfanos", "comando": "node scripts/barrido-huerfanos.mjs -- --base=restaurada", "espera": "exit 0; 0 huérfanos" }
+      ],
+      "aplicaSi": { "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["scripts/comparar-conteo-restaurado.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.copia.cubre-todo-almacen-no-solo-la-base",
+      "titulo": "Hacer que el respaldo cubra todo lo que el negocio guarda, no solo la base de datos",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un respaldo que solo cubre Postgres y olvida los PDF de factura o las fotos de producto guardadas en disco restaura una base perfecta que apunta a archivos que ya no existen: la factura del cliente se ve en el sistema pero su PDF real desapareció con el resto del servidor.",
+      "queHacer": [
+        "Listar todo lugar donde el negocio guarda algo que no está en la base: archivos subidos, PDFs generados, exportaciones, caché en disco.",
+        "Incluir cada uno en la rutina de respaldo, con la misma frecuencia que la base, o documentar por qué no hace falta.",
+        "Marcar cada archivo y cada fila de la base con una referencia cruzada que permita comprobar que los dos se restauraron juntos.",
+        "Probar el ensayo de restauración completo y confirmar que un documento con archivo adjunto sigue teniendo su archivo después de restaurar."
+      ],
+      "aceptacion": [
+        { "check": "Todo almacén distinto de la base está en la lista de respaldo", "comando": null, "espera": "tabla almacén→incluido en respaldo completa, 0 filas sin decisión" },
+        { "check": "Un documento con archivo adjunto conserva su archivo tras restaurar", "comando": "npm run ensayo-restauracion -- --verificar-adjuntos", "espera": "exit 0; 0 documentos con archivo faltante" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["docs/respaldo.md", "scripts/ensayo-restauracion.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias", "tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.copia.recuperar-un-registro-sin-restaurar-todo",
+      "titulo": "Poder recuperar un solo registro dañado desde el respaldo, sin restaurar el sistema entero",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Con datos reales corriendo, una restauración completa para recuperar un solo registro que alguien corrigió mal vuelve atrás también todo lo que se cobró después: en un negocio con ventas cada minuto, esa opción cuesta más de lo que arregla.",
+      "queHacer": [
+        "Restaurar el respaldo en una base aparte y desechable, nunca sobre la base viva.",
+        "Extraer de ahí solamente la fila o las filas dañadas, con su identificador exacto.",
+        "Reconciliar esa fila contra lo que se escribió después del respaldo, para no perder cambios legítimos posteriores sin relación con el daño.",
+        "Escribir el procedimiento en pasos numerados y ensayarlo con un caso real antes de necesitarlo de verdad."
+      ],
+      "aceptacion": [
+        { "check": "El procedimiento recupera una fila sin tocar el resto de la base", "comando": "npm run recuperar-registro -- --id=<id> --ensayo", "espera": "exit 0; solo la fila pedida cambia, el resto del conteo es idéntico antes y después" },
+        { "check": "El procedimiento está documentado y ensayado", "comando": "grep -n 'fecha del ensayo' docs/recuperar-registro.md", "espera": "1+ líneas con fecha" }
+      ],
+      "aplicaSi": { "dineroReal": true, "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["docs/recuperar-registro.md", "scripts/recuperar-registro.mjs"],
+      "cerebro": ["tema:dominio-migraciones-y-copias"]
+    },
+    {
+      "id": "dat.privacidad.dato-sensible-fuera-de-los-ambientes-de-prueba",
+      "titulo": "Impedir que un dato personal real de un cliente entre a un ambiente de desarrollo o prueba",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Copiar un export de producción a la base de desarrollo para tener datos realistas deja la cédula y el teléfono de un cliente real en la laptop de un builder o en el navegador de desarrollo de cualquiera: la fuga no ocurre en producción, ocurre en el lugar que nadie vigila.",
+      "queHacer": [
+        "Prohibir explícitamente copiar un export o un respaldo de producción hacia un entorno de desarrollo o prueba.",
+        "Cuando un ambiente de prueba necesite datos realistas, generarlos con el seed de volumen, nunca importarlos de un cliente real.",
+        "Revisar los datos que hoy existen en entornos de desarrollo y marcar como incidente cualquier dato personal real encontrado.",
+        "Dejar un grep de guardia que busque patrones de documento o teléfono real conocido en los repositorios de fixtures."
+      ],
+      "aceptacion": [
+        { "check": "No hay proceso que copie producción a desarrollo", "comando": "grep -rniE 'produccion.*(dump|export).*(dev|desarrollo|staging)' scripts/", "espera": "0 líneas" },
+        { "check": "Los entornos de desarrollo no tienen datos personales reales", "comando": "node scripts/auditar-pii-en-dev.mjs", "espera": "exit 0; 0 coincidencias con datos reales conocidos" }
+      ],
+      "aplicaSi": { "datosPersonales": true },
+      "porCada": null,
+      "posee": ["scripts/auditar-pii-en-dev.mjs"],
+      "cerebro": ["tema:entorno-de-la-maquina"]
+    },
+    {
+      "id": "dat.privacidad.columna-personal-nueva-pasa-por-el-inventario",
+      "titulo": "Bloquear en la migración toda columna de dato personal que no esté en el inventario",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El inventario de datos personales describe el esquema del día que se escribió: una columna de teléfono añadida meses después en una tabla nueva nunca entra ahí si nadie se acuerda de actualizarlo a mano, y el día que el titular reclama sus datos esa columna no aparece en ningún lado.",
+      "queHacer": [
+        "Escribir una comprobación que recorra las migraciones nuevas buscando nombres de columna que coincidan con patrones de dato personal.",
+        "Hacer que falle si encuentra una coincidencia que no está ya listada en el inventario de datos personales.",
+        "Correrla como parte de verificar, para que agregar la columna al inventario sea parte del mismo cambio, no una tarea aparte que se olvida.",
+        "Probar agregando a propósito una columna de teléfono sin actualizar el inventario y confirmar que la comprobación la detiene."
+      ],
+      "aceptacion": [
+        { "check": "Una columna personal nueva sin inventario detiene la comprobación", "comando": "npm run verificar-inventario-pii; echo EXIT=$?", "espera": "EXIT distinto de 0 si hay una columna sin listar" },
+        { "check": "Está dentro de verificar", "comando": "grep -n 'verificar-inventario-pii' package.json", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "datosPersonales": true, "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["scripts/verificar-inventario-pii.mjs"],
+      "cerebro": []
+    },
+    {
+      "id": "dat.privacidad.anonimizado-es-irreversible-de-verdad",
+      "titulo": "Probar que el anonimizado de un dato personal no se puede revertir",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Reemplazar un teléfono por sus últimos cuatro dígitos, o por un hash sin sal calculado sobre el número original, se ve anonimizado pero no lo es: con la lista de clientes de una zona es trivial recalcular el hash de cada número posible y encontrar a quién pertenecía el dato borrado.",
+      "queHacer": [
+        "Elegir una técnica de anonimizado que de verdad destruya la posibilidad de reconstruir el original, no una que solo lo disfrace.",
+        "Probar activamente recuperar el valor original a partir del anonimizado con los métodos más obvios y confirmar que fallan.",
+        "No reutilizar el mismo valor anonimizado para dos personas distintas de forma que sirva como identificador encubierto.",
+        "Documentar la técnica elegida y por qué se descartaron las más débiles."
+      ],
+      "aceptacion": [
+        { "check": "El anonimizado resiste el intento de recuperación", "comando": "npm test -- anonimizado-irreversible", "espera": "exit 0; el intento de fuerza bruta sobre el rango real no recupera el valor original" },
+        { "check": "La técnica elegida está documentada", "comando": "grep -n 'tecnica de anonimizado' docs/derechos-del-titular.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "datosPersonales": true },
+      "porCada": null,
+      "posee": ["lib/servidor/anonimizar.ts", "tests/datos/anonimizado-irreversible.test.ts"],
+      "cerebro": []
+    },
+    {
+      "id": "dat.privacidad.borrado-no-deja-copia-en-cache-derivada",
+      "titulo": "Confirmar que borrar los datos de un titular también los quita de toda copia derivada",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Anonimizar la fila principal de un cliente no sirve de nada si su nombre y teléfono siguen intactos en un índice de búsqueda, una vista materializada o un CSV exportado el mes pasado a la carpeta de reportes: el titular pidió que se le olvidara y una copia lo sigue recordando.",
+      "queHacer": [
+        "Listar toda copia derivada de datos personales: índices de búsqueda, vistas materializadas, exportaciones guardadas, cachés.",
+        "Para cada una, incluirla explícitamente en el procedimiento de borrado a petición del titular.",
+        "Probar el procedimiento completo y, después, buscar el dato borrado en cada copia derivada listada, no solo en la tabla principal.",
+        "Repetir la búsqueda algunas semanas después, por si una copia derivada se regenera sola desde una fuente que no se actualizó."
+      ],
+      "aceptacion": [
+        { "check": "El dato borrado no aparece en ninguna copia derivada", "comando": "node scripts/buscar-en-copias-derivadas.mjs -- --titular=<id>", "espera": "exit 0; 0 coincidencias en todas las copias listadas" },
+        { "check": "Las copias derivadas están todas listadas", "comando": "grep -c '^- ' docs/derechos-del-titular.md", "espera": "1+ y coincide con el número de copias reales encontradas" }
+      ],
+      "aplicaSi": { "datosPersonales": true },
+      "porCada": null,
+      "posee": ["scripts/buscar-en-copias-derivadas.mjs"],
+      "cerebro": ["tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.privacidad.la-retencion-declarada-se-cumple-sola",
+      "titulo": "Hacer que un job cumpla solo la retención de datos personales ya declarada, sin depender de que alguien lo recuerde",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Un inventario que dice 'se conserva 2 años' y ningún proceso que lo aplique es una promesa de papel: a los tres, cinco o diez años los datos siguen ahí exactamente igual, y el día que alguien audite, la respuesta real es que nunca se cumplió lo escrito.",
+      "queHacer": [
+        "Tomar el período de retención ya declarado por tabla en el inventario de datos personales, sin volver a decidirlo aquí.",
+        "Escribir un job programado que busque filas más viejas que su período declarado y las anonimice o elimine según la doctrina de borrado ya decidida para esa tabla.",
+        "Probar sembrando una fila con fecha anterior al corte y confirmando que una corrida en seco la detecta antes de tocarla de verdad.",
+        "Dejar un registro de cada corrida: cuántas filas procesó y de qué tabla, para poder auditar que el job de verdad se ejecuta."
+      ],
+      "aceptacion": [
+        { "check": "El dry-run detecta filas vencidas sin tocarlas", "comando": "node scripts/purgar-retencion.mjs --dry-run", "espera": "exit 0; lista las filas candidatas sin modificarlas" },
+        { "check": "La corrida real procesa solo lo vencido y queda registrada", "comando": "npm test -- purgar-retencion", "espera": "exit 0; las filas dentro del período quedan intactas" }
+      ],
+      "aplicaSi": { "datosPersonales": true, "stack": ["postgres", "supabase"] },
+      "porCada": null,
+      "posee": ["scripts/purgar-retencion.mjs", "docs/derechos-del-titular.md"],
+      "cerebro": []
+    },
+    {
+      "id": "dat.reporte.cada-columna-exportada-tiene-nombre-que-el-dueno-entiende",
+      "titulo": "Nombrar las columnas de cada exportación como el negocio las llama, no como se llaman en la base",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Un CSV con columnas monto_cop, fk_sede_id y estado_enum obliga al contador a preguntar qué es cada una antes de poder usarlo: la exportación existe para que alguien fuera del sistema la entienda sola, y un nombre interno de la base falla ese propósito aunque el dato adentro sea correcto.",
+      "queHacer": [
+        "Revisar cada exportación existente y listar sus encabezados de columna tal como salen hoy.",
+        "Traducir cada uno al nombre que el dueño o el contador usan hablando del negocio, no al nombre de la columna en la base.",
+        "Centralizar esa traducción en un solo mapa de nombre técnico a nombre visible, para que todas las exportaciones lo usen igual.",
+        "Revisar el resultado con el dueño antes de darlo por bueno, no solo con quien lo construyó."
+      ],
+      "aceptacion": [
+        { "check": "Ninguna columna exportada usa el nombre técnico de la base", "comando": "head -1 exportaciones/ventas.csv | grep -ciE '_id$|_cop$|_enum'", "espera": "0" },
+        { "check": "El mapa de nombres está centralizado", "comando": "grep -c '=>' lib/servidor/nombres-exportacion.ts", "espera": "1+ por cada columna exportada" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["lib/servidor/nombres-exportacion.ts"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    {
+      "id": "dat.reporte.csv-que-el-contador-puede-abrir",
+      "titulo": "Exportar el CSV con la codificación, el separador y el formato de número que Excel abre bien",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un CSV en UTF-8 sin BOM abierto en Excel en Colombia muestra las tildes rotas y convierte un número con separador de miles en texto en vez de en número: el contador termina corrigiendo a mano cada mes lo que la exportación debió entregar bien desde el principio.",
+      "queHacer": [
+        "Generar el CSV con BOM UTF-8 para que Excel reconozca tildes y la ñ sin configuración adicional.",
+        "Usar el separador decimal y de miles que Excel en español espera, o declarar explícitamente el separador de columnas si no es la coma.",
+        "Exportar el dinero como número plano en pesos enteros, nunca como texto con símbolo de moneda.",
+        "Abrir el archivo generado en una hoja de cálculo real como parte de la prueba, no solo leerlo con un parser de CSV."
+      ],
+      "aceptacion": [
+        { "check": "El archivo lleva BOM UTF-8", "comando": "head -c 3 exportaciones/ventas.csv | xxd", "espera": "ef bb bf al inicio del archivo" },
+        { "check": "Los montos son número plano, no texto con símbolo", "comando": "grep -c '\\$' exportaciones/ventas.csv", "espera": "0" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["lib/servidor/exportar-csv.ts"],
+      "cerebro": []
+    },
+    {
+      "id": "dat.reporte.exportacion-cuadra-con-la-pantalla",
+      "titulo": "Confirmar que el total del CSV exportado es igual al que muestra la pantalla para el mismo filtro",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una exportación que arma su propia consulta por separado de la pantalla puede olvidar excluir los anulados o usar otro campo de fecha: el CSV que el dueño le manda al contador dice una cifra y la pantalla que él mismo revisó decía otra, sin ninguna explicación fácil para la diferencia.",
+      "queHacer": [
+        "Hacer que la exportación reutilice la misma consulta o definición que usa la pantalla equivalente, no una escrita aparte.",
+        "Probar exportando con el mismo filtro que una pantalla ya verificada y comparando el total de ambas.",
+        "Si la exportación necesita columnas que la pantalla no muestra, agregarlas sin cambiar el filtro base que decide qué filas entran.",
+        "Repetir la prueba cuando cambie el filtro de anulados o el campo de fecha usado, para que no se desincronicen con el tiempo."
+      ],
+      "aceptacion": [
+        { "check": "El total exportado coincide con el de la pantalla", "comando": "npm test -- exportacion-cuadra-con-pantalla", "espera": "exit 0" },
+        { "check": "La exportación reutiliza la consulta de la pantalla", "comando": "grep -n 'vista_ventas_dia\\|ventas_vigentes' lib/servidor/exportar-csv.ts", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["lib/servidor/exportar-csv.ts", "tests/datos/exportacion-cuadra-con-pantalla.test.ts"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.reporte.consolidado-multi-sede-concilia-antes-de-sumar",
+      "titulo": "Conciliar el subtotal de cada sede antes de sumarlas en un reporte consolidado",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si el filtro de una sola sede está roto y arrastra ventas de otra, sumarlo todo en un consolidado esconde el error dentro de un total más grande: la sede afectada nunca cuadra sola porque nadie la mira sola, solo se mira el número ya sumado.",
+      "queHacer": [
+        "Antes de sumar el consolidado, calcular el subtotal de cada sede por separado.",
+        "Comparar cada subtotal contra su propio detalle, la misma cifra que esa sede vería si consultara solo lo suyo.",
+        "Rechazar o marcar visiblemente el consolidado si alguna sede no concilia con su propio detalle, en vez de sumar igual.",
+        "Probar con una sede a propósito descuadrada y confirmar que el consolidado la señala en vez de absorberla en el total."
+      ],
+      "aceptacion": [
+        { "check": "Una sede descuadrada se señala antes de sumar", "comando": "npm test -- consolidado-concilia", "espera": "exit 0; la sede descuadrada aparece marcada, no absorbida en el total" },
+        { "check": "El consolidado no suma sin conciliar primero", "comando": "grep -n 'conciliarSede' lib/servidor/reportes.ts", "espera": "1+ líneas antes de la suma final" }
+      ],
+      "aplicaSi": { "dineroReal": true, "multiUsuario": true },
+      "porCada": null,
+      "posee": ["lib/servidor/reportes.ts", "tests/datos/consolidado-concilia.test.ts"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.reporte.exportacion-programada-que-nadie-tiene-que-pedir",
+      "titulo": "Generar y entregar el reporte mensual del contador sin que nadie tenga que acordarse de pedirlo",
+      "nivel": "N4",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un reporte que solo se genera cuando alguien se acuerda de hacer clic se olvida justo el mes con más movimiento: el contador lo pide tarde, el cierre se atrasa, y la excusa siempre es la misma sin que el mecanismo cambie para el mes siguiente.",
+      "queHacer": [
+        "Programar la generación del reporte mensual para que corra sola, en una fecha fija después del cierre del mes.",
+        "Entregarlo a un lugar que el dueño y el contador ya revisan, no a un botón que alguien debe recordar apretar.",
+        "Avisar visiblemente si la generación programada falla, en vez de fallar en silencio hasta que se necesite y no esté.",
+        "Probar la corrida programada de punta a punta al menos una vez antes de confiar en que corre sola."
+      ],
+      "aceptacion": [
+        { "check": "El reporte se genera solo en la fecha programada", "comando": "grep -n 'cron\\|programado' scripts/reporte-mensual.mjs", "espera": "1+ líneas" },
+        { "check": "Un fallo en la generación se avisa", "comando": "npm test -- reporte-programado-avisa-fallo", "espera": "exit 0" }
+      ],
+      "aplicaSi": { "equipo": "orion+humanos", "dineroReal": true },
+      "porCada": null,
+      "posee": ["scripts/reporte-mensual.mjs"],
+      "cerebro": ["tema:documentos-para-personas"]
+    },
+    {
+      "id": "dat.calidad.huecos-en-la-secuencia-explicados",
+      "titulo": "Listar todo hueco en la numeración de documentos y exigirle una causa",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un consecutivo que salta de la factura 108 a la 111 sin ninguna explicación visible es exactamente lo que un auditor pregunta primero: sin una causa registrada para cada hueco, el dueño no tiene cómo contestar y el hueco se ve indistinguible de una factura escondida.",
+      "queHacer": [
+        "Escribir una consulta que recorra el consecutivo de cada tipo de documento y liste los números que faltan.",
+        "Para cada hueco encontrado, cruzarlo contra los intentos fallidos o las transacciones revertidas que lo explicarían.",
+        "Donde no exista una causa registrada para el hueco, marcarlo como pendiente de explicar en vez de dejarlo pasar.",
+        "Correr esta consulta con regularidad, no solo cuando alguien ya sospecha algo."
+      ],
+      "aceptacion": [
+        { "check": "El script lista todo hueco con su causa o su falta de causa", "comando": "node scripts/huecos-en-secuencia.mjs", "espera": "exit 0; imprime cada hueco con su causa registrada o 'sin explicar'" },
+        { "check": "No quedan huecos sin explicar más allá de la ventana reciente", "comando": null, "espera": "tabla hueco→causa; 0 filas sin explicar de más de una semana" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["scripts/huecos-en-secuencia.mjs"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.calidad.la-suma-de-las-partes-es-el-todo",
+      "titulo": "Auditar con regularidad que la suma de los movimientos coincide con cualquier total que todavía se guarde aparte",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un total heredado de una versión anterior que ya debería derivarse siempre puede seguir viviendo en una columna vieja que nadie borró: mientras las dos cifras coincidan nadie lo nota, pero un bug o una corrección manual que solo toque una de las dos dispara una diferencia que puede tardar meses en descubrirse.",
+      "queHacer": [
+        "Identificar todo total o saldo que todavía exista como columna guardada además de poder derivarse de sus movimientos.",
+        "Escribir una auditoría periódica que recalcule el total desde los movimientos y lo compare contra la columna guardada.",
+        "Tratar cualquier diferencia como incidente que se investiga, no como un redondeo sin importancia.",
+        "Usar cada diferencia encontrada como argumento para terminar de eliminar la columna guardada, no solo para corregirla una vez."
+      ],
+      "aceptacion": [
+        { "check": "La auditoría corre contra los datos reales", "comando": "node scripts/auditar-totales-derivados.mjs", "espera": "exit 0; imprime 0 diferencias o la lista con tabla, fila y magnitud" },
+        { "check": "Cualquier diferencia encontrada queda registrada como incidente", "comando": null, "espera": "tabla diferencia→incidente abierto, ninguna diferencia ignorada" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["scripts/auditar-totales-derivados.mjs"],
+      "cerebro": ["tema:invariantes-contables", "tema:donde-vive-el-dato"]
+    },
+    {
+      "id": "dat.calidad.barrido-de-valores-imposibles",
+      "titulo": "Barrer la base real buscando valores que la física del negocio hace imposibles",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una fila con stock en -12, un cierre de caja con contado pero sin esperado, o un descuento del 300% pasa cualquier revisión visual de la pantalla porque cada fila aislada se ve como cualquier otra: solo un barrido que conoce las reglas del negocio encuentra la fila que nunca debió existir.",
+      "queHacer": [
+        "Listar, junto con el dueño del dominio, los valores que la física o las reglas del negocio hacen imposibles.",
+        "Escribir una consulta por cada regla que cuente filas reales que la violan.",
+        "Correrla contra la base de producción, no solo contra datos de prueba recién sembrados.",
+        "Para cada fila encontrada, investigar cómo entró antes de simplemente corregirla, para cerrar la vía por la que se coló."
+      ],
+      "aceptacion": [
+        { "check": "El barrido corre contra la base real", "comando": "node scripts/barrido-valores-imposibles.mjs", "espera": "exit 0; imprime 0 filas imposibles o la lista con tabla, fila y regla violada" },
+        { "check": "Cada violación encontrada tiene una investigación abierta", "comando": null, "espera": "tabla violación→causa investigada, ninguna corregida sin entender cómo entró" }
+      ],
+      "aplicaSi": { "dineroReal": true },
+      "porCada": null,
+      "posee": ["scripts/barrido-valores-imposibles.mjs"],
+      "cerebro": ["tema:invariantes-contables"]
+    },
+    {
+      "id": "dat.calidad.duplicado-por-significado-no-por-igualdad",
+      "titulo": "Detectar filas que significan lo mismo aunque no sean idénticas letra por letra",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un mismo cliente registrado con variantes de mayúsculas y espacios existe varias veces para cualquier consulta que agrupe por igualdad exacta: el reporte de clientes únicos infla el número real y una promoción para nuevos clientes se le puede volver a ofrecer a quien ya es cliente hace un año.",
+      "queHacer": [
+        "Normalizar el campo clave, sin mayúsculas, espacios sobrantes ni tildes, antes de comparar, en un reporte aparte de la búsqueda de duplicados.",
+        "Listar los grupos de filas que coinciden después de normalizar pero no antes, con sus valores originales uno junto al otro.",
+        "No fusionar ni borrar automáticamente: dejar la lista para que una persona decida caso por caso.",
+        "Repetirlo con regularidad, porque el mismo error de captura vuelve a ocurrir con clientes nuevos."
+      ],
+      "aceptacion": [
+        { "check": "El reporte encuentra duplicados por significado", "comando": "node scripts/duplicados-por-significado.mjs", "espera": "exit 0; imprime los grupos encontrados o 0 grupos" },
+        { "check": "No fusiona ni borra nada por su cuenta", "comando": "grep -c 'DELETE\\|merge(' scripts/duplicados-por-significado.mjs", "espera": "0" }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": ["scripts/duplicados-por-significado.mjs"],
+      "cerebro": []
+    },
+    {
+      "id": "dat.calidad.medida-imposible-por-la-fisica-del-negocio",
+      "titulo": "Declarar y vigilar los límites físicamente imposibles de {{entidad}}",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Sin límites declarados por entidad, cada quien decide a ojo qué valor se ve raro: un peso de 50 kilos en una bolsa de mercado o una propina del 500% pasan sin que ninguna alarma suene, porque nadie escribió antes cuál es el límite que la realidad del negocio impone.",
+      "queHacer": [
+        "Para {{entidad}}, escribir junto al dueño del negocio los límites que la física o la operación hacen imposibles de cruzar de verdad.",
+        "Expresarlos como una consulta que debe devolver siempre cero filas contra la base real.",
+        "Añadir el límite nuevo a la lista en cuanto se aprenda un hecho físico más del negocio que antes no estaba escrito.",
+        "Correr la consulta con regularidad y no solo la primera vez que se escribió."
+      ],
+      "aceptacion": [
+        { "check": "La consulta de límites de {{entidad}} da cero filas en la base real", "comando": "node scripts/limites-imposibles.mjs --entidad={{entidad}}", "espera": "exit 0; 0 filas fuera de los límites declarados" },
+        { "check": "Los límites de {{entidad}} están documentados con su motivo", "comando": "grep -c '{{entidad}}' docs/limites-fisicos.md", "espera": "1+ líneas" }
+      ],
+      "aplicaSi": { "entidades": ["*"] },
+      "porCada": "entidad",
+      "posee": ["scripts/limites-imposibles.mjs", "docs/limites-fisicos.md"],
+      "cerebro": ["tema:invariantes-contables"]
+    }
+  ]
+}
