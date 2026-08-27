@@ -17,13 +17,26 @@
         "Confirmar con git status que ningún archivo de la lista aparece como rastreado."
       ],
       "aceptacion": [
-        { "check": "Ningún archivo de secretos o datos reales está rastreado por git", "comando": "git ls-files | grep -iE \"\\.env$|\\.env\\.local|data/.*\\.json$|credenciales\"", "espera": "0 líneas, salvo archivos .example" },
-        { "check": "Existe una plantilla de variables sin valores reales", "comando": "test -f .env.example && echo SI || echo NO", "espera": "SI" }
+        {
+          "check": "Ningún archivo de secretos o datos reales está rastreado por git",
+          "comando": "git ls-files | grep -iE \"\\.env$|\\.env\\.local|data/.*\\.json$|credenciales\"",
+          "espera": "0 líneas, salvo archivos .example"
+        },
+        {
+          "check": "Existe una plantilla de variables sin valores reales",
+          "comando": "test -f .env.example && echo SI || echo NO",
+          "espera": "SI"
+        }
       ],
       "aplicaSi": {},
       "porCada": null,
-      "posee": [".gitignore", ".env.example"],
-      "cerebro": ["tema:donde-vive-el-dato"]
+      "posee": [
+        ".gitignore",
+        ".env.example"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
     },
     {
       "id": "ops.repo.pendientes-de-subir",
@@ -39,13 +52,25 @@
         "Marcar cada línea como resuelta cuando el dueño confirme que ya la subió."
       ],
       "aceptacion": [
-        { "check": "La lista de commits sin subir coincide con lo realmente pendiente", "comando": "git log @{u}..HEAD --oneline | wc -l", "espera": "coincide con las líneas activas de PENDIENTES-GIT.md (0 si no hay pendientes)" },
-        { "check": "Ningún hook o script intenta push automático", "comando": "grep -rln \"git push\" .git/hooks/ package.json 2>/dev/null", "espera": "0 líneas" }
+        {
+          "check": "La lista de commits sin subir coincide con lo realmente pendiente",
+          "comando": "git log @{u}..HEAD --oneline | wc -l",
+          "espera": "coincide con las líneas activas de PENDIENTES-GIT.md (0 si no hay pendientes)"
+        },
+        {
+          "check": "Ningún hook o script intenta push automático",
+          "comando": "grep -rln \"git push\" .git/hooks/ package.json 2>/dev/null",
+          "espera": "0 líneas"
+        }
       ],
       "aplicaSi": {},
       "porCada": null,
-      "posee": ["PENDIENTES-GIT.md"],
-      "cerebro": ["tema:entorno-de-la-maquina"]
+      "posee": [
+        "PENDIENTES-GIT.md"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina"
+      ]
     },
     {
       "id": "ops.repo.rama-para-cambios-grandes",
@@ -61,12 +86,24 @@
         "Si el cambio se queda a medias por límite de sesión, dejar la rama tal cual y anotar en qué quedó — nunca forzar el merge para no perder el trabajo."
       ],
       "aceptacion": [
-        { "check": "El HEAD de main compila y pasa verificar", "comando": "npm run verificar", "espera": "exit 0" },
-        { "check": "No queda trabajo a medias suelto en main sin commitear", "comando": "git status --porcelain", "espera": "0 líneas en main" }
+        {
+          "check": "El HEAD de main compila y pasa verificar",
+          "comando": "npm run verificar",
+          "espera": "exit 0"
+        },
+        {
+          "check": "No queda trabajo a medias suelto en main sin commitear",
+          "comando": "git status --porcelain",
+          "espera": "0 líneas en main"
+        }
       ],
-      "aplicaSi": { "modo": "evolucion" },
+      "aplicaSi": {
+        "modo": "evolucion"
+      },
       "porCada": null,
-      "posee": ["docs/flujo-de-ramas.md"],
+      "posee": [
+        "docs/flujo-de-ramas.md"
+      ],
       "cerebro": []
     },
     {
@@ -83,16 +120,35 @@
         "Añadir un grep de guardia a `verificar` para que un secreto nuevo no vuelva a colarse."
       ],
       "aceptacion": [
-        { "check": "El historial completo no contiene secretos vigentes", "comando": "git log -p | grep -iE \"pin.{0,3}[0-9]{4}|api.?key|secret.?=|password.?=\" | head -20", "espera": "0 líneas, o cada una corresponde a un secreto ya rotado y documentado" },
-        { "check": "El grep de guardia corre dentro de verificar", "comando": "grep -n \"secretos\" package.json", "espera": "1+ líneas" }
+        {
+          "check": "El historial completo no contiene secretos vigentes",
+          "comando": "git log -p | grep -iE \"pin.{0,3}[0-9]{4}|api.?key|secret.?=|password.?=\" | head -20",
+          "espera": "0 líneas, o cada una corresponde a un secreto ya rotado y documentado"
+        },
+        {
+          "check": "El grep de guardia corre dentro de verificar",
+          "comando": "grep -n \"secretos\" package.json",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "superficies": ["panel-interno", "api", "caja"] },
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "api",
+          "caja"
+        ]
+      },
       "porCada": null,
-      "posee": ["package.json", "scripts/auditar-secretos.mjs"],
-      "cerebro": ["tema:acceso-roles-y-puestos"]
+      "posee": [
+        "package.json",
+        "scripts/auditar-secretos.mjs"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
     },
-
-    { "id": "ops.entorno.variables-fuera-del-codigo",
+    {
+      "id": "ops.entorno.variables-fuera-del-codigo",
       "titulo": "Sacar toda clave y URL de servicio del código a variables de entorno",
       "nivel": "N0",
       "dificultad": "trivial",
@@ -105,15 +161,27 @@
         "Confirmar que el arranque falla con mensaje claro si falta una variable requerida, en vez de arrancar a medias."
       ],
       "aceptacion": [
-        { "check": "No hay claves ni URLs de servicio escritas literal en el código fuente", "comando": "grep -rnE \"sk_live_|AIza[0-9A-Za-z_-]{20,}|://[a-z0-9_.-]+:[^/]*@\" --include=*.ts --include=*.tsx --include=*.js .", "espera": "0 líneas" },
-        { "check": "El arranque avisa explícito si falta una variable requerida", "comando": null, "espera": "quitar una variable requerida y arrancar: el mensaje nombra la variable, no un stack trace genérico; se pega la salida" }
+        {
+          "check": "No hay claves ni URLs de servicio escritas literal en el código fuente",
+          "comando": "grep -rnE \"sk_live_|AIza[0-9A-Za-z_-]{20,}|://[a-z0-9_.-]+:[^/]*@\" --include=*.ts --include=*.tsx --include=*.js .",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El arranque avisa explícito si falta una variable requerida",
+          "comando": null,
+          "espera": "quitar una variable requerida y arrancar: el mensaje nombra la variable, no un stack trace genérico; se pega la salida"
+        }
       ],
       "aplicaSi": {},
       "porCada": null,
-      "posee": [".env.example", "lib/config.ts"],
+      "posee": [
+        ".env.example",
+        "lib/config.ts"
+      ],
       "cerebro": []
     },
-    { "id": "ops.entorno.documentar-el-stack-elegido",
+    {
+      "id": "ops.entorno.documentar-el-stack-elegido",
       "titulo": "Dejar escrito qué proveedor de hosting, base de datos y dominio se eligió",
       "nivel": "N0",
       "dificultad": "trivial",
@@ -125,14 +193,21 @@
         "Mantenerlo actualizado si algo cambia, por ejemplo al migrar de proveedor."
       ],
       "aceptacion": [
-        { "check": "El stack elegido está documentado con fecha", "comando": "grep -nE \"hosting|proveedor\" docs/stack.md", "espera": "1+ líneas con fecha" }
+        {
+          "check": "El stack elegido está documentado con fecha",
+          "comando": "grep -nE \"hosting|proveedor\" docs/stack.md",
+          "espera": "1+ líneas con fecha"
+        }
       ],
       "aplicaSi": {},
       "porCada": null,
-      "posee": ["docs/stack.md"],
+      "posee": [
+        "docs/stack.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.entorno.separar-desarrollo-de-produccion",
+    {
+      "id": "ops.entorno.separar-desarrollo-de-produccion",
       "titulo": "Separar de verdad la base y las claves de desarrollo de las de producción",
       "nivel": "N1",
       "dificultad": "normal",
@@ -145,15 +220,30 @@
         "Dejar escrito, en un lugar visible, cuál base es cuál."
       ],
       "aceptacion": [
-        { "check": "Desarrollo y producción apuntan a proyectos distintos", "comando": null, "espera": "las dos URLs/IDs de proyecto anotadas lado a lado; son diferentes" },
-        { "check": "Ninguna clave de producción real está en el .env.example de desarrollo", "comando": "grep -f <(grep -o \"^[A-Z_]*\" .env.production 2>/dev/null) .env.example 2>/dev/null | grep -v \"^[A-Z_]*=$\"", "espera": "0 líneas" }
+        {
+          "check": "Desarrollo y producción apuntan a proyectos distintos",
+          "comando": null,
+          "espera": "las dos URLs/IDs de proyecto anotadas lado a lado; son diferentes"
+        },
+        {
+          "check": "Ninguna clave de producción real está en el .env.example de desarrollo",
+          "comando": "grep -f <(grep -o \"^[A-Z_]*\" .env.production 2>/dev/null) .env.example 2>/dev/null | grep -v \"^[A-Z_]*=$\"",
+          "espera": "0 líneas"
+        }
       ],
       "aplicaSi": {},
       "porCada": null,
-      "posee": ["docs/entornos.md", ".env.production.example"],
-      "cerebro": ["tema:donde-vive-el-dato", "tema:entorno-de-la-maquina"]
+      "posee": [
+        "docs/entornos.md",
+        ".env.production.example"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:entorno-de-la-maquina"
+      ]
     },
-    { "id": "ops.entorno.rotar-credenciales-por-defecto",
+    {
+      "id": "ops.entorno.rotar-credenciales-por-defecto",
       "titulo": "Rotar todo PIN o clave de fábrica antes de que el cliente empiece a usarlo",
       "nivel": "N1",
       "dificultad": "normal",
@@ -166,15 +256,30 @@
         "Confirmar en producción que el valor de fábrica ya no funciona."
       ],
       "aceptacion": [
-        { "check": "El PIN o clave de fábrica ya no autentica en producción", "comando": null, "espera": "intento de login con el valor de fábrica devuelve rechazo; se pega la respuesta" },
-        { "check": "El cambio de credencial de fábrica quedó marcado hecho antes de la fecha de entrega", "comando": "grep -n \"credencial de f[aá]brica\" docs/entrega.md", "espera": "1+ líneas marcadas como hechas" }
+        {
+          "check": "El PIN o clave de fábrica ya no autentica en producción",
+          "comando": null,
+          "espera": "intento de login con el valor de fábrica devuelve rechazo; se pega la respuesta"
+        },
+        {
+          "check": "El cambio de credencial de fábrica quedó marcado hecho antes de la fecha de entrega",
+          "comando": "grep -n \"credencial de f[aá]brica\" docs/entrega.md",
+          "espera": "1+ líneas marcadas como hechas"
+        }
       ],
-      "aplicaSi": { "multiUsuario": true },
+      "aplicaSi": {
+        "multiUsuario": true
+      },
       "porCada": null,
-      "posee": ["docs/entrega.md"],
-      "cerebro": ["tema:acceso-roles-y-puestos"]
+      "posee": [
+        "docs/entrega.md"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
     },
-    { "id": "ops.entorno.quien-tiene-acceso-a-que",
+    {
+      "id": "ops.entorno.quien-tiene-acceso-a-que",
       "titulo": "Llevar una lista de quién tiene acceso a las claves de producción",
       "nivel": "N2",
       "dificultad": "normal",
@@ -187,16 +292,28 @@
         "Revisar la lista contra el acceso real al menos una vez: quién puede entrar hoy de verdad, no quién debería."
       ],
       "aceptacion": [
-        { "check": "La lista de accesos tiene fecha de última revisión", "comando": "grep -n \"[UÚ]ltima revisi\" docs/accesos.md", "espera": "1 línea con fecha" },
-        { "check": "Nadie fuera de la lista tiene acceso real al panel de hosting o dominio", "comando": null, "espera": "miembros del panel del proveedor comparados 1 a 1 contra docs/accesos.md; coinciden" }
+        {
+          "check": "La lista de accesos tiene fecha de última revisión",
+          "comando": "grep -n \"[UÚ]ltima revisi\" docs/accesos.md",
+          "espera": "1 línea con fecha"
+        },
+        {
+          "check": "Nadie fuera de la lista tiene acceso real al panel de hosting o dominio",
+          "comando": null,
+          "espera": "miembros del panel del proveedor comparados 1 a 1 contra docs/accesos.md; coinciden"
+        }
       ],
-      "aplicaSi": { "equipo": "orion+humanos" },
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
       "porCada": null,
-      "posee": ["docs/accesos.md"],
+      "posee": [
+        "docs/accesos.md"
+      ],
       "cerebro": []
     },
-
-    { "id": "ops.build.un-comando-reproducible",
+    {
+      "id": "ops.build.un-comando-reproducible",
       "titulo": "Dejar un comando que construye el proyecto igual en cualquier máquina",
       "nivel": "N0",
       "dificultad": "trivial",
@@ -209,15 +326,27 @@
         "Correr el build en limpio, borrando node_modules y las carpetas de build, para confirmar que no depende de caché local."
       ],
       "aceptacion": [
-        { "check": "El build corre limpio desde cero", "comando": "rm -rf node_modules .next dist && npm ci && npm run build", "espera": "exit 0" },
-        { "check": "La versión de runtime requerida está declarada", "comando": "grep -n \"engines\" package.json; test -f .nvmrc && echo SI", "espera": "1+ líneas" }
+        {
+          "check": "El build corre limpio desde cero",
+          "comando": "rm -rf node_modules .next dist && npm ci && npm run build",
+          "espera": "exit 0"
+        },
+        {
+          "check": "La versión de runtime requerida está declarada",
+          "comando": "grep -n \"engines\" package.json; test -f .nvmrc && echo SI",
+          "espera": "1+ líneas"
+        }
       ],
       "aplicaSi": {},
       "porCada": null,
-      "posee": ["package.json", ".nvmrc"],
+      "posee": [
+        "package.json",
+        ".nvmrc"
+      ],
       "cerebro": []
     },
-    { "id": "ops.build.falla-cortando-no-avisando",
+    {
+      "id": "ops.build.falla-cortando-no-avisando",
       "titulo": "Hacer que el build falle con código distinto de cero cuando algo está mal",
       "nivel": "N0",
       "dificultad": "trivial",
@@ -229,15 +358,26 @@
         "Restaurar el error provocado."
       ],
       "aceptacion": [
-        { "check": "El build corta de verdad ante un error real", "comando": "node -e \"require('fs').appendFileSync('lib/_roto.ts','const x: number = \\\"s\\\"')\" && npm run build; echo EXIT=$?; rm -f lib/_roto.ts", "espera": "EXIT distinto de 0" },
-        { "check": "Ningún paso está silenciado", "comando": "grep -n \"|| true\\|--passWithNoTests\\|--no-verify\" package.json", "espera": "0 líneas" }
+        {
+          "check": "El build corta de verdad ante un error real",
+          "comando": "node -e \"require('fs').appendFileSync('lib/_roto.ts','const x: number = \\\"s\\\"')\" && npm run build; echo EXIT=$?; rm -f lib/_roto.ts",
+          "espera": "EXIT distinto de 0"
+        },
+        {
+          "check": "Ningún paso está silenciado",
+          "comando": "grep -n \"|| true\\|--passWithNoTests\\|--no-verify\" package.json",
+          "espera": "0 líneas"
+        }
       ],
       "aplicaSi": {},
       "porCada": null,
-      "posee": ["package.json"],
+      "posee": [
+        "package.json"
+      ],
       "cerebro": []
     },
-    { "id": "ops.build.paridad-entre-build-local-y-hosting",
+    {
+      "id": "ops.build.paridad-entre-build-local-y-hosting",
       "titulo": "Confirmar que el build del proveedor de hosting es el mismo que el local",
       "nivel": "N2",
       "dificultad": "normal",
@@ -250,15 +390,30 @@
         "Comparar el log del build del proveedor contra el build local: mismo resultado."
       ],
       "aceptacion": [
-        { "check": "El build en el proveedor de hosting termina en éxito", "comando": null, "espera": "log del proveedor pegado, terminando en build exitoso" },
-        { "check": "Las variables configuradas en el proveedor cubren las que el proyecto requiere", "comando": "comm -23 <(grep -o \"^[A-Z_]*\" .env.example | sort) <(sort variables-configuradas-en-el-proveedor.txt)", "espera": "0 líneas faltantes" }
+        {
+          "check": "El build en el proveedor de hosting termina en éxito",
+          "comando": null,
+          "espera": "log del proveedor pegado, terminando en build exitoso"
+        },
+        {
+          "check": "Las variables configuradas en el proveedor cubren las que el proyecto requiere",
+          "comando": "comm -23 <(grep -o \"^[A-Z_]*\" .env.example | sort) <(sort variables-configuradas-en-el-proveedor.txt)",
+          "espera": "0 líneas faltantes"
+        }
       ],
-      "aplicaSi": { "publico": true },
+      "aplicaSi": {
+        "publico": true
+      },
       "porCada": null,
-      "posee": ["docs/despliegue.md"],
-      "cerebro": ["tema:entorno-de-la-maquina"]
+      "posee": [
+        "docs/despliegue.md"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina"
+      ]
     },
-    { "id": "ops.build.tiempo-de-build-medido",
+    {
+      "id": "ops.build.tiempo-de-build-medido",
       "titulo": "Medir y publicar cuánto tarda el build, como línea base",
       "nivel": "N4",
       "dificultad": "trivial",
@@ -270,15 +425,21 @@
         "Repetir la medición cuando el proyecto crezca notablemente, para tener más de un punto de comparación."
       ],
       "aceptacion": [
-        { "check": "El tiempo de build está anotado con fecha", "comando": "grep -nE \"[0-9]+ ?(s|segundos)\" docs/build.md", "espera": "1+ líneas" }
+        {
+          "check": "El tiempo de build está anotado con fecha",
+          "comando": "grep -nE \"[0-9]+ ?(s|segundos)\" docs/build.md",
+          "espera": "1+ líneas"
+        }
       ],
       "aplicaSi": {},
       "porCada": null,
-      "posee": ["docs/build.md"],
+      "posee": [
+        "docs/build.md"
+      ],
       "cerebro": []
     },
-
-    { "id": "ops.despliegue.primer-despliegue-real",
+    {
+      "id": "ops.despliegue.primer-despliegue-real",
       "titulo": "Publicar el proyecto y confirmar que responde desde internet, no solo local",
       "nivel": "N0",
       "dificultad": "normal",
@@ -291,15 +452,30 @@
         "Anotar la URL real de producción en docs/despliegue.md."
       ],
       "aceptacion": [
-        { "check": "El sitio responde desde internet, no solo localhost", "comando": "curl -s -o /dev/null -w \"%{http_code}\" https://<url-real>", "espera": "200 (o el código esperado de la ruta pública)" },
-        { "check": "La URL de producción está documentada", "comando": "grep -n \"https://\" docs/despliegue.md", "espera": "1+ líneas" }
+        {
+          "check": "El sitio responde desde internet, no solo localhost",
+          "comando": "curl -s -o /dev/null -w \"%{http_code}\" https://<url-real>",
+          "espera": "200 (o el código esperado de la ruta pública)"
+        },
+        {
+          "check": "La URL de producción está documentada",
+          "comando": "grep -n \"https://\" docs/despliegue.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "publico": true },
+      "aplicaSi": {
+        "publico": true
+      },
       "porCada": null,
-      "posee": ["docs/despliegue.md"],
-      "cerebro": ["tema:entorno-de-la-maquina"]
+      "posee": [
+        "docs/despliegue.md"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina"
+      ]
     },
-    { "id": "ops.despliegue.checklist-antes-de-publicar",
+    {
+      "id": "ops.despliegue.checklist-antes-de-publicar",
       "titulo": "Correr una lista de chequeo fija antes de cada despliegue, no de memoria",
       "nivel": "N1",
       "dificultad": "trivial",
@@ -312,15 +488,28 @@
         "Añadirle un ítem nuevo cada vez que un despliegue falle por algo que la lista no cubría."
       ],
       "aceptacion": [
-        { "check": "La checklist cubre al menos build, variables y migración", "comando": "grep -ciE \"build|variable|migraci\" docs/checklist-despliegue.md", "espera": "3+ coincidencias" },
-        { "check": "Se usó en el último despliegue real", "comando": "git log -1 --format=%ci -- docs/checklist-despliegue.md", "espera": "fecha igual o posterior al último despliegue registrado" }
+        {
+          "check": "La checklist cubre al menos build, variables y migración",
+          "comando": "grep -ciE \"build|variable|migraci\" docs/checklist-despliegue.md",
+          "espera": "3+ coincidencias"
+        },
+        {
+          "check": "Se usó en el último despliegue real",
+          "comando": "git log -1 --format=%ci -- docs/checklist-despliegue.md",
+          "espera": "fecha igual o posterior al último despliegue registrado"
+        }
       ],
-      "aplicaSi": { "publico": true },
+      "aplicaSi": {
+        "publico": true
+      },
       "porCada": null,
-      "posee": ["docs/checklist-despliegue.md"],
+      "posee": [
+        "docs/checklist-despliegue.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.despliegue.dominio-propio-y-tls",
+    {
+      "id": "ops.despliegue.dominio-propio-y-tls",
       "titulo": "Apuntar un dominio propio al proyecto con HTTPS activo",
       "nivel": "N1",
       "dificultad": "normal",
@@ -333,15 +522,28 @@
         "Verificar el dominio cargando desde un dispositivo fuera de esta red."
       ],
       "aceptacion": [
-        { "check": "El dominio propio sirve el sitio con HTTPS válido", "comando": "curl -sI https://<dominio-del-cliente> | head -1", "espera": "HTTP/... 200" },
-        { "check": "HTTP redirige a HTTPS", "comando": "curl -sI http://<dominio-del-cliente> | grep -i location", "espera": "1 línea con https://" }
+        {
+          "check": "El dominio propio sirve el sitio con HTTPS válido",
+          "comando": "curl -sI https://<dominio-del-cliente> | head -1",
+          "espera": "HTTP/... 200"
+        },
+        {
+          "check": "HTTP redirige a HTTPS",
+          "comando": "curl -sI http://<dominio-del-cliente> | grep -i location",
+          "espera": "1 línea con https://"
+        }
       ],
-      "aplicaSi": { "publico": true },
+      "aplicaSi": {
+        "publico": true
+      },
       "porCada": null,
-      "posee": ["docs/dominio.md"],
+      "posee": [
+        "docs/dominio.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.despliegue.banner-de-migracion-pendiente",
+    {
+      "id": "ops.despliegue.banner-de-migracion-pendiente",
       "titulo": "Avisar en pantalla, con nombre, cuando el código llegó antes que su migración",
       "nivel": "N2",
       "dificultad": "normal",
@@ -354,15 +556,36 @@
         "Confirmar que las rutas con su esquema ya listo siguen funcionando normal mientras otra parte espera su migración."
       ],
       "aceptacion": [
-        { "check": "El error de esquema faltante se distingue de un error genérico", "comando": null, "espera": "con una columna esperada ausente a propósito, la respuesta trae el código de migración pendiente, no un 500 plano; se pega la respuesta" },
-        { "check": "El aviso en pantalla nombra el archivo de la migración", "comando": "grep -rn \"MIGRATION_.*_REQUIRED\" app/ components/", "espera": "1+ líneas" }
+        {
+          "check": "El error de esquema faltante se distingue de un error genérico",
+          "comando": null,
+          "espera": "con una columna esperada ausente a propósito, la respuesta trae el código de migración pendiente, no un 500 plano; se pega la respuesta"
+        },
+        {
+          "check": "El aviso en pantalla nombra el archivo de la migración",
+          "comando": "grep -rn \"MIGRATION_.*_REQUIRED\" app/ components/",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "stack": ["postgres", "supabase", "mysql", "sqlite"] },
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql",
+          "sqlite"
+        ]
+      },
       "porCada": null,
-      "posee": ["lib/servidor/migracion-pendiente.ts", "components/aviso-migracion.tsx"],
-      "cerebro": ["tema:dominio-migraciones-y-copias"]
+      "posee": [
+        "lib/servidor/migracion-pendiente.ts",
+        "components/aviso-migracion.tsx"
+      ],
+      "cerebro": [
+        "tema:dominio-migraciones-y-copias"
+      ]
     },
-    { "id": "ops.despliegue.ventana-de-mantenimiento-sin-sorprender",
+    {
+      "id": "ops.despliegue.ventana-de-mantenimiento-sin-sorprender",
       "titulo": "Avisar de antemano cuando un despliegue va a interrumpir el servicio",
       "nivel": "N2",
       "dificultad": "normal",
@@ -375,15 +598,28 @@
         "Si el negocio no tiene horas bajas, dejarlo escrito como restricción y ajustar el proceso en vez de ignorarlo."
       ],
       "aceptacion": [
-        { "check": "El tiempo de caída durante un deploy está medido", "comando": null, "espera": "cifra en segundos medida con un curl en loop durante un despliegue real, pegada en docs/ventana-mantenimiento.md" },
-        { "check": "Existe una ventana acordada o la razón por la que no aplica", "comando": "grep -n \"ventana\\|horario\" docs/ventana-mantenimiento.md", "espera": "1+ líneas" }
+        {
+          "check": "El tiempo de caída durante un deploy está medido",
+          "comando": null,
+          "espera": "cifra en segundos medida con un curl en loop durante un despliegue real, pegada en docs/ventana-mantenimiento.md"
+        },
+        {
+          "check": "Existe una ventana acordada o la razón por la que no aplica",
+          "comando": "grep -n \"ventana\\|horario\" docs/ventana-mantenimiento.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/ventana-mantenimiento.md"],
+      "posee": [
+        "docs/ventana-mantenimiento.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.despliegue.rollback-ensayado",
+    {
+      "id": "ops.despliegue.rollback-ensayado",
       "titulo": "Ensayar volver a la versión anterior, no solo saber que se podría",
       "nivel": "N3",
       "dificultad": "hard",
@@ -396,17 +632,35 @@
         "Dejar el procedimiento en pasos numerados, ejecutable por alguien que no lo hizo la primera vez."
       ],
       "aceptacion": [
-        { "check": "El rollback al deploy anterior se ejecutó de verdad", "comando": null, "espera": "salida del comando o panel de rollback pegada, con el sitio sirviendo la versión anterior confirmado por curl o captura" },
-        { "check": "El tiempo de rollback está medido", "comando": "grep -nE \"minutos|segundos\" docs/rollback.md", "espera": "1+ líneas con cifra" },
-        { "check": "La limitación sobre datos post-migración está escrita, no omitida", "comando": "grep -n \"migraci\" docs/rollback.md", "espera": "1+ líneas" }
+        {
+          "check": "El rollback al deploy anterior se ejecutó de verdad",
+          "comando": null,
+          "espera": "salida del comando o panel de rollback pegada, con el sitio sirviendo la versión anterior confirmado por curl o captura"
+        },
+        {
+          "check": "El tiempo de rollback está medido",
+          "comando": "grep -nE \"minutos|segundos\" docs/rollback.md",
+          "espera": "1+ líneas con cifra"
+        },
+        {
+          "check": "La limitación sobre datos post-migración está escrita, no omitida",
+          "comando": "grep -n \"migraci\" docs/rollback.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "publico": true },
+      "aplicaSi": {
+        "publico": true
+      },
       "porCada": null,
-      "posee": ["docs/rollback.md"],
-      "cerebro": ["tema:dominio-migraciones-y-copias"]
+      "posee": [
+        "docs/rollback.md"
+      ],
+      "cerebro": [
+        "tema:dominio-migraciones-y-copias"
+      ]
     },
-
-    { "id": "ops.persistencia.detectar-disco-efimero-antes-de-publicar",
+    {
+      "id": "ops.persistencia.detectar-disco-efimero-antes-de-publicar",
       "titulo": "Confirmar si el hosting borra los archivos que el proyecto escribe en disco",
       "nivel": "N0",
       "dificultad": "hard",
@@ -419,15 +673,30 @@
         "Dejar la decisión escrita: hosting elegido, si su disco es persistente o no, con la fuente."
       ],
       "aceptacion": [
-        { "check": "Toda escritura a disco del proyecto está identificada y clasificada", "comando": "grep -rn \"writeFileSync\\|fs\\.writeFile\\|fs\\.appendFile\" --include=*.ts --include=*.js .", "espera": "cada resultado tiene su fila en docs/persistencia.md diciendo a dónde va en producción" },
-        { "check": "La naturaleza del disco del hosting elegido está documentada con fuente", "comando": "grep -n \"ef[ií]mero\\|persistente\" docs/persistencia.md", "espera": "1+ líneas con URL de la documentación oficial del proveedor" }
+        {
+          "check": "Toda escritura a disco del proyecto está identificada y clasificada",
+          "comando": "grep -rnE \"writeFileSync|appendFileSync|createWriteStream|\\bwriteFile\\(|\\bappendFile\\(\" --include=*.ts --include=*.js --exclude-dir=node_modules --exclude-dir=.next .",
+          "espera": "cada resultado tiene su fila en docs/persistencia.md diciendo a dónde va en producción. El patrón incluye `writeFile(` a secas a propósito: node:fs/promises se importa suelto (`await writeFile(...)`) y un grep sobre `fs.writeFile` NO lo ve. Medido en villa-broaster 2026-08-27: el patrón anterior devolvía solo el cerrojo —justo lo único que NO tiene que sobrevivir a un reinicio— y dejaba fuera las dos escrituras que son el negocio."
+        },
+        {
+          "check": "La naturaleza del disco del hosting elegido está documentada con fuente",
+          "comando": "grep -nE \"efímero|efimero|persistente\" docs/persistencia.md",
+          "espera": "1+ líneas con URL de la documentación oficial del proveedor. Se usan alternativas literales y no una clase `[ií]`: en UTF-8 la clase compara byte a byte y no casa con la vocal acentuada (medido: `grep \"ef[ií]mero\"` sobre la palabra «efímero» devuelve 0)."
+        }
       ],
-      "aplicaSi": { "publico": true },
+      "aplicaSi": {
+        "publico": true
+      },
       "porCada": null,
-      "posee": ["docs/persistencia.md"],
-      "cerebro": ["tema:donde-vive-el-dato"]
+      "posee": [
+        "docs/persistencia.md"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
     },
-    { "id": "ops.persistencia.declarar-alcance-de-localstorage",
+    {
+      "id": "ops.persistencia.declarar-alcance-de-localstorage",
       "titulo": "Declarar si el sistema es un kiosko de un equipo o necesita datos compartidos",
       "nivel": "N1",
       "dificultad": "normal",
@@ -440,14 +709,28 @@
         "Si el negocio sí necesita compartir entre equipos, marcarlo como el pendiente estructural del proyecto, no como detalle menor."
       ],
       "aceptacion": [
-        { "check": "El alcance de localStorage está escrito y confirmado con el dueño antes de la entrega", "comando": "grep -n \"kiosko\\|un solo equipo\\|por navegador\" docs/alcance-localstorage.md", "espera": "1+ líneas con fecha anterior a la entrega" }
+        {
+          "check": "El alcance de localStorage está escrito y confirmado con el dueño antes de la entrega",
+          "comando": "grep -n \"kiosko\\|un solo equipo\\|por navegador\" docs/alcance-localstorage.md",
+          "espera": "1+ líneas con fecha anterior a la entrega"
+        }
       ],
-      "aplicaSi": { "stack": ["static", "node"] },
+      "aplicaSi": {
+        "stack": [
+          "static",
+          "node"
+        ]
+      },
       "porCada": null,
-      "posee": ["docs/alcance-localstorage.md"],
-      "cerebro": ["tema:donde-vive-el-dato"]
+      "posee": [
+        "docs/alcance-localstorage.md"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
     },
-    { "id": "ops.persistencia.version-de-datos-guardados",
+    {
+      "id": "ops.persistencia.version-de-datos-guardados",
       "titulo": "Subir de versión y migrar en el mismo cambio al alterar un dato guardado",
       "nivel": "N2",
       "dificultad": "normal",
@@ -460,15 +743,29 @@
         "Revalidar después de migrar: si el resultado es basura, no se da por buena la migración."
       ],
       "aceptacion": [
-        { "check": "Un dato guardado con la versión anterior sigue funcionando o migra sin perderse", "comando": null, "espera": "cargar un dato de ejemplo de la versión previa; el sistema lo migra o lo respalda, nunca revienta con un error tipo undefined" },
-        { "check": "Existe un número de versión de los datos declarado en el código", "comando": "grep -rn \"VERSION_DATOS\\|SCHEMA_VERSION\" lib/", "espera": "1+ líneas" }
+        {
+          "check": "Un dato guardado con la versión anterior sigue funcionando o migra sin perderse",
+          "comando": null,
+          "espera": "cargar un dato de ejemplo de la versión previa; el sistema lo migra o lo respalda, nunca revienta con un error tipo undefined"
+        },
+        {
+          "check": "Existe un número de versión de los datos declarado en el código",
+          "comando": "grep -rn \"VERSION_DATOS\\|SCHEMA_VERSION\" lib/",
+          "espera": "1+ líneas"
+        }
       ],
       "aplicaSi": {},
       "porCada": null,
-      "posee": ["lib/dominio/version-datos.ts", "docs/versionado-de-datos.md"],
-      "cerebro": ["tema:dominio-migraciones-y-copias"]
+      "posee": [
+        "lib/dominio/version-datos.ts",
+        "docs/versionado-de-datos.md"
+      ],
+      "cerebro": [
+        "tema:dominio-migraciones-y-copias"
+      ]
     },
-    { "id": "ops.persistencia.mas-de-un-equipo-mismo-negocio",
+    {
+      "id": "ops.persistencia.mas-de-un-equipo-mismo-negocio",
       "titulo": "Probar qué pasa con los datos si el negocio usa más de un equipo a la vez",
       "nivel": "N3",
       "dificultad": "hard",
@@ -481,15 +778,34 @@
         "Si la decisión es 'equipos independientes', escribirla antes de que el dueño la descubra por un inventario que no cuadra."
       ],
       "aceptacion": [
-        { "check": "El comportamiento con 2+ equipos reales está probado, no asumido", "comando": null, "espera": "prueba con los equipos reales o simulados del negocio; se documenta si el inventario o la caja queda compartido o separado, con evidencia" },
-        { "check": "La limitación, si existe, está escrita antes de la entrega", "comando": "grep -n \"no comparten\\|equipos independientes\\|un solo equipo\" docs/multi-equipo.md", "espera": "1+ líneas con fecha anterior a la entrega" }
+        {
+          "check": "El comportamiento con 2+ equipos reales está probado, no asumido",
+          "comando": null,
+          "espera": "prueba con los equipos reales o simulados del negocio; se documenta si el inventario o la caja queda compartido o separado, con evidencia"
+        },
+        {
+          "check": "La limitación, si existe, está escrita antes de la entrega",
+          "comando": "grep -n \"no comparten\\|equipos independientes\\|un solo equipo\" docs/multi-equipo.md",
+          "espera": "1+ líneas con fecha anterior a la entrega"
+        }
       ],
-      "aplicaSi": { "superficies": ["caja"], "multiUsuario": true },
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ],
+        "multiUsuario": true
+      },
       "porCada": null,
-      "posee": ["docs/multi-equipo.md"],
-      "cerebro": ["tema:entorno-de-la-maquina", "tema:donde-vive-el-dato"]
+      "posee": [
+        "docs/multi-equipo.md"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina",
+        "tema:donde-vive-el-dato"
+      ]
     },
-    { "id": "ops.persistencia.archivo-que-crece-sin-limite",
+    {
+      "id": "ops.persistencia.archivo-que-crece-sin-limite",
       "titulo": "Anticipar qué pasa cuando el archivo o tabla chica crece con el negocio",
       "nivel": "N3",
       "dificultad": "normal",
@@ -502,15 +818,33 @@
         "Escribir la decisión y el número que la dispara."
       ],
       "aceptacion": [
-        { "check": "El tamaño actual y proyectado están medidos, no estimados a ojo", "comando": "find data/ -name \"*.json\" -exec du -h {} \\;", "espera": "tamaño real listado, con la proyección escrita en docs/crecimiento-de-datos.md" },
-        { "check": "Existe un disparador explícito para migrar a base de datos real", "comando": "grep -nE \"migrar cuando|disparador\" docs/crecimiento-de-datos.md", "espera": "1+ líneas con número" }
+        {
+          "check": "El tamaño actual y proyectado están medidos, no estimados a ojo",
+          "comando": "find data/ -name \"*.json\" -exec du -h {} \\;",
+          "espera": "tamaño real listado, con la proyección escrita en docs/crecimiento-de-datos.md"
+        },
+        {
+          "check": "Existe un disparador explícito para migrar a base de datos real",
+          "comando": "grep -nE \"migrar cuando|disparador\" docs/crecimiento-de-datos.md",
+          "espera": "1+ líneas con número"
+        }
       ],
-      "aplicaSi": { "stack": ["static", "node"] },
+      "aplicaSi": {
+        "stack": [
+          "static",
+          "node"
+        ]
+      },
       "porCada": null,
-      "posee": ["docs/crecimiento-de-datos.md"],
-      "cerebro": ["tema:donde-vive-el-dato"]
+      "posee": [
+        "docs/crecimiento-de-datos.md"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
     },
-    { "id": "ops.persistencia.cache-declarada-no-segunda-verdad",
+    {
+      "id": "ops.persistencia.cache-declarada-no-segunda-verdad",
       "titulo": "Declarar la copia local como caché, no como una segunda verdad",
       "nivel": "N3",
       "dificultad": "hard",
@@ -523,16 +857,33 @@
         "Confirmar que mientras esa cola tiene algo pendiente de subir, el sistema NO acepta una bajada que la pise."
       ],
       "aceptacion": [
-        { "check": "El módulo declara explícitamente que es caché y cuál es la fuente real", "comando": "grep -n \"cach[eé]\\|no es la verdad\\|fuente real\" lib/persistencia.ts", "espera": "1+ líneas en la cabecera del archivo" },
-        { "check": "Con cola pendiente de subir, no se acepta una bajada que la pise", "comando": null, "espera": "encolar un cambio local, forzar una bajada del servidor; el cambio local pendiente sigue ahí, no se perdió" }
+        {
+          "check": "El módulo declara explícitamente que es caché y cuál es la fuente real",
+          "comando": "grep -n \"cach[eé]\\|no es la verdad\\|fuente real\" lib/persistencia.ts",
+          "espera": "1+ líneas en la cabecera del archivo"
+        },
+        {
+          "check": "Con cola pendiente de subir, no se acepta una bajada que la pise",
+          "comando": null,
+          "espera": "encolar un cambio local, forzar una bajada del servidor; el cambio local pendiente sigue ahí, no se perdió"
+        }
       ],
-      "aplicaSi": { "superficies": ["caja"] },
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ]
+      },
       "porCada": null,
-      "posee": ["lib/persistencia.ts", "lib/outbox.ts"],
-      "cerebro": ["tema:donde-vive-el-dato"]
+      "posee": [
+        "lib/persistencia.ts",
+        "lib/outbox.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
     },
-
-    { "id": "ops.respaldo.existe-y-corre-solo",
+    {
+      "id": "ops.respaldo.existe-y-corre-solo",
       "titulo": "Tener un respaldo automático que no dependa de que alguien lo recuerde",
       "nivel": "N1",
       "dificultad": "normal",
@@ -545,15 +896,28 @@
         "Dejar escrito dónde vive cada respaldo y cómo se accede, en un lugar que no dependa de una sola persona."
       ],
       "aceptacion": [
-        { "check": "Existe un respaldo con fecha reciente", "comando": null, "espera": "panel del proveedor o carpeta propia mostrando un respaldo de menos de 24-48h según la frecuencia configurada; fecha pegada" },
-        { "check": "La ubicación y forma de acceso están documentadas", "comando": "grep -n \"respaldo\" docs/respaldo.md", "espera": "1+ líneas" }
+        {
+          "check": "Existe un respaldo con fecha reciente",
+          "comando": null,
+          "espera": "panel del proveedor o carpeta propia mostrando un respaldo de menos de 24-48h según la frecuencia configurada; fecha pegada"
+        },
+        {
+          "check": "La ubicación y forma de acceso están documentadas",
+          "comando": "grep -n \"respaldo\" docs/respaldo.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/respaldo.md"],
+      "posee": [
+        "docs/respaldo.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.respaldo.antes-de-cada-migracion",
+    {
+      "id": "ops.respaldo.antes-de-cada-migracion",
       "titulo": "Respaldar el dato crudo antes de correr una migración que le cambie la forma",
       "nivel": "N2",
       "dificultad": "normal",
@@ -566,15 +930,36 @@
         "Revalidar los datos después de migrar: si el resultado es basura, restaurar desde la copia en vez de arreglarlo a mano en caliente."
       ],
       "aceptacion": [
-        { "check": "Existe una copia previa a la última migración corrida", "comando": null, "espera": "copia con fecha anterior a la migración, identificable por nombre o carpeta" },
-        { "check": "La migración se revalidó después de correr", "comando": "grep -n \"revalidad\\|verificado tras migrar\" docs/respaldo-pre-migracion.md", "espera": "1+ líneas" }
+        {
+          "check": "Existe una copia previa a la última migración corrida",
+          "comando": null,
+          "espera": "copia con fecha anterior a la migración, identificable por nombre o carpeta"
+        },
+        {
+          "check": "La migración se revalidó después de correr",
+          "comando": "grep -n \"revalidad\\|verificado tras migrar\" docs/respaldo-pre-migracion.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "stack": ["postgres", "supabase", "mysql", "sqlite"] },
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql",
+          "sqlite"
+        ]
+      },
       "porCada": null,
-      "posee": ["docs/respaldo-pre-migracion.md", "scripts/respaldar-antes-de-migrar.mjs"],
-      "cerebro": ["tema:dominio-migraciones-y-copias"]
+      "posee": [
+        "docs/respaldo-pre-migracion.md",
+        "scripts/respaldar-antes-de-migrar.mjs"
+      ],
+      "cerebro": [
+        "tema:dominio-migraciones-y-copias"
+      ]
     },
-    { "id": "ops.respaldo.exportacion-fuera-del-proveedor",
+    {
+      "id": "ops.respaldo.exportacion-fuera-del-proveedor",
       "titulo": "Guardar una copia de los datos reales fuera del proveedor principal",
       "nivel": "N3",
       "dificultad": "normal",
@@ -586,16 +971,34 @@
         "Anotar la frecuencia y el último éxito verificado."
       ],
       "aceptacion": [
-        { "check": "El script de exportación existe y corre sin error", "comando": "node scripts/exportar.mjs --dry-run; echo EXIT=$?", "espera": "EXIT=0" },
-        { "check": "Existe una exportación reciente fuera del proveedor principal", "comando": null, "espera": "archivo de exportación con fecha reciente, ubicado fuera de la infraestructura del proveedor principal" },
-        { "check": "La exportación se abre sin herramientas del proveedor original", "comando": null, "espera": "el archivo se abre con una herramienta genérica; se confirma con una captura" }
+        {
+          "check": "El script de exportación existe y corre sin error",
+          "comando": "node scripts/exportar.mjs --dry-run; echo EXIT=$?",
+          "espera": "EXIT=0"
+        },
+        {
+          "check": "Existe una exportación reciente fuera del proveedor principal",
+          "comando": null,
+          "espera": "archivo de exportación con fecha reciente, ubicado fuera de la infraestructura del proveedor principal"
+        },
+        {
+          "check": "La exportación se abre sin herramientas del proveedor original",
+          "comando": null,
+          "espera": "el archivo se abre con una herramienta genérica; se confirma con una captura"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/exportacion-de-datos.md", "scripts/exportar.mjs"],
+      "posee": [
+        "docs/exportacion-de-datos.md",
+        "scripts/exportar.mjs"
+      ],
       "cerebro": []
     },
-    { "id": "ops.respaldo.restaurar-ensayado",
+    {
+      "id": "ops.respaldo.restaurar-ensayado",
       "titulo": "Ensayar la restauración completa del respaldo, no solo confirmar que existe",
       "nivel": "N3",
       "dificultad": "hard",
@@ -609,16 +1012,36 @@
         "Repetir el ensayo cada pocos meses: uno viejo vuelve a ser, en la práctica, un archivo sin probar."
       ],
       "aceptacion": [
-        { "check": "La restauración se completó en un entorno vacío", "comando": null, "espera": "salida del comando o panel de restauración con éxito, pegada en docs/rehearsal-restauracion.md, contra una base marcada como desechable" },
-        { "check": "El sistema funciona de punta a punta contra los datos restaurados", "comando": "npm run verificar", "espera": "exit 0 apuntando a la base restaurada" },
-        { "check": "Los dos números están escritos", "comando": "grep -nE \"minutos|ventana de p[eé]rdida\" docs/rehearsal-restauracion.md", "espera": "2+ líneas con cifras" }
+        {
+          "check": "La restauración se completó en un entorno vacío",
+          "comando": null,
+          "espera": "salida del comando o panel de restauración con éxito, pegada en docs/rehearsal-restauracion.md, contra una base marcada como desechable"
+        },
+        {
+          "check": "El sistema funciona de punta a punta contra los datos restaurados",
+          "comando": "npm run verificar",
+          "espera": "exit 0 apuntando a la base restaurada"
+        },
+        {
+          "check": "Los dos números están escritos",
+          "comando": "grep -nE \"minutos|ventana de p[eé]rdida\" docs/rehearsal-restauracion.md",
+          "espera": "2+ líneas con cifras"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/rehearsal-restauracion.md", "scripts/restaurar.mjs"],
-      "cerebro": ["tema:dominio-migraciones-y-copias"]
+      "posee": [
+        "docs/rehearsal-restauracion.md",
+        "scripts/restaurar.mjs"
+      ],
+      "cerebro": [
+        "tema:dominio-migraciones-y-copias"
+      ]
     },
-    { "id": "ops.respaldo.retencion-y-quien-la-paga",
+    {
+      "id": "ops.respaldo.retencion-y-quien-la-paga",
       "titulo": "Decidir por cuánto tiempo se guardan los respaldos y qué cuesta guardarlos más",
       "nivel": "N3",
       "dificultad": "normal",
@@ -631,15 +1054,28 @@
         "Anotar la decisión final y su fecha."
       ],
       "aceptacion": [
-        { "check": "La política de retención está escrita con su fuente", "comando": "grep -n \"retenci[oó]n\" docs/retencion-respaldo.md", "espera": "1+ líneas con días/copias y fuente" },
-        { "check": "El costo de la retención elegida está en el desglose mensual", "comando": "grep -n \"respaldo\" docs/costos.md", "espera": "1+ líneas" }
+        {
+          "check": "La política de retención está escrita con su fuente",
+          "comando": "grep -n \"retenci[oó]n\" docs/retencion-respaldo.md",
+          "espera": "1+ líneas con días/copias y fuente"
+        },
+        {
+          "check": "El costo de la retención elegida está en el desglose mensual",
+          "comando": "grep -n \"respaldo\" docs/costos.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/retencion-respaldo.md"],
+      "posee": [
+        "docs/retencion-respaldo.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.respaldo.alerta-si-el-respaldo-deja-de-correr",
+    {
+      "id": "ops.respaldo.alerta-si-el-respaldo-deja-de-correr",
       "titulo": "Enterarse el mismo día si el respaldo automático deja de correr",
       "nivel": "N4",
       "dificultad": "normal",
@@ -652,16 +1088,29 @@
         "Decidir quién recibe la alerta, sin que sea solo el dueño si es quien menos revisa correo técnico."
       ],
       "aceptacion": [
-        { "check": "La alerta de respaldo atrasado se disparó en una prueba real", "comando": null, "espera": "mensaje o correo de alerta recibido tras simular un respaldo viejo; se describe la prueba" },
-        { "check": "Está definido quién la recibe", "comando": "grep -n \"recibe la alerta\\|destinatario\" docs/alerta-respaldo.md", "espera": "1+ líneas" }
+        {
+          "check": "La alerta de respaldo atrasado se disparó en una prueba real",
+          "comando": null,
+          "espera": "mensaje o correo de alerta recibido tras simular un respaldo viejo; se describe la prueba"
+        },
+        {
+          "check": "Está definido quién la recibe",
+          "comando": "grep -n \"recibe la alerta\\|destinatario\" docs/alerta-respaldo.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/alerta-respaldo.md", "scripts/alerta-respaldo.mjs"],
+      "posee": [
+        "docs/alerta-respaldo.md",
+        "scripts/alerta-respaldo.mjs"
+      ],
       "cerebro": []
     },
-
-    { "id": "ops.observabilidad.errores-no-desaparecen-en-silencio",
+    {
+      "id": "ops.observabilidad.errores-no-desaparecen-en-silencio",
       "titulo": "Registrar los errores de producción en un sitio que alguien vaya a mirar",
       "nivel": "N1",
       "dificultad": "normal",
@@ -674,15 +1123,28 @@
         "Anotar dónde se revisan los errores y con qué frecuencia alguien lo hace."
       ],
       "aceptacion": [
-        { "check": "Un error provocado aparece en el registro con contexto útil", "comando": null, "espera": "provocar un error real; aparece en el log con mensaje identificable, no solo un código genérico; se pega el fragmento" },
-        { "check": "Está escrito dónde y con qué frecuencia se revisan los errores", "comando": "grep -n \"revisar\\|frecuencia\" docs/observabilidad.md", "espera": "1+ líneas" }
+        {
+          "check": "Un error provocado aparece en el registro con contexto útil",
+          "comando": null,
+          "espera": "provocar un error real; aparece en el log con mensaje identificable, no solo un código genérico; se pega el fragmento"
+        },
+        {
+          "check": "Está escrito dónde y con qué frecuencia se revisan los errores",
+          "comando": "grep -n \"revisar\\|frecuencia\" docs/observabilidad.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "publico": true },
+      "aplicaSi": {
+        "publico": true
+      },
       "porCada": null,
-      "posee": ["docs/observabilidad.md"],
+      "posee": [
+        "docs/observabilidad.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.observabilidad.salud-que-no-miente",
+    {
+      "id": "ops.observabilidad.salud-que-no-miente",
       "titulo": "Hacer que la ruta de salud confirme que el sistema funciona de verdad",
       "nivel": "N2",
       "dificultad": "normal",
@@ -695,15 +1157,28 @@
         "Documentar qué revisa exactamente la ruta de salud."
       ],
       "aceptacion": [
-        { "check": "La ruta de salud detecta una dependencia caída de verdad", "comando": null, "espera": "con la base inalcanzable a propósito, la ruta de salud responde error, no 200; se pega la respuesta antes y después" },
-        { "check": "La ruta existe y responde en condiciones normales", "comando": "curl -s -o /dev/null -w \"%{http_code}\" https://<url>/api/salud", "espera": "200" }
+        {
+          "check": "La ruta de salud detecta una dependencia caída de verdad",
+          "comando": null,
+          "espera": "con la base inalcanzable a propósito, la ruta de salud responde error, no 200; se pega la respuesta antes y después"
+        },
+        {
+          "check": "La ruta existe y responde en condiciones normales",
+          "comando": "curl -s -o /dev/null -w \"%{http_code}\" https://<url>/api/salud",
+          "espera": "200"
+        }
       ],
-      "aplicaSi": { "publico": true },
+      "aplicaSi": {
+        "publico": true
+      },
       "porCada": null,
-      "posee": ["app/api/salud/route.ts"],
+      "posee": [
+        "app/api/salud/route.ts"
+      ],
       "cerebro": []
     },
-    { "id": "ops.observabilidad.quien-se-entera-primero",
+    {
+      "id": "ops.observabilidad.quien-se-entera-primero",
       "titulo": "Decidir quién se entera primero cuando algo se cae, y probar que le llega",
       "nivel": "N3",
       "dificultad": "normal",
@@ -716,15 +1191,28 @@
         "Anotar el tiempo medido como línea base."
       ],
       "aceptacion": [
-        { "check": "La alerta llegó de verdad en una prueba", "comando": null, "espera": "captura o registro del aviso recibido tras una caída provocada, con la hora de la caída y la hora del aviso" },
-        { "check": "El tiempo entre caída y aviso está medido", "comando": "grep -nE \"[0-9]+ ?(min|seg)\" docs/observabilidad.md", "espera": "1+ líneas con cifra" }
+        {
+          "check": "La alerta llegó de verdad en una prueba",
+          "comando": null,
+          "espera": "captura o registro del aviso recibido tras una caída provocada, con la hora de la caída y la hora del aviso"
+        },
+        {
+          "check": "El tiempo entre caída y aviso está medido",
+          "comando": "grep -nE \"[0-9]+ ?(min|seg)\" docs/observabilidad.md",
+          "espera": "1+ líneas con cifra"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/observabilidad.md"],
+      "posee": [
+        "docs/observabilidad.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.observabilidad.avisos-de-pantalla-catalogados",
+    {
+      "id": "ops.observabilidad.avisos-de-pantalla-catalogados",
       "titulo": "Catalogar cada aviso que el sistema muestra y qué hacer con él",
       "nivel": "N4",
       "dificultad": "normal",
@@ -737,15 +1225,33 @@
         "Publicar la tabla donde la persona del mostrador la encuentre rápido."
       ],
       "aceptacion": [
-        { "check": "La tabla de avisos existe con sus columnas completas", "comando": "grep -c \"|\" docs/avisos.md", "espera": "10+ líneas de tabla" },
-        { "check": "Cada fila dice si se verificó en vivo o solo contra código", "comando": "grep -ciE \"verificado en vivo|verificado contra c[oó]digo\" docs/avisos.md", "espera": "igual al número de avisos catalogados" }
+        {
+          "check": "La tabla de avisos existe con sus columnas completas",
+          "comando": "grep -c \"|\" docs/avisos.md",
+          "espera": "10+ líneas de tabla"
+        },
+        {
+          "check": "Cada fila dice si se verificó en vivo o solo contra código",
+          "comando": "grep -ciE \"verificado en vivo|verificado contra c[oó]digo\" docs/avisos.md",
+          "espera": "igual al número de avisos catalogados"
+        }
       ],
-      "aplicaSi": { "superficies": ["caja", "panel-interno"] },
+      "aplicaSi": {
+        "superficies": [
+          "caja",
+          "panel-interno"
+        ]
+      },
       "porCada": null,
-      "posee": ["docs/avisos.md"],
-      "cerebro": ["tema:documentos-para-personas"]
+      "posee": [
+        "docs/avisos.md"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
     },
-    { "id": "ops.observabilidad.metricas-basicas-del-negocio",
+    {
+      "id": "ops.observabilidad.metricas-basicas-del-negocio",
       "titulo": "Tener a la vista, sin pedirlo, si el sistema se está usando de verdad",
       "nivel": "N4",
       "dificultad": "normal",
@@ -758,15 +1264,28 @@
         "Dejar escrito qué significa cada número y de dónde sale."
       ],
       "aceptacion": [
-        { "check": "El número reacciona a una acción real", "comando": null, "espera": "hacer una venta o pedido de prueba; el número visible cambia en consecuencia; se pega antes/después" },
-        { "check": "Cada número tiene su definición escrita", "comando": "grep -n \"significa\\|se calcula\" docs/metricas.md", "espera": "1+ líneas por número" }
+        {
+          "check": "El número reacciona a una acción real",
+          "comando": null,
+          "espera": "hacer una venta o pedido de prueba; el número visible cambia en consecuencia; se pega antes/después"
+        },
+        {
+          "check": "Cada número tiene su definición escrita",
+          "comando": "grep -n \"significa\\|se calcula\" docs/metricas.md",
+          "espera": "1+ líneas por número"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/metricas.md"],
+      "posee": [
+        "docs/metricas.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.observabilidad.panel-para-quien-no-es-tecnico",
+    {
+      "id": "ops.observabilidad.panel-para-quien-no-es-tecnico",
       "titulo": "Traducir el estado técnico del sistema a algo que el dueño entienda solo",
       "nivel": "N4",
       "dificultad": "normal",
@@ -779,16 +1298,30 @@
         "Probar el mensaje leyéndoselo en voz alta a alguien que no construyó el sistema."
       ],
       "aceptacion": [
-        { "check": "El estado simple cambia ante un problema real", "comando": null, "espera": "provocar una falla real; el indicador visible pasa de bien a atención sin intervención manual; se pega antes/después" },
-        { "check": "El mensaje no usa jerga técnica", "comando": "grep -rniE \"endpoint|stack trace|undefined|null pointer\" components/estado-sistema.tsx", "espera": "0 líneas" }
+        {
+          "check": "El estado simple cambia ante un problema real",
+          "comando": null,
+          "espera": "provocar una falla real; el indicador visible pasa de bien a atención sin intervención manual; se pega antes/después"
+        },
+        {
+          "check": "El mensaje no usa jerga técnica",
+          "comando": "grep -rniE \"endpoint|stack trace|undefined|null pointer\" components/estado-sistema.tsx",
+          "espera": "0 líneas"
+        }
       ],
-      "aplicaSi": { "equipo": "orion+humanos" },
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
       "porCada": null,
-      "posee": ["components/estado-sistema.tsx"],
-      "cerebro": ["tema:documentos-para-personas"]
+      "posee": [
+        "components/estado-sistema.tsx"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
     },
-
-    { "id": "ops.incidente.a-quien-se-llama",
+    {
+      "id": "ops.incidente.a-quien-se-llama",
       "titulo": "Dejar un solo canal para cuando el sistema falla y nadie sabe qué hacer",
       "nivel": "N1",
       "dificultad": "trivial",
@@ -800,15 +1333,28 @@
         "Confirmar que el dueño ya lo probó una vez: le escribió y recibió respuesta."
       ],
       "aceptacion": [
-        { "check": "El canal de emergencia está documentado y visible", "comando": "grep -n \"emergencia\\|urgente\" docs/contacto-emergencia.md", "espera": "1+ líneas" },
-        { "check": "El dueño confirmó que el canal funciona", "comando": null, "espera": "mensaje de prueba enviado por el canal y respondido; se referencia la fecha" }
+        {
+          "check": "El canal de emergencia está documentado y visible",
+          "comando": "grep -n \"emergencia\\|urgente\" docs/contacto-emergencia.md",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "El dueño confirmó que el canal funciona",
+          "comando": null,
+          "espera": "mensaje de prueba enviado por el canal y respondido; se referencia la fecha"
+        }
       ],
-      "aplicaSi": { "equipo": "orion+humanos" },
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
       "porCada": null,
-      "posee": ["docs/contacto-emergencia.md"],
+      "posee": [
+        "docs/contacto-emergencia.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.incidente.runbook-de-los-fallos-mas-probables",
+    {
+      "id": "ops.incidente.runbook-de-los-fallos-mas-probables",
       "titulo": "Escribir de antemano qué hacer para los fallos más probables de este sistema",
       "nivel": "N2",
       "dificultad": "normal",
@@ -821,15 +1367,28 @@
         "Practicar al menos uno de los pasos a paso contra un fallo simulado, no dejarlo solo en teoría."
       ],
       "aceptacion": [
-        { "check": "El runbook cubre al menos 3 fallos con pasos concretos", "comando": "grep -c \"^## \" docs/incidentes.md", "espera": "3+" },
-        { "check": "Al menos un procedimiento se probó de verdad", "comando": "grep -n \"probado\\|simulado\" docs/incidentes.md", "espera": "1+ líneas" }
+        {
+          "check": "El runbook cubre al menos 3 fallos con pasos concretos",
+          "comando": "grep -c \"^## \" docs/incidentes.md",
+          "espera": "3+"
+        },
+        {
+          "check": "Al menos un procedimiento se probó de verdad",
+          "comando": "grep -n \"probado\\|simulado\" docs/incidentes.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/incidentes.md"],
+      "posee": [
+        "docs/incidentes.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.incidente.simulacro-de-caida-total",
+    {
+      "id": "ops.incidente.simulacro-de-caida-total",
       "titulo": "Simular una caída total del sistema al menos una vez, con el dueño mirando",
       "nivel": "N3",
       "dificultad": "normal",
@@ -842,15 +1401,28 @@
         "Corregir lo que el simulacro reveló como confuso antes de considerar el sistema listo para producción real."
       ],
       "aceptacion": [
-        { "check": "El simulacro se ejecutó y quedó registrado", "comando": "grep -n \"simulacro\" docs/simulacro-caida.md", "espera": "1+ líneas con fecha, qué se apagó y qué vio el usuario" },
-        { "check": "Lo que reveló como confuso quedó corregido o anotado como pendiente explícito", "comando": null, "espera": "cada hallazgo del simulacro tiene su línea de seguimiento" }
+        {
+          "check": "El simulacro se ejecutó y quedó registrado",
+          "comando": "grep -n \"simulacro\" docs/simulacro-caida.md",
+          "espera": "1+ líneas con fecha, qué se apagó y qué vio el usuario"
+        },
+        {
+          "check": "Lo que reveló como confuso quedó corregido o anotado como pendiente explícito",
+          "comando": null,
+          "espera": "cada hallazgo del simulacro tiene su línea de seguimiento"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/simulacro-caida.md"],
+      "posee": [
+        "docs/simulacro-caida.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.incidente.modo-degradado-declarado",
+    {
+      "id": "ops.incidente.modo-degradado-declarado",
       "titulo": "Decidir qué sigue funcionando cuando falla una parte, no todo junto",
       "nivel": "N3",
       "dificultad": "hard",
@@ -863,15 +1435,28 @@
         "Escribir la lista de qué se degrada y qué no, como decisión explícita."
       ],
       "aceptacion": [
-        { "check": "El flujo principal sobrevive a la caída de una dependencia secundaria", "comando": null, "espera": "con la dependencia secundaria apagada, el flujo principal se completa igual; se pega la prueba" },
-        { "check": "La lista de qué se degrada está escrita", "comando": "grep -c \"^-\" docs/modo-degradado.md", "espera": "1+ líneas por dependencia identificada" }
+        {
+          "check": "El flujo principal sobrevive a la caída de una dependencia secundaria",
+          "comando": null,
+          "espera": "con la dependencia secundaria apagada, el flujo principal se completa igual; se pega la prueba"
+        },
+        {
+          "check": "La lista de qué se degrada está escrita",
+          "comando": "grep -c \"^-\" docs/modo-degradado.md",
+          "espera": "1+ líneas por dependencia identificada"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/modo-degradado.md"],
+      "posee": [
+        "docs/modo-degradado.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.incidente.registro-de-lo-que-paso",
+    {
+      "id": "ops.incidente.registro-de-lo-que-paso",
       "titulo": "Dejar escrito cada incidente real: qué pasó, cuánto duró y qué se hizo",
       "nivel": "N3",
       "dificultad": "trivial",
@@ -883,16 +1468,28 @@
         "Revisar el registro de vez en cuando buscando patrones antes de tratar cada incidente como si fuera el primero."
       ],
       "aceptacion": [
-        { "check": "El registro existe con los campos mínimos por incidente", "comando": "grep -c \"^## \" docs/incidentes-registro.md", "espera": "1+ (aumenta con cada incidente real)" },
-        { "check": "Cada entrada tiene duración", "comando": "grep -ciE \"duraci[oó]n\" docs/incidentes-registro.md", "espera": "igual al número de entradas" }
+        {
+          "check": "El registro existe con los campos mínimos por incidente",
+          "comando": "grep -c \"^## \" docs/incidentes-registro.md",
+          "espera": "1+ (aumenta con cada incidente real)"
+        },
+        {
+          "check": "Cada entrada tiene duración",
+          "comando": "grep -ciE \"duraci[oó]n\" docs/incidentes-registro.md",
+          "espera": "igual al número de entradas"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/incidentes-registro.md"],
+      "posee": [
+        "docs/incidentes-registro.md"
+      ],
       "cerebro": []
     },
-
-    { "id": "ops.soporte.canal-y-tiempo-de-respuesta-acordado",
+    {
+      "id": "ops.soporte.canal-y-tiempo-de-respuesta-acordado",
       "titulo": "Acordar con el cliente cómo se pide ayuda y en cuánto tiempo se responde",
       "nivel": "N1",
       "dificultad": "trivial",
@@ -905,15 +1502,30 @@
         "Confirmar con el cliente que lo leyó y está de acuerdo."
       ],
       "aceptacion": [
-        { "check": "El canal y el tiempo de respuesta están escritos junto a la mensualidad", "comando": "grep -n \"tiempo de respuesta\\|canal de soporte\" docs/soporte.md", "espera": "1+ líneas" },
-        { "check": "Distingue soporte incluido de trabajo nuevo cobrable aparte", "comando": "grep -n \"no incluye\\|fuera de alcance\" docs/soporte.md", "espera": "1+ líneas" }
+        {
+          "check": "El canal y el tiempo de respuesta están escritos junto a la mensualidad",
+          "comando": "grep -n \"tiempo de respuesta\\|canal de soporte\" docs/soporte.md",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Distingue soporte incluido de trabajo nuevo cobrable aparte",
+          "comando": "grep -n \"no incluye\\|fuera de alcance\" docs/soporte.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "equipo": "orion+humanos" },
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
       "porCada": null,
-      "posee": ["docs/soporte.md"],
-      "cerebro": ["tema:cobro-a-clientes"]
+      "posee": [
+        "docs/soporte.md"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes"
+      ]
     },
-    { "id": "ops.soporte.que-pasa-si-el-cliente-se-va",
+    {
+      "id": "ops.soporte.que-pasa-si-el-cliente-se-va",
       "titulo": "Dejar escrito qué se le entrega al cliente si termina el contrato",
       "nivel": "N2",
       "dificultad": "normal",
@@ -926,15 +1538,28 @@
         "Confirmar al menos una vez que la exportación de datos prometida se puede generar hoy."
       ],
       "aceptacion": [
-        { "check": "Las condiciones de salida están escritas en el documento de servicio", "comando": "grep -n \"termina el contrato\\|fin del contrato\" docs/fin-de-contrato.md", "espera": "1+ líneas" },
-        { "check": "La exportación de datos prometida se generó de verdad al menos una vez", "comando": null, "espera": "archivo de exportación real generado y verificado; se referencia" }
+        {
+          "check": "Las condiciones de salida están escritas en el documento de servicio",
+          "comando": "grep -n \"termina el contrato\\|fin del contrato\" docs/fin-de-contrato.md",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "La exportación de datos prometida se generó de verdad al menos una vez",
+          "comando": null,
+          "espera": "archivo de exportación real generado y verificado; se referencia"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/fin-de-contrato.md"],
+      "posee": [
+        "docs/fin-de-contrato.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.soporte.manual-de-la-persona-del-mostrador",
+    {
+      "id": "ops.soporte.manual-de-la-persona-del-mostrador",
       "titulo": "Escribir el manual para quien usa el sistema a diario, no para el dueño",
       "nivel": "N4",
       "dificultad": "normal",
@@ -948,15 +1573,30 @@
         "Verificar cada sección abriendo la pantalla real, marcando al pie si se verificó en vivo o solo contra el código."
       ],
       "aceptacion": [
-        { "check": "Cada sección declara cómo se verificó", "comando": "grep -ciE \"verificado en vivo|verificado contra c[oó]digo\" docs/manual/*.md", "espera": "1 por archivo de sección, sin excepción" },
-        { "check": "No usa jerga técnica que no sale en pantalla", "comando": "grep -rniE \"endpoint|deploy|commit|payload|backend|token\" docs/manual/", "espera": "0 líneas" }
+        {
+          "check": "Cada sección declara cómo se verificó",
+          "comando": "grep -ciE \"verificado en vivo|verificado contra c[oó]digo\" docs/manual/*.md",
+          "espera": "1 por archivo de sección, sin excepción"
+        },
+        {
+          "check": "No usa jerga técnica que no sale en pantalla",
+          "comando": "grep -rniE \"endpoint|deploy|commit|payload|backend|token\" docs/manual/",
+          "espera": "0 líneas"
+        }
       ],
-      "aplicaSi": { "equipo": "orion+humanos" },
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
       "porCada": null,
-      "posee": ["docs/manual/"],
-      "cerebro": ["tema:documentos-para-personas"]
+      "posee": [
+        "docs/manual/"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
     },
-    { "id": "ops.soporte.capacitacion-con-evidencia",
+    {
+      "id": "ops.soporte.capacitacion-con-evidencia",
       "titulo": "Confirmar que la persona real ya usó el sistema con ayuda al lado",
       "nivel": "N4",
       "dificultad": "normal",
@@ -969,15 +1609,30 @@
         "Repetir con la siguiente persona nueva que entre al puesto."
       ],
       "aceptacion": [
-        { "check": "Existe un registro de al menos una sesión de capacitación real con hallazgos", "comando": "grep -n \"capacitaci[oó]n\" docs/soporte.md", "espera": "1+ líneas con fecha y persona" },
-        { "check": "Los hallazgos se reflejaron en el manual o el sistema", "comando": null, "espera": "al menos un cambio referenciado desde el hallazgo" }
+        {
+          "check": "Existe un registro de al menos una sesión de capacitación real con hallazgos",
+          "comando": "grep -n \"capacitaci[oó]n\" docs/soporte.md",
+          "espera": "1+ líneas con fecha y persona"
+        },
+        {
+          "check": "Los hallazgos se reflejaron en el manual o el sistema",
+          "comando": null,
+          "espera": "al menos un cambio referenciado desde el hallazgo"
+        }
       ],
-      "aplicaSi": { "equipo": "orion+humanos" },
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
       "porCada": null,
-      "posee": ["docs/soporte.md"],
-      "cerebro": ["tema:documentos-para-personas"]
+      "posee": [
+        "docs/soporte.md"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
     },
-    { "id": "ops.soporte.reporte-mensual-al-cliente",
+    {
+      "id": "ops.soporte.reporte-mensual-al-cliente",
       "titulo": "Mandar cada mes un reporte corto de qué se hizo y cómo está el sistema",
       "nivel": "N4",
       "dificultad": "trivial",
@@ -990,16 +1645,30 @@
         "Guardar copia de cada reporte enviado, con fecha."
       ],
       "aceptacion": [
-        { "check": "Existe al menos un reporte mensual enviado con fecha", "comando": "ls docs/reportes-mensuales/ | wc -l", "espera": "1+" },
-        { "check": "El reporte cubre estado del sistema, no solo cambios", "comando": "grep -ciE \"ca[ií]da|estado del sistema|sin incidentes\" docs/reportes-mensuales/*.md", "espera": "1+ por reporte" }
+        {
+          "check": "Existe al menos un reporte mensual enviado con fecha",
+          "comando": "ls docs/reportes-mensuales/ | wc -l",
+          "espera": "1+"
+        },
+        {
+          "check": "El reporte cubre estado del sistema, no solo cambios",
+          "comando": "grep -ciE \"ca[ií]da|estado del sistema|sin incidentes\" docs/reportes-mensuales/*.md",
+          "espera": "1+ por reporte"
+        }
       ],
-      "aplicaSi": { "equipo": "orion+humanos" },
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
       "porCada": null,
-      "posee": ["docs/reportes-mensuales/"],
-      "cerebro": ["tema:cobro-a-clientes"]
+      "posee": [
+        "docs/reportes-mensuales/"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes"
+      ]
     },
-
-    { "id": "ops.costos.desglose-mensual-real",
+    {
+      "id": "ops.costos.desglose-mensual-real",
       "titulo": "Escribir el costo mensual real de tener esto vivo, servicio por servicio",
       "nivel": "N0",
       "dificultad": "trivial",
@@ -1012,15 +1681,28 @@
         "Marcar cuáles escalan con el uso y cuáles son fijos."
       ],
       "aceptacion": [
-        { "check": "El desglose de costos existe con fuente por cada línea", "comando": "grep -c \"COP\\|USD\" docs/costos.md", "espera": "1+ por servicio listado" },
-        { "check": "Distingue costo fijo de costo variable por uso", "comando": "grep -ciE \"fijo|variable|por uso\" docs/costos.md", "espera": "2+ líneas" }
+        {
+          "check": "El desglose de costos existe con fuente por cada línea",
+          "comando": "grep -c \"COP\\|USD\" docs/costos.md",
+          "espera": "1+ por servicio listado"
+        },
+        {
+          "check": "Distingue costo fijo de costo variable por uso",
+          "comando": "grep -ciE \"fijo|variable|por uso\" docs/costos.md",
+          "espera": "2+ líneas"
+        }
       ],
       "aplicaSi": {},
       "porCada": null,
-      "posee": ["docs/costos.md"],
-      "cerebro": ["tema:cobro-a-clientes"]
+      "posee": [
+        "docs/costos.md"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes"
+      ]
     },
-    { "id": "ops.costos.que-pasa-si-no-se-paga-el-plan",
+    {
+      "id": "ops.costos.que-pasa-si-no-se-paga-el-plan",
       "titulo": "Saber qué le hace el proveedor al sistema si se atrasa un pago",
       "nivel": "N1",
       "dificultad": "trivial",
@@ -1032,15 +1714,28 @@
         "Si el proveedor no da días de gracia, decidir si hace falta un recordatorio propio antes del vencimiento."
       ],
       "aceptacion": [
-        { "check": "La política de pago fallido de cada proveedor crítico está documentada", "comando": "grep -n \"d[ií]as de gracia\\|suspende\" docs/costos.md", "espera": "1+ líneas por proveedor crítico" },
-        { "check": "Está definido quién recibe el aviso de pago fallido", "comando": "grep -n \"recibe el aviso\\|tarjeta a nombre\" docs/costos.md", "espera": "1+ líneas" }
+        {
+          "check": "La política de pago fallido de cada proveedor crítico está documentada",
+          "comando": "grep -n \"d[ií]as de gracia\\|suspende\" docs/costos.md",
+          "espera": "1+ líneas por proveedor crítico"
+        },
+        {
+          "check": "Está definido quién recibe el aviso de pago fallido",
+          "comando": "grep -n \"recibe el aviso\\|tarjeta a nombre\" docs/costos.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/costos.md"],
+      "posee": [
+        "docs/costos.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.costos.tope-al-consumo-variable",
+    {
+      "id": "ops.costos.tope-al-consumo-variable",
       "titulo": "Poner un techo al gasto por uso, antes de que lo ponga la factura",
       "nivel": "N2",
       "dificultad": "normal",
@@ -1053,15 +1748,30 @@
         "Escribir en el documento de servicio qué tope incluye la mensualidad y qué pasa si se supera."
       ],
       "aceptacion": [
-        { "check": "Existe una alerta configurada antes del tope, no solo un corte duro sin avisar", "comando": null, "espera": "configuración del proveedor o script propio mostrando el umbral de alerta por debajo del tope real" },
-        { "check": "El tope y qué pasa al superarlo están en el documento de servicio", "comando": "grep -n \"tope\" docs/tope-consumo.md", "espera": "1+ líneas con número" }
+        {
+          "check": "Existe una alerta configurada antes del tope, no solo un corte duro sin avisar",
+          "comando": null,
+          "espera": "configuración del proveedor o script propio mostrando el umbral de alerta por debajo del tope real"
+        },
+        {
+          "check": "El tope y qué pasa al superarlo están en el documento de servicio",
+          "comando": "grep -n \"tope\" docs/tope-consumo.md",
+          "espera": "1+ líneas con número"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/tope-consumo.md"],
-      "cerebro": ["tema:cobro-a-clientes"]
+      "posee": [
+        "docs/tope-consumo.md"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes"
+      ]
     },
-    { "id": "ops.costos.revision-contra-el-crecimiento-real",
+    {
+      "id": "ops.costos.revision-contra-el-crecimiento-real",
       "titulo": "Revisar el costo mensual cuando el negocio crece, no dejarlo fijo al inicio",
       "nivel": "N3",
       "dificultad": "normal",
@@ -1074,16 +1784,28 @@
         "Registrar cada revisión con fecha y el número encontrado."
       ],
       "aceptacion": [
-        { "check": "Existe al menos una revisión de costos posterior al lanzamiento", "comando": "grep -c \"^## Revisi\" docs/costos.md", "espera": "1+" },
-        { "check": "Cada revisión compara contra el número anterior", "comando": "grep -n \"comparado con\\|vs\\.\" docs/costos.md", "espera": "1+ líneas" }
+        {
+          "check": "Existe al menos una revisión de costos posterior al lanzamiento",
+          "comando": "grep -c \"^## Revisi\" docs/costos.md",
+          "espera": "1+"
+        },
+        {
+          "check": "Cada revisión compara contra el número anterior",
+          "comando": "grep -n \"comparado con\\|vs\\.\" docs/costos.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": {
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/costos.md"],
+      "posee": [
+        "docs/costos.md"
+      ],
       "cerebro": []
     },
-
-    { "id": "ops.continuidad.metodo-de-respaldo-en-papel",
+    {
+      "id": "ops.continuidad.metodo-de-respaldo-en-papel",
       "titulo": "Dejar un método en papel para cuando el sistema completo no es opción",
       "nivel": "N1",
       "dificultad": "trivial",
@@ -1095,15 +1817,30 @@
         "Confirmar que el dueño ya tiene a la mano lo necesario para el respaldo en papel antes de que haga falta."
       ],
       "aceptacion": [
-        { "check": "El método de respaldo en papel está escrito y confirmado", "comando": "grep -n \"respaldo en papel\\|cuaderno\\|talonario\" docs/continuidad.md", "espera": "1+ líneas" },
-        { "check": "Está escrito cómo esas ventas entran después al sistema", "comando": "grep -n \"registrar despu[eé]s\\|cargar al sistema\" docs/continuidad.md", "espera": "1+ líneas" }
+        {
+          "check": "El método de respaldo en papel está escrito y confirmado",
+          "comando": "grep -n \"respaldo en papel\\|cuaderno\\|talonario\" docs/continuidad.md",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Está escrito cómo esas ventas entran después al sistema",
+          "comando": "grep -n \"registrar despu[eé]s\\|cargar al sistema\" docs/continuidad.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "superficies": ["caja"] },
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ]
+      },
       "porCada": null,
-      "posee": ["docs/continuidad.md"],
+      "posee": [
+        "docs/continuidad.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.continuidad.puede-cobrar-sin-internet",
+    {
+      "id": "ops.continuidad.puede-cobrar-sin-internet",
       "titulo": "Probar si el negocio puede seguir cobrando cuando se cae la conexión del local",
       "nivel": "N2",
       "dificultad": "hard",
@@ -1116,15 +1853,31 @@
         "Escribir la decisión y el comportamiento real, para que no sea una sorpresa el día que pase."
       ],
       "aceptacion": [
-        { "check": "El comportamiento sin internet está probado, no supuesto", "comando": null, "espera": "con la red desconectada, intento real de cobro; se documenta uno de tres resultados: cobró localmente, quedó bloqueado con un mensaje que nombra la causa, o terminó sin ningún mensaje" },
-        { "check": "La decisión de negocio está escrita", "comando": "grep -n \"sin internet\\|sin conexi[oó]n\" docs/continuidad-sin-internet.md", "espera": "1+ líneas" }
+        {
+          "check": "El comportamiento sin internet está probado, no supuesto",
+          "comando": null,
+          "espera": "con la red desconectada, intento real de cobro; se documenta uno de tres resultados: cobró localmente, quedó bloqueado con un mensaje que nombra la causa, o terminó sin ningún mensaje"
+        },
+        {
+          "check": "La decisión de negocio está escrita",
+          "comando": "grep -n \"sin internet\\|sin conexi[oó]n\" docs/continuidad-sin-internet.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "superficies": ["caja"], "dineroReal": true },
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ],
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["docs/continuidad-sin-internet.md"],
+      "posee": [
+        "docs/continuidad-sin-internet.md"
+      ],
       "cerebro": []
     },
-    { "id": "ops.continuidad.que-pasa-si-falla-un-periferico",
+    {
+      "id": "ops.continuidad.que-pasa-si-falla-un-periferico",
       "titulo": "Decidir qué pasa con la venta si falla la impresora, la báscula o el lector",
       "nivel": "N2",
       "dificultad": "normal",
@@ -1137,15 +1890,32 @@
         "Escribir el límite: cuántas ventas sin resolver el periférico se permiten antes de exigir arreglarlo."
       ],
       "aceptacion": [
-        { "check": "El sistema permite cobrar con al menos un periférico simulado como fallando", "comando": null, "espera": "venta de prueba completada con la impresora, báscula o lector desconectado; se documenta el camino manual usado" },
-        { "check": "El límite o comportamiento ante la falla está escrito", "comando": "grep -n \"impresora\\|b[aá]scula\\|lector\" docs/continuidad-perifericos.md", "espera": "1+ líneas" }
+        {
+          "check": "El sistema permite cobrar con al menos un periférico simulado como fallando",
+          "comando": null,
+          "espera": "venta de prueba completada con la impresora, báscula o lector desconectado; se documenta el camino manual usado"
+        },
+        {
+          "check": "El límite o comportamiento ante la falla está escrito",
+          "comando": "grep -n \"impresora\\|b[aá]scula\\|lector\" docs/continuidad-perifericos.md",
+          "espera": "1+ líneas"
+        }
       ],
-      "aplicaSi": { "superficies": ["caja"] },
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ]
+      },
       "porCada": null,
-      "posee": ["docs/continuidad-perifericos.md"],
-      "cerebro": ["tema:caja-y-turnos"]
+      "posee": [
+        "docs/continuidad-perifericos.md"
+      ],
+      "cerebro": [
+        "tema:caja-y-turnos"
+      ]
     },
-    { "id": "ops.continuidad.cola-de-subida-al-volver-la-senal",
+    {
+      "id": "ops.continuidad.cola-de-subida-al-volver-la-senal",
       "titulo": "Confirmar que lo vendido sin internet sube completo al volver la señal",
       "nivel": "N3",
       "dificultad": "hard",
@@ -1158,14 +1928,36 @@
         "Probar también dos equipos del mismo local vendiendo sin señal a la vez: ¿qué pasa si generan el mismo número de referencia por separado?"
       ],
       "aceptacion": [
-        { "check": "La cola de subida existe en el código, separada de la copia de lectura", "comando": "grep -rln \"outbox\\|colaDeSubida\\|colaPendiente\" lib/", "espera": "1+ archivos" },
-        { "check": "Una venta hecha sin señal aparece completa tras reconectar", "comando": null, "espera": "venta de prueba cobrada con la red apagada; tras reconectar, la misma venta se ve en el sistema central con sus datos completos; se pega la comparación antes/después" },
-        { "check": "No se pierde ni se duplica con dos equipos vendiendo sin señal a la vez", "comando": null, "espera": "prueba con dos equipos simulados generando ventas sin señal; al reconectar ambos, las dos ventas existen y ninguna quedó con datos de la otra" }
+        {
+          "check": "La cola de subida existe en el código, separada de la copia de lectura",
+          "comando": "grep -rln \"outbox\\|colaDeSubida\\|colaPendiente\" lib/",
+          "espera": "1+ archivos"
+        },
+        {
+          "check": "Una venta hecha sin señal aparece completa tras reconectar",
+          "comando": null,
+          "espera": "venta de prueba cobrada con la red apagada; tras reconectar, la misma venta se ve en el sistema central con sus datos completos; se pega la comparación antes/después"
+        },
+        {
+          "check": "No se pierde ni se duplica con dos equipos vendiendo sin señal a la vez",
+          "comando": null,
+          "espera": "prueba con dos equipos simulados generando ventas sin señal; al reconectar ambos, las dos ventas existen y ninguna quedó con datos de la otra"
+        }
       ],
-      "aplicaSi": { "superficies": ["caja"], "dineroReal": true },
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ],
+        "dineroReal": true
+      },
       "porCada": null,
-      "posee": ["lib/outbox.ts", "docs/continuidad.md"],
-      "cerebro": ["tema:donde-vive-el-dato"]
+      "posee": [
+        "lib/outbox.ts",
+        "docs/continuidad.md"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
     }
   ]
 }
