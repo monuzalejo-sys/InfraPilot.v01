@@ -1,11 +1,11 @@
 {
   "projectId": "orion",
-  "sessionCount": 1,
+  "sessionCount": 2,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-08-26T06:30:00.000Z",
+  "lastUpdated": "2026-08-27T02:10:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-08-26-orion-v4",
@@ -121,6 +121,59 @@
           "verdict": "ok",
           "tokens": 323402,
           "notes": "catalogo/datos.json - 62 arquetipos, RELANZADO tras morir por tope de salida; con instruccion de escribir por tandas entrego sin problema"
+        }
+      ]
+    },
+    {
+      "sessionId": "session-2026-08-27-planes-placita",
+      "runId": "orion-plan-placita-y-tienda",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-27T00:30:00.000Z",
+      "completedAt": "2026-08-27T02:10:00.000Z",
+      "objectsCreated": 5,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "notes": "Primer uso real de /orion-plan: dos planes de ejecucion, placita (122 tareas, evolucion, sistema en produccion) y placita-tienda (118, la pagina de ventas que llevaba desde el 20 de agosto aparcada esperando una decision de negocio). Los arquitectos encontraron lo que ninguna conversacion habria encontrado: los 3 commits del arreglo de sync de placita nunca salieron del PC (el sitio corre codigo viejo), y .env.example de la tienda deja la direccion de produccion comentada, asi que un build saldria apuntando a localhost. El uso real destapo ademas cuatro defectos del propio ORION, los cuatro arreglados y verificados: la imprecision del catalogo (KN-017), el limite de `ola` frente a criterios que cuantifican (KN-019), la ingesta silenciosa de campos mal nombrados (KN-020), y que la boveda no descubria proyectos con plan pero sin memoria.",
+      "measurement_mode": "MEASURED",
+      "modelOutcomes": [
+        {
+          "phase": "analysis",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 37171,
+          "notes": "orion-traductor: resolvio la ambiguedad de 'la placita ventas' con la cita de DEC-017, y corrigio una coordenada muerta de KN-035"
+        },
+        {
+          "phase": "analysis",
+          "model": "haiku",
+          "verdict": "ok",
+          "tokens": 35378,
+          "notes": "orion-bibliotecario: 5 temas, coordenadas de PEND-022 y RSK-005, y 4 huecos declarados (marketing, cobro, promos, metricas)"
+        },
+        {
+          "phase": "analysis",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 99718,
+          "notes": "orion-arquitecto sobre placita: 16 tareas. Encontro que los 3 commits del arreglo nunca salieron del PC"
+        },
+        {
+          "phase": "analysis",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 122145,
+          "notes": "orion-arquitecto sobre placita-tienda: 23 tareas, marketing incluido. Encontro la direccion de produccion comentada y el manifiesto rechazado vivo en globals.css"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 129484,
+          "notes": "correccion del catalogo: 37 arquetipos con su condicion, verificado en los dos sentidos (KN-017)"
         }
       ]
     }

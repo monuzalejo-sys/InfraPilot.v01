@@ -1,11 +1,11 @@
 ---
 slug: planes-de-ejecucion
 titulo: Cómo se planea el trabajo de un proyecto para ejecutarlo con agentes
-alias: [plan, planes, plan de trabajo, plan de ejecucion, plan del proyecto, planear, planificar, planeacion, planificacion, hacer un plan, armar el plan, hazme un plan, necesito un plan, quiero un plan, por donde empiezo, por donde arranco, que hago primero, que sigue, que sigue ahora, cual es la siguiente tarea, siguiente tarea, proxima tarea, tareas, lista de tareas, cuantas tareas, numero de tareas, cuantas tareas hay, en cuantas tareas, backlog, roadmap, hoja de ruta, hoja de trabajo, etapas, fases del proyecto, niveles, nivel de madurez, madurez, N0, N1, N2, N3, N4, cimientos, escalar, escalabilidad, mejoras despues, que sigue despues de terminar, terminar el proyecto, cuando esta terminado, plan.json, planmjs, plan mjs, registro de tareas, catalogo, arquetipo, arquetipos, que se me olvida, que me falta, que falta por hacer, checklist del proyecto, ceremonia, presupuesto de tareas, cuanto va a costar el proyecto, construir de cero, genesis, modificar lo que existe, evolucion, brownfield, greenfield, plan para el cliente, plan para nosotros, plan de equipo]
+alias: [plan, planes, plan de trabajo, plan de ejecucion, plan del proyecto, planear, planificar, planeacion, planificacion, hacer un plan, armar el plan, hazme un plan, necesito un plan, quiero un plan, por donde empiezo, por donde arranco, que hago primero, que sigue, que sigue ahora, cual es la siguiente tarea, siguiente tarea, proxima tarea, tareas, lista de tareas, cuantas tareas, numero de tareas, cuantas tareas hay, en cuantas tareas, backlog, roadmap, hoja de ruta, hoja de trabajo, etapas, fases del proyecto, niveles, nivel de madurez, madurez, N0, N1, N2, N3, N4, cimientos, escalar, escalabilidad, mejoras despues, que sigue despues de terminar, terminar el proyecto, cuando esta terminado, plan.json, planmjs, plan mjs, registro de tareas, catalogo, arquetipo, arquetipos, que se me olvida, que me falta, que falta por hacer, checklist del proyecto, ceremonia, presupuesto de tareas, cuanto va a costar el proyecto, construir de cero, genesis, modificar lo que existe, evolucion, brownfield, greenfield, plan para el cliente, plan para nosotros, plan de equipo, posee, propiedad de archivos, criterios de aceptacion, criterio que cuantifica, ninguna ruta, todo componente, cada modulo, glob en posee, dos tareas se pisan, ola disjunta, plan.mjs ola]
 preguntas: ["hazme un plan para este proyecto", "por donde empiezo con este proyecto", "cuantas tareas hace falta para terminar esto", "que hago primero y que despues", "que se me esta olvidando en este proyecto", "que sigue ahora", "como se cuando el proyecto esta terminado", "que hacemos despues de entregarlo"]
 proyectos: [orion, infrapilot, villa-broaster, placita, orama]
 confianza: alta
-actualizado: 2026-08-26
+actualizado: 2026-08-27
 ---
 
 # Cómo se planea el trabajo de un proyecto para ejecutarlo con agentes
@@ -52,6 +52,16 @@ completa (RFC-0008 N8-R11).
 evitarlas dependía de que el orquestador se acordara. Con `posee` obligatorio
 por tarea, «¿estas dos se pisan?» pasa a ser una pregunta que responde un
 script (`plan.mjs ola`), no un juicio a las 2 de la mañana.
+
+**Con un límite que ya se pagó: `ola` compara listas `posee`, y la propiedad real
+la fijan los CRITERIOS.** El 2026-08-26 dos tareas con `posee` disjunto
+(`lib/servidor/respuesta.ts` vs `lib/dominio/**`) colisionaron en las mismas 24
+rutas de `app/api`, porque sus criterios eran *"ninguna ruta arma JSON a mano"* y
+*"ninguna ruta pasa de 60 líneas"* (`villa-broaster/KN-023`). **Un criterio que
+empieza por "ninguna ruta…", "todo componente…" o "cada módulo…" es una
+declaración de propiedad sobre ese glob**: o se escribe en `posee`, o `ola` va a
+dar por paralelizables dos tareas que no lo son. Al redactar la tarjeta, la regla
+práctica es: si el criterio cuantifica sobre un glob, ese glob entra en `posee`.
 
 **Porque «qué se me está olvidando» es la pregunta que una conversación nunca
 contesta bien.** Por eso el plan se arma de dos fuentes y hacen falta las dos:

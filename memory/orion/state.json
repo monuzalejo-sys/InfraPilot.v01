@@ -1,7 +1,7 @@
 {
   "projectId": "orion",
-  "snapshotDate": "2026-08-26T09:40:00.000Z",
-  "version": 7,
+  "snapshotDate": "2026-08-27T02:10:00.000Z",
+  "version": 9,
   "lastAmmRun": "2026-08-26T06:30:00.000Z",
   "objects": [
     {
@@ -444,6 +444,91 @@
       "fact": "Cuando varios builders escriben catalogos hermanos EN PARALELO, el remedio contra la duplicacion no es coordinarlos por adelantado sino pedirle a cada uno que LEA a los demas antes de escribir. Medido: el builder de `datos` descubrio a mitad de su trabajo que `calidad` y `rendimiento` habian aparecido mientras el escribia, y recorto su propio alcance —de 9 ideas a 3 en `dat.consulta.*`, mas 4 arquetipos eliminados de `semilla` y `migracion`— para no solapar. El de accesibilidad hizo lo mismo contra frontend y lo reporto arquetipo por arquetipo.",
       "context": "Es lo contrario de la propiedad disjunta de ARCHIVOS, que sigue siendo obligatoria: aqui el solapamiento es de CONTENIDO, y un archivo propio no lo evita. La instruccion que funciona es 'lee a los hermanos y di que recortaste', porque ademas deja la decision auditada en el reporte.",
       "source": "sesion 2026-08-26, reportes de los builders de datos y accesibilidad"
+    },
+    {
+      "id": "KN-017",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-006",
+        "KN-015"
+      ],
+      "fact": "UN ARQUETIPO QUE 'APLICA SIEMPRE' CASI NUNCA EXISTE, y el catalogo lo estaba incumpliendo: 49 de los 134 arquetipos de backend+datos no declaraban condicion de superficie ni de stack. Lo destapo un plan real: placita-tienda es una pagina publica SIN servidor y SIN base de datos -consume por HTTP la API de otro proyecto- y el catalogo le metio 17 tareas absurdas ('poner la hora en el servidor', 'dar a articulo-carrito su tabla, su clave primaria y su indice'). Arreglado: 37 arquetipos con su condicion, mas 3 que se colaban porque su stack ['node','json-en-disco'] matcheaba el 'node' de cualquier Next.js. Quedan 15 sin condicion A PROPOSITO: reglas de dominio puras que si aplican a una app cliente.",
+      "context": "Lo que hace creible el recorte no es que baje el numero hacia adelante (de 20 a 3 arquetipos aplicables a una app sin servidor) sino la REGRESION EN SENTIDO CONTRARIO contra los respaldos: perfil de caja con json-en-disco 67->67, perfil api+postgres 125->125, perfil de panel interno 69->69. Ni un arquetipo perdido. Comprobar que no se recorto de mas es la mitad del trabajo, y es la que casi nunca se hace.",
+      "source": "sesion 2026-08-27, /orion-plan sobre placita y placita-tienda",
+      "created": "2026-08-27T02:10:00.000Z",
+      "updated": "2026-08-27T02:10:00.000Z"
+    },
+    {
+      "id": "KN-018",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "DEC-002"
+      ],
+      "fact": "EL REGISTRO AGUANTA USO CONCURRENTE, medido sin querer: mientras esta sesion planeaba placita, OTRA sesion ejecuto T-008 del plan de villa-broaster y escribio de vuelta `estado: hecho` con evidencia comprobable en disco ('SISTEMA_URL aparece 2 veces en villa-app/next.config.ts, .env.example existe y lo nombra, verificar:completo sale con codigo 0'). Se verifico la evidencia contra el disco y era cierta. El lazo de control de RFC-0008 N8-R10 funciona entre sesiones, no solo dentro de una.",
+      "context": "Regla de convivencia que se deduce: el plan de otra sesion NO se commitea desde aqui, aunque este sucio en el arbol. Se reporta y se deja. Dos sesiones escribiendo el mismo plan.json a la vez si serian un problema; escribir tareas distintas del mismo plan, no lo fue.",
+      "source": "sesion 2026-08-27, villa-broaster/plan.json T-008",
+      "created": "2026-08-27T02:10:00.000Z",
+      "updated": "2026-08-27T02:10:00.000Z"
+    },
+    {
+      "id": "KN-019",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-007"
+      ],
+      "fact": "LIMITE DE `plan.mjs ola`, pagado en villa-broaster (KN-023): `ola` compara listas `posee`, pero la propiedad REAL la fijan los criterios de aceptacion. Dos tareas con `posee` disjunto (lib/servidor/respuesta.ts vs lib/dominio/**) colisionaron en las mismas 24 rutas de app/api porque sus criterios eran 'ninguna ruta arma JSON a mano' y 'ninguna ruta pasa de 60 lineas'. Un criterio que empieza por 'ninguna ruta...', 'todo componente...' o 'cada modulo...' es una DECLARACION DE PROPIEDAD sobre ese glob.",
+      "context": "Convertido en procedimiento, que es la unica forma de que una regla se cumpla: `plan.mjs validar` avisa cuando un criterio cuantifica sobre un artefacto de codigo (ruta, componente, modulo, archivo, pagina, funcion, test, script, migracion) y `posee` no tiene ningun glob. Se afino el vocabulario a proposito: la primera version marcaba 'ninguna venta' y 'cada sede' -que cuantifican sobre DATOS, no sobre archivos- y 74 avisos de ruido convierten la comprobacion en algo que nadie mira. Con el vocabulario acotado quedan 8 avisos en tres planes, y los ocho son el patron exacto.",
+      "source": "sesion 2026-08-27, villa-broaster/KN-023 convertido en comprobacion de tools/plan.mjs",
+      "created": "2026-08-27T02:10:00.000Z",
+      "updated": "2026-08-27T02:10:00.000Z"
+    },
+    {
+      "id": "KN-020",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "DEC-002"
+      ],
+      "fact": "`plan.mjs agregar` aceptaba EN SILENCIO tareas con el campo de criterio mal nombrado. Una sesion escribio cuatro criterios con `que` en vez de `check` -que es como se dice en espanol, 'que se comprueba'- y la herramienta los trago sin avisar, dejando el plan invalido con `check: undefined` y cuatro criterios invisibles para el validador. Ni una palabra del texto se habia perdido: estaba entero bajo la otra clave.",
+      "context": "Arreglado aceptando el sinonimo y AVISANDO al normalizar, en vez de rechazar: quien escribe la tarjeta piensa en espanol y el rechazo le costaria una iteracion entera. La regla general: una herramienta que ingiere datos de otro agente normaliza lo que puede deducir sin ambiguedad y grita lo que no; tragar callado es lo unico que no puede hacer.",
+      "source": "sesion 2026-08-27, villa-broaster/plan.json T-261",
+      "created": "2026-08-27T02:10:00.000Z",
+      "updated": "2026-08-27T02:10:00.000Z"
+    },
+    {
+      "id": "PEND-004",
+      "type": "Pending",
+      "tier": "Project",
+      "lifetime": "Sprint",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Ready",
+      "dependencies": [
+        "KN-019"
+      ],
+      "task": "Revisar los 8 avisos de propiedad implicita que quedan en los tres planes (placita 3, villa-broaster 5) y meter el glob en `posee` donde corresponda, para que `ola` deje de darlos por paralelizables.",
+      "reason": "Cada uno de esos 8 es una colision potencial entre builders, que es el fallo #1 medido del ecosistema. El aviso ya senala cual es; falta la edicion.",
+      "created": "2026-08-27T02:10:00.000Z",
+      "updated": "2026-08-27T02:10:00.000Z"
     }
   ],
   "archives": []

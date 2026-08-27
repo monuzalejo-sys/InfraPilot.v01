@@ -1,11 +1,11 @@
 ---
 slug: encargos-verificables
 titulo: Escribir un encargo que otro pueda ejecutar y cualquiera pueda verificar
-alias: [encargo, encargos, brief, briefs, briefing, prompt, prompts, promt, promps, escribir el prompt, armar el prompt, prompt para el agente, prompt de construccion, prompt de diseno, instrucciones al agente, orden al agente, tarea al agente, spec, especificacion, requisitos, criterios de aceptacion, criterio de aceptacion, criterios verificables, definicion de terminado, definicion de hecho, DoD, done, checklist, chequeo, chequeos, autochequeo, autochequeos, grep negativo, greps negativos, grep que de 0, copy congelado, texto congelado, frase congelada, congelar copy, no toques, intocable, prohibiciones, prohibido, lista de prohibido, delegar, delegacion, encargar, mandar a hacer, subagente, subagentes, builder, builders, agente barato, haiku, haiku barato, modelo barato, ejecutor, generador, tercero, freelance, el del equipo, auditar salida, auditar el entregable, revisar lo que entrego, rubrica, rubricas, porcentaje de avance, avance, juez, juez externo, calificar, numeros en el prompt, medible, medibles, adjetivos, se ve bien, hizo otra cosa, no hizo caso, no me hizo caso, se invento, invento datos, relleno, se lo salto, ignoro la instruccion, quedo mal el brief, brief flojo]
-preguntas: ["como le escribo el encargo a un agente", "como hago un brief que no falle", "por que el agente hizo otra cosa", "como cierro un brief para que no invente", "que le pongo al final del prompt para poder verificarlo despues", "le dije que no tocara admin y lo toco igual, que hago", "como le encargo algo a alguien del equipo sin que cada quien se ponga su propia nota", "como se si el subagente si cumplio lo que le pedi"]
+alias: [encargo, encargos, brief, briefs, briefing, prompt, prompts, promt, promps, escribir el prompt, armar el prompt, prompt para el agente, prompt de construccion, prompt de diseno, instrucciones al agente, orden al agente, tarea al agente, spec, especificacion, requisitos, criterios de aceptacion, criterio de aceptacion, criterios verificables, definicion de terminado, definicion de hecho, DoD, done, checklist, chequeo, chequeos, autochequeo, autochequeos, grep negativo, greps negativos, grep que de 0, copy congelado, texto congelado, frase congelada, congelar copy, no toques, intocable, prohibiciones, prohibido, lista de prohibido, delegar, delegacion, encargar, mandar a hacer, subagente, subagentes, builder, builders, agente barato, haiku, haiku barato, modelo barato, ejecutor, generador, tercero, freelance, el del equipo, auditar salida, auditar el entregable, revisar lo que entrego, rubrica, rubricas, porcentaje de avance, avance, juez, juez externo, calificar, numeros en el prompt, medible, medibles, adjetivos, se ve bien, hizo otra cosa, no hizo caso, no me hizo caso, se invento, invento datos, relleno, se lo salto, ignoro la instruccion, quedo mal el brief, brief flojo, el grep no lo vio, el grep dio 0 y estaba mal, grep en 0, grep de 0 lineas no basta, grep insuficiente, criterio que solo greppea, verificar con grep, comprobar con grep, valor calculado, valor computado, clamp, calc, variable css, escala de espaciado, tokens de espaciado, espaciado fuera de escala, padding raro, padding que no esta en la escala, arbitrary value, valor arbitrario de tailwind, contraejemplo, contraejemplo en un comentario, la regla se marco a si misma, el comentario salio como infraccion, falso positivo del grep, regla que se autoincumple]
+preguntas: ["como le escribo el encargo a un agente", "como hago un brief que no falle", "por que el agente hizo otra cosa", "como cierro un brief para que no invente", "que le pongo al final del prompt para poder verificarlo despues", "le dije que no tocara admin y lo toco igual, que hago", "como le encargo algo a alguien del equipo sin que cada quien se ponga su propia nota", "como se si el subagente si cumplio lo que le pedi", "el grep dio 0 pero igual estaba mal, que me falto", "como verifico un criterio de espaciado o de color", "por que el grep marca mi propio comentario como error"]
 proyectos: [wrd, orama, landings, villa-broaster, infrapilot, _permanent]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-08-27
 ---
 
 # Escribir un encargo que otro pueda ejecutar y cualquiera pueda verificar
@@ -15,7 +15,9 @@ actualizado: 2026-08-24
 **Una prohibición que no se puede comprobar leyendo la salida, no existe.** Convierte
 cada regla en un procedimiento: **greps negativos que deben devolver 0 líneas**,
 **frases congeladas que deben seguir devolviendo 1+**, y **criterios numerados que
-sean mediciones** —ms, px, hex, ratio de contraste— nunca adjetivos. **Antes de
+sean mediciones** —ms, px, hex, ratio de contraste— nunca adjetivos. **Un grep en 0 no
+cierra un criterio de px, hex o ms: eso se cierra midiendo en el navegador**, y la regla
+nunca lleva su contraejemplo escrito tal cual o el propio grep la marca. **Antes de
 mandarlo, cuenta lo que pides contra los datos que citas**: el hueco que dejes, el
 ejecutor lo rellena inventando. Cierra con una **Definición de terminado que sea la
 suma aritmética de esos números** y exige que el ejecutor **pegue la salida**. Si tu
@@ -92,6 +94,23 @@ en vez de la niebla optimista de preguntarle a cada quien cómo va.
    nuevas, sin cifras sociales inventadas, sin promesa de contacto del negocio.
    Detalle que ya se pagó: el grep de precios va **solo sobre HTML**, porque en CSS un
    `10000` sería un `z-index` y daría falso positivo (`:543`).
+3b. **El grep en 0 es el primer filtro, no la prueba — y para tamaño, color o espaciado
+   la prueba es medir en el navegador.** Medido el 2026-08-26: el criterio *"no hay
+   espaciados fuera de la escala"* se comprobaba con un grep de `p-[Npx]` sobre `app/` y
+   `components/` y daba **0**, pero midiendo el CSS ya calculado a 390 px aparecieron
+   **dos paddings de 22 px** que salían de `p-[clamp(22px,2.6vw,34px)]`: el valor prohibido
+   estaba ahí, envuelto en un `clamp` que el patrón no caza (`villa-broaster/KN-024`).
+   Regla: **si el criterio habla de píxeles, hex, ms o ratio, el grep se acompaña de un
+   `getComputedStyle` en el ancho real** — un criterio que solo greppea da falsa
+   tranquilidad, y el ejecutor la reporta de buena fe. El cómo se mide está en
+   [[TEMA-verificar-con-evidencia]].
+3c. **Una regla que se verifica con grep NO puede llevar su contraejemplo escrito tal
+   cual.** En el mismo run, la regla se documentó en un comentario del código con el
+   valor prohibido literal, y **el propio grep de la regla marcó el comentario como
+   infracción** (`villa-broaster/KN-024`). Costó una vuelta entera de verificación.
+   Escribe el contraejemplo partido (`p-[` + `22px]`), descrito en palabras, o excluye
+   comentarios en el propio comando — y decídelo **al escribir el encargo**, no cuando
+   el grep dé rojo.
 4. **Copy congelado: cada frase debe seguir devolviendo 1+ línea.** 13 greps con su
    archivo en `:560-576`, más el texto nuevo que debe aparecer **una sola vez** como
    constante compartida (`:578-582`). Es lo que impide que un ejecutor "mejore" el
@@ -211,6 +230,11 @@ en vez de la niebla optimista de preguntarle a cada quien cómo va.
   servicio.
 - `landings/KN-002` — "si el prompt se puede cumplir sin cambiar una línea, no era un
   prompt"; los tres ejes como especificación; medición base de placita al 2026-08-19.
+- `villa-broaster/KN-024` (2026-08-26, T-034) — **el límite medido del grep negativo**:
+  `p-[Npx]` en 0 y aun así dos paddings de **22 px** calculados a 390 px, escondidos en
+  `p-[clamp(22px,2.6vw,34px)]`; y la trampa gemela, la regla escrita en un comentario con
+  su contraejemplo literal que el propio grep marcó como infracción. Dos vueltas de
+  verificación, una por cada trampa.
 - `landings/POL-004` — armadura + anexo: las dos piezas fijas de todo prompt a un
   generador. `landings/KN-008` — `getAnimations()` = 1 sobre el entregable del v2.
 - `infrapilot/DEC-011` — "una prohibición declarada no basta… convertirla en

@@ -1,11 +1,11 @@
 ---
 slug: olas-de-agentes
 titulo: Repartir trabajo entre agentes en paralelo sin colisiones ni pérdidas
-alias: [ola, olas, ola de agentes, tope de salida, limite de salida, output token maximum, 64000, 64k, respuesta demasiado larga, escribir por tandas, escribir por partes, archivo grande, json grande, no dejo nada, no escribio nada, murio sin dejar rastro, olas de agentes, agentes en paralelo, varios agentes, repartir trabajo, dividir el trabajo, dividir la tarea, partir la tarea, parto la tarea, en cuantos pedazos, pedazos, trozos, trocear, partir en pedazos, granularidad, un builder por paso, por pasos, tamano del encargo, equipo de agentes, paralelo, paralelizar, paralelismo, builder, builders, subagente, subagentes, spawn, spawns, wave, wave.json, manifiesto de ola, colision, colisiones, conflicto de archivos, pisarse, se pisan, muerte de agente, agente muerto, se murio, se murieron, se cayo, se cayeron, limite de sesion, infra-death, infra death, reanudar, reanudacion, recuperar ola, recuperacion de ola, respawn, relanzar, orquestador, orquestrador, contratos, ownership, propiedad de archivos, SendMessage, trabajo perdido, se me murio un agente, se me murio un builder, se me murio el agente, murio a mitad, checklist de rescate, rescate de ola, protocolo de muerte, que hago si se muere un agente, audita el disco, auditar el disco, antes de relanzar, mirar el disco, stub de 0 bytes, 0 bytes, archivo vacio, archivo en cero, tamano en disco, reporte vacio, reporte truncado, no es fallo del modelo, no lo cuentes como fallo, senal de capacidad, infraDeath, INFRA_DEATH, sufijo de fase, arqueologia, trabajo huerfano, delta, respawn estrecho, siembra en disco, sembrar datos, fixture sembrado, qa reanudable, resumeFromRunId, HEAD, mover HEAD, checkout a mitad de sesion, cambio de rama, cambia de rama, rama se movio, rama distinta a mitad, builder en rama vieja, construyendo sobre rama vieja, git checkout, git switch, reflog, conteo de tests no cuadra, numero de tests no coincide, cifra medida que no cuadra, metrica no coincide, discrepancia de tests, señal no ruido, no es ruido]
-preguntas: ["¿por qué se me murieron los agentes a mitad de la ola?", "¿cómo reparto el trabajo entre varios agentes?", "¿cómo lanzo varios builders sin que se pisen los archivos?", "¿qué hago si un builder se cayó a mitad del trabajo?", "¿cómo recupero una ola que murió?", "¿cuántos agentes puedo lanzar a la vez?", "se me murió un agente, ¿qué hago?", "¿qué reviso antes de relanzar un builder muerto?", "el agente dijo que arrancó pero no veo nada en disco, ¿entregó o no?", "¿cómo anoto una muerte por límite de sesión sin que cuente como fallo del modelo?", "el conteo de tests no coincide con lo esperado, ¿lo ignoro?", "¿puede un subagente cambiar la rama del repo?", "¿por qué dos builders en paralelo construyeron sobre código viejo?"]
+alias: [ola, olas, ola de agentes, tope de salida, limite de salida, output token maximum, 64000, 64k, respuesta demasiado larga, escribir por tandas, escribir por partes, archivo grande, json grande, no dejo nada, no escribio nada, murio sin dejar rastro, olas de agentes, agentes en paralelo, varios agentes, repartir trabajo, dividir el trabajo, dividir la tarea, partir la tarea, parto la tarea, en cuantos pedazos, pedazos, trozos, trocear, partir en pedazos, granularidad, un builder por paso, por pasos, tamano del encargo, equipo de agentes, paralelo, paralelizar, paralelismo, builder, builders, subagente, subagentes, spawn, spawns, wave, wave.json, manifiesto de ola, colision, colisiones, conflicto de archivos, pisarse, se pisan, muerte de agente, agente muerto, se murio, se murieron, se cayo, se cayeron, limite de sesion, infra-death, infra death, reanudar, reanudacion, recuperar ola, recuperacion de ola, respawn, relanzar, orquestador, orquestrador, contratos, ownership, propiedad de archivos, SendMessage, trabajo perdido, se me murio un agente, se me murio un builder, se me murio el agente, murio a mitad, checklist de rescate, rescate de ola, protocolo de muerte, que hago si se muere un agente, audita el disco, auditar el disco, antes de relanzar, mirar el disco, stub de 0 bytes, 0 bytes, archivo vacio, archivo en cero, tamano en disco, reporte vacio, reporte truncado, no es fallo del modelo, no lo cuentes como fallo, senal de capacidad, infraDeath, INFRA_DEATH, sufijo de fase, arqueologia, trabajo huerfano, delta, respawn estrecho, siembra en disco, sembrar datos, fixture sembrado, qa reanudable, resumeFromRunId, HEAD, mover HEAD, checkout a mitad de sesion, cambio de rama, cambia de rama, rama se movio, rama distinta a mitad, builder en rama vieja, construyendo sobre rama vieja, git checkout, git switch, reflog, conteo de tests no cuadra, numero de tests no coincide, cifra medida que no cuadra, metrica no coincide, discrepancia de tests, señal no ruido, no es ruido, criterios de aceptacion, criterio de aceptacion, leer los criterios, propiedad declarada, propiedad real, lista posee, posee, owns, ninguna ruta, todo componente, cada modulo, glob, criterio transversal, dos tareas chocaron, chocaron, se pisaron sin compartir archivos, colision sin solape, archivos disjuntos y aun asi, verificador en paralelo, dos verificadores, dos medidores, medidor, medir en paralelo, verificador es escritor, quien mide escribe, puerto compartido, mismo puerto, puerto 3200, carpeta data, data compartido, limpieza cruzada, borrar lo que otro usa, turnos.json en cero, aislar el verificador, verificar aislado, verificar:aislado, worktree, copia del arbol, servidor de prueba, levantar servidor para verificar, rojo transitorio, rojo a mitad de la ola, tsc en rojo, tsc rojo de otro carril, falso rojo, rojo falso, error de tipos de otro agente, el arbol quedo verde al final, cuando juzgo el arbol, cuando corro tsc en una ola, builder muerto, builders muertos, relanzar un builder muerto, relanzar builder muerto, que reviso antes de relanzar un builder muerto, reviso antes de relanzar, que reviso antes de relanzar, reviso, revisar antes de relanzar, muerto, muertos]
+preguntas: ["¿por qué se me murieron los agentes a mitad de la ola?", "¿cómo reparto el trabajo entre varios agentes?", "¿cómo lanzo varios builders sin que se pisen los archivos?", "¿qué hago si un builder se cayó a mitad del trabajo?", "¿cómo recupero una ola que murió?", "¿cuántos agentes puedo lanzar a la vez?", "se me murió un agente, ¿qué hago?", "¿qué reviso antes de relanzar un builder muerto?", "el agente dijo que arrancó pero no veo nada en disco, ¿entregó o no?", "¿cómo anoto una muerte por límite de sesión sin que cuente como fallo del modelo?", "el conteo de tests no coincide con lo esperado, ¿lo ignoro?", "¿puede un subagente cambiar la rama del repo?", "¿por qué dos builders en paralelo construyeron sobre código viejo?", "las dos tareas tenían archivos distintos, ¿por qué se pisaron?", "¿cómo sé de verdad qué archivos va a tocar una tarea?", "¿puedo lanzar dos verificadores a la vez?", "¿por qué el archivo que estaba midiendo cambió a mitad de la medición?", "un agente reportó tsc en rojo durante la ola, ¿lo arreglo?"]
 proyectos: [infrapilot, estanco-contable, villa-broaster, wrd, placita, orama, landings]
 confianza: alta
-actualizado: 2026-08-26
+actualizado: 2026-08-27
 ---
 
 # Repartir trabajo entre agentes en paralelo sin colisiones ni pérdidas
@@ -14,7 +14,11 @@ actualizado: 2026-08-26
 
 **Escribe tú los archivos compartidos ANTES de repartir**: tipos, seed, tokens de
 diseño y esqueletos van a disco primero, se declaran **intocables** en cada brief, y
-cada agente recibe archivos propios que nadie más toca. **Deja `wave.json` escrito
+cada agente recibe archivos propios que nadie más toca. **Reparte leyendo los CRITERIOS
+de aceptación, no la lista `posee`**: un criterio que dice *"ninguna ruta…"* o *"todo
+componente…"* reclama ese glob entero, y **quien levanta un servidor para medir también
+escribe** — puerto y datos propios, o en serie. **Un rojo de `tsc` mientras la ola corre
+no es veredicto**: el árbol se juzga una vez, al cerrar. **Deja `wave.json` escrito
 antes del segundo spawn**: quién posee qué y cuál es su contrato. **Cuando uno muera
 —y van a morir: es el fallo #1 medido— no lo relances**: mira primero `git status`,
 `git log` y el tamaño en disco, porque casi siempre el código ya está escrito y lo que
@@ -105,6 +109,38 @@ subir su tier.
    *exactamente* qué archivos/namespace posee ese agente y que no toque nada más
    (`ORION/runtime/skills/orion.SKILL.md:188-196`). Si dos tienen que tocar el mismo
    archivo, el trabajo está mal cortado.
+2b. **La propiedad REAL de una tarea no es su lista `posee`: es el conjunto de archivos
+   que sus CRITERIOS DE ACEPTACIÓN obligan a tocar.** Un criterio que empieza por
+   *"ninguna ruta…"*, *"todo componente…"*, *"cada módulo…"* **reclama ese glob entero**
+   aunque la tarjeta no lo nombre. Medido el 2026-08-26: T-023 declaraba poseer
+   `lib/servidor/respuesta.ts` y T-028 `lib/dominio/**` —cero solape en el papel, así que
+   se lanzaron en paralelo—, pero sus criterios eran *"ninguna ruta arma JSON a mano"* y
+   *"ninguna ruta pasa de 60 líneas"*: **las dos obligaban a reescribir las mismas 24
+   rutas de `app/api`**. Uno alcanzó a pisar `comparativa/csv/route.ts` con un Write, lo
+   detectó, **paró**, vigiló mtimes ~4 minutos hasta que el otro quedó quieto y rehízo lo
+   suyo **encima de la convención del compañero** en vez de imponer la suya. No se perdió
+   nada, pero fue disciplina del agente, no diseño del orquestador
+   (`villa-broaster/KN-023`). **Antes de paralelizar, lee los criterios, no la lista de
+   archivos**: si dos criterios cuantifican sobre el mismo glob, o es UNA tarea, o van en
+   serie, o uno de los dos criterios se recorta a los archivos que sí posee.
+2c. **Un verificador que levanta un servidor es un ESCRITOR, aunque su trabajo sea
+   leer.** La propiedad disjunta se pensó para builders y **no cubre el puerto, la
+   carpeta de datos ni el árbol de trabajo**. El 2026-08-25 dos medidores lanzados en
+   paralelo sobre la misma pantalla compartieron puerto 3200, `data/` y árbol: uno vio su
+   archivo pasar de **758 a 840 líneas a mitad de la medición** y tuvo que descartar la
+   tanda entera; en `data/` aparecieron 3 turnos y 3 órdenes que ninguno creó; y la
+   limpieza cruzada dejó `data/turnos.json` en **0 bytes** —malformado, no `[]`— que solo
+   no reventó porque el `JSON.parse` del almacén va envuelto en `catch`
+   (`villa-broaster/KN-020`). Tres reglas: **puerto propio y copia propia de los datos, o
+   en serie**; **nadie borra lo que no creó** (la limpieza cruzada corrompe en silencio y
+   es peor que dejar basura); y **comprobación de salida obligatoria** tras medir —
+   `git status` limpio, ningún `data/*.json` en cero bytes, y el arreglo que se midió
+   todavía en el archivo. La forma barata de cumplirlo es un comando, no un recordatorio:
+   `npm run verificar:aislado` pide puerto libre al sistema, copia `data/` a una carpeta
+   desechable, levanta ahí y borra al salir, y **se niega a arrancar en los puertos de
+   trabajo** (`villa-broaster/broaster-app/package.json:20`,
+   `villa-broaster/broaster-app/scripts/aislado.mjs`, `villa-broaster/docs/DESPLIEGUE.md`
+   §6 «Quien mide arranca con un comando»).
 3. **Donde no se puede separar por archivo, separa por namespace**: builders que solo
    escriben su prefijo de JS/CSS sobre un HTML que escribió el orquestador
    (`wrd/KN-003`).
@@ -130,6 +166,17 @@ subir su tier.
    **cualquier** medición agregada durante la ola (conteo de tests, de archivos, de
    rutas), confirma en qué rama estás parado: una cifra que no coincide con lo
    esperado es señal de que el terreno cambió, nunca ruido a ignorar.
+7c. **Un rojo emitido MIENTRAS la ola corre no es evidencia de nada.** En la tanda del
+   2026-08-26 dos agentes reportaron su `verificar` en **rojo** por errores de `tsc` en
+   archivos **del otro, a medio escribir**; cuando terminaron todos, el árbol quedó verde
+   y limpio (`villa-broaster/KN-023`). La causa es estructural: `tsc`, el build y la suite
+   son del **proyecto entero**, no del carril, así que cada agente compila el trabajo a
+   medias de sus compañeros. **El veredicto de tipos/build/tests se toma UNA vez, al
+   cerrar la ola, y lo toma el orquestador**; un rojo intermedio se anota como *"pendiente
+   de recheck al cierre"* y **nunca dispara un arreglo**. Creérselo cuesta doble: el
+   orquestador se pone a arreglar algo que no está roto y encima pisa a quien lo estaba
+   escribiendo. El corolario del brief: pídele al agente que reporte **qué rompió de lo
+   suyo**, no el color global del árbol.
 
 **Cuando uno cae (protocolo de recuperación, en este orden):** resumen; el
 procedimiento completo, con el comando de cada paso, está abajo en
@@ -410,6 +457,19 @@ opcionales ni intercambiables.
   nota de calibración: no penalizar a los builders, fue el entorno.
 - `placita/RSK-005` (Open) — el repo tiene dos ramas y GitHub las tenía divergidas;
   causa exacta de por qué algo movió HEAD a mitad de sesión, sin confirmar del todo.
+- `villa-broaster/KN-023` — listas `posee` disjuntas (`lib/servidor/respuesta.ts` vs
+  `lib/dominio/**`) y **colisión real** en las 24 rutas de `app/api`, porque los
+  criterios *"ninguna ruta arma JSON a mano"* y *"ninguna ruta pasa de 60 líneas"*
+  reclamaban el mismo glob. Incluye el rojo transitorio de `tsc` entre carriles que se
+  volvió verde al cerrar la ola. Depende de `villa-broaster/KN-020`.
+- `villa-broaster/KN-020` — dos VERIFICADORES en paralelo comparten puerto 3200, `data/`
+  y árbol: archivo de 758→840 líneas a mitad de medición, 3 turnos y 3 órdenes que nadie
+  creó, `data/turnos.json` en **0 bytes** por limpieza cruzada. Es la extensión explícita
+  de este tema de builders a medidores.
+- `C:\Users\Kalel\prommter\proyectos\villa-broaster\docs\DESPLIEGUE.md` §6 — la regla ya
+  escrita para el equipo (verificador = escritor, prohibida la limpieza cruzada,
+  comprobación de salida) y el comando `npm run verificar:aislado`
+  (`broaster-app/package.json:20`, `broaster-app/scripts/aislado.mjs`).
 
 **El protocolo escrito (archivo:línea)**
 - `ORION/runtime/skills/orion.SKILL.md:188-196` — un builder por paso; el brief declara los archivos que posee.

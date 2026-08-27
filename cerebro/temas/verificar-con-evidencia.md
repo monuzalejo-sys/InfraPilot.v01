@@ -1,11 +1,11 @@
 ---
 slug: verificar-con-evidencia
 titulo: Cómo se comprueba un resultado en esta máquina (y por qué no se confía en la vista)
-alias: [captura, capturas, captura de pantalla, capturas de pantalla, pantallazo, pantallazos, screenshot, screenshots, sacar una captura, tomar una foto de la pagina, imagen de la pagina, captura del sitio, pantallazo del sitio, captura de la web, captura de la landing, foto del sitio, png, pdf, pdfs, generar pdf, generar un pdf, genero un pdf, genero pdf, generacion de pdf, hacer un pdf, sacar un pdf, saco un pdf, armar un pdf, pasar a pdf, paso a pdf, convertir a pdf, html a pdf, de html a pdf, exportar a pdf, imprimir a pdf, imprimir en pdf, print-to-pdf, edge headless, edge, msedge, headless, cdp, edge-cdp, edge-cdp.mjs, navegador, navegador embebido, pane, browser, poppler, pdftoppm, python, verificar, verificacion, comprobar, comprobacion, evidencia, prueba, probar, medir, medicion, mediciones, qa, qa visual, calidad, veredicto, pass, fail, movil, celular, 390, viewport, overflow, desborde, desbordamiento, bamboleo, scroll lateral, animacion, animaciones, getanimations, reduced motion, tap target, scrollwidth, clientwidth, papel, impresora, imprimir, factura, comprobante, caja, cajero, mostrador, arqueo, bascula, en esta maquina, cortada, cortado, recortada, recortado, captura recortada, captura cortada, screenshot cortado, se ve cortado a la derecha, corrido a la derecha, se sale a la derecha, ancho equivocado, se ve mal en celular]
-preguntas: ["como saco una captura de una pagina en esta maquina", "como genero un pdf", "¿cómo verifico que esto de verdad quedó bien?", "¿por qué la captura se ve cortada a la derecha?", "¿cómo pruebo cómo se ve en celular?", "¿cómo compruebo que el PDF no salió corrupto?", "¿cómo saco un pantallazo del sitio?", "¿cómo tomo un screenshot de la landing?"]
+alias: [captura, capturas, captura de pantalla, capturas de pantalla, pantallazo, pantallazos, screenshot, screenshots, sacar una captura, tomar una foto de la pagina, imagen de la pagina, captura del sitio, pantallazo del sitio, captura de la web, captura de la landing, foto del sitio, png, pdf, pdfs, generar pdf, generar un pdf, genero un pdf, genero pdf, generacion de pdf, hacer un pdf, sacar un pdf, saco un pdf, armar un pdf, pasar a pdf, paso a pdf, convertir a pdf, html a pdf, de html a pdf, exportar a pdf, imprimir a pdf, imprimir en pdf, print-to-pdf, edge headless, edge, msedge, headless, cdp, edge-cdp, edge-cdp.mjs, navegador, navegador embebido, pane, browser, poppler, pdftoppm, python, verificar, verificacion, comprobar, comprobacion, evidencia, prueba, probar, medir, medicion, mediciones, qa, qa visual, calidad, veredicto, pass, fail, movil, celular, 390, viewport, overflow, desborde, desbordamiento, bamboleo, scroll lateral, animacion, animaciones, getanimations, reduced motion, tap target, scrollwidth, clientwidth, papel, impresora, imprimir, factura, comprobante, caja, cajero, mostrador, arqueo, bascula, en esta maquina, cortada, cortado, recortada, recortado, captura recortada, captura cortada, screenshot cortado, se ve cortado a la derecha, corrido a la derecha, se sale a la derecha, ancho equivocado, se ve mal en celular, getcomputedstyle, css calculado, estilo calculado, valor calculado, clamp, calc, var css, variable css, escala de espaciado, espaciado, padding, paddings, margenes, token de diseno, tokens de diseno, valor arbitrario, arbitrary value, tailwind, el grep no lo vio, grep en 0, grep no basta, buscar con grep el valor, medir el padding, medir espaciados, medir colores, contraste calculado]
+preguntas: ["como saco una captura de una pagina en esta maquina", "como genero un pdf", "¿cómo verifico que esto de verdad quedó bien?", "¿por qué la captura se ve cortada a la derecha?", "¿cómo pruebo cómo se ve en celular?", "¿cómo compruebo que el PDF no salió corrupto?", "¿cómo saco un pantallazo del sitio?", "¿cómo tomo un screenshot de la landing?", "el grep no encontró nada pero el diseño está mal, ¿cómo lo compruebo?", "¿cómo mido los paddings o colores reales de una pantalla?"]
 proyectos: [_permanent, landings, wrd, placita, villa-broaster, estanco-contable]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-08-27
 ---
 
 # Cómo se comprueba un resultado en esta máquina
@@ -94,6 +94,15 @@ que un screenshot del pane no es evidencia de cómo se ve la pantalla.
    - **orden visual en móvil**: posiciones **Y** de `getBoundingClientRect()`, nunca el
      orden del markup — `order` de CSS engaña a cualquier lectura del DOM (`placita/KN-036`).
    - **movimiento**: `document.getAnimations().length` (`landings/KN-008`).
+   - **escala de espaciado, color o tipografía (todo lo que sea un valor de diseño)**: el
+     grep del valor literal **no basta y miente tranquilizando**. `p-[Npx]` daba 0 en
+     `app/` y `components/` y aun así, midiendo a 390 px con `--eval` sobre
+     `getComputedStyle(el).padding` de cada elemento, salieron **dos paddings de 22 px**
+     escondidos en `p-[clamp(22px,2.6vw,34px)]` (`villa-broaster/KN-024`, 2026-08-26). Lo
+     mismo vale para `calc()`, variables CSS, valores heredados y clases compuestas: **el
+     grep es el primer filtro, el CSS calculado en el ancho real es la prueba**. Y mídelo
+     en **cada ancho que el criterio nombre**: un `clamp` es correcto a 1440 px y
+     prohibido a 390.
    - **tocable**: tap targets ≥ 40 px y campos de formulario ≥ 16 px de fuente, o iOS Safari
      hace zoom al enfocar (`villa-broaster/KN-015`, `placita/KN-036`).
    - **pantalla llena sin scroll**: viewport vs `scrollHeight` en la resolución real —
@@ -157,6 +166,9 @@ que un screenshot del pane no es evidencia de cómo se ve la pantalla.
 - `_permanent/KN-011` — límite de ~8 KB del tool Bash.
 - `landings/KN-003` — las dos trampas de Edge headless (ancho y reduced-motion) y la receta CDP.
 - `landings/KN-008` — `getAnimations()` = 1 sobre el entregable del generador.
+- `villa-broaster/KN-024` — grep de `p-[Npx]` en 0 y **dos paddings de 22 px** medidos a
+  390 px con `getComputedStyle`, escondidos en `p-[clamp(22px,2.6vw,34px)]`: el límite
+  exacto entre buscar en el código y medir en el navegador.
 - `landings/POL-003` — móvil es canal principal: toda combinación se mide por CDP a 390 px.
 - `wrd/KN-006` — el pane miente sobre `visibility`; iteraciones perdidas.
 - `wrd/KN-008` — captura compensada a 488 px (**refutada por medición, ver abajo**); la
