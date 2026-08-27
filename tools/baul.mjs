@@ -42,22 +42,28 @@ const esc = (s) => String(s ?? "").replace(/\r?\n/g, " ").trim()
 const slug = (s) => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
   .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60)
 
+/* Un proyecto entra a la bóveda si tiene memoria O si tiene plan. Las dos, no
+   solo la primera: un proyecto recién planeado todavía no ha cerrado ninguna
+   sesión y por tanto no tiene `state.json`, y filtrar por él dejaba su plan
+   invisible justo cuando más se va a mirar. */
+const esMemoria = (d) => existsSync(join(d, "state.json")) || existsSync(join(d, "plan.json"))
+
 function descubrirMemorias() {
   const out = new Set(SUELTAS)
   for (const raiz of RAICES) {
     if (!existsSync(raiz)) continue
     for (const entrada of readdirSync(raiz)) {
       const directa = join(raiz, entrada)
-      try { if (statSync(directa).isDirectory() && existsSync(join(directa, "state.json"))) out.add(directa) } catch {}
+      try { if (statSync(directa).isDirectory() && esMemoria(directa)) out.add(directa) } catch {}
       const mem = join(raiz, entrada, "memory")
       if (!existsSync(mem)) continue
       for (const sub of readdirSync(mem)) {
         const d = join(mem, sub)
-        try { if (statSync(d).isDirectory() && existsSync(join(d, "state.json"))) out.add(d) } catch {}
+        try { if (statSync(d).isDirectory() && esMemoria(d)) out.add(d) } catch {}
       }
     }
   }
-  return [...out].filter((p) => existsSync(join(p, "state.json")))
+  return [...out].filter(esMemoria)
 }
 
 function limpiarMd(dir) {
