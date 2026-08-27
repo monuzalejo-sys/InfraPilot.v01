@@ -308,6 +308,16 @@ function listas(plan, { respetarNiveles = !flag("sin-niveles") } = {}) {
   })
 }
 
+/* Orden de lectura: nivel primero (N8-R8) y, dentro del nivel, lo PROPIO del
+   proyecto antes que lo del catálogo. Una tarea que salió de auditar este repo
+   —el commit sin publicar, el PIN de fábrica— pesa más que una que aplica a
+   cualquier proyecto, por correcta que sea. Sin esta regla la primera tanda
+   mezclaba la ruta crítica con trabajo genérico y el dueño tenía que buscarla. */
+const porUrgencia = (a, b) =>
+  NIVELES.indexOf(a.nivel) - NIVELES.indexOf(b.nivel)
+  || (a.arquetipo ? 1 : 0) - (b.arquetipo ? 1 : 0)
+  || a.id.localeCompare(b.id)
+
 function lineaTarea(t) {
   const pres = t.presupuesto ? `${Math.round(t.presupuesto / 1000)}k` : "inline"
   return `${t.id} [${t.nivel}·${t.categoria}·${t.dificultad}·${t.ceremonia}·${pres}] ${t.titulo}`
@@ -319,7 +329,7 @@ function cmdSiguiente() {
   const n = Number(val("n", 3))
   const cands = listas(plan)
     .filter((t) => !lista("categoria") || lista("categoria").includes(t.categoria))
-    .sort((a, b) => NIVELES.indexOf(a.nivel) - NIVELES.indexOf(b.nivel) || a.id.localeCompare(b.id))
+    .sort(porUrgencia)
   if (!cands.length) {
     const bloq = plan.tareas.filter((t) => t.estado === "bloqueado")
     console.log(bloq.length
@@ -758,7 +768,7 @@ function cmdTanda() {
   const salida = posicional[1] ?? join(dirname(ruta), "TANDA.md")
   const cands = listas(plan)
     .filter((t) => !lista("categoria") || lista("categoria").includes(t.categoria))
-    .sort((a, b) => NIVELES.indexOf(a.nivel) - NIVELES.indexOf(b.nivel) || a.id.localeCompare(b.id))
+    .sort(porUrgencia)
     .slice(0, n)
   if (!cands.length) morir("no hay tareas listas: mira `estado` para ver qué las bloquea")
 

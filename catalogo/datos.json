@@ -20,7 +20,7 @@
         { "check": "{{entidad}} tiene su propia migración", "comando": "grep -rl '{{entidad}}' supabase/migrations/*.sql | wc -l", "espera": "1+ archivos" },
         { "check": "La migración declara clave primaria e índice", "comando": null, "espera": "el archivo de {{entidad}} tiene PRIMARY KEY y al menos un CREATE INDEX; se cita la línea" }
       ],
-      "aplicaSi": { "entidades": ["*"] },
+      "aplicaSi": { "entidades": ["*"], "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": "entidad",
       "posee": ["supabase/migrations/**", "docs/modelo-de-datos.md"],
       "cerebro": ["tema:donde-vive-el-dato"]
@@ -680,7 +680,7 @@
         { "check": "El script sigue el orden de dependencias", "comando": "node scripts/sembrar.mjs; echo EXIT=$?", "espera": "EXIT=0; todas las tablas declaradas quedan con filas" },
         { "check": "Insertar un hijo antes que su padre falla con el nombre de la tabla", "comando": "npm test -- orden-de-siembra", "espera": "exit 0" }
       ],
-      "aplicaSi": { "modo": "genesis" },
+      "aplicaSi": { "modo": "genesis", "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["scripts/sembrar.mjs"],
       "cerebro": ["tema:donde-vive-el-dato"]
@@ -702,7 +702,7 @@
         { "check": "Existen los dos scripts por separado", "comando": "ls scripts/sembrar-demo.mjs tests/apoyo/fixtures.ts", "espera": "los dos archivos existen" },
         { "check": "Los tests no dependen del seed de demo", "comando": "npm test", "espera": "exit 0 sin haber corrido sembrar-demo antes" }
       ],
-      "aplicaSi": {},
+      "aplicaSi": { "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["scripts/sembrar-demo.mjs", "tests/apoyo/fixtures.ts"],
       "cerebro": []
@@ -724,7 +724,7 @@
         { "check": "Correr la siembra dos veces no cambia el conteo de filas", "comando": "node scripts/sembrar.mjs && node scripts/sembrar.mjs; echo EXIT=$?", "espera": "EXIT=0; mismo conteo tras la segunda corrida" },
         { "check": "La raíz aleatoria está fija y documentada", "comando": "grep -n 'seed\\|raiz' scripts/sembrar.mjs", "espera": "1+ líneas con un valor constante" }
       ],
-      "aplicaSi": { "modo": "genesis" },
+      "aplicaSi": { "modo": "genesis", "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["scripts/sembrar.mjs"],
       "cerebro": []
@@ -746,7 +746,7 @@
         { "check": "{{entidad}} tiene al menos el mínimo de filas sembradas", "comando": "node scripts/sembrar.mjs --entidad={{entidad}} --contar", "espera": "conteo mayor o igual al mínimo declarado" },
         { "check": "Las filas de {{entidad}} no son la misma repetida", "comando": null, "espera": "valores distintos en al menos dos columnas visibles de la lista" }
       ],
-      "aplicaSi": { "entidades": ["*"], "modo": "genesis" },
+      "aplicaSi": { "entidades": ["*"], "modo": "genesis", "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": "entidad",
       "posee": ["scripts/sembrar.mjs"],
       "cerebro": []
@@ -790,7 +790,7 @@
         { "check": "El comando deja la base en el estado nombrado", "comando": "npm run reset-dev; echo EXIT=$?", "espera": "EXIT=0; termina con el seed de demo aplicado" },
         { "check": "Se niega a correr contra una base que no es de desarrollo", "comando": "DATABASE_URL=postgres://produccion npm run reset-dev; echo EXIT=$?", "espera": "EXIT distinto de 0, sin tocar ninguna fila" }
       ],
-      "aplicaSi": { "equipo": "orion+humanos" },
+      "aplicaSi": { "equipo": "orion+humanos", "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["scripts/reset-dev.mjs"],
       "cerebro": ["tema:entorno-de-la-maquina"]
@@ -812,7 +812,7 @@
         { "check": "Toda tabla de dinero o hechos tiene su doctrina escrita", "comando": "grep -c '^| ' docs/borrado-de-datos.md", "espera": "conteo igual al número de tablas listadas como sensibles" },
         { "check": "Ninguna tabla queda sin decisión", "comando": null, "espera": "tabla→doctrina completa, 0 filas en blanco o con signo de pregunta" }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": { "dineroReal": true, "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["docs/borrado-de-datos.md"],
       "cerebro": ["tema:invariantes-contables", "tema:donde-vive-el-dato"]
@@ -944,7 +944,7 @@
         { "check": "La línea de tiempo se genera para un registro con varios cambios", "comando": "npm run linea-de-tiempo -- <id>", "espera": "exit 0; imprime cada cambio en una frase legible, ordenado por fecha" },
         { "check": "No muestra nombres de columna crudos", "comando": "npm run linea-de-tiempo -- <id> | grep -ciE '_id$|_at$'", "espera": "0" }
       ],
-      "aplicaSi": { "equipo": "orion+humanos", "dineroReal": true },
+      "aplicaSi": { "equipo": "orion+humanos", "dineroReal": true, "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["scripts/linea-de-tiempo.mjs"],
       "cerebro": ["tema:documentos-para-personas"]
@@ -966,7 +966,7 @@
         { "check": "El respaldo de hoy pasa la comprobación de validez", "comando": "node scripts/verificar-respaldo.mjs --ultimo", "espera": "exit 0; confirma que el archivo abre y su contenido es interpretable" },
         { "check": "Un respaldo truncado se detecta", "comando": "npm test -- respaldo-truncado", "espera": "exit 0; el script marca inválido el archivo cortado" }
       ],
-      "aplicaSi": {},
+      "aplicaSi": { "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["scripts/verificar-respaldo.mjs"],
       "cerebro": ["tema:dominio-migraciones-y-copias"]
@@ -1010,7 +1010,7 @@
         { "check": "Todo almacén distinto de la base está en la lista de respaldo", "comando": null, "espera": "tabla almacén→incluido en respaldo completa, 0 filas sin decisión" },
         { "check": "Un documento con archivo adjunto conserva su archivo tras restaurar", "comando": "npm run ensayo-restauracion -- --verificar-adjuntos", "espera": "exit 0; 0 documentos con archivo faltante" }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": { "dineroReal": true, "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["docs/respaldo.md", "scripts/ensayo-restauracion.mjs"],
       "cerebro": ["tema:dominio-migraciones-y-copias", "tema:donde-vive-el-dato"]
@@ -1054,7 +1054,7 @@
         { "check": "No hay proceso que copie producción a desarrollo", "comando": "grep -rniE 'produccion.*(dump|export).*(dev|desarrollo|staging)' scripts/", "espera": "0 líneas" },
         { "check": "Los entornos de desarrollo no tienen datos personales reales", "comando": "node scripts/auditar-pii-en-dev.mjs", "espera": "exit 0; 0 coincidencias con datos reales conocidos" }
       ],
-      "aplicaSi": { "datosPersonales": true },
+      "aplicaSi": { "datosPersonales": true, "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["scripts/auditar-pii-en-dev.mjs"],
       "cerebro": ["tema:entorno-de-la-maquina"]
@@ -1098,7 +1098,7 @@
         { "check": "El anonimizado resiste el intento de recuperación", "comando": "npm test -- anonimizado-irreversible", "espera": "exit 0; el intento de fuerza bruta sobre el rango real no recupera el valor original" },
         { "check": "La técnica elegida está documentada", "comando": "grep -n 'tecnica de anonimizado' docs/derechos-del-titular.md", "espera": "1+ líneas" }
       ],
-      "aplicaSi": { "datosPersonales": true },
+      "aplicaSi": { "datosPersonales": true, "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["lib/servidor/anonimizar.ts", "tests/datos/anonimizado-irreversible.test.ts"],
       "cerebro": []
@@ -1120,7 +1120,7 @@
         { "check": "El dato borrado no aparece en ninguna copia derivada", "comando": "node scripts/buscar-en-copias-derivadas.mjs -- --titular=<id>", "espera": "exit 0; 0 coincidencias en todas las copias listadas" },
         { "check": "Las copias derivadas están todas listadas", "comando": "grep -c '^- ' docs/derechos-del-titular.md", "espera": "1+ y coincide con el número de copias reales encontradas" }
       ],
-      "aplicaSi": { "datosPersonales": true },
+      "aplicaSi": { "datosPersonales": true, "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["scripts/buscar-en-copias-derivadas.mjs"],
       "cerebro": ["tema:donde-vive-el-dato"]
@@ -1164,7 +1164,7 @@
         { "check": "Ninguna columna exportada usa el nombre técnico de la base", "comando": "head -1 exportaciones/ventas.csv | grep -ciE '_id$|_cop$|_enum'", "espera": "0" },
         { "check": "El mapa de nombres está centralizado", "comando": "grep -c '=>' lib/servidor/nombres-exportacion.ts", "espera": "1+ por cada columna exportada" }
       ],
-      "aplicaSi": {},
+      "aplicaSi": { "superficies": ["api", "panel-interno", "caja"] },
       "porCada": null,
       "posee": ["lib/servidor/nombres-exportacion.ts"],
       "cerebro": ["tema:documentos-para-personas"]
@@ -1186,7 +1186,7 @@
         { "check": "El archivo lleva BOM UTF-8", "comando": "head -c 3 exportaciones/ventas.csv | xxd", "espera": "ef bb bf al inicio del archivo" },
         { "check": "Los montos son número plano, no texto con símbolo", "comando": "grep -c '\\$' exportaciones/ventas.csv", "espera": "0" }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": { "dineroReal": true, "superficies": ["api", "panel-interno", "caja"] },
       "porCada": null,
       "posee": ["lib/servidor/exportar-csv.ts"],
       "cerebro": []
@@ -1208,7 +1208,7 @@
         { "check": "El total exportado coincide con el de la pantalla", "comando": "npm test -- exportacion-cuadra-con-pantalla", "espera": "exit 0" },
         { "check": "La exportación reutiliza la consulta de la pantalla", "comando": "grep -n 'vista_ventas_dia\\|ventas_vigentes' lib/servidor/exportar-csv.ts", "espera": "1+ líneas" }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": { "dineroReal": true, "superficies": ["api", "panel-interno", "caja"] },
       "porCada": null,
       "posee": ["lib/servidor/exportar-csv.ts", "tests/datos/exportacion-cuadra-con-pantalla.test.ts"],
       "cerebro": ["tema:invariantes-contables"]
@@ -1230,7 +1230,7 @@
         { "check": "Una sede descuadrada se señala antes de sumar", "comando": "npm test -- consolidado-concilia", "espera": "exit 0; la sede descuadrada aparece marcada, no absorbida en el total" },
         { "check": "El consolidado no suma sin conciliar primero", "comando": "grep -n 'conciliarSede' lib/servidor/reportes.ts", "espera": "1+ líneas antes de la suma final" }
       ],
-      "aplicaSi": { "dineroReal": true, "multiUsuario": true },
+      "aplicaSi": { "dineroReal": true, "multiUsuario": true, "superficies": ["api", "panel-interno", "caja"] },
       "porCada": null,
       "posee": ["lib/servidor/reportes.ts", "tests/datos/consolidado-concilia.test.ts"],
       "cerebro": ["tema:invariantes-contables"]
@@ -1252,7 +1252,7 @@
         { "check": "El reporte se genera solo en la fecha programada", "comando": "grep -n 'cron\\|programado' scripts/reporte-mensual.mjs", "espera": "1+ líneas" },
         { "check": "Un fallo en la generación se avisa", "comando": "npm test -- reporte-programado-avisa-fallo", "espera": "exit 0" }
       ],
-      "aplicaSi": { "equipo": "orion+humanos", "dineroReal": true },
+      "aplicaSi": { "equipo": "orion+humanos", "dineroReal": true, "superficies": ["api", "panel-interno", "caja"] },
       "porCada": null,
       "posee": ["scripts/reporte-mensual.mjs"],
       "cerebro": ["tema:documentos-para-personas"]
@@ -1274,7 +1274,7 @@
         { "check": "El script lista todo hueco con su causa o su falta de causa", "comando": "node scripts/huecos-en-secuencia.mjs", "espera": "exit 0; imprime cada hueco con su causa registrada o 'sin explicar'" },
         { "check": "No quedan huecos sin explicar más allá de la ventana reciente", "comando": null, "espera": "tabla hueco→causa; 0 filas sin explicar de más de una semana" }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": { "dineroReal": true, "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["scripts/huecos-en-secuencia.mjs"],
       "cerebro": ["tema:invariantes-contables"]
@@ -1296,7 +1296,7 @@
         { "check": "La auditoría corre contra los datos reales", "comando": "node scripts/auditar-totales-derivados.mjs", "espera": "exit 0; imprime 0 diferencias o la lista con tabla, fila y magnitud" },
         { "check": "Cualquier diferencia encontrada queda registrada como incidente", "comando": null, "espera": "tabla diferencia→incidente abierto, ninguna diferencia ignorada" }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": { "dineroReal": true, "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["scripts/auditar-totales-derivados.mjs"],
       "cerebro": ["tema:invariantes-contables", "tema:donde-vive-el-dato"]
@@ -1318,7 +1318,7 @@
         { "check": "El barrido corre contra la base real", "comando": "node scripts/barrido-valores-imposibles.mjs", "espera": "exit 0; imprime 0 filas imposibles o la lista con tabla, fila y regla violada" },
         { "check": "Cada violación encontrada tiene una investigación abierta", "comando": null, "espera": "tabla violación→causa investigada, ninguna corregida sin entender cómo entró" }
       ],
-      "aplicaSi": { "dineroReal": true },
+      "aplicaSi": { "dineroReal": true, "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["scripts/barrido-valores-imposibles.mjs"],
       "cerebro": ["tema:invariantes-contables"]
@@ -1340,7 +1340,7 @@
         { "check": "El reporte encuentra duplicados por significado", "comando": "node scripts/duplicados-por-significado.mjs", "espera": "exit 0; imprime los grupos encontrados o 0 grupos" },
         { "check": "No fusiona ni borra nada por su cuenta", "comando": "grep -c 'DELETE\\|merge(' scripts/duplicados-por-significado.mjs", "espera": "0" }
       ],
-      "aplicaSi": {},
+      "aplicaSi": { "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": null,
       "posee": ["scripts/duplicados-por-significado.mjs"],
       "cerebro": []
@@ -1362,7 +1362,7 @@
         { "check": "La consulta de límites de {{entidad}} da cero filas en la base real", "comando": "node scripts/limites-imposibles.mjs --entidad={{entidad}}", "espera": "exit 0; 0 filas fuera de los límites declarados" },
         { "check": "Los límites de {{entidad}} están documentados con su motivo", "comando": "grep -c '{{entidad}}' docs/limites-fisicos.md", "espera": "1+ líneas" }
       ],
-      "aplicaSi": { "entidades": ["*"] },
+      "aplicaSi": { "entidades": ["*"], "stack": ["postgres", "supabase", "sqlite", "mysql", "json-en-disco"] },
       "porCada": "entidad",
       "posee": ["scripts/limites-imposibles.mjs", "docs/limites-fisicos.md"],
       "cerebro": ["tema:invariantes-contables"]

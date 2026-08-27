@@ -75,7 +75,14 @@
         }
       ],
       "aplicaSi": {
-        "modo": "genesis"
+        "modo": "genesis",
+        "stack": [
+          "postgres",
+          "supabase",
+          "sqlite",
+          "mysql",
+          "json-en-disco"
+        ]
       },
       "porCada": null,
       "posee": [
@@ -191,7 +198,15 @@
           "espera": "exit 0; incluye el caso de vaciar el catálogo y esperar 0"
         }
       ],
-      "aplicaSi": {},
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "sqlite",
+          "mysql",
+          "json-en-disco"
+        ]
+      },
       "porCada": null,
       "posee": [
         "lib/tipos.ts",
@@ -228,7 +243,15 @@
           "espera": "exit 0; un test por cada hecho de la tabla"
         }
       ],
-      "aplicaSi": {},
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "sqlite",
+          "mysql",
+          "json-en-disco"
+        ]
+      },
       "porCada": null,
       "posee": [
         "docs/donde-vive-el-dato.md",
@@ -378,7 +401,13 @@
           "espera": "exit 0"
         }
       ],
-      "aplicaSi": {},
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
+        ]
+      },
       "porCada": null,
       "posee": [
         "lib/servidor/reloj.ts",
@@ -888,6 +917,11 @@
         "stack": [
           "node",
           "json-en-disco"
+        ],
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
         ]
       },
       "porCada": null,
@@ -1197,7 +1231,12 @@
         }
       ],
       "aplicaSi": {
-        "multiUsuario": true
+        "multiUsuario": true,
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
+        ]
       },
       "porCada": null,
       "posee": [
@@ -1394,7 +1433,12 @@
         }
       ],
       "aplicaSi": {
-        "dineroReal": true
+        "dineroReal": true,
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
+        ]
       },
       "porCada": null,
       "posee": [
@@ -1434,6 +1478,11 @@
         "stack": [
           "node",
           "json-en-disco"
+        ],
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
         ]
       },
       "porCada": null,
@@ -1711,6 +1760,11 @@
         "stack": [
           "node",
           "json-en-disco"
+        ],
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
         ]
       },
       "porCada": null,
@@ -1795,7 +1849,12 @@
         }
       ],
       "aplicaSi": {
-        "multiUsuario": true
+        "multiUsuario": true,
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
+        ]
       },
       "porCada": null,
       "posee": [
@@ -1910,6 +1969,11 @@
       "aplicaSi": {
         "entidades": [
           "*"
+        ],
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
         ]
       },
       "porCada": "entidad",
@@ -2527,7 +2591,12 @@
         }
       ],
       "aplicaSi": {
-        "datosPersonales": true
+        "datosPersonales": true,
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
+        ]
       },
       "porCada": null,
       "posee": [
@@ -2641,7 +2710,12 @@
         }
       ],
       "aplicaSi": {
-        "modo": "evolucion"
+        "modo": "evolucion",
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
+        ]
       },
       "porCada": null,
       "posee": [
@@ -2676,7 +2750,12 @@
         }
       ],
       "aplicaSi": {
-        "equipo": "orion+humanos"
+        "equipo": "orion+humanos",
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
+        ]
       },
       "porCada": null,
       "posee": [
