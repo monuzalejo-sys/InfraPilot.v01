@@ -522,6 +522,7 @@ function cmdAgregar() {
   const entradas = Array.isArray(entrada) ? entrada : [entrada]
   let n = plan.tareas.length
   const añadidas = []
+  const avisosIngesta = []
   for (const e of entradas) {
     const t = {
       id: `T-${String(++n).padStart(3, "0")}`,
@@ -530,6 +531,21 @@ function cmdAgregar() {
       estado: "pendiente", bloqueadoPor: null, evidencia: null, gastoReal: null,
       ...e,
     }
+    /* `check` es el nombre canónico, pero quien escribe la tarjeta piensa en
+       español y escribe `que` («qué se comprueba»). Aceptarlo y normalizarlo es
+       mejor que rechazarlo: el 2026-08-26 una sesión escribió cuatro criterios
+       con `que` y `agregar` los tragó EN SILENCIO, dejando el plan inválido con
+       `check: undefined` y sin que se perdiera una sola palabra del texto. */
+    let renombrados = 0
+    t.aceptacion = (t.aceptacion ?? []).map((a) => {
+      if (a.check || !a.que) return a
+      renombrados++
+      const { que, ...resto } = a
+      return { check: que, ...resto }
+    })
+    if (renombrados) avisosIngesta.push(`${t.id}: ${renombrados} criterio(s) escritos con \`que\` en vez de \`check\`; se normalizaron.`)
+    const sinCheck = t.aceptacion.filter((a) => !a.check).length
+    if (sinCheck) avisosIngesta.push(`${t.id}: ${sinCheck} criterio(s) SIN \`check\` ni \`que\` — la tarea entra, pero el validador la marcará.`)
     t.modelo = t.modelo ?? MODELO_POR_DIFICULTAD[t.dificultad]
     t.presupuesto = presupuestar(t)
     plan.tareas.push(t); añadidas.push(t)
@@ -553,6 +569,7 @@ function cmdAgregar() {
   }
   const v = guardar(ruta, plan)
   console.log(`+${añadidas.length} tareas propias del proyecto (v${v}): ${añadidas.map((t) => t.id).join(", ")}`)
+  for (const a of avisosIngesta) console.log(`  ! ${a}`)
   if (resueltas) console.log(`${resueltas} dependencia(s) declaradas por título, resueltas a su id.`)
   if (huerfanas.length) console.log(`${huerfanas.length} dependencia(s) que no apuntan a nada y se descartaron:\n  ${huerfanas.join("\n  ")}`)
 }
@@ -641,6 +658,23 @@ function cmdValidar() {
     else {
       const observable = t.aceptacion.some((a) => a.comando || /\b(0 |exit|200|4\d\d|5\d\d|\d+\s*(px|ms|s|filas|líneas|tests|caracteres))/i.test(a.espera ?? ""))
       if (!observable) errores.push(`${donde}: ninguna aceptación es un hecho observable (N8-R3)`)
+      /* Un criterio que CUANTIFICA sobre un glob es una declaración de
+         propiedad sobre ese glob, aunque `posee` no lo diga. Lo pagó
+         villa-broaster/KN-023 el 2026-08-26: dos tareas con `posee` disjunto
+         (`lib/servidor/respuesta.ts` vs `lib/dominio/**`) colisionaron en las
+         mismas 24 rutas de `app/api`, porque sus criterios eran «ninguna ruta
+         arma JSON a mano» y «ninguna ruta pasa de 60 líneas». `ola` compara
+         listas `posee`; si el glob no está ahí, da por paralelizable lo que no
+         lo es. */
+      /* Solo cuando lo cuantificado es un ARTEFACTO DE CÓDIGO. «ninguna venta»
+         o «cada sede» cuantifican sobre datos y no declaran propiedad de
+         archivos; avisar de esas convierte la comprobación en ruido y entonces
+         nadie mira los avisos que sí importan. */
+      const ARTEFACTO = "rutas?|endpoints?|componentes?|m[oó]dulos?|archivos?|p[aá]ginas?|pantallas?|vistas?|funciones?|tests?|pruebas?|scripts?|hooks?|handlers?|migraciones?"
+      const cuantificadores = t.aceptacion.filter((a) =>
+        new RegExp(`\\b(ningun[ao]?|tod[ao]s?|cada)\\s+(${ARTEFACTO})\\b`, "i").test(a.check ?? ""))
+      if (cuantificadores.length && (t.posee ?? []).every((p) => !p.includes("*")))
+        avisos.push(`${donde}: el criterio «${(cuantificadores[0].check ?? "").slice(0, 45)}…» cuantifica sobre un conjunto, pero \`posee\` no tiene ningún glob. O el glob entra en \`posee\`, o \`ola\` va a paralelizar esta tarea con otra que toque los mismos archivos (villa-broaster/KN-023).`)
       const adjetivos = t.aceptacion.filter((a) => /\b(bien|correcto|adecuado|bonito|limpio|seguro|óptimo|apropiado)\b/i.test(a.espera ?? ""))
       if (adjetivos.length) avisos.push(`${donde}: aceptación con adjetivo en vez de medición ("${adjetivos[0].espera}")`)
     }
