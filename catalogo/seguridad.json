@@ -20,8 +20,8 @@
       "aceptacion": [
         {
           "check": "Ningún archivo de entorno está rastreado por git",
-          "comando": "git ls-files | grep -E \"(^|/)\\.env($|\\.)\"",
-          "espera": "0 líneas"
+          "comando": "git ls-files | grep -E \"(^|/)\\.env($|\\.)\" | grep -v \"\\.example$\"",
+          "espera": "0 líneas. Se excluye `.env.example` a propósito: es la plantilla SIN valores que el criterio 3 de este mismo arquetipo exige que exista — sin la exclusión, los dos criterios se contradicen y el arquetipo no puede pasar nunca."
         },
         {
           "check": "No hay valores de llave en el código rastreado",
