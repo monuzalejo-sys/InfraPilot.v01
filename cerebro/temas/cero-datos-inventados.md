@@ -56,6 +56,27 @@ pagaron:
   *"is already deployed on Vercel and reachable outside this machine"*). La frontera de
   abajo explica por qué ese dato **nunca tuvo derecho a parquearse**.
 
+**Y la misma disciplina se pagó del lado del dominio, no de una landing.** Al
+dictar su catálogo real de 111 productos de viva voz, el dueño de la placita
+dejó tres sin precio, cinco sin decir si se venden por peso o por unidad, y
+tres códigos cruzados con otros productos: *"un dictado largo... trae huecos,
+códigos cruzados y excepciones a sus propias reglas — no se puede tratar como
+una lista limpia"* (`placita/KN-054`, commit `003e84b`). Los tres sin precio
+(Achote, Manzana verde, Uva chilena) entraron al catálogo **sin precio**, no
+con uno inventado, reusando el mismo patrón `sinPrecio` que ya existía para
+"compra todavía sin poner" (`placita/DEC-027`); y los cinco sin modo de venta
+se dejaron en una constante propia, `SIN_MODO_DICTADO`, con el supuesto de
+cada uno y **por qué** se asumió así —*"el aguacate de la plaza se pesa"*,
+*"el banano común de al lado va a peso"*— en vez de disolverse en la lista
+principal (`lib/dominio/surtido.ts:190-227`). Y dos renglones declarados
+"bandeja" pero dictados por peso —contra la regla general de que toda bandeja
+va por unidad— se dejaron exactamente como se dictaron, uno por uno, en vez de
+"corregirlos" para que calzaran con el patrón: **el dictado real y explícito
+manda sobre la regla general inferida, aunque parezca una inconsistencia**
+(`placita/KN-054`). Es el mismo "9. HUECOS DEL DUEÑO" de una landing,
+trasladado a una constante de TypeScript que nadie ve en pantalla pero que
+sigue siendo preguntable.
+
 Y hay una razón que no es reputacional sino **operativa**: en una vitrina viva, un dato
 falso es una promesa que alguien reclama. Un horario falso **manda gente a un local
 cerrado**; un cupón publicado *"es una promesa que alguien reclama en el mostrador
@@ -154,6 +175,14 @@ la primera publicación.
    asignado en la pantalla** (ticket de papel crema clavado, el dato como `__`, la
    coletilla "lo confirma el dueño"), porque *en el intento anterior la palabra "hueco"
    apareció **cero veces** en todo el HTML entregado*.
+4b. **Cuando el hueco vive en datos de dominio, no en una pantalla, expórtalo
+   como una lista con nombre propio, su supuesto y su porqué.**
+   `SIN_MODO_DICTADO` no es un comentario suelto: es una constante exportada y
+   tipada que cualquier pantalla o script puede recorrer para preguntarle al
+   dueño uno por uno (`placita lib/dominio/surtido.ts:225-227`). Mismo
+   principio que los H-1…H-12 de arriba — lo que falta se nombra y se puede
+   señalar con el dedo — solo que aquí el "dedo" es código, no un ticket de
+   papel dibujado en pantalla.
 5. **Cero cifras sociales.** Años de experiencia, número de clientes, kilos vendidos,
    testimonios, premios, "más de X familias confían": si no está en las fuentes, **no
    existe**. Si el negocio lo necesita para vender, se pide como hueco
@@ -174,6 +203,19 @@ la primera publicación.
 10. **Audita el copy público de los builders baratos.** Cuando un modelo trivial-tier toca
     metadata, keywords o descripciones, revisa su salida **contra el archivo de datos del
     dominio** — solo hechos que existan ahí (`villa-broaster/KN-008`).
+11. **Si el campo es IRREVERSIBLE una vez creado el registro, la pregunta no
+    se puede parquear: se hace ANTES de crear, no después.** Un hueco marcado
+    sirve cuando el dato se puede completar más tarde editando el registro (un
+    precio, un teléfono). Pero si el campo no admite edición posterior —en la
+    placita, `modoVenta`: cambiar de peso a unidad "no es editar, es otro
+    producto" (`lib/dominio/surtido.ts:43-49`)— dejarlo como hueco para
+    después no ahorra nada: completarlo implicaría borrar y recrear el
+    registro, con todo lo que ya cuelgue de él. Por eso los cinco casos sin
+    modo de venta se resolvieron **antes** de crear el catálogo, preguntándose
+    de viva voz, mientras que los tres sin precio sí se dejaron como hueco
+    editable (`placita/KN-054`). **La pregunta que decide el orden: ¿este
+    dato se puede corregir después sin destruir el registro? Si no, se
+    pregunta ya.**
 
 ## Cuándo NO aplica
 
@@ -270,6 +312,15 @@ la primera publicación.
 - Apartado **"9. HUECOS DEL DUEÑO"** presente en `arroces-super-arroz-del-norte.md:354`,
   `estanco-contable.md:343`, `wrd.md:382`, `placita-mercaplaza-v2.md:655`,
   `infrapilot.md:373` y `villa-app-villa-broaster-v3.md:992`.
+- `placita/KN-054` (commit `003e84b`) — un dictado largo de 111 productos trae
+  huecos, códigos cruzados y excepciones a sus propias reglas; los tres sin
+  precio entraron sin precio; los cinco sin modo de venta quedaron explícitos
+  en `SIN_MODO_DICTADO`; dos "bandeja" dictadas por peso se respetaron tal
+  cual contra la regla general. `placita/DEC-027` — el catálogo guarda el
+  precio de venta dictado, nunca uno inventado para lo que faltaba.
+  `lib/dominio/surtido.ts:43-49` (por qué `modoVenta` se pregunta antes de
+  crear, no después) y `:190-227` (bloque "LO QUE NO ESTABA EN EL DICTADO" y
+  `SIN_MODO_DICTADO`).
 
 ## Enlaces
 

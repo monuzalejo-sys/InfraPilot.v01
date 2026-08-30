@@ -1,11 +1,11 @@
 ---
 slug: donde-vive-el-dato
 titulo: "Dónde vive el dato: fuente única, derivados y duplicación deliberada"
-alias: [donde vive el dato, donde vive, donde se guarda, donde lo guardo, donde guardo, donde guardar, guardar, guardado, guardo, almacenar, almacenamiento, almacen, almacenes, store, stores, persistir, persistencia, persistido, persistidos, base de datos, bd, db, tabla, tablas, columna, campo, campos, fuente de verdad, fuente unica, fuente unica de verdad, unica fuente, una sola fuente, dos fuentes, dos fuentes de verdad, source of truth, single source of truth, verdad, la verdad, quien manda, dueno del dato, dueño del dato, hecho, hechos, derivado, derivados, derivar, se calcula, se guarda o se calcula, calculado, saldo, saldos, stock, el stock, stok, stoc, dnde, dnde guardo, inventario, existencias, cuantas quedan, cuanto queda, total, totales, total guardado, contador, contadores, kardex, movimiento, movimientos, lote, lotes, dato, datos, el mismo dato, dato repetido, repetido, repetir, repetida, duplicar, duplicado, duplicacion, duplicar datos, duplicar el dato, dos tablas, en dos tablas, dos sitios, en dos sitios, dos lados, en dos lados, guardarlo dos veces, dos veces, copia, copias, copiar, replica, replicar, cache, cachear, cacheado, denormalizar, desnormalizar, redundancia, redundante, offline, sin internet, sin senal, sin señal, offline first, outbox, cola, cola de subida, cola local, sincronizar, sincronizacion, sync, merge, conflicto, conflictos, pisar, se pisa, se pisan, me pisa, pisa el catalogo, la landing pisa, se sobreescriben, se borran solos, sobreescribir, sobrescribir, catalogo, catalogos, catalogo publicado, producto, productos, precio, precios, localstorage, local storage, navegador, supabase, backend, backends, monto backend, monto el backend, monto backend de una, backend de una, arranco con localstorage, arranco, arrancar, arranque, empiezo con localstorage, empiezo, empezar, necesito backend, hace falta backend, cuando monto el backend, vale la pena backend, api, nube, servidor, seed, semilla, sembrar, datos demo, demo, cuenta nueva, empresa nueva, onboarding, registro, alta, no aparece, no sale, no hay nada, listas vacias, lista vacia, aparece vacio, sale vacio, se borro, se perdio, se perdieron los datos, recargar, f5, version de datos, VERSION_DATOS, migracion, migraciones, migrar, esquema, contrato, tipos, types, helpers, capa de datos, repositorio, interfaz, almacen tras interfaz, multi sede, multisede, sucursal, sucursales, sucursalId, localId, empresaId, multi tenant, multitenant, aislamiento, tenant, escritor, escritores, un solo escritor, quien escribe, quien lee, lectora, solo lectura, read only, landing, panel, back office, backoffice, kiosko, kiosco, mostrador, concurrencia, carrera, condicion de carrera, lock, bloqueo, for update, trigger, idempotencia, idempotente, sobreventa, sobrevender, choque de codigo, choque de identificador, codigo unico, codigo repetido, unique constraint, restriccion unica, SQLSTATE, 23505, unique_violation, rechazo silencioso, lote rechazado, falla el lote entero, fila por fila, reintento por fila, degradar a fila, codigo libre, renombrar producto, renombrado, converger, convergencia, cola gira para siempre, sube el valor viejo, rearma la respuesta, rearmar la respuesta, contrato de respuesta, campos nuevos se pierden, dos equipos offline mismo codigo]
+alias: [cuantas fuentes de verdad, cuantas fuentes de verdad debe haber, numero de fuentes de verdad, fuentes de verdad, dos fuentes de verdad, una sola fuente de verdad, donde vive el dato, donde vive, donde se guarda, donde lo guardo, donde guardo, donde guardar, guardar, guardado, guardo, almacenar, almacenamiento, almacen, almacenes, store, stores, persistir, persistencia, persistido, persistidos, base de datos, bd, db, tabla, tablas, columna, campo, campos, fuente de verdad, fuente unica, fuente unica de verdad, unica fuente, una sola fuente, dos fuentes, dos fuentes de verdad, source of truth, single source of truth, verdad, la verdad, quien manda, dueno del dato, dueño del dato, hecho, hechos, derivado, derivados, derivar, se calcula, se guarda o se calcula, calculado, saldo, saldos, stock, el stock, stok, stoc, dnde, dnde guardo, inventario, existencias, cuantas quedan, cuanto queda, total, totales, total guardado, contador, contadores, kardex, movimiento, movimientos, lote, lotes, dato, datos, el mismo dato, dato repetido, repetido, repetir, repetida, duplicar, duplicado, duplicacion, duplicar datos, duplicar el dato, dos tablas, en dos tablas, dos sitios, en dos sitios, dos lados, en dos lados, guardarlo dos veces, dos veces, copia, copias, copiar, replica, replicar, cache, cachear, cacheado, denormalizar, desnormalizar, redundancia, redundante, offline, sin internet, sin senal, sin señal, offline first, outbox, cola, cola de subida, cola local, sincronizar, sincronizacion, sync, merge, conflicto, conflictos, pisar, se pisa, se pisan, me pisa, pisa el catalogo, la landing pisa, se sobreescriben, se borran solos, sobreescribir, sobrescribir, catalogo, catalogos, catalogo publicado, producto, productos, precio, precios, localstorage, local storage, navegador, supabase, backend, backends, monto backend, monto el backend, monto backend de una, backend de una, arranco con localstorage, arranco, arrancar, arranque, empiezo con localstorage, empiezo, empezar, necesito backend, hace falta backend, cuando monto el backend, vale la pena backend, api, nube, servidor, seed, semilla, sembrar, datos demo, demo, cuenta nueva, empresa nueva, onboarding, registro, alta, no aparece, no sale, no hay nada, listas vacias, lista vacia, aparece vacio, sale vacio, se borro, se perdio, se perdieron los datos, recargar, f5, version de datos, VERSION_DATOS, migracion, migraciones, migrar, esquema, contrato, tipos, types, helpers, capa de datos, repositorio, interfaz, almacen tras interfaz, multi sede, multisede, sucursal, sucursales, sucursalId, localId, empresaId, multi tenant, multitenant, aislamiento, tenant, escritor, escritores, un solo escritor, quien escribe, quien lee, lectora, solo lectura, read only, landing, panel, back office, backoffice, kiosko, kiosco, mostrador, concurrencia, carrera, condicion de carrera, lock, bloqueo, for update, trigger, idempotencia, idempotente, sobreventa, sobrevender, choque de codigo, choque de identificador, codigo unico, codigo repetido, unique constraint, restriccion unica, SQLSTATE, 23505, unique_violation, rechazo silencioso, lote rechazado, falla el lote entero, fila por fila, reintento por fila, degradar a fila, codigo libre, renombrar producto, renombrado, converger, convergencia, cola gira para siempre, sube el valor viejo, rearma la respuesta, rearmar la respuesta, contrato de respuesta, campos nuevos se pierden, dos equipos offline mismo codigo]
 preguntas: ["donde guardo el stock", "puedo tener el total guardado en la tabla", "cuantas fuentes de verdad debe haber", "cuando esta bien duplicar datos", "¿el stock se guarda o se calcula?", "cree la empresa y me dice que no hay locales, donde esta el bug", "¿por qué la app dice que no hay nada si acabo de crearlo?", "puedo tener una copia local para que funcione sin internet", "arranco con localStorage o monto backend de una", "dos cajas offline le dieron el mismo codigo a productos distintos, como lo resuelvo", "una fila mala tumba todo el lote de sincronizacion, que hago", "como detecto un choque de unique en postgres sin depender del texto del error", "el servidor cambio un dato al aceptarlo, como evito que el cliente lo vuelva a subir viejo"]
 proyectos: [placita, estanco-contable, wrd, villa-broaster, pollo-landing, arroces, _permanent]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-08-29
 ---
 
 # Dónde vive el dato: fuente única, derivados y duplicación deliberada
@@ -106,6 +106,25 @@ encontró un builder saliéndose de su tarea para seguir el dato hasta quien lo
 consume — el borde que "solo transporta" es exactamente donde se pierde un
 contrato ampliado (`placita/KN-051`, commits `b8dbccc`/`52b4377`).
 
+**Y lo pagó, en la misma sesión, una ley de negocio que casi se volvió a
+escribir a mano en dos sitios y un catálogo que casi guardó la cuenta en vez
+del hecho.** El dueño ordenó *"guarda como ley que se le gane un 80% a cada
+producto"*, y `MARGEN_LEY_PCT` en `lib/dominio/precios.ts` quedó como su única
+fuente — *"no queda un solo 80 escrito a mano en el resto del árbol"*
+(`placita/DEC-026`, commit `003e84b`), sustituyendo una constante hermana que
+un alta masiva anterior había creado solo para esa ocasión. Y al dictar su
+catálogo real de 111 productos dando el precio del CARTEL (lo que cobra) y
+dejando la compra en blanco, el catálogo guardó la VENTA, no la compra
+derivada: *"guardar aquí una compra ya calculada sería congelar una cuenta que
+este archivo no tiene por qué hacer, y el día que cambie la ley del margen
+esta lista quedaría mintiendo"* (`lib/dominio/surtido.ts:11-18`,
+`placita/DEC-027`). Las dos decisiones son la misma regla aplicada dos veces:
+**el dato que persiste es el que la persona conoce y puede corregir, nunca la
+cuenta que otro módulo puede rehacer bajo demanda** — aunque el cálculo interno
+del dominio vaya en la dirección contraria (de compra a venta) a como se
+guarda el catálogo (de venta a compra; la fórmula que reconstruye la compra
+bajo demanda es el caso completo de [[TEMA-invertir-formulas-redondeadas]]).
+
 ## Cómo se aplica
 
 1. **Escribe la tabla hechos↔derivados en el contrato de tipos, antes de la
@@ -137,6 +156,27 @@ contrato ampliado (`placita/KN-051`, commits `b8dbccc`/`52b4377`).
    almacén a mano, eso ya es deuda: súbela al módulo antes de construir encima
    (`estanco-contable/PEND-010`, fuga detectada al construir la página de equipo,
    resuelta 2026-07-30).
+3b. **La regla es "un dueño por HECHO", pero también "un dueño por LEY".** Una
+   constante de negocio ("a todo producto se le gana el 80%") sigue el mismo
+   patrón que un dato: vive en un solo archivo y se verifica con un grep
+   negativo del valor crudo (`margenBrutoPct: 80`) contra el resto del árbol —
+   cero resultados fuera de `lib/dominio/precios.ts` (`placita/DEC-026`). Y una
+   "ley" tiene un alcance que hay que declarar por escrito: gobierna con qué
+   NACE un registro nuevo y con qué se RECALCULA cuando hace falta — no es una
+   validación que rechace un valor ya guardado. El dueño sigue pudiendo bajarle
+   el margen a un producto suelto sin pelearse con el sistema
+   (`lib/dominio/precios.ts:47-59`). Confundir "constante única" con
+   "constante que bloquea excepciones" convierte una regla de negocio flexible
+   en un candado que el próximo caso especial va a tener que romper.
+3c. **Cuando la persona dicta un número que tú podrías derivar por dentro,
+   guarda el número que ella dijo, no el que calculaste.** El dominio de la
+   placita calcula de compra a venta; el dueño, al dictar su catálogo, piensa
+   al revés porque conoce lo que cobra. Guardar la compra derivada habría
+   fijado una cuenta que la lista no necesita fijar, y que si la ley del margen
+   cambia mañana quedaría mintiendo en silencio (`placita/DEC-027`,
+   `lib/dominio/surtido.ts:11-18`). La pregunta que decide cuál es el "hecho"
+   no es qué dirección calcula el dominio: es **qué número puede la persona
+   mirar y decir "sí, eso fue lo que dije."**
 4. **Toda la persistencia detrás de funciones con nombre.** En chico son tres
    helpers por recurso: `apiLeerRegistros` / `apiCrearRegistro` /
    `apiVaciarRegistros`, con el comentario que declara la invariante — *"El
@@ -216,6 +256,26 @@ contrato ampliado (`placita/KN-051`, commits `b8dbccc`/`52b4377`).
       re-subiría). Es la primera vez que este corpus resuelve un conflicto
       cliente-servidor de verdad, aunque sea de un solo tipo —renombrado
       autoritativo del servidor, no un merge de campos— (`placita/KN-051`).
+10b. **Un código único también puede estar retenido por una fila ya
+    ELIMINADA, no solo por dos filas vivas en carrera.** Es una tercera causa
+    del mismo síntoma ("no me deja usar este código") y no la resuelve la
+    auto-corrección de sincronización del punto anterior, porque ahí no hay
+    dos filas vivas chocando: hay una restricción `unique` que no distingue
+    una fila viva de una soft-eliminada. En la placita, tres códigos que el
+    dueño quería reutilizar para su dictado real (`P01`, `P04`, `M01`) seguían
+    ocupados por productos ya borrados (Papa, papa parda, Mango Tommy); se
+    liberaron **renombrando la fila vieja** (`P01`→`P01X`) en vez de
+    borrarla, porque *"su historial de kardex/ventas apunta al id interno, no
+    al código, así que renombrar no rompe nada y conserva la historia"*
+    (`placita/KN-055`) — confirmado en el propio contrato de tipos: lo que
+    NUNCA se borra al eliminar un producto son los `Movimiento`, `Lote` y
+    `Venta` que lo referencian por `productoId` (`placita lib/types.ts:292-303`).
+    Regla general: **liberar un identificador ocupado por un registro
+    archivado se hace renombrando ese registro, nunca borrándolo** — el mismo
+    principio del punto 10 (un código no es una identidad), aplicado a un
+    archivo en vez de a una carrera. El script que lo hizo corrió en producción
+    con un protocolo propio de un solo uso: ver
+    [[TEMA-dominio-migraciones-y-copias]].
 11. **Si la misma regla existe en los dos lados, congela el texto y hazlo
     idéntico.** En WRD el descuento de stock existe dos veces —en el store del
     navegador para la demo y en el trigger SQL para el modo real— con **las
@@ -367,6 +427,14 @@ contrato ampliado (`placita/KN-051`, commits `b8dbccc`/`52b4377`).
   `KN-046` — familia del mismo bug evitada antes de producción: un bucle que
   genera consecutivos leyendo `datosRef.current` reparte el MISMO código a
   todo un lote porque la ref no se actualiza entre iteraciones síncronas.
+  `DEC-026` (commit `003e84b`) — `MARGEN_LEY_PCT` como única fuente del margen,
+  sin un solo 80 hardcodeado fuera de `lib/dominio/precios.ts`. `DEC-027`
+  (mismo commit) — el catálogo guarda el precio de VENTA dictado por el dueño
+  y deriva la compra, nunca al revés. `KN-053` — la lección general sobre
+  invertir una función que redondea (ver [[TEMA-invertir-formulas-redondeadas]]).
+  `KN-055` — un código único puede seguir retenido por una fila ya eliminada,
+  no solo por dos filas vivas en carrera; se libera renombrando, con un script
+  de un solo uso corrido en seco y con autorización expresa del dueño.
 - `wrd/DEC-009` — la landing dejó de sembrar y quedó de solo lectura; catálogo,
   precio y stock se editan únicamente desde `wrd/sistema/`. `DEC-008` —
   separación landing/sistema, sin ningún link entre ellas; *"Restaurar backup =
@@ -411,6 +479,16 @@ contrato ampliado (`placita/KN-051`, commits `b8dbccc`/`52b4377`).
     `renombradas`).
   - `prommter\proyectos\placita\components\store.tsx:1592`
     (`reemplazar`, no encola), `:1916` (`adoptarCodigosRenombrados`).
+  - `prommter\proyectos\placita\lib\dominio\precios.ts:47-65` (la LEY del
+    margen en una sola constante, con su alcance declarado: gobierna
+    nacimiento y recálculo, no congela el campo) y `lib\dominio\surtido.ts:1-61`
+    (cabecera: *"SE GUARDA EL PRECIO DE VENTA, NO LA COMPRA... guardar aquí una
+    compra ya calculada sería congelar una cuenta que este archivo no tiene
+    por qué hacer"*, `:11-18`).
+  - `prommter\proyectos\placita\lib\types.ts:292-303` — lo que NUNCA se borra
+    al eliminar un producto (`Movimiento`, `Lote`, `Venta` referencian por
+    `productoId`, no por código), la base de por qué renombrar un código
+    retenido por una fila eliminada no rompe nada.
   - `ORION\estancorepo\lib\auth.ts:46` (`CLAVE_ALMACEN`), `:305-321`
     (`listarLocalesEmpresa`, el bug documentado dentro del arreglo y *"al migrar
     a Supabase… la firma no cambia"*), `:323-332` (mismo patrón en
@@ -481,3 +559,10 @@ contrato ampliado (`placita/KN-051`, commits `b8dbccc`/`52b4377`).
   e2e con cuenta nueva y sin seed).
 - [[TEMA-olas-de-agentes]] — el mismo bug, con agentes en vez de cajeros:
   escribe tú los archivos compartidos antes de repartir, y que solo uno escriba.
+- [[TEMA-invertir-formulas-redondeadas]] — el caso completo de un derivado que
+  se reconstruye bajo demanda: cómo despejar la compra desde la venta cuando la
+  función directa redondea.
+- [[TEMA-dominio-migraciones-y-copias]] — el protocolo de un script de un solo
+  uso que toca identificadores en producción (en seco por defecto, escritura
+  con flag explícito, autorización del dueño): el mecanismo con el que se
+  liberó un código retenido por una fila eliminada.
