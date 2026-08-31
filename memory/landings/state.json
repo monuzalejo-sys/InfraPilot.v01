@@ -1,6 +1,6 @@
 {
   "projectId": "landings",
-  "snapshotDate": "2026-08-23T22:40:00.000Z",
+  "snapshotDate": "2026-08-29T00:00:00.000Z",
   "objects": [
     {
       "id": "POL-001",
@@ -292,9 +292,119 @@
       "task": "Recoger el veredicto del dueno sobre ORION/prompts-landing/villa-app-villa-broaster-v3.md (entregado 2026-08-23) y escribirlo aqui con su causa y por canal. Preguntas concretas: (1) la ARMADURA se respeto: el zip trae carpeta _ds/? el fondo de la portada es oscuro? las fotos salieron a color? los radios son 18-24? (2) el MOVIMIENTO CONGELADO (presa gigante en diagonal saliendose del encuadre, migas suspendidas, promo dibujada a medio armar, disco siguiente cortado por el borde, sticker 'SALIENDO AHORA') basto para que dejara de decir 'estatico/apagado', o volvio a pedir animacion de verdad — y en ese caso hay que llevarlo a la fase de codigo, no a otro prompt de lienzo; (3) que palabra uso esta vez: si repite 'generico' el problema sigue siendo composicion, si dice otra cosa hay leccion nueva; (4) si el registro de cartel de feria (display enorme, stickers rotados, precios amarillos gigantes) le parecio divertido o le parecio gritado/barato — esa frontera todavia no tiene veredicto.",
       "reason": "Es el primer prompt que aplica POL-004 (armadura + anexo de coreografia) y el primero que apuesta por el registro de cartel. Ninguna de las dos cosas esta pagada: sembrar ahora que funciono seria hipotesis contaminando los prompts siguientes, y la frontera entre 'divertido' y 'gritado' solo la fija el dueno.",
       "source": "entrega 2026-08-23 (v3, tras el rechazo del v2)"
+    },
+    {
+      "id": "KN-010",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-29T00:00:00.000Z",
+      "updated": "2026-08-29T00:00:00.000Z",
+      "dependencies": [
+        "KN-002",
+        "KN-006"
+      ],
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Current",
+      "fact": "EL OCRE CANONICO DE LA CASA NO SIRVE COMO TEXTO SOBRE FONDO CLARO, Y UN PROMPT DE LA CASA YA LO PEDIA ASI. Contrastes calculados el 2026-08-29 (luminancia relativa WCAG 2.1, no estimados) para la paleta de la landing de Prommter: sobre papel #F8F6F2 -> tinta #111111 17.49, gris #666666 5.32, verde de marca #2F5D50 6.94, teja #C2452D 4.65, verde ok #4D7C59 4.48 (LIMITE: solo >=24px o >=18.66px bold), ambar #E8A83A 1.93 FALLA, y ocre --warn #B98A3C 2.88 FALLA. Sobre noche #12100E -> claro #F8F6F2 17.59, #C9C2B8 10.75, #8A8177 4.96, ambar #E8A83A 9.12, verde claro #5E9E85 6.06, teja clara #E5623E 5.56, verde WhatsApp #25D366 9.57; y FALLAN el verde de marca #2F5D50 (2.53) y la teja #C2452D (3.78). Inversas utiles: tinta #111111 sobre ambar #E8A83A 9.08 y sobre verde WhatsApp #25D366 9.52. LO QUE ESTO CORRIGE: ORION/prompts-landing/agencia.md:318 instruia poner la cifra de la comision (el numero mas importante de esa landing) en --warn #B98A3C sobre fondo claro, es decir en 2.88 - por debajo de AA. La regla derivada: los tokens --warn/--ok/--error del manifiesto son colores de ESTADO para superficies pequenas del interior de la app, no colores de TEXTO para cifras grandes de una portada; si la portada necesita el color de 'la plata que se va' sobre papel, es teja #C2452D (4.65) o ambar de FONDO con tinta encima (9.08).",
+      "context": "Calculado al escribir ORION/prompts-landing/prommter-agencia-v2.md. Mismo patron que KN-006 encontro en la paleta Orama (Teja sobre papel 2.70): el color de acento de una marca casi nunca es legible como texto y hay que definirle variante de servicio ANTES de escribir el prompt.",
+      "source": "calculo propio de luminancia relativa 2026-08-29 + lectura de agencia.md:305-321"
+    },
+    {
+      "id": "KN-011",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-29T00:00:00.000Z",
+      "updated": "2026-08-29T00:00:00.000Z",
+      "dependencies": [
+        "KN-001"
+      ],
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "fact": "UN PROMPT DE LANDING CADUCA CUANDO CAMBIA EL NEGOCIO, Y EL DE LA AGENCIA YA HABIA CADUCADO EN TRES PUNTOS SIN QUE NADIE LO MARCARA. Verificado el 2026-08-29 sobre ORION/prompts-landing/agencia.md: (1) su ADVERTENCIA DE ARRANQUE dice que el proyecto NO tiene marca y manda usar tokens [[MAYUSCULAS]] para el nombre - pero la casa se llama Prommter desde EMPRESA.md:1 y PROYECTOS.md:1; (2) su §1 describe el modelo como 'cobrando una instalacion una vez y una MENSUALIDAD recurrente', redaccion anterior a la correccion del dueno del 2026-08-21 (prommter/KN-003: mensualidades CON PERMANENCIA, nunca pago unico, y ninguna landing puede presentarlo como pago unico); (3) todas sus rutas apuntan a C:/Users/Kalel/agencia, carpeta que YA NO EXISTE (los documentos de precios viven hoy en prommter/documentos/agencia/). Lo grave no es que envejeciera: es que sigue CABLEADO en un plan de trabajo vivo - equipo/planes/2026-08-21-plan-landing-frontend.md:29 manda al disenador de front hacer la landing de Prommter 'a partir de ORION/prompts-landing/agencia.md' en la semana 4. Regla derivada: antes de escribir un prompt nuevo, grepear quien APUNTA al viejo; y todo prompt sustituido lleva en su primera linea a que archivo se movio, porque el que lo va a ejecutar llega por el plan, no por la memoria.",
+      "context": "Descubierto al reunir fuentes para prommter-agencia-v2.md (2026-08-29). El sustituto declara la sustitucion en su cabecera; el plan del equipo sigue apuntando al viejo hasta que el dueno lo actualice (PEND-005).",
+      "source": "lectura directa de agencia.md:7-23, prommter/EMPRESA.md:1,42-45, prommter/memory/prommter/state.json KN-003 y equipo/planes/2026-08-21-plan-landing-frontend.md:29 (2026-08-29)"
+    },
+    {
+      "id": "PEND-005",
+      "type": "Pending",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-29T00:00:00.000Z",
+      "updated": "2026-08-29T00:00:00.000Z",
+      "dependencies": [
+        "KN-010",
+        "KN-011",
+        "POL-003",
+        "POL-004"
+      ],
+      "impact": "High",
+      "priority": "High",
+      "status": "Ready",
+      "task": "Recoger el veredicto del dueno sobre ORION/prompts-landing/prommter-agencia-v2.md (entregado 2026-08-29) POR CANAL (movil 390x844 y escritorio 1440x900 por separado) y escribirlo aqui con su causa. Preguntas concretas: (1) el registro elegido - heroe OSCURO con carrusel de cuatro negocios porque el producto son PANTALLAS, en un rubro que NO es comida - le parecio vendedor o le parecio prestado de Villa Broaster; es la primera vez que se saca la direccion oscura fuera de comida y KN-009 avisa de no extrapolar; (2) las pantallas DIBUJADAS en CSS/SVG (sin una sola foto, porque ningun sistema esta publicado y no hay permiso de clientes) bastaron como prueba de producto, o pidio capturas reales (hueco H-11); (3) los cuatro casos ANONIMOS ('un asadero con dos sedes', 'una plaza que se usa a diario') convencen sin nombres, o hay que ir a pedir los permisos (H-5); (4) el bloque de cobro sin cifras ('se cotiza con sus numeros') le parecio bien o quiere publicar rangos (H-6). Al registrarlo, actualizar la columna Resultados de referencias/_INDEX.md y el Historial de uso de las fichas 01, 02 y 03. Y avisar de KN-011: el plan del equipo (equipo/planes/2026-08-21-plan-landing-frontend.md:29) todavia apunta al prompt viejo agencia.md.",
+      "reason": "Es la primera landing de la casa que se vende a si misma, la primera que aplica la direccion oscura fuera de comida y la primera cuyo unico material visual son pantallas dibujadas. Ninguna de las tres cosas tiene veredicto pagado: sembrar ahora que funcionaron seria una hipotesis contaminando los prompts siguientes. Ademas sigue abierto el veredicto del v3 de Villa Broaster (PEND-004), asi que la armadura POL-004 tampoco esta comprobada todavia.",
+      "source": "entrega 2026-08-29 (encargo: landing publica de Prommter)",
+      "nota": "VEREDICTO PARCIAL 2026-08-29, POSITIVO Y SIN DESGLOSE: la landing se construyo con este prompt y el dueno dijo textualmente 'me gusto lo que veo pero quiero algo mejor, no re hagas, mejora lo que hiciste'. Es la PRIMERA aceptacion de una combinacion de fichas (01+02+03) tras dos rechazos seguidos en villa-broaster. Lo que NO dijo y por tanto NO se registra: en que canal miro (movil o escritorio), ni las respuestas a las cuatro preguntas (1) heroe oscuro fuera de comida, (2) pantallas dibujadas vs capturas reales, (3) casos anonimos, (4) bloque de cobro sin cifras. Siguen abiertas: preguntarlas junto con el veredicto del v3 de mejora (PEND-006)."
+    },
+    {
+      "id": "KN-012",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-29T00:00:00.000Z",
+      "updated": "2026-08-29T00:00:00.000Z",
+      "dependencies": [
+        "PEND-005",
+        "KN-009"
+      ],
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "fact": "EXISTE UN TERCER TIPO DE ENCARGO ADEMAS DE 'PROMPT NUEVO' Y 'RECHAZO': LA ACEPTACION CON ELEVACION, Y SE RESPONDE CON UN PROMPT DISTINTO. El 2026-08-29, con la landing de Prommter ya construida a partir de prommter-agencia-v2.md, el dueno dijo: 'me gusto lo que veo pero quiero algo mejor, no re hagas, mejora lo que hiciste'. Tratar eso como un rechazo (reescribir el prompt, rehacer la landing) habria destruido una aceptacion que costo dos rechazos previos conseguir. FORMA CORRECTA, aplicada en prommter-agencia-v3-mejora.md: (1) archivo NUEVO que REFERENCIA al v2 y opera ENCIMA del entregable, sin duplicar sus apartados de contenido -duplicarlos es como caduco agencia.md, ver KN-011-; el v2 recibe una linea en su cabecera apuntando al de mejora, y sigue vigente. (2) Un apartado 'LO QUE ESTA CONGELADO' con lista numerada C-1..C-10: datos, copy, modelo de cobro, huecos, CONFIG, estructura de secciones, tokens, tipografias, restricciones tecnicas, prohibiciones. (3) PASE 0 = AUDITORIA con numeros medidos del entregable existente ANTES de tocar nada, y regla de decision explicita: metrica que ya cumple = pase OMITIDO (no se aplica 'por si acaso'); metrica que incumple una meta vieja = correctivo primero, antes que cualquier mejora estetica. (4) Pases numerados, cada uno en un bloque CSS rotulado + una funcion JS + una clave en CONFIG.mejoras, reversibles por separado, uno por edicion, con captura antes/despues y criterio medible propio; prohibicion explicita de 'aprovechar el viaje' para tocar nada fuera del pase, y obligacion de reportar la lista de 'vistos y no tocados'. (5) 'Algo mejor' se traduce a OFICIO, no a idea nueva: atmosfera/profundidad del fondo, coreografia acotada, luz que dirige, microinteracciones con la duda de compra que resuelve cada una, densidad de detalle fino (sombra de dos capas, filo de luz, tabular-nums, tabla de estados) y remate del cierre. (6) La armadura contra el generador (POL-004) se repite INTEGRA porque el medio no cambio, mas una orden 0.9 'NO REHACER' y una 0.10 'si no encuentras el entregable, PARA'. RIESGO PRINCIPAL DE ESTE TIPO DE ENCARGO, y es el que ordena todo lo anterior: la sobrecorreccion. Lo que el dueno no critico se conserva -misma logica que KN-009 uso para no prohibir el crema, solo degradarlo de rol-.",
+      "context": "Escrito al entregar ORION/prompts-landing/prommter-agencia-v3-mejora.md (2026-08-29). La leccion es de FORMA del encargo, no de diseno: aplica a cualquier proyecto donde el dueno acepte y pida subir el nivel. Sin veredicto todavia sobre si los siete pases bastaron (PEND-006).",
+      "source": "encargo del dueno 2026-08-29 (cita textual) + entrega del prompt de mejora"
+    },
+    {
+      "id": "KN-013",
+      "type": "Knowledge",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-29T00:00:00.000Z",
+      "updated": "2026-08-29T00:00:00.000Z",
+      "dependencies": [
+        "KN-003"
+      ],
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Current",
+      "fact": "TRES HERRAMIENTAS DE MEDICION VERIFICADAS HOY QUE CONVIERTEN 'SE VE PLANO / SE VE TRABADO' EN NUMEROS. (1) LUMINANCIA REAL DE UN PNG SIN DEPENDENCIAS: decodificar el PNG a mano (IHDR + IDAT concatenados + zlib.inflateSync + deshacer los filtros 0-4) y promediar luminancia relativa WCAG por pixel. Probado contra un PNG de #12100E puro generado con edge-cdp: devolvio media 0.0053 y desviacion 0.0000. Ademas de la media conviene sacar la DESVIACION ESTANDAR y las medias por tercios: la media dice si el fondo es oscuro (criterio viejo, A11), la desviacion dice si tiene RELIEVE — una cartulina plana da desv 0.0000 y un fondo con radial + pozo + grano medido dio 0.0058 con p95 0.0230. Umbral propuesto para 'fondo con atmosfera': desv >= 0.015 y diferencia >= 0.004 entre el tercio mas claro y el mas oscuro (aun sin veredicto del dueno: es criterio de ingenieria, no ley de gusto). El script vive copiado dentro de prommter-agencia-v3-mejora.md §2.B. (2) SONDA DE FLUIDEZ POR CDP: edge-cdp.mjs pasa --eval con awaitPromise, asi que una funcion async que corre requestAnimationFrame ~1500 ms haciendo window.scrollBy(0,14) y cuenta cuadros y cuadros largos (>20 ms) devuelve fps reales; en pagina de control dio fps 60.8, frames 92, framesLargos 0. Eso permite pedir 'fps >= 50 y <= 3 cuadros largos' en vez de 'que sea fluido'. (3) TRAMPA NUEVA DE LA EMULACION MOVIL: con --mobile, si la pagina NO trae <meta name=\"viewport\" content=\"width=device-width...\">, Edge reporta innerWidth 980 y TODA la medida se va al piso (medido hoy: viewport pedido 390x844, innerWidth devuelto 980, innerHeight 2121). Si la primera corrida devuelve 980, el fallo es el <meta>, no el CSS. Complementa las dos trampas de KN-003.",
+      "context": "Verificado el 2026-08-29 en esta maquina (Node v24.16.0, Edge headless por CDP) mientras se escribia el prompt de mejora de Prommter. Reutilizable en QA de cualquier landing.",
+      "source": "medicion propia 2026-08-29 (PNG de control #12100E, pagina de control con radial, sonda de rAF)"
+    },
+    {
+      "id": "PEND-006",
+      "type": "Pending",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-08-29T00:00:00.000Z",
+      "updated": "2026-08-29T00:00:00.000Z",
+      "dependencies": [
+        "KN-012",
+        "KN-013",
+        "PEND-005"
+      ],
+      "impact": "High",
+      "priority": "High",
+      "status": "Ready",
+      "task": "Recoger el veredicto del dueno sobre ORION/prompts-landing/prommter-agencia-v3-mejora.md (entregado 2026-08-29) POR CANAL (movil 390x844 y escritorio 1440x900) y escribirlo aqui con su causa. Preguntas concretas: (1) el fondo con relieve del pase P1 se leyo como 'mejor' o solo como 'mas oscuro'; (2) la escena dirigida por scroll del P2 (telefonos que se apartan y entregan la calculadora) le parecio elegante o mareadora — es la primera vez que se usa el MOTOR de la ficha 02 y no solo su 'dato grande'; (3) la vista previa del mensaje de WhatsApp (M1) le da confianza o le estorba; (4) el cierre rematado (P6) le parece un final; (5) ADEMAS: si el builder respeto la regla de no rehacer, cuantos pases omitio por 'ya cumple' y si alguno se revirtio por conflicto de criterio. Y arrastrar aqui las cuatro preguntas de PEND-005 que quedaron sin contestar.",
+      "reason": "Es el primer prompt de MEJORA de la casa (aceptacion + elevacion, KN-012) y el primero que exige una auditoria medida antes de tocar. Ninguna de las dos formas tiene veredicto pagado; sembrar ahora que funcionaron seria una hipotesis contaminando los proximos encargos de este tipo, que van a ser frecuentes ahora que hay landings construidas.",
+      "source": "entrega 2026-08-29 (encargo textual: 'me gusto lo que veo pero quiero algo mejor, no re hagas, mejora lo que hiciste')"
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-08-23T22:40:00.000Z",
-  "version": 6
+  "lastAmmRun": "2026-08-29T00:00:00.000Z",
+  "version": 8
 }

@@ -1,11 +1,11 @@
 {
   "projectId": "landings",
-  "sessionCount": 3,
+  "sessionCount": 4,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-08-23T22:55:00.000Z",
+  "lastUpdated": "2026-08-29T00:00:00.000Z",
   "sessions": [
     {
       "completedAt": "2026-08-19T00:00:00.000Z",
@@ -41,6 +41,20 @@
       "fixCycles": 0,
       "modelOutcomes": [],
       "notes": "Veredicto NEGATIVO del dueno sobre el resultado del v2 de Villa Broaster (generico/apagado/estatico): PEND-003 cerrado con causa verificada en el entregable (DS Modernist anclado, portada crema, getAnimations=1). Lecciones pagadas KN-007/008/009 + POL-004 (armadura contra el medio + anexo de coreografia). Escrito villa-app-villa-broaster-v3.md y actualizados referencias/_INDEX.md y fichas 01/02/03."
+    },
+    {
+      "sessionId": "session-2026-08-29-prommter-v3-mejora",
+      "runId": "landings-prommter-mejora",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-29T00:00:00.000Z",
+      "completedAt": "2026-08-29T00:00:00.000Z",
+      "objectsCreated": 3,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [],
+      "notes": "Primera ACEPTACION de una landing ('me gusto lo que veo pero quiero algo mejor, no re hagas') y primer prompt de MEJORA: prommter-agencia-v3-mejora.md, siete pases reversibles sobre auditoria medida. Lecciones KN-012 (forma del encargo aceptacion+elevacion) y KN-013 (luminancia de PNG sin dependencias, sonda de fps por CDP, trampa del meta viewport en emulacion movil). PEND-005 anotado con veredicto parcial; abierto PEND-006."
     }
   ]
 }
