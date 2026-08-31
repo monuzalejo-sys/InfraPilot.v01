@@ -20,7 +20,11 @@ superarrozrepo/
 estancorepo/
 wrdrepo/
 prommter/
+placita/
 cerebro/indice.json
 
 # entrega intermedia del arquitecto: se consume con plan.mjs agregar y se descarta
 **/tareas-propias.json
+
+# config local del dispositivo (previews de Claude Code)
+.claude/launch.json
