@@ -1,303 +1,317 @@
 {
-  "projectId": "_permanent",
-  "snapshotDate": "2026-08-24T11:00:00.000Z",
-  "objects": [
-    {
-      "id": "KN-001",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-07-02T05:45:00.000Z",
-      "updated": "2026-07-02T05:45:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "On this machine, terminal 'git push' cannot complete (Git Credential Manager dialog fails: 'User cancelled dialog', no /dev/tty). Commit locally and push via GitHub Desktop, which is already authenticated. Applies to every repo/project on this machine.",
-      "context": "Machine-level fact promoted from infrapilot memory (KN-001 there). Kept in both while infrapilot PEND-004 references the local copy.",
-      "source": "session 2026-07-01"
-    },
-    {
-      "id": "KN-002",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-07-02T05:45:00.000Z",
-      "updated": "2026-07-02T05:45:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "High",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "Claude Code agent-spawn completion notifications include measured usage: subagent_tokens, tool_uses, duration_ms. The ORION orchestrator collects these per spawn and passes them to the reflector, so metrics.json modelOutcomes carry MEASURED token costs per phase/model (measurement_mode MEASURED for spawns). The orchestrator's own inline consumption remains unmetered — never fabricate it.",
-      "context": "Discovered 2026-07-02 during the E2E pipeline test; upgraded ORION's Context Economy from conceptual to measured for delegated work.",
-      "source": "session 2026-07-02"
-    },
-    {
-      "id": "KN-003",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-07-03T00:00:00.000Z",
-      "updated": "2026-07-03T00:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "infrapilot Supabase project: ref zrogravgwhoijajzciem, URL https://zrogravgwhoijajzciem.supabase.co. Client-safe publishable anon key (sb_publishable_ format, the new Supabase key style equivalent to legacy anon) is stored in infrapilot-app/.env.local (gitignored). Re-readable from Supabase Dashboard -> Project Settings -> API. SECURITY RULE: never request, paste into chat, or store the service_role/secret key; publishable keys are public-by-design (they ship in the browser bundle) so they are safe, secrets are not.",
-      "context": "Recorded at 2026-07-03 session close. Raw key intentionally kept only in .env.local, not in committed memory.",
-      "source": "session 2026-07-03"
-    },
-    {
-      "id": "KN-004",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-01T00:00:00.000Z",
-      "updated": "2026-08-01T00:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "GENERAR PDF EN ESTA MAQUINA: no hay Python (ni `python` ni `python3`), asi que reportlab/pypdf NO son opcion. Lo que SI funciona: Microsoft Edge headless, ya instalado. Comando verificado 2026-08-01 (genero un PDF de 11 paginas): \"/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe\" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf=\"C:\\ruta\\salida.pdf\" \"file:///C:/ruta/entrada.html\" . Se escribe el documento en HTML con @page/@media print y sale un PDF con tipografia y maquetacion controladas.",
-      "context": "Descubierto al generar el plan del asadero. Edge esta en Program Files (x86)."
-    },
-    {
-      "id": "KN-005",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-01T00:00:00.000Z",
-      "updated": "2026-08-01T00:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "VERIFICAR UN PDF SIN poppler: `pdftoppm` no esta instalado, asi que la herramienta Read no puede renderizar paginas de PDF. Para comprobar que un PDF salio bien, parsear su estructura con node: contar /Type /Page, revisar que empiece por %PDF- y termine en %%EOF. Es suficiente para confirmar que no salio corrupto ni vacio.",
-      "context": "Usado 2026-08-01 tras generar el plan del asadero con Edge headless."
-    },
-    {
-      "id": "KN-006",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-01T00:00:00.000Z",
-      "updated": "2026-08-01T00:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "High",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "CLASE DE BUG RECURRENTE — DOS FUENTES DE VERDAD: cuando un flujo de alta (registro, onboarding, creacion) PERSISTE una entidad en un sitio y otra pantalla la LEE de otro, la entidad existe pero es invisible, y el sintoma tipico es 'no hay X registrados' justo despues de haber creado X. Paso literal en estanco-contable con las sucursales (ver KN-012 alli). REGLA: al construir cualquier alta, comprobar explicitamente que la pantalla que consume esa entidad lee del MISMO sitio donde el alta escribe. Es barato de verificar y deja al usuario encerrado fuera de su propia app si se escapa.",
-      "context": "Generalizado desde el bug de locales de estanco-contable, reportado por el dueno 2026-08-01."
-    },
-    {
-      "id": "KN-007",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-08T00:00:00.000Z",
-      "updated": "2026-08-08T00:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "VERIFICAR UI EN EL NAVEGADOR EMBEBIDO con el pane oculto (usuario ausente): las acciones del computer tool (click, screenshot) se cuelgan/timeout porque la pagina no compone frames. Lo que SI funciona sin pane visible: get_page_text, read_page, form_input (maneja inputs controlados de React), y javascript_tool con boton.click() nativo + esperas. Para llenar inputs React NO sirve el setter nativo via Object.getOwnPropertyDescriptor (Illegal invocation en el sandbox del tool) — usar form_input. Un builder ya perdio tiempo con esto (S6 broaster 2026-08-08); el orquestador completo el e2e con esta combinacion.",
-      "context": "Descubierto verificando el flujo de pedido de broaster-app 2026-08-08."
-    },
-    {
-      "id": "KN-008",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-10T00:00:00.000Z",
-      "updated": "2026-08-10T00:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "High",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [
-        "KN-007"
-      ],
-      "fact": "VERDAD DE TERRENO VISUAL/CSS = EDGE HEADLESS, NO el navegador embebido. Amplia KN-007: el pane embebido no solo cuelga screenshots con el pane oculto, sino que ADEMAS reporta mal getComputedStyle(...).visibility y element.checkVisibility({visibilityProperty:true}) — un visibility:hidden real (incluso !important o inline) puede reportarse como 'visible', llevando a diagnosticar mal un CSS que en realidad funciona. Fiables en el pane: .hidden (propiedad/atributo), checkVisibility para display, y display:none. NO fiables: 'visibility' computada y screenshots. Para confirmar de verdad como se ve algo: Edge headless a PNG y leer el PNG — & 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe' --headless=new --disable-gpu --hide-scrollbars --window-size=390,780 --virtual-time-budget=6000 --user-data-dir=<perfil-fresco-en-scratchpad> --screenshot=<out.png> <url>. Perfil fresco = localStorage limpio (util para probar primeras visitas). Edge ya estaba confirmado para PDF (KN-004).",
-      "context": "WRD sesion 4 (2026-08-10): el pane afirmaba que <main> con .wrd-cargando (visibility:hidden) seguia visible; Edge headless probo que el cloak funcionaba (pantalla negra + solo el gate). Se perdieron iteraciones confiando en el pane."
-    },
-    {
-      "id": "KN-009",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-19T00:00:00.000Z",
-      "updated": "2026-08-19T00:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "dependencies": [
-        "KN-008"
-      ],
-      "fact": "EDGE HEADLESS TIENE PISO DE VIEWPORT ~480-500px: con --window-size mas angosto (p.ej. 390) el PNG sale de 390px pero el LAYOUT se calcula a ~480px+, asi que todo se ve corrido/recortado a la derecha aunque la pagina este bien. NO sirve para verificar layout movil <480px. Para movil: (1) asegurar <meta name=viewport> en la pagina, y (2) verificar overflow con JS en el pane embebido (resize_window preset mobile + document.documentElement.scrollWidth vs clientWidth), que funciona con el pane oculto. Ademas Edge headless falla intermitentemente sin escribir el PNG (LoadEnclaveImageW error 577 en stderr es ruido, no la causa) — reintentar con --user-data-dir fresco suele bastar.",
-      "context": "Descubierto 2026-08-19 verificando la propuesta de orama: el PNG a 390px mostraba todo recortado; el pane a <759px confirmo scrollWidth==clientWidth (sin overflow real)."
-    },
-    {
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-21T00:00:00.000Z",
-      "updated": "2026-08-21T00:00:00.000Z",
-      "lifetime": "Permanent",
-      "status": "Current",
-      "id": "KN-010",
-      "impact": "High",
-      "priority": "High",
-      "dependencies": [
-        "KN-008",
-        "KN-009"
-      ],
-      "fact": "HERRAMIENTA DE QA VISUAL: C:/Users/Kalel/ORION/tools/edge-cdp.mjs (creada y validada 2026-08-21) empaqueta la receta CDP (landings KN-003): node edge-cdp.mjs --url <archivo|url> --width 390 --height 844 --mobile --shot out.png [--full] [--eval \"<js>\"] [--reduce] [--wait ms]. Lanza Edge headless con --remote-debugging-port, emula el viewport REAL (innerWidth 390 de verdad, no el piso de ~492 de --screenshot), pone prefers-reduced-motion en no-preference (las animaciones corren), navega y devuelve JSON con scrollWidth/clientWidth/overflowX/scrollHeight, getAnimations().length, fuentes cargadas, titulo, consola y excepciones, mas la captura PNG. Sin dependencias (Node 24 trae fetch y WebSocket). Es la verdad de terreno para QA movil y de movimiento; --screenshot a secas queda solo para capturas rapidas de escritorio.",
-      "context": "Probada contra fable 5/orama/propuesta-orama.html: 390x390 sin overflow, 6 animaciones vivas, 3 fuentes, consola limpia, PNG fiel."
-    },
-    {
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-21T00:00:00.000Z",
-      "updated": "2026-08-21T00:00:00.000Z",
-      "lifetime": "Permanent",
-      "status": "Current",
-      "id": "KN-011",
-      "impact": "Medium",
-      "priority": "High",
-      "dependencies": [],
-      "fact": "LIMITE DEL TOOL BASH EN ESTA MAQUINA: un comando de mas de ~8 KB se TRUNCA (limite de linea de comandos de Windows al pasar por bash -c) — un heredoc de ~150 lineas fallo con unexpected EOF while looking for matching quote en la linea 145 y NO creo el archivo. Ademas el wrapper colapsa doble backslash en uno solo. Regla: archivos nuevos grandes o con backslashes se escriben con Write/Edit; los comandos Bash se mantienen cortos (<~5 KB) y sin depender de backslashes literales.",
-      "context": "Pagado 2026-08-21 escribiendo edge-cdp.mjs por heredoc; el mismo heredoc corto si funcionaba."
-    },
-    {
-      "id": "KN-012",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-24T09:00:00.000Z",
-      "updated": "2026-08-24T09:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "High",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "EXISTE UN CEREBRO TRANSVERSAL Y SE CONSULTA ANTES DE PENSAR. `node C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs buscar \"<pregunta>\"` responde con lo que YA sabe el ecosistema (11 memorias, ~275 objetos, sus metricas de costo por modelo, los documentos de doctrina y los temas curados) y devuelve la cita de donde salio cada cosa. Comandos: buscar, tema <slug>, probar (prueba de regresion), citas (verifica que ninguna cita este inventada), estado (huecos), exportar (vista de la boveda), indexar. Cuesta ~0 y se reindexa solo cuando algo cambia, asi que se llama varias veces por turno sin pensarlo. La FUENTE DE VERDAD de la capa transversal son los archivos de C:\\Users\\Kalel\\ORION\\cerebro\\temas\\; la boveda (ORION-Vault\\Cerebro) es una vista regenerable. Lo consumen el skill orion-cerebro (responder con cita), el agente orion-harvester (alimentarlo) y la fase 1 del skill orion (consultar antes de analizar).",
-      "context": "Construido la noche del 2026-08-24. Antes de esto la boveda era un espejo pasivo: una nota por objeto, aislada por proyecto, y para saber si algo ya se habia aprendido habia que abrir once state.json — que en la practica nadie abria.",
-      "source": "session 2026-08-24 bloque EL CEREBRO"
-    },
-    {
-      "id": "KN-013",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-24T09:00:00.000Z",
-      "updated": "2026-08-24T09:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "High",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [
-        "KN-012"
-      ],
-      "fact": "LA PRUEBA DE REGRESION DEL CEREBRO ES LA METRICA DE SI EL ECOSISTEMA APRENDE O SOLO ACUMULA. `cerebro.mjs probar` corre las preguntas de C:\\Users\\Kalel\\ORION\\cerebro\\preguntas-de-prueba.md —escritas como las hace el dueno, informales y sin tildes— y exige que el tema correcto salga PRIMERO. No mide cuanto sabe el cerebro: mide si responde a como se pregunta de verdad. Un tema impecable con alias malos falla ahi, y debe fallar, porque nadie lo encontraria nunca. Se corre en cada cierre de sesion y NO puede bajar: si bajo, algo se rompio o un tema nuevo le esta robando preguntas a otro. Medicion inicial 3/26 (12%) con cero temas; 26/26 (100%) con 12 temas escritos, la misma noche.",
-      "context": "El complemento es `cerebro.mjs citas`, que verifica mecanicamente que cada proyecto/ID citado exista: 454 citas comprobadas y 0 rotas en los 12 primeros temas. La promesa de 'nada inventado' no se sostiene a mano cuando hay docenas de citas.",
-      "source": "session 2026-08-24 bloque EL CEREBRO"
-    },
-    {
-      "id": "KN-014",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-24T09:00:00.000Z",
-      "updated": "2026-08-24T09:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "High",
-      "priority": "Critical",
-      "status": "Current",
-      "dependencies": [
-        "KN-012"
-      ],
-      "fact": "SI UNA LECCION SE PAGA EN UN SEGUNDO PROYECTO, DEJA DE SER DEL PROYECTO Y SUBE A PERMANENT. La promocion manual llega tarde y por eso cada proyecto vuelve a pagar la misma leccion: al leer las 11 memorias juntas aparecieron 8 lecciones en 6 proyectos diciendo lo mismo ('el agente muerto ya escribio: audita el disco antes de relanzar'), 5 midiendo lo mismo sobre capturas por CDP en 4 proyectos, y 8 sobre no inventar datos en 6 proyectos. El caso mas caro medido: infrapilot escribio el 2026-07-28 que en esta maquina no se podian probar migraciones SQL, y estanco-contable demostro lo contrario el 2026-07-29 con embedded-postgres validando 37/37 — infrapilot quedo trabado casi un mes con la solucion escrita al lado, en otra memoria.",
-      "context": "Es la razon de ser del cerebro y tambien su primera cosecha. Regla operativa: al cerrar, si la leccion de la sesion ya existe en OTRA memoria, no se duplica: se promueve a permanent o se escribe como tema transversal, y las dos memorias apuntan ahi.",
-      "source": "diagnostico transversal 2026-08-24 (ORION/cerebro/diagnostico-del-ecosistema.md)"
-    },
-    {
-      "id": "KN-015",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-24T09:00:00.000Z",
-      "updated": "2026-08-24T09:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "Medium",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [
-        "KN-012"
-      ],
-      "fact": "EN LA MEMORIA, SEPARA LA REGLA DE LA COORDENADA: la regla no caduca, la coordenada si. Con los proyectos repartidos en tres raices (ORION\\, prommter\\proyectos\\, fable 5\\), la evidencia archivo:linea envejece mas rapido de lo que se cura: pollo-landing apunta a una carpeta que ya no existe, estanco dice que fechaNegocio vive en facturacion.ts cuando se movio a jornada.ts, y landings avisa que sus propios numeros de linea se desplazaron. Al escribir conocimiento, enuncia la regla de forma que sobreviva sola y trata la ruta como una pista que hay que RE-VERIFICAR en el momento de citarla, no como un hecho.",
-      "context": "Hallado al cruzar las 11 memorias el 2026-08-24. Es tambien por que el verificador de citas (`cerebro.mjs citas`) comprueba proyecto/ID —que es estable— y no rutas de archivo.",
-      "source": "diagnostico transversal 2026-08-24"
-    },
-    {
-      "id": "KN-016",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-24T09:45:00.000Z",
-      "updated": "2026-08-24T09:45:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "High",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [
-        "KN-013"
-      ],
-      "fact": "`verdict: ok` EN LAS METRICAS MIDE QUE EL SPAWN ATERRIZO, NO QUE ACERTO — y por eso hoy NO existe medicion de defectos por tier. Al agregar las 280 filas `modelOutcomes` de las 11 memorias (32,7 millones de tokens) la tasa de fallo sale casi identica entre modelos: haiku 1/24, sonnet 6/149, opus 3/101. Pero al abrir las 24 filas no-ok, 19 son MUERTES DE SESION (infra, no capacidad), una es un verificador haciendo bien su trabajo, y en todo el corpus queda UN SOLO fallo de capacidad real (placita build:visual opus, 283.543 tokens) cuya causa fue el insumo. Mientras tanto los tres desastres documentados de haiku —seed corrupto, la ciudad 'Rionegro' inventada en keywords SEO, y el genero equivocado en documentos publicos— figuran los tres como `ok`, porque el spawn termino. CONSECUENCIA PRACTICA: no uses la tasa de fallo de `modelOutcomes` para decidir tier, no dice nada. Para que empiece a decir algo hay que registrar el veredicto DEL VERIFICADOR sobre el trabajo (aterrizo / acerto / hubo que corregirlo), separar las muertes de infraestructura en su propio campo, y contar los defectos hallados despues.",
-      "context": "Hallado el 2026-08-24 al escribir el tema `modelos-y-costos`, agregando a mano los metrics.json de las 11 memorias. Segundo hueco de la misma medicion: ninguna memoria registra precio por token, asi que 'costo' en todo el ecosistema significa tokens, nunca dinero. Contra-dato util: en placita, sonnet gasto MAS que opus en la misma fase (build:page 256k vs 224k), asi que 'el barato sale mas barato' tampoco se sostiene solo.",
-      "source": "session 2026-08-24, tema modelos-y-costos"
-    },
-    {
-      "id": "KN-017",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-24T11:00:00.000Z",
-      "updated": "2026-08-24T11:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "High",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [
-        "KN-016"
-      ],
-      "fact": "UN AGREGADOR QUE 'CORRE Y DEVUELVE RESULTADOS' NO ESTA VERIFICADO: hay que comprobarlo contra un caso con respuesta conocida a mano, igual que cualquier otro trabajo. El sintetizador de costos de `cerebro.mjs` (escrito por el orquestador la misma noche de KN-012..KN-016) se dio por bueno porque indexaba, buscaba y devolvia resultados con forma correcta -- nadie lo comparo contra un numero calculado a mano. Horas despues, un agente que escribia el tema `modelos-y-costos` SI cruzo el agregado contra el `metrics.json` crudo de estanco-contable y encontro que mentia: contaba muertes por limite de sesion como fallos del modelo porque el ecosistema las marca de DOS formas que el agregador no leia ninguna: campo `infraDeath: true` (estanco-contable, 10 filas en modelOutcomes) y sufijo `:infra-death` en el nombre de la fase (wrd, 2 filas). Con el bug, `build:page` con sonnet en estanco-contable salia '4 fallidas de 10'; la cifra real es 6 corridas juzgables con 0 fallidas (verificado en `C:\\Users\\Kalel\\prommter\\proyectos\\estanco-contable\\memory\\estanco-contable\\metrics.json`, filas con `infraDeath: true` en build:page/sonnet). Corregido en `C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs` (busca `infraDeath === true || porSufijo`), que ahora reconoce las dos convenciones y aparta las muertes en su propio conteo (`a.infra`) en vez de sumarlas a `a.mal`.",
-      "context": "Medicion adicional al cruzar las 11 memorias por la convencion: SOLO estanco-contable usa el campo (10 filas) y SOLO wrd usa el sufijo (2 filas, mas ~5 muertes mas mencionadas solo en la nota de sesion sin fila alguna en modelOutcomes -- `wrd/metrics.json` linea 174). infrapilot no usa ninguna de las dos: su nota de sesion narra una tercera convencion de facto ('verdict: escalate, tokens: 0 por convencion') que nunca aparece como campo ni sufijo inspeccionable -- invisible para cualquier lector que no abra la prosa. placita y villa-broaster documentan muertes de sesion en sus notas (villa-broaster: '4 muertes por limite de sesion reanudadas por SendMessage'; placita: el builder de gastos+cierre 'muerto' que en realidad termino antes de morir) sin marcar NINGUNA fila de modelOutcomes de ninguna forma. Osea: 3 memorias (infrapilot, placita, villa-broaster) tienen muertes documentadas sin marca estructurada, y de esas 3 solo infrapilot deja rastro de una convencion propia, solo en prosa. RECOMENDACION PARA SESIONES FUTURAS: usa el campo `infraDeath: true` sobre la fila de `modelOutcomes`, no el sufijo -- ya es la convencion mayoritaria (10 filas contra 2) y no obliga a nadie a hacer cirugia de texto sobre el nombre de la fase para recuperarla despues. El sufijo sigue siendo leido por compatibilidad, pero no se recomienda para filas nuevas.",
-      "source": "session 2026-08-24, hallado escribiendo el tema modelos-y-costos, corregido en cerebro.mjs"
-    },
-    {
-      "id": "PEND-001",
-      "type": "Pending",
-      "tier": "Permanent",
-      "created": "2026-08-24T10:00:00.000Z",
-      "updated": "2026-08-24T10:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "High",
-      "priority": "High",
-      "status": "Ready",
-      "dependencies": [
-        "KN-012"
-      ],
-      "task": "HUECOS DEL ECOSISTEMA hallados al leer las 11 memorias juntas el 2026-08-24: areas donde hay trabajo real y CERO conocimiento persistido. En orden de riesgo: (1) FACTURACION DIAN Y LEGALIDAD COLOMBIANA — condiciona el modelo de anulacion de cuatro productos y hasta el precio del software; la decision lleva abierta desde julio en tres memorias (estanco-contable/PEND-009, villa-broaster/PEND-001, placita/PEND-010) y no hay una sola leccion. (2) DESPLIEGUE, HOSTING Y RESPALDO — diez proyectos, uno solo en produccion, y ni una leccion de deploy, dominio, backup, ni de que pasa cuando el local se queda sin internet. (3) PRECIO Y CONTRATO — se vende software a negocios reales y solo hay dos lecciones (mensualidad con permanencia, piloto a mano); nada de cuanto vale cada producto ni que pasa si el cliente deja de pagar. (4) SOPORTE Y OPERACION POST-ENTREGA — placita esta EN PRODUCCION con el dueno usandola y no hay conocimiento de soporte, capacitacion ni respaldo (el PIN 0000 vigente semanas es el sintoma). (5) USUARIOS REALES — hay reglas disenadas PARA la cajera pero ninguna leccion de haberla OBSERVADO usando el sistema: todo el QA es de agente. (6) WHATSAPP — canal real de al menos tres negocios, cero lecciones. (7) DATOS PERSONALES — se guardan telefonos de clientes reales sin una linea sobre habeas data ni la ley 1581, en Colombia.",
-      "reason": "Un hueco de conocimiento no duele hasta que alguien decide sin el. Estos siete estan ordenados por lo que costaria equivocarse: el primero tiene implicacion legal y de precio, el ultimo tambien. Cada vez que se trabaje en uno de estos frentes, cosechar la leccion aunque parezca obvia — hoy no existe ninguna."
-    },
-    {
-      "id": "PEND-002",
-      "type": "Pending",
-      "tier": "Permanent",
-      "created": "2026-08-24T11:00:00.000Z",
-      "updated": "2026-08-24T11:00:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Ready",
-      "dependencies": [],
-      "task": "La skill `orion` NO le dice a sus builders que carguen la skill `estudio-diseno` (el manifiesto visual de la casa) cuando el paso que les toca es de UI. Verificado el 2026-08-24: grep de 'estudio-diseno' en C:\\Users\\Kalel\\.claude\\skills\\orion\\SKILL.md devuelve 0 apariciones, mientras la skill sí nombra `code-review` y `run` como opcionales. Un subagente arranca sin el contexto de la conversación, así que si el brief no lo apunta al manifiesto, diseña con su promedio — que es exactamente el fallo que ya se pagó con una landing rechazada (ver el tema `generadores-de-diseno` del cerebro: lo que salva no es prohibir, es RELLENAR el hueco con tus tokens). ARREGLO: en la fase BUILDING de la skill `orion`, una línea que obligue a incluir en el brief de todo builder con trabajo visual (a) que cargue `estudio-diseno`, y (b) los tokens concretos del proyecto con sus contrastes ya calculados, no la referencia al archivo. Recordar que el espejo canónico es ORION\\runtime\\skills\\orion.SKILL.md y que después hay que correr node tools/generar-instalador.mjs.",
-      "reason": "Hallado en conversación al contar cuántas skills usa ORION. Es barato de arreglar (una línea) y ataca la causa raíz de un fallo ya pagado: el ejecutor barato rellena con su promedio el hueco que le dejes en el encargo."
-    }
-  ],
-  "archives": [],
-  "lastAmmRun": "2026-08-24T11:00:00.000Z",
-  "version": 11
+ "projectId": "_permanent",
+ "snapshotDate": "2026-08-24T11:00:00.000Z",
+ "objects": [
+  {
+   "id": "KN-001",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-07-02T05:45:00.000Z",
+   "updated": "2026-07-02T05:45:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "Medium",
+   "priority": "Medium",
+   "status": "Current",
+   "dependencies": [],
+   "fact": "On this machine, terminal 'git push' cannot complete (Git Credential Manager dialog fails: 'User cancelled dialog', no /dev/tty). Commit locally and push via GitHub Desktop, which is already authenticated. Applies to every repo/project on this machine.",
+   "context": "Machine-level fact promoted from infrapilot memory (KN-001 there). Kept in both while infrapilot PEND-004 references the local copy.",
+   "source": "session 2026-07-01"
+  },
+  {
+   "id": "KN-002",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-07-02T05:45:00.000Z",
+   "updated": "2026-07-02T05:45:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "High",
+   "priority": "High",
+   "status": "Current",
+   "dependencies": [],
+   "fact": "Claude Code agent-spawn completion notifications include measured usage: subagent_tokens, tool_uses, duration_ms. The ORION orchestrator collects these per spawn and passes them to the reflector, so metrics.json modelOutcomes carry MEASURED token costs per phase/model (measurement_mode MEASURED for spawns). The orchestrator's own inline consumption remains unmetered — never fabricate it.",
+   "context": "Discovered 2026-07-02 during the E2E pipeline test; upgraded ORION's Context Economy from conceptual to measured for delegated work.",
+   "source": "session 2026-07-02"
+  },
+  {
+   "id": "KN-003",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-07-03T00:00:00.000Z",
+   "updated": "2026-07-03T00:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "Medium",
+   "priority": "Medium",
+   "status": "Current",
+   "dependencies": [],
+   "fact": "infrapilot Supabase project: ref zrogravgwhoijajzciem, URL https://zrogravgwhoijajzciem.supabase.co. Client-safe publishable anon key (sb_publishable_ format, the new Supabase key style equivalent to legacy anon) is stored in infrapilot-app/.env.local (gitignored). Re-readable from Supabase Dashboard -> Project Settings -> API. SECURITY RULE: never request, paste into chat, or store the service_role/secret key; publishable keys are public-by-design (they ship in the browser bundle) so they are safe, secrets are not.",
+   "context": "Recorded at 2026-07-03 session close. Raw key intentionally kept only in .env.local, not in committed memory.",
+   "source": "session 2026-07-03"
+  },
+  {
+   "id": "KN-004",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-01T00:00:00.000Z",
+   "updated": "2026-08-01T00:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "Medium",
+   "priority": "Medium",
+   "status": "Current",
+   "dependencies": [],
+   "fact": "GENERAR PDF EN ESTA MAQUINA: no hay Python (ni `python` ni `python3`), asi que reportlab/pypdf NO son opcion. Lo que SI funciona: Microsoft Edge headless, ya instalado. Comando verificado 2026-08-01 (genero un PDF de 11 paginas): \"/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe\" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf=\"C:\\ruta\\salida.pdf\" \"file:///C:/ruta/entrada.html\" . Se escribe el documento en HTML con @page/@media print y sale un PDF con tipografia y maquetacion controladas.",
+   "context": "Descubierto al generar el plan del asadero. Edge esta en Program Files (x86)."
+  },
+  {
+   "id": "KN-005",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-01T00:00:00.000Z",
+   "updated": "2026-08-01T00:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "Medium",
+   "priority": "Medium",
+   "status": "Current",
+   "dependencies": [],
+   "fact": "VERIFICAR UN PDF SIN poppler: `pdftoppm` no esta instalado, asi que la herramienta Read no puede renderizar paginas de PDF. Para comprobar que un PDF salio bien, parsear su estructura con node: contar /Type /Page, revisar que empiece por %PDF- y termine en %%EOF. Es suficiente para confirmar que no salio corrupto ni vacio.",
+   "context": "Usado 2026-08-01 tras generar el plan del asadero con Edge headless."
+  },
+  {
+   "id": "KN-006",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-01T00:00:00.000Z",
+   "updated": "2026-08-01T00:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "High",
+   "priority": "High",
+   "status": "Current",
+   "dependencies": [],
+   "fact": "CLASE DE BUG RECURRENTE — DOS FUENTES DE VERDAD: cuando un flujo de alta (registro, onboarding, creacion) PERSISTE una entidad en un sitio y otra pantalla la LEE de otro, la entidad existe pero es invisible, y el sintoma tipico es 'no hay X registrados' justo despues de haber creado X. Paso literal en estanco-contable con las sucursales (ver KN-012 alli). REGLA: al construir cualquier alta, comprobar explicitamente que la pantalla que consume esa entidad lee del MISMO sitio donde el alta escribe. Es barato de verificar y deja al usuario encerrado fuera de su propia app si se escapa.",
+   "context": "Generalizado desde el bug de locales de estanco-contable, reportado por el dueno 2026-08-01."
+  },
+  {
+   "id": "KN-007",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-08T00:00:00.000Z",
+   "updated": "2026-08-08T00:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "Medium",
+   "priority": "Medium",
+   "status": "Current",
+   "dependencies": [],
+   "fact": "VERIFICAR UI EN EL NAVEGADOR EMBEBIDO con el pane oculto (usuario ausente): las acciones del computer tool (click, screenshot) se cuelgan/timeout porque la pagina no compone frames. Lo que SI funciona sin pane visible: get_page_text, read_page, form_input (maneja inputs controlados de React), y javascript_tool con boton.click() nativo + esperas. Para llenar inputs React NO sirve el setter nativo via Object.getOwnPropertyDescriptor (Illegal invocation en el sandbox del tool) — usar form_input. Un builder ya perdio tiempo con esto (S6 broaster 2026-08-08); el orquestador completo el e2e con esta combinacion.",
+   "context": "Descubierto verificando el flujo de pedido de broaster-app 2026-08-08."
+  },
+  {
+   "id": "KN-008",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-10T00:00:00.000Z",
+   "updated": "2026-08-10T00:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "High",
+   "priority": "High",
+   "status": "Current",
+   "dependencies": [
+    "KN-007"
+   ],
+   "fact": "VERDAD DE TERRENO VISUAL/CSS = EDGE HEADLESS, NO el navegador embebido. Amplia KN-007: el pane embebido no solo cuelga screenshots con el pane oculto, sino que ADEMAS reporta mal getComputedStyle(...).visibility y element.checkVisibility({visibilityProperty:true}) — un visibility:hidden real (incluso !important o inline) puede reportarse como 'visible', llevando a diagnosticar mal un CSS que en realidad funciona. Fiables en el pane: .hidden (propiedad/atributo), checkVisibility para display, y display:none. NO fiables: 'visibility' computada y screenshots. Para confirmar de verdad como se ve algo: Edge headless a PNG y leer el PNG — & 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe' --headless=new --disable-gpu --hide-scrollbars --window-size=390,780 --virtual-time-budget=6000 --user-data-dir=<perfil-fresco-en-scratchpad> --screenshot=<out.png> <url>. Perfil fresco = localStorage limpio (util para probar primeras visitas). Edge ya estaba confirmado para PDF (KN-004).",
+   "context": "WRD sesion 4 (2026-08-10): el pane afirmaba que <main> con .wrd-cargando (visibility:hidden) seguia visible; Edge headless probo que el cloak funcionaba (pantalla negra + solo el gate). Se perdieron iteraciones confiando en el pane."
+  },
+  {
+   "id": "KN-009",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-19T00:00:00.000Z",
+   "updated": "2026-08-19T00:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "Medium",
+   "priority": "Medium",
+   "status": "Current",
+   "dependencies": [
+    "KN-008"
+   ],
+   "fact": "EDGE HEADLESS TIENE PISO DE VIEWPORT ~480-500px: con --window-size mas angosto (p.ej. 390) el PNG sale de 390px pero el LAYOUT se calcula a ~480px+, asi que todo se ve corrido/recortado a la derecha aunque la pagina este bien. NO sirve para verificar layout movil <480px. Para movil: (1) asegurar <meta name=viewport> en la pagina, y (2) verificar overflow con JS en el pane embebido (resize_window preset mobile + document.documentElement.scrollWidth vs clientWidth), que funciona con el pane oculto. Ademas Edge headless falla intermitentemente sin escribir el PNG (LoadEnclaveImageW error 577 en stderr es ruido, no la causa) — reintentar con --user-data-dir fresco suele bastar.",
+   "context": "Descubierto 2026-08-19 verificando la propuesta de orama: el PNG a 390px mostraba todo recortado; el pane a <759px confirmo scrollWidth==clientWidth (sin overflow real)."
+  },
+  {
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-21T00:00:00.000Z",
+   "updated": "2026-08-21T00:00:00.000Z",
+   "lifetime": "Permanent",
+   "status": "Current",
+   "id": "KN-010",
+   "impact": "High",
+   "priority": "High",
+   "dependencies": [
+    "KN-008",
+    "KN-009"
+   ],
+   "fact": "HERRAMIENTA DE QA VISUAL: C:/Users/Kalel/ORION/tools/edge-cdp.mjs (creada y validada 2026-08-21) empaqueta la receta CDP (landings KN-003): node edge-cdp.mjs --url <archivo|url> --width 390 --height 844 --mobile --shot out.png [--full] [--eval \"<js>\"] [--reduce] [--wait ms]. Lanza Edge headless con --remote-debugging-port, emula el viewport REAL (innerWidth 390 de verdad, no el piso de ~492 de --screenshot), pone prefers-reduced-motion en no-preference (las animaciones corren), navega y devuelve JSON con scrollWidth/clientWidth/overflowX/scrollHeight, getAnimations().length, fuentes cargadas, titulo, consola y excepciones, mas la captura PNG. Sin dependencias (Node 24 trae fetch y WebSocket). Es la verdad de terreno para QA movil y de movimiento; --screenshot a secas queda solo para capturas rapidas de escritorio.",
+   "context": "Probada contra fable 5/orama/propuesta-orama.html: 390x390 sin overflow, 6 animaciones vivas, 3 fuentes, consola limpia, PNG fiel."
+  },
+  {
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-21T00:00:00.000Z",
+   "updated": "2026-08-21T00:00:00.000Z",
+   "lifetime": "Permanent",
+   "status": "Current",
+   "id": "KN-011",
+   "impact": "Medium",
+   "priority": "High",
+   "dependencies": [],
+   "fact": "LIMITE DEL TOOL BASH EN ESTA MAQUINA: un comando de mas de ~8 KB se TRUNCA (limite de linea de comandos de Windows al pasar por bash -c) — un heredoc de ~150 lineas fallo con unexpected EOF while looking for matching quote en la linea 145 y NO creo el archivo. Ademas el wrapper colapsa doble backslash en uno solo. Regla: archivos nuevos grandes o con backslashes se escriben con Write/Edit; los comandos Bash se mantienen cortos (<~5 KB) y sin depender de backslashes literales.",
+   "context": "Pagado 2026-08-21 escribiendo edge-cdp.mjs por heredoc; el mismo heredoc corto si funcionaba."
+  },
+  {
+   "id": "KN-012",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-24T09:00:00.000Z",
+   "updated": "2026-08-24T09:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "High",
+   "priority": "High",
+   "status": "Current",
+   "dependencies": [],
+   "fact": "EXISTE UN CEREBRO TRANSVERSAL Y SE CONSULTA ANTES DE PENSAR. `node C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs buscar \"<pregunta>\"` responde con lo que YA sabe el ecosistema (11 memorias, ~275 objetos, sus metricas de costo por modelo, los documentos de doctrina y los temas curados) y devuelve la cita de donde salio cada cosa. Comandos: buscar, tema <slug>, probar (prueba de regresion), citas (verifica que ninguna cita este inventada), estado (huecos), exportar (vista de la boveda), indexar. Cuesta ~0 y se reindexa solo cuando algo cambia, asi que se llama varias veces por turno sin pensarlo. La FUENTE DE VERDAD de la capa transversal son los archivos de C:\\Users\\Kalel\\ORION\\cerebro\\temas\\; la boveda (ORION-Vault\\Cerebro) es una vista regenerable. Lo consumen el skill orion-cerebro (responder con cita), el agente orion-harvester (alimentarlo) y la fase 1 del skill orion (consultar antes de analizar).",
+   "context": "Construido la noche del 2026-08-24. Antes de esto la boveda era un espejo pasivo: una nota por objeto, aislada por proyecto, y para saber si algo ya se habia aprendido habia que abrir once state.json — que en la practica nadie abria.",
+   "source": "session 2026-08-24 bloque EL CEREBRO"
+  },
+  {
+   "id": "KN-013",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-24T09:00:00.000Z",
+   "updated": "2026-08-24T09:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "High",
+   "priority": "High",
+   "status": "Current",
+   "dependencies": [
+    "KN-012"
+   ],
+   "fact": "LA PRUEBA DE REGRESION DEL CEREBRO ES LA METRICA DE SI EL ECOSISTEMA APRENDE O SOLO ACUMULA. `cerebro.mjs probar` corre las preguntas de C:\\Users\\Kalel\\ORION\\cerebro\\preguntas-de-prueba.md —escritas como las hace el dueno, informales y sin tildes— y exige que el tema correcto salga PRIMERO. No mide cuanto sabe el cerebro: mide si responde a como se pregunta de verdad. Un tema impecable con alias malos falla ahi, y debe fallar, porque nadie lo encontraria nunca. Se corre en cada cierre de sesion y NO puede bajar: si bajo, algo se rompio o un tema nuevo le esta robando preguntas a otro. Medicion inicial 3/26 (12%) con cero temas; 26/26 (100%) con 12 temas escritos, la misma noche.",
+   "context": "El complemento es `cerebro.mjs citas`, que verifica mecanicamente que cada proyecto/ID citado exista: 454 citas comprobadas y 0 rotas en los 12 primeros temas. La promesa de 'nada inventado' no se sostiene a mano cuando hay docenas de citas.",
+   "source": "session 2026-08-24 bloque EL CEREBRO"
+  },
+  {
+   "id": "KN-014",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-24T09:00:00.000Z",
+   "updated": "2026-08-24T09:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "High",
+   "priority": "Critical",
+   "status": "Current",
+   "dependencies": [
+    "KN-012"
+   ],
+   "fact": "SI UNA LECCION SE PAGA EN UN SEGUNDO PROYECTO, DEJA DE SER DEL PROYECTO Y SUBE A PERMANENT. La promocion manual llega tarde y por eso cada proyecto vuelve a pagar la misma leccion: al leer las 11 memorias juntas aparecieron 8 lecciones en 6 proyectos diciendo lo mismo ('el agente muerto ya escribio: audita el disco antes de relanzar'), 5 midiendo lo mismo sobre capturas por CDP en 4 proyectos, y 8 sobre no inventar datos en 6 proyectos. El caso mas caro medido: infrapilot escribio el 2026-07-28 que en esta maquina no se podian probar migraciones SQL, y estanco-contable demostro lo contrario el 2026-07-29 con embedded-postgres validando 37/37 — infrapilot quedo trabado casi un mes con la solucion escrita al lado, en otra memoria.",
+   "context": "Es la razon de ser del cerebro y tambien su primera cosecha. Regla operativa: al cerrar, si la leccion de la sesion ya existe en OTRA memoria, no se duplica: se promueve a permanent o se escribe como tema transversal, y las dos memorias apuntan ahi.",
+   "source": "diagnostico transversal 2026-08-24 (ORION/cerebro/diagnostico-del-ecosistema.md)"
+  },
+  {
+   "id": "KN-015",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-24T09:00:00.000Z",
+   "updated": "2026-08-24T09:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "Medium",
+   "priority": "High",
+   "status": "Current",
+   "dependencies": [
+    "KN-012"
+   ],
+   "fact": "EN LA MEMORIA, SEPARA LA REGLA DE LA COORDENADA: la regla no caduca, la coordenada si. Con los proyectos repartidos en tres raices (ORION\\, prommter\\proyectos\\, fable 5\\), la evidencia archivo:linea envejece mas rapido de lo que se cura: pollo-landing apunta a una carpeta que ya no existe, estanco dice que fechaNegocio vive en facturacion.ts cuando se movio a jornada.ts, y landings avisa que sus propios numeros de linea se desplazaron. Al escribir conocimiento, enuncia la regla de forma que sobreviva sola y trata la ruta como una pista que hay que RE-VERIFICAR en el momento de citarla, no como un hecho.",
+   "context": "Hallado al cruzar las 11 memorias el 2026-08-24. Es tambien por que el verificador de citas (`cerebro.mjs citas`) comprueba proyecto/ID —que es estable— y no rutas de archivo.",
+   "source": "diagnostico transversal 2026-08-24"
+  },
+  {
+   "id": "KN-016",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-24T09:45:00.000Z",
+   "updated": "2026-08-24T09:45:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "High",
+   "priority": "High",
+   "status": "Current",
+   "dependencies": [
+    "KN-013"
+   ],
+   "fact": "`verdict: ok` EN LAS METRICAS MIDE QUE EL SPAWN ATERRIZO, NO QUE ACERTO — y por eso hoy NO existe medicion de defectos por tier. Al agregar las 280 filas `modelOutcomes` de las 11 memorias (32,7 millones de tokens) la tasa de fallo sale casi identica entre modelos: haiku 1/24, sonnet 6/149, opus 3/101. Pero al abrir las 24 filas no-ok, 19 son MUERTES DE SESION (infra, no capacidad), una es un verificador haciendo bien su trabajo, y en todo el corpus queda UN SOLO fallo de capacidad real (placita build:visual opus, 283.543 tokens) cuya causa fue el insumo. Mientras tanto los tres desastres documentados de haiku —seed corrupto, la ciudad 'Rionegro' inventada en keywords SEO, y el genero equivocado en documentos publicos— figuran los tres como `ok`, porque el spawn termino. CONSECUENCIA PRACTICA: no uses la tasa de fallo de `modelOutcomes` para decidir tier, no dice nada. Para que empiece a decir algo hay que registrar el veredicto DEL VERIFICADOR sobre el trabajo (aterrizo / acerto / hubo que corregirlo), separar las muertes de infraestructura en su propio campo, y contar los defectos hallados despues.",
+   "context": "Hallado el 2026-08-24 al escribir el tema `modelos-y-costos`, agregando a mano los metrics.json de las 11 memorias. Segundo hueco de la misma medicion: ninguna memoria registra precio por token, asi que 'costo' en todo el ecosistema significa tokens, nunca dinero. Contra-dato util: en placita, sonnet gasto MAS que opus en la misma fase (build:page 256k vs 224k), asi que 'el barato sale mas barato' tampoco se sostiene solo.",
+   "source": "session 2026-08-24, tema modelos-y-costos"
+  },
+  {
+   "id": "KN-017",
+   "type": "Knowledge",
+   "tier": "Permanent",
+   "created": "2026-08-24T11:00:00.000Z",
+   "updated": "2026-08-24T11:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "High",
+   "priority": "High",
+   "status": "Current",
+   "dependencies": [
+    "KN-016"
+   ],
+   "fact": "UN AGREGADOR QUE 'CORRE Y DEVUELVE RESULTADOS' NO ESTA VERIFICADO: hay que comprobarlo contra un caso con respuesta conocida a mano, igual que cualquier otro trabajo. El sintetizador de costos de `cerebro.mjs` (escrito por el orquestador la misma noche de KN-012..KN-016) se dio por bueno porque indexaba, buscaba y devolvia resultados con forma correcta -- nadie lo comparo contra un numero calculado a mano. Horas despues, un agente que escribia el tema `modelos-y-costos` SI cruzo el agregado contra el `metrics.json` crudo de estanco-contable y encontro que mentia: contaba muertes por limite de sesion como fallos del modelo porque el ecosistema las marca de DOS formas que el agregador no leia ninguna: campo `infraDeath: true` (estanco-contable, 10 filas en modelOutcomes) y sufijo `:infra-death` en el nombre de la fase (wrd, 2 filas). Con el bug, `build:page` con sonnet en estanco-contable salia '4 fallidas de 10'; la cifra real es 6 corridas juzgables con 0 fallidas (verificado en `C:\\Users\\Kalel\\prommter\\proyectos\\estanco-contable\\memory\\estanco-contable\\metrics.json`, filas con `infraDeath: true` en build:page/sonnet). Corregido en `C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs` (busca `infraDeath === true || porSufijo`), que ahora reconoce las dos convenciones y aparta las muertes en su propio conteo (`a.infra`) en vez de sumarlas a `a.mal`.",
+   "context": "Medicion adicional al cruzar las 11 memorias por la convencion: SOLO estanco-contable usa el campo (10 filas) y SOLO wrd usa el sufijo (2 filas, mas ~5 muertes mas mencionadas solo en la nota de sesion sin fila alguna en modelOutcomes -- `wrd/metrics.json` linea 174). infrapilot no usa ninguna de las dos: su nota de sesion narra una tercera convencion de facto ('verdict: escalate, tokens: 0 por convencion') que nunca aparece como campo ni sufijo inspeccionable -- invisible para cualquier lector que no abra la prosa. placita y villa-broaster documentan muertes de sesion en sus notas (villa-broaster: '4 muertes por limite de sesion reanudadas por SendMessage'; placita: el builder de gastos+cierre 'muerto' que en realidad termino antes de morir) sin marcar NINGUNA fila de modelOutcomes de ninguna forma. Osea: 3 memorias (infrapilot, placita, villa-broaster) tienen muertes documentadas sin marca estructurada, y de esas 3 solo infrapilot deja rastro de una convencion propia, solo en prosa. RECOMENDACION PARA SESIONES FUTURAS: usa el campo `infraDeath: true` sobre la fila de `modelOutcomes`, no el sufijo -- ya es la convencion mayoritaria (10 filas contra 2) y no obliga a nadie a hacer cirugia de texto sobre el nombre de la fase para recuperarla despues. El sufijo sigue siendo leido por compatibilidad, pero no se recomienda para filas nuevas.",
+   "source": "session 2026-08-24, hallado escribiendo el tema modelos-y-costos, corregido en cerebro.mjs"
+  },
+  {
+   "id": "PEND-001",
+   "type": "Pending",
+   "tier": "Permanent",
+   "created": "2026-08-24T10:00:00.000Z",
+   "updated": "2026-08-24T10:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "High",
+   "priority": "High",
+   "status": "Ready",
+   "dependencies": [
+    "KN-012"
+   ],
+   "task": "HUECOS DEL ECOSISTEMA hallados al leer las 11 memorias juntas el 2026-08-24: areas donde hay trabajo real y CERO conocimiento persistido. En orden de riesgo: (1) FACTURACION DIAN Y LEGALIDAD COLOMBIANA — condiciona el modelo de anulacion de cuatro productos y hasta el precio del software; la decision lleva abierta desde julio en tres memorias (estanco-contable/PEND-009, villa-broaster/PEND-001, placita/PEND-010) y no hay una sola leccion. (2) DESPLIEGUE, HOSTING Y RESPALDO — diez proyectos, uno solo en produccion, y ni una leccion de deploy, dominio, backup, ni de que pasa cuando el local se queda sin internet. (3) PRECIO Y CONTRATO — se vende software a negocios reales y solo hay dos lecciones (mensualidad con permanencia, piloto a mano); nada de cuanto vale cada producto ni que pasa si el cliente deja de pagar. (4) SOPORTE Y OPERACION POST-ENTREGA — placita esta EN PRODUCCION con el dueno usandola y no hay conocimiento de soporte, capacitacion ni respaldo (el PIN 0000 vigente semanas es el sintoma). (5) USUARIOS REALES — hay reglas disenadas PARA la cajera pero ninguna leccion de haberla OBSERVADO usando el sistema: todo el QA es de agente. (6) WHATSAPP — canal real de al menos tres negocios, cero lecciones. (7) DATOS PERSONALES — se guardan telefonos de clientes reales sin una linea sobre habeas data ni la ley 1581, en Colombia.",
+   "reason": "Un hueco de conocimiento no duele hasta que alguien decide sin el. Estos siete estan ordenados por lo que costaria equivocarse: el primero tiene implicacion legal y de precio, el ultimo tambien. Cada vez que se trabaje en uno de estos frentes, cosechar la leccion aunque parezca obvia — hoy no existe ninguna."
+  },
+  {
+   "id": "PEND-002",
+   "type": "Pending",
+   "tier": "Permanent",
+   "created": "2026-08-24T11:00:00.000Z",
+   "updated": "2026-08-24T11:00:00.000Z",
+   "lifetime": "Permanent",
+   "impact": "Medium",
+   "priority": "Medium",
+   "status": "Ready",
+   "dependencies": [],
+   "task": "La skill `orion` NO le dice a sus builders que carguen la skill `estudio-diseno` (el manifiesto visual de la casa) cuando el paso que les toca es de UI. Verificado el 2026-08-24: grep de 'estudio-diseno' en C:\\Users\\Kalel\\.claude\\skills\\orion\\SKILL.md devuelve 0 apariciones, mientras la skill sí nombra `code-review` y `run` como opcionales. Un subagente arranca sin el contexto de la conversación, así que si el brief no lo apunta al manifiesto, diseña con su promedio — que es exactamente el fallo que ya se pagó con una landing rechazada (ver el tema `generadores-de-diseno` del cerebro: lo que salva no es prohibir, es RELLENAR el hueco con tus tokens). ARREGLO: en la fase BUILDING de la skill `orion`, una línea que obligue a incluir en el brief de todo builder con trabajo visual (a) que cargue `estudio-diseno`, y (b) los tokens concretos del proyecto con sus contrastes ya calculados, no la referencia al archivo. Recordar que el espejo canónico es ORION\\runtime\\skills\\orion.SKILL.md y que después hay que correr node tools/generar-instalador.mjs.",
+   "reason": "Hallado en conversación al contar cuántas skills usa ORION. Es barato de arreglar (una línea) y ataca la causa raíz de un fallo ya pagado: el ejecutor barato rellena con su promedio el hueco que le dejes en el encargo."
+  },
+  {
+   "id": "PEND-003",
+   "type": "Pending",
+   "tier": "Permanent",
+   "created": "2026-09-01T05:03:23.000Z",
+   "updated": "2026-09-01T05:03:23.000Z",
+   "lifetime": "Permanent",
+   "impact": "High",
+   "priority": "High",
+   "status": "Ready",
+   "dependencies": [],
+   "task": "ACTUALIZAR LA BOVEDA A LA MAQUINA REAL: la memoria permanente describe el PC Windows (C:\\Users\\Kalel) pero ORION corre ahora TAMBIEN en la Mac (/Users/g/orion, casa migrada el 2026-08-31 con la carpeta completa desde ~/Downloads/ORION). Revisar los 17 KN uno a uno y corregir o partir por maquina los que mienten aqui: KN-001 (dice que git push de terminal no funciona -- en la Mac SI funciona: push a kalelfelpem-glitch/placita OK el 2026-08-31 via gh auth + credential helper local), KN-004 (dice que no hay Python -- la Mac tiene python3), KN-005 (pdftoppm: verificar en la Mac), KN-003 y todo KN con rutas o supuestos de Windows. Ademas cerrar los pendings de orion que la migracion ya resolvio y regenerar la boveda (vault/_INDEX.md y KN-*.md) al cierre.",
+   "reason": "Pedido del dueno el 2026-09-01 ('ahora que ya tienes la boveda y el conocimiento'): una boveda que describe otra maquina produce decisiones equivocadas -- p. ej. no intentar un push que si se puede, o buscar herramientas por rutas de Windows."
+  }
+ ],
+ "archives": [],
+ "lastAmmRun": "2026-08-24T11:00:00.000Z",
+ "version": 12
 }
