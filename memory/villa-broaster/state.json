@@ -1,6 +1,6 @@
 {
   "projectId": "villa-broaster",
-  "snapshotDate": "2026-09-02T02:37:20.000Z",
+  "snapshotDate": "2026-09-02T02:53:11.000Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -543,7 +543,7 @@
       "type": "Knowledge",
       "tier": "Project",
       "created": "2026-08-24T20:45:00.000Z",
-      "updated": "2026-09-02T02:37:20.000Z",
+      "updated": "2026-09-02T02:53:11.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
@@ -551,7 +551,7 @@
       "dependencies": [
         "PEND-004"
       ],
-      "fact": "LOS TRES REPOS DE GITHUB ESTABAN VACIOS Y NADIE LO SABIA (hallado 2026-08-24). El dueno creo los tres remotos privados (Equipo-villa-broaster, Sistema-villa-broaster-sistema, Vitrina-villa-broaster-vitrina) y los CLONO DENTRO de las carpetas de trabajo: villa-broaster/Equipo villa-broaster/, broaster-app/Sistema villa-broaster-sistema/, villa-app/Vitrina villa-broaster-vitrina/. Cada clon traia solo Initial commit con un .gitattributes; el trabajo real (32 + 11 + 5 = 48 commits) nunca salio del computador, y el dueno creia que ya estaba publicado. PATRON A VIGILAR: un clon vacio anidado dentro de la carpeta de trabajo se ve identico a un repo publicado — aparece como carpeta sin trackear en git status y no da ningun error. CORREGIDO: los tres clones se retiraron (movidos al scratchpad, no borrados) y se enlazo cada repo local con su remoto por git remote add. NO SE PUDO HACER FETCH NI PUSH: git por terminal en esta maquina no autentica (could not read Username for https://github.com) y los repos son privados — confirma entorno-de-la-maquina. Procedimiento escrito en docs/REPOS.md: borrar los 3 repos vacios y recrearlos SIN README para evitar la divergencia del Initial commit, luego GitHub Desktop > Add local repository > Push origin, y despues accesos por rol + proteccion de main. || DESENLACE (2026-09-01): el patron se confirmo pero la correccion salio a medias. De los tres remotos, SOLO el del sistema termino publicado — y con OTRO nombre, broaster-app-repo (35 commits, incluido el merge 'Unir con el repositorio de GitHub' que absorbio el Initial commit). Los otros dos siguieron vacios cinco semanas mientras su contenido vivia suelto en ~/Downloads sin control de versiones. Cerrado hoy: villa-app-repo y Equipo-villa-broaster quedaron poblados y commiteados en local (ver DEC-012 y KN-035); falta el push del dueno.",
+      "fact": "LOS TRES REPOS DE GITHUB ESTABAN VACIOS Y NADIE LO SABIA (hallado 2026-08-24). El dueno creo los tres remotos privados (Equipo-villa-broaster, Sistema-villa-broaster-sistema, Vitrina-villa-broaster-vitrina) y los CLONO DENTRO de las carpetas de trabajo: villa-broaster/Equipo villa-broaster/, broaster-app/Sistema villa-broaster-sistema/, villa-app/Vitrina villa-broaster-vitrina/. Cada clon traia solo Initial commit con un .gitattributes; el trabajo real (32 + 11 + 5 = 48 commits) nunca salio del computador, y el dueno creia que ya estaba publicado. PATRON A VIGILAR: un clon vacio anidado dentro de la carpeta de trabajo se ve identico a un repo publicado — aparece como carpeta sin trackear en git status y no da ningun error. CORREGIDO: los tres clones se retiraron (movidos al scratchpad, no borrados) y se enlazo cada repo local con su remoto por git remote add. NO SE PUDO HACER FETCH NI PUSH: git por terminal en esta maquina no autentica (could not read Username for https://github.com) y los repos son privados — confirma entorno-de-la-maquina. Procedimiento escrito en docs/REPOS.md: borrar los 3 repos vacios y recrearlos SIN README para evitar la divergencia del Initial commit, luego GitHub Desktop > Add local repository > Push origin, y despues accesos por rol + proteccion de main. || DESENLACE (2026-09-01): el patron se confirmo pero la correccion salio a medias. De los tres remotos, SOLO el del sistema termino publicado — y con OTRO nombre, broaster-app-repo (35 commits, incluido el merge 'Unir con el repositorio de GitHub' que absorbio el Initial commit). Los otros dos siguieron vacios cinco semanas mientras su contenido vivia suelto en ~/Downloads sin control de versiones. Cerrado hoy: villa-app-repo y Equipo-villa-broaster quedaron poblados y commiteados en local (ver DEC-012 y KN-035); falta el push del dueno. || CERRADO DEL TODO 2026-09-01: los tres repos quedaron publicados. villa-app-repo (de20b97) y Equipo-villa-broaster (f3b5fe3) subieron por terminal desde la Mac — local y remoto en el mismo commit, cero pendientes en los tres. El push del repo del equipo (19 MB de PDFs en docs/) fallo primero con 'RPC failed; HTTP 400' y entro tras subir http.postBuffer a 500 MB. La regla 'ningun agente hace push' quedo derogada por el dueno (politica DEC-001 de la memoria permanente).",
       "context": "Run 2026-08-24. El dueno pregunto si los repos ya quedaban publicados; la respuesta medida es que no."
     },
     {
@@ -559,16 +559,16 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-08-24T20:45:00.000Z",
-      "updated": "2026-09-02T02:37:20.000Z",
+      "updated": "2026-09-02T02:53:11.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
-      "status": "Ready",
+      "status": "Done",
       "dependencies": [
         "KN-016"
       ],
-      "task": "PUBLICAR LO QUE FALTA (accion del dueno). Estado al 2026-09-01: broaster-app-repo YA esta publicado (35 commits). Pendiente: (1) push por GitHub Desktop de villa-app-repo (commit de20b97) y de Equipo-villa-broaster (commit f3b5fe3), ambos desde /Users/g/orion/prommter/; (2) invitar por rol — Equipo-villa-broaster = las 3 personas Read, broaster-app-repo = senior Write, villa-app-repo = disenador de landing + disenadora Write; (3) proteger main en los tres con PR obligatorio y 1 aprobacion; (4) borrar en GitHub los dos repos obsoletos y vacios, Sistema-villa-broaster-sistema y Vitrina-villa-broaster-vitrina, para que nadie los confunda con los buenos (ver DEC-012). OJO: docs/REPOS.md todavia describe los nombres viejos y el procedimiento de Windows.",
-      "reason": "El equipo sigue sin poder empezar en la vitrina y en el repo comun; el sistema ya esta arriba."
+      "task": "[HECHO 2026-09-01 en su mayor parte] Los TRES repos estan publicados y sincronizados: broaster-app-repo f5abd4b, villa-app-repo de20b97, Equipo-villa-broaster f3b5fe3. LO QUE QUEDA, y es accion del dueno en la web de GitHub: (1) invitar por rol — Equipo-villa-broaster = las 3 personas Read, broaster-app-repo = senior Write, villa-app-repo = disenador de landing + disenadora Write; (2) borrar los dos repos obsoletos y vacios, Sistema-villa-broaster-sistema y Vitrina-villa-broaster-vitrina. (3) PROTEGER MAIN NO SE PUEDE HOY: GitHub responde 403 'Upgrade to GitHub Pro or make this repository public' — las reglas de rama no existen en repos privados del plan gratuito. O se paga Pro, o los repos se hacen publicos, o la puerta de calidad se sostiene por acuerdo del equipo y no por la plataforma. Decision del dueno.",
+      "reason": "El codigo ya esta arriba; falta abrirles la puerta a las tres personas y decidir que hacer con la proteccion de main."
     },
     {
       "id": "KN-017",
@@ -910,5 +910,5 @@
     }
   ],
   "lastAmmRun": "2026-08-31T02:00:00.000Z",
-  "version": 32
+  "version": 33
 }

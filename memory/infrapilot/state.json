@@ -26,14 +26,14 @@
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-07-01T00:00:00.000Z",
-      "updated": "2026-07-02T04:30:00.000Z",
+      "updated": "2026-09-02T02:54:11.000Z",
       "lifetime": "Permanent",
       "impact": "Medium",
       "priority": "Medium",
       "status": "Current",
       "dependencies": [],
-      "fact": "GitHub pushes from this automated terminal environment cannot complete: the Git Credential Manager auth dialog fails ('User cancelled dialog', no /dev/tty). Pushes must be done through GitHub Desktop (already authenticated on this machine) instead.",
-      "context": "Discovered when 'git push -u origin main' failed after the initial ORION+InfraPilot merge commit.",
+      "fact": "EL PUSH POR TERMINAL SI FUNCIONA EN LA MAC (verificado con pushes reales el 2026-09-01). gh esta autenticado en el keyring y actua de credential helper. El hecho viejo — 'Git Credential Manager falla, User cancelled dialog, no /dev/tty' — era del PC WINDOWS y no describe esta maquina. Si un push grande muere con 'RPC failed; HTTP 400', subir http.postBuffer a 500 MB en ese repo. Ver KN-001 y DEC-001 de la memoria permanente, que son la copia que manda.",
+      "context": "Corregido el 2026-09-01. Antes decia lo contrario y bloqueaba cualquier intento de publicar.",
       "source": "session 2026-07-01"
     },
     {
@@ -101,7 +101,7 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-07-28T00:00:00.000Z",
+      "updated": "2026-09-02T02:54:11.000Z",
       "lifetime": "Sprint",
       "impact": "Low",
       "priority": "Medium",
@@ -109,8 +109,8 @@
       "dependencies": [
         "KN-001"
       ],
-      "task": "Push vía GitHub Desktop (app primero, luego parent). Pendientes ahora: app {a6314fe landing v2, 131040f proveedores+comparativa, 91ab9d6 ROAD-003/004/006 integración cruzada+eléctrica+PWA+cuentas de equipo}; parent {2760909, d7ebca0, aaaadd8, 53fc712 + cierre de sesión}. Nota: si Desktop muestra archivos modificados solo por line endings LF→CRLF, ignorar/refrescar — no committear churn de EOL.",
-      "reason": "Terminal git push doesn't work in this environment (see KN-001) — pending manual push next time the user is at GitHub Desktop."
+      "task": "[REVISAR] Esta lista de commits por subir se escribio cuando el push era manual (KN-001 viejo). Con el push automatico (DEC-005/DEC-001) ya no se lleva una lista: se publica al terminar. Falta comprobar si estos commits siguen sin subir — app {a6314fe, 131040f, 91ab9d6}; parent {2760909, d7ebca0, aaaadd8, 53fc712} — y si es asi, publicarlos. OJO con infrapilot-app: su historia DIVERGIO (dos ramas con el mismo remoto), asi que ahi NO se publica a ciegas.",
+      "reason": "La razon original ('terminal push doesn't work') dejo de ser cierta; queda comprobar el estado real."
     },
     {
       "id": "ARCH-001",
@@ -166,15 +166,15 @@
       "type": "Decision",
       "tier": "Permanent",
       "created": "2026-07-01T03:00:00.000Z",
-      "updated": "2026-07-01T03:00:00.000Z",
+      "updated": "2026-09-02T02:54:11.000Z",
       "lifetime": "Permanent",
       "impact": "Medium",
       "priority": "High",
       "status": "Accepted",
       "dependencies": [],
-      "title": "ORION autocommits on verification PASS; push stays manual",
-      "description": "Standing policy: when an ORION task passes VERIFYING, autocommit the changes in whichever repo changed (app code -> infrapilot-app submodule / InfraPilot.Ai; memory & docs -> parent InfraPilot.v01), with a clear message. Do NOT push (terminal push blocked, KN-001) — list pending commits for the user to push via GitHub Desktop. Escalated/failed tasks are not auto-committed.",
-      "reason": "User chose 'autocommit al pasar verificación' so work is checkpointed automatically without losing the manual-push safety gate."
+      "title": "ORION autocommits on verification PASS — and now pushes automatically too",
+      "description": "Standing policy: when an ORION task passes VERIFYING, autocommit the changes in whichever repo changed, with a clear message, AND PUSH THEM. || CHANGED 2026-09-01 by the owner's explicit request ('quiero que cambies la regla de el push a automatico'): the old 'do NOT push' half of this policy rested on KN-001, which described the Windows PC and is no longer true here. Pushing is now part of finishing the task. || Still off-limits without asking: --force / --force-with-lease, rewriting published history, deleting remote branches or tags, and pushing straight to a main that requires PRs (use a branch + PR instead). Nothing is published if the secret scan finds anything. Escalated/failed tasks are still not auto-committed. || The authoritative copy of this policy is DEC-001 in the permanent memory.",
+      "reason": "User chose 'autocommit al pasar verificación' in 2026-07, with manual push as the safety gate; in 2026-09 the user removed that gate because the limitation behind it belonged to another machine, and holding it back was leaving verified work unpublished for weeks."
     },
     {
       "id": "KN-005",
@@ -1024,6 +1024,6 @@
     }
   ],
   "lastAmmRun": "2026-08-24T08:30:00.000Z",
-  "snapshotDate": "2026-08-24T08:30:00.000Z",
-  "version": 37
+  "snapshotDate": "2026-09-02T02:54:11.000Z",
+  "version": 38
 }

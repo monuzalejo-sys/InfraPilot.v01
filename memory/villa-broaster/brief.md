@@ -12,13 +12,17 @@ están en `/Users/g/orion/prommter/` y **los tres tienen su contenido**:
 | Repo | Estado |
 |---|---|
 | `broaster-app-repo` | Publicado en GitHub desde antes: 35 commits + rama `feature/roles-puestos`. Recuperado con fetch; el clon local era el desactualizado, no el remoto. |
-| `villa-app-repo` | Poblado y commiteado hoy (`de20b97`, 38 archivos). **Sin push.** |
-| `Equipo-villa-broaster` | Poblado y commiteado hoy (`f3b5fe3`, 74 archivos). **Sin push.** |
+| `villa-app-repo` | Poblado, commiteado y **publicado** hoy (`de20b97`, 38 archivos). |
+| `Equipo-villa-broaster` | Poblado, commiteado y **publicado** hoy (`f3b5fe3`, 74 archivos). |
 
-Lo que falta es del dueño (PEND-010): push de los dos por GitHub Desktop,
-invitaciones por rol, proteger `main`, y borrar en GitHub los dos repos
-obsoletos y vacíos. `docs/REPOS.md` todavía describe los nombres viejos y el
-procedimiento de Windows — corregirlo cuando se toque.
+**El push ya no lo hace el dueño: es automático** (política DEC-001 de la memoria
+permanente). Después de verificar en verde y commitear, el agente publica solo.
+Siguen prohibidos el `--force`, reescribir historia publicada y borrar ramas remotas.
+
+Lo que queda para el dueño (PEND-010): invitar a las 3 personas por rol y borrar en
+GitHub los dos repos obsoletos. **Proteger `main` no se puede** en repos privados del
+plan gratuito (403 'Upgrade to GitHub Pro') — hay que decidir entre pagar Pro, hacerlos
+públicos, o sostener la puerta de calidad por acuerdo.
 
 Al comparar árboles traídos de Windows contra un checkout en la Mac, el diff
 miente: CRLF vs LF marcó 166 archivos como distintos con cero diferencias
