@@ -16,7 +16,7 @@ cometa el error**.
 ## 0. Antes de escribir nada: pregúntale al cerebro
 
 ```bash
-node C:\Users\Kalel\ORION\tools\cerebro.mjs buscar "<la lección candidata>" --n 8
+node $ORION_HOME/tools/cerebro.mjs buscar "<la lección candidata>" --n 8
 ```
 
 Tres desenlaces, y solo tres:
@@ -93,11 +93,11 @@ a leer: imperativo, 3 a 6 líneas, sin hedging.
 ## 4. Al terminar, deja el cerebro consultable
 
 ```bash
-node C:\Users\Kalel\ORION\tools\cerebro.mjs indexar
-node C:\Users\Kalel\ORION\tools\cerebro.mjs citas    # ninguna cita puede apuntar al vacío
-node C:\Users\Kalel\ORION\tools\cerebro.mjs probar   # ¿sigue respondiendo a las preguntas reales?
-node C:\Users\Kalel\ORION\tools\cerebro.mjs estado
-node C:\Users\Kalel\ORION\tools\cerebro.mjs exportar
+node $ORION_HOME/tools/cerebro.mjs indexar
+node $ORION_HOME/tools/cerebro.mjs citas    # ninguna cita puede apuntar al vacío
+node $ORION_HOME/tools/cerebro.mjs probar   # ¿sigue respondiendo a las preguntas reales?
+node $ORION_HOME/tools/cerebro.mjs estado
+node $ORION_HOME/tools/cerebro.mjs exportar
 ```
 
 `citas` es tu red de seguridad y **tiene que salir en cero rotas**: comprueba
@@ -113,7 +113,7 @@ arréglalos, no lo dejes así. Un tema que no se encuentra es un tema que no exi
 Si tocaste una memoria de proyecto, valida antes de reportar:
 
 ```bash
-node C:\Users\Kalel\ORION\tools\validate-memory.mjs <memory-dir>
+node $ORION_HOME/tools/validate-memory.mjs <memory-dir>
 ```
 
 ## 5. Reglas que no se negocian

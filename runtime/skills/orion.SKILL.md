@@ -7,7 +7,7 @@ description: "Runs a task end-to-end through the ORION cognitive-runtime lifecyc
 
 You are acting as an ORION-compliant Cognitive Runtime, executing ONE Task
 end-to-end with minimal check-ins. ORION is the user's own standard, defined
-in `C:\Users\Kalel\ORION\ORION_STANDARD.md` and its `RFC\*.md` files. Treat
+in `$ORION_HOME/ORION_STANDARD.md` and its `RFC\*.md` files. Treat
 those files as the source of truth for phase order, object shapes, and
 terminal-state rules — this skill is the operating procedure, not a
 duplicate of the spec. Re-read the relevant RFC if a phase's exact rules
@@ -61,15 +61,15 @@ translator is for when a misreading would cost real work.
   session DIED MID-WAVE: it maps builders to owned files and contracts.
   Recover per its content (diff ownership vs `git status`, verify completed
   work directly, re-spawn only what's genuinely missing), then delete it.
-- Also read `C:\Users\Kalel\ORION\memory\permanent\state.json` — machine-level
+- Also read `$ORION_HOME/memory/permanent/state.json` — machine-level
   facts shared across ALL projects (a handful of objects, one cheap read).
 - PIDE LA RUTA ANTES DE ANALIZAR. Nunca abras archivos a ciegas: primero
   pregunta DÓNDE está lo que necesitas. Cuesta ~0 y devuelve coordenadas —
   archivo, línea y el comando para abrir solo ese trozo— en vez de texto:
 
   ```bash
-  node C:\Users\Kalel\ORION\tools\cerebro.mjs ruta "<el objetivo, con las palabras del usuario>" --n 6
-  node C:\Users\Kalel\ORION\tools\cerebro.mjs ruta "<los términos del dominio>" --n 6
+  node $ORION_HOME/tools/cerebro.mjs ruta "<el objetivo, con las palabras del usuario>" --n 6
+  node $ORION_HOME/tools/cerebro.mjs ruta "<los términos del dominio>" --n 6
   ```
 
   Hazlo SIEMPRE, dos o tres veces con formulaciones distintas («caja», «turno»
@@ -90,7 +90,7 @@ translator is for when a misreading would cost real work.
   ya está especificado y NO hay que volver a analizarlo ni a planearlo:
 
   ```bash
-  node C:\Users\Kalel\ORION\tools\plan.mjs siguiente <memory-dir>/plan.json --n 3
+  node $ORION_HOME/tools/plan.mjs siguiente <memory-dir>/plan.json --n 3
   ```
 
   Si el objetivo del usuario es un id de tarea (`/orion T-042`) o coincide con
@@ -140,7 +140,7 @@ How to apply it:
   bump it up on the next attempt — don't default everything to Opus.
 
 MEASURED DEFAULTS (298 spawns / 39.4M tokens across 9 projects, 2026-08-26 —
-reproduce with `node C:\Users\Kalel\ORION\tools\costos.mjs fases`). Sample size
+reproduce with `node $ORION_HOME/tools/costos.mjs fases`). Sample size
 in parentheses; a cell with (1) is an anecdote, not a measurement:
 
 | phase | haiku | sonnet | opus | default |
@@ -319,7 +319,7 @@ Afterwards:
   (haiku) on the memory dir — it dedupes, archives expired objects, and keeps
   state.json cheap to load.
 - Validate the memory files: run
-  `node C:\Users\Kalel\ORION\tools\validate-memory.mjs <memory-dir>` — it's a
+  `node $ORION_HOME/tools/validate-memory.mjs <memory-dir>` — it's a
   local script, near-zero cost. If it reports errors, have the reflector (or
   yourself, if trivial) fix the JSON before finishing.
 
@@ -342,7 +342,7 @@ context/compression fields can be left at reasonable defaults).
 If this run executed a task from `plan.json`, close the loop (RFC-0008 N8-R10):
 
 ```bash
-node C:\Users\Kalel\ORION\tools\plan.mjs hecho <plan.json> T-042 \
+node $ORION_HOME/tools/plan.mjs hecho <plan.json> T-042 \
   --evidencia "<the fact the verifier OBSERVED, not 'done'>" --tokens <measured>
 ```
 
@@ -364,15 +364,20 @@ policy, DEC-005):
   commits in both — commit the app changes in the submodule first, then the
   memory/pointer changes in the parent.
 - Write a clear message ending with the standard Co-Authored-By trailer.
-- Do NOT push. Terminal `git push` fails here (Git Credential Manager) — tell
-  the user to push via GitHub Desktop. List the pending commits so they know.
+- Push it too. Publishing is part of finishing (owner's decision, 2026-09-01):
+  once the commit lands, push it. The old "push stays manual" half of DEC-005
+  rested on a Windows-only limitation and no longer holds.
+- Still ask first, every time: `--force`/`--force-with-lease`, rewriting
+  published history, deleting remote branches or tags, and pushing straight to
+  a `main` that requires PRs — there the path is a branch and a PR. Publish
+  nothing if the secret scan finds something.
 - If verification did not pass (ESCALATED), do not auto-commit; leave the tree
   for the user to inspect unless they say otherwise.
 
 ## 8. DONE / ESCALATED
 
 Report concisely: what changed, what got verified, what's now recorded in
-memory, what was committed (and that push is still manual), and — if
+memory, what was committed and pushed, and — if
 ESCALATED — the exact decision a human needs to make.
 
 ## Ground rules
@@ -384,6 +389,7 @@ ESCALATED — the exact decision a human needs to make.
   visible — pushing to a remote, deleting substantial work, force
   operations, sending messages, spending money. Confirm those explicitly;
   workflow autonomy doesn't waive them.
-- If asked to push to GitHub, note that terminal `git push` fails in this
-  environment (Git Credential Manager can't open its dialog) — commit
-  locally and tell the user to push via GitHub Desktop instead of retrying.
+- Pushing works from the terminal on this machine (`gh` is the credential
+  helper). If a large push dies with `RPC failed; HTTP 400 curl 22`, that is the
+  1 MB HTTP buffer and not a permission: `git config http.postBuffer 524288000`
+  in that repo, then retry.

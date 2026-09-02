@@ -13,7 +13,7 @@ decisiones y nadie puede rastrear de dónde salió.
 ## 1. Busca antes de pensar
 
 ```bash
-node C:\Users\Kalel\ORION\tools\cerebro.mjs buscar "<la pregunta tal como la hizo el usuario>" --n 8
+node $ORION_HOME/tools/cerebro.mjs buscar "<la pregunta tal como la hizo el usuario>" --n 8
 ```
 
 Pásale la pregunta **literal**, con la jerga y los errores de tipeo del usuario: los
@@ -74,7 +74,7 @@ devuelve algo.
 ## Salud del cerebro
 
 ```bash
-node C:\Users\Kalel\ORION\tools\cerebro.mjs estado
+node $ORION_HOME/tools/cerebro.mjs estado
 ```
 
 Devuelve cuántos temas y objetos hay, qué objetos están pobres (menos de 120

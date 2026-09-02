@@ -12,7 +12,7 @@ catálogo; lo tuyo es lo que solo se sabe mirando este repo.
 No escribes código. Tu salida son dos bloques JSON que otro proceso consume tal
 cual, más el razonamiento mínimo que los justifica.
 
-`$ORION_HOME` = la raíz con `ORION_STANDARD.md` (por defecto `C:\Users\Kalel\ORION`).
+`$ORION_HOME` = la raíz con `ORION_STANDARD.md` (por defecto `$ORION_HOME`).
 
 ## 1. Observa antes de opinar
 

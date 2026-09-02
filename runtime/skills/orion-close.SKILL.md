@@ -17,7 +17,7 @@ autonomous — no per-step approval needed). Order matters:
    `triggeredBy: SESSION_CLOSE`. It dedupes, archives terminal/expired
    objects, and appends its own metrics entry.
 3. **Validate.** Run
-   `node C:\Users\Kalel\ORION\tools\validate-memory.mjs <memory-dir>`.
+   `node $ORION_HOME/tools/validate-memory.mjs <memory-dir>`.
    If INVALID, fix (trivial JSON repairs inline; otherwise re-brief the
    curator with the exact errors) and re-validate. Do not close a session
    leaving invalid memory. Known invariant: metrics `sessionCount` must
@@ -25,7 +25,7 @@ autonomous — no per-step approval needed). Order matters:
 3b. **Push everything to the vault — the gateway.** Run
 
    ```bash
-   node C:\Users\Kalel\ORION\tools\baul.mjs empujar
+   node $ORION_HOME/tools/baul.mjs empujar
    ```
 
    One deterministic command (**never delegate this to an agent** — a subagent
@@ -45,7 +45,7 @@ autonomous — no per-step approval needed). Order matters:
 3b-bis. **Write back the plan.** If this session executed tasks from
    `plan.json`, make sure each one was closed with
    `plan.mjs hecho … --evidencia … --tokens …` (RFC-0008 N8-R10) and run
-   `node C:\Users\Kalel\ORION\tools\plan.mjs validar <plan.json>`. A plan that
+   `node $ORION_HOME/tools/plan.mjs validar <plan.json>`. A plan that
    is not written back stops being a control loop and goes back to being a
    document — and the budget never converges. Then regenerate its prose view
    with `plan.mjs md <plan.json>`.
@@ -58,9 +58,9 @@ autonomous — no per-step approval needed). Order matters:
    Después, siempre:
 
    ```
-   node C:\Users\Kalel\ORION\tools\cerebro.mjs citas
-   node C:\Users\Kalel\ORION\tools\cerebro.mjs probar
-   node C:\Users\Kalel\ORION\tools\cerebro.mjs exportar
+   node $ORION_HOME/tools/cerebro.mjs citas
+   node $ORION_HOME/tools/cerebro.mjs probar
+   node $ORION_HOME/tools/cerebro.mjs exportar
    ```
 
    La prueba dice si el cerebro sigue respondiendo a las preguntas reales; si
@@ -69,13 +69,13 @@ autonomous — no per-step approval needed). Order matters:
    aprendiendo o solo acumulando.
 
 4. **Commit** the memory changes in the repo that holds them (for InfraPilot:
-   the parent repo `C:\Users\Kalel\ORION`, InfraPilot.v01) with a message like
-   `orion: session close — memory curation (vN)`. Do NOT push — remind the
-   user of any commits pending push via GitHub Desktop.
+   the parent repo `$ORION_HOME`, InfraPilot.v01) with a message like
+   `orion: session close — memory curation (vN)`, and push it: publishing is
+   part of closing (owner's decision, 2026-09-01).
 4b. **Mira dónde se fue el gasto.** Un solo comando, ~0 tokens:
 
    ```bash
-   node C:\Users\Kalel\ORION\tools\costos.mjs fugas
+   node $ORION_HOME/tools/costos.mjs fugas
    ```
 
    Da las tres fugas medidas —muertes de agente, tier de más, ceremonia de más—

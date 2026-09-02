@@ -76,7 +76,7 @@ resuelve `ORION_HOME` (la raíz que contiene `ORION_STANDARD.md`, `RFC/`,
 
 1. Variable de entorno `ORION_HOME`.
 2. El ancestro más cercano del directorio de trabajo con `ORION_STANDARD.md`.
-3. Por defecto: `C:\Users\Kalel\ORION`.
+3. Por defecto: `$ORION_HOME`.
 
 Y adapta cómo lee según el entorno, porque no es el mismo acceso:
 

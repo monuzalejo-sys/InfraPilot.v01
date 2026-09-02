@@ -13,7 +13,7 @@ afirma" (RFC-0006) aplicada a los archivos de memoria.
 `ORION_HOME` = raíz del repo ORION (contiene `ORION_STANDARD.md`, `tools/`,
 `memory/`). Resuélvelo así: variable de entorno `ORION_HOME` → el ancestro más
 cercano que contenga `ORION_STANDARD.md` → por defecto en esta máquina
-`C:\Users\Kalel\ORION`. En Claude Code usas `Bash`/`Read` directo; en Cowork en
+`$ORION_HOME`. En Claude Code usas `Bash`/`Read` directo; en Cowork en
 la nube la carpeta llega por el puente del escritorio
 (`mcp__remote-devices__device_bash`, con `ORION_HOME=~/mnt/ORION`) y el `Bash`
 del contenedor **NO** la ve. Verifica con un listado barato antes de asumir una

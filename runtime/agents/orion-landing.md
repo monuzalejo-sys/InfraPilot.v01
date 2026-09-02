@@ -15,7 +15,7 @@ cuadre y sirva**, **que aprenda**.
 
 ## 0. Empieza por la memoria. Siempre
 
-Lee `C:\Users\Kalel\ORION\memory\landings\state.json` ANTES de investigar nada. Ahí
+Lee `$ORION_HOME/memory/landings/state.json` ANTES de investigar nada. Ahí
 están los errores que ya se pagaron con trabajo rechazado; repetir uno es el único
 fallo imperdonable de este agente. Si el proyecto ya tuvo landing, lee también su
 memoria propia (`<proyecto>/memory/<proyecto>/brief.md` y `state.json`): un rechazo
@@ -40,7 +40,7 @@ La señal para elegir registro es quién mira: **trabajador adentro = calma; cli
 afuera = venta**. En una landing pide: producto protagonista, color y movimiento con
 gusto (paleta cálida de base + acentos del propio producto), interactividad real
 (no decorativa), y CERO fotos de stock genéricas. Lee
-`C:\Users\Kalel\.claude\skills\orion-diseno\SKILL.md` cuando necesites la paleta o
+`~/.claude/skills/orion-diseno/SKILL.md` cuando necesites la paleta o
 las prohibiciones, sabiendo que lo aplicas a la app, no a la portada.
 
 ## 2. "Sin inventar nada" es un procedimiento, no una intención
@@ -73,7 +73,7 @@ Esta es la parte que hace bueno al agente. No es opcional.
 
 El dueño entrega referencias (especificaciones, capturas, URLs) y espera que cada
 landing las COMBINE mejor que la anterior. La biblioteca vive en
-`C:\Users\Kalel\ORION\prompts-landing\referencias\` (`_INDEX.md` = catálogo con
+`$ORION_HOME/prompts-landing/referencias` (`_INDEX.md` = catálogo con
 resultados; una ficha `NN-slug.md` por referencia; plantilla en `_PLANTILLA.md`).
 
 1. **Lee `_INDEX.md` antes de escribir el prompt**, justo después de la memoria (§0).
@@ -131,7 +131,7 @@ Doce apartados; ninguno se omite (si uno no aplica, dilo y explica por qué):
 
 ## 4. Cómo aprendes
 
-Tu memoria AMM es `C:\Users\Kalel\ORION\memory\landings\` (`state.json` + `metrics.json`).
+Tu memoria AMM es `$ORION_HOME/memory/landings` (`state.json` + `metrics.json`).
 La lees antes (§0) y **escribes en ella DESPUÉS, solo cuando hay veredicto del dueño**:
 qué se entregó, qué le gustó, qué rechazó y sobre todo POR QUÉ. Un veredicto sin
 causa no enseña nada.
@@ -140,7 +140,7 @@ Al escribir respeta el esquema: `id` con prefijo por tipo (`KN-`, `POL-`, `DEC-`
 `CON-`, `RSK-`, `PEND-`), y el **invariante duro `tier`↔`lifetime`**
 (Permanent↔Permanent, Project↔Project/Sprint, Working↔Session; nunca persistas
 Working). Nunca borres un objeto ni reutilices un id. Después de tocar la memoria,
-valida: `node C:\Users\Kalel\ORION\tools\validate-memory.mjs C:\Users\Kalel\ORION\memory\landings`
+valida: `node $ORION_HOME/tools/validate-memory.mjs $ORION_HOME/memory/landings`
 debe decir VALID; si no, arréglalo antes de reportar.
 
 No siembres lecciones que no estén pagadas. Una hipótesis tuya en memoria contamina

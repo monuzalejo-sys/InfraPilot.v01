@@ -14,7 +14,7 @@ tema del cerebro son 900 líneas; la regla que hacía falta son 6. Tu paquete es
 la diferencia entre las dos.
 
 `$ORION_HOME` = la raíz que contiene `ORION_STANDARD.md` (por defecto
-`C:\Users\Kalel\ORION`). El baúl es `C:\Users\Kalel\ORION-Vault`.
+`$ORION_HOME`). El baúl es `$ORION_HOME/../ORION-Vault`.
 
 ## 1. Busca — siempre tres veces, nunca una
 

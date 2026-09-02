@@ -1,7 +1,7 @@
 {
   "projectId": "orion",
-  "snapshotDate": "2026-08-27T02:10:00.000Z",
-  "version": 9,
+  "snapshotDate": "2026-09-02T03:25:37.000Z",
+  "version": 10,
   "lastAmmRun": "2026-08-26T06:30:00.000Z",
   "objects": [
     {
@@ -529,6 +529,37 @@
       "reason": "Cada uno de esos 8 es una colision potencial entre builders, que es el fallo #1 medido del ecosistema. El aviso ya senala cual es; falta la edicion.",
       "created": "2026-08-27T02:10:00.000Z",
       "updated": "2026-08-27T02:10:00.000Z"
+    },
+    {
+      "id": "DEC-006",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-09-02T03:25:37.000Z",
+      "updated": "2026-09-02T03:25:37.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [],
+      "title": "El runtime se escribe con $ORION_HOME, nunca con rutas literales (2026-09-01)",
+      "reason": "El dueno pregunto si ORION ya podia trabajar a la par del PC. La respuesta era no, y no por las herramientas: los 21 archivos de agentes y skills traian 53 rutas C:\\Users\\Kalel\\ORION. Un agente arranca en blanco, lee su definicion, copia el comando y falla — o sea que el primer paso obligatorio del runtime (consultar el cerebro) estaba roto en esta maquina sin que nada lo avisara.",
+      "description": "Todo comando dentro de runtime/agents y runtime/skills usa $ORION_HOME/... con barras normales. La variable se declara UNA vez por maquina en ~/.claude/settings.json (env.ORION_HOME) — en la Mac /Users/g/orion, en el PC C:\\Users\\Kalel\\ORION — y entra en caliente, sin reiniciar la sesion. La boveda es $ORION_HOME/../ORION-Vault. Las herramientas .mjs ya resolvian process.env.ORION_HOME con autodeteccion como respaldo, asi que el arreglo fue solo en la documentacion ejecutable. || CADENA DE PROPAGACION, en este orden y sin saltarse pasos: se edita runtime/ (unica fuente de verdad), se regenera el instalador con `node tools/generar-instalador.mjs`, y se instala con `node tools/instalar-orion.mjs`. Comprobar con --check: debe decir 'sin cambios: 21'. || Se quito tambien PowerShell de las herramientas de orion-verifier (no existe en macOS) y se reescribio la regla del push en orion y orion-close, que seguian ordenando no publicar."
+    },
+    {
+      "id": "KN-021",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-09-02T03:25:37.000Z",
+      "updated": "2026-09-02T03:25:37.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "DEC-006"
+      ],
+      "fact": "MIGRAR EL REPO NO MIGRA EL RUNTIME, Y UN HECHO DE MAQUINA SIN LA MAQUINA ESCRITA AL LADO CADUCA EN SILENCIO. Dos hallazgos de la misma sesion, y el segundo es el caro. (1) La casa se mudo a la Mac el 2026-08-31 y se dio por migrada, pero el runtime NI SIQUIERA ESTABA INSTALADO: ~/.claude tenia solo lo que trae el plugin (7 agentes de fase, 5 skills) mientras el repo define 13 y 8. Faltaban arquitecto, bibliotecario, estratega, harvester, landing, traductor, y las skills orion-baul, orion-cerebro y orion-plan. Nadie lo noto porque /orion seguia respondiendo — con menos runtime. COMPROBACION BARATA en cualquier maquina nueva: `node tools/instalar-orion.mjs --check`; si dice que TODO 'se crearia', no hay nada instalado. (2) Lo caro: _permanent/KN-001 afirmaba en presente que el push por terminal no funciona, sin decir de que computador hablaba. Era del PC. La creencia viajo con la mudanza y NINGUNA sesion intento un push durante cinco semanas — dos repos de villa-broaster quedaron vacios en GitHub con su codigo suelto en ~/Downloads. El mismo veneno estaba en cerebro/temas/entorno-de-la-maquina.md, que es peor porque un TEMA se lee como restriccion del run: decia que no hay Python, que el push falla y que Bash se trunca a 8 KB, todo falso aqui. REGLA: un hecho de entorno se escribe SIEMPRE con la maquina y la fecha ('en el PC, medido el X'), o por maquina en una tabla. Sin eso no caduca: miente.",
+      "context": "Sesion 2026-09-01, pregunta del dueno: 'ya estas listo para trabajar a la par del PC?'. La respuesta honesta exigio medir, no recordar."
     }
   ],
   "archives": []

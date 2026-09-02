@@ -9,8 +9,8 @@ Norma: RFC-0008. Un plan en prosa hay que leerlo entero para usarlo; aquí el
 plan es un **registro** al que se le pregunta «¿qué sigue?». La prosa se genera
 desde el registro y nunca al revés.
 
-`$ORION_HOME` = la raíz con `ORION_STANDARD.md` (por defecto `C:\Users\Kalel\ORION`).
-Baúl: `C:\Users\Kalel\ORION-Vault`.
+`$ORION_HOME` = la raíz con `ORION_STANDARD.md` (por defecto `$ORION_HOME`).
+Baúl: `$ORION_HOME/../ORION-Vault`.
 
 ## 0. Qué te dieron
 

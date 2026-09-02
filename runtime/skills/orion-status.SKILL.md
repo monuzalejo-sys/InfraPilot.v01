@@ -9,9 +9,9 @@ Give the user a compact, current picture of the project under ORION. This is a
 READ-ONLY skill: no agents, no edits, minimal tokens.
 
 1. Locate the memory: `<outermost-repo-root>/memory/<projectId>/` (for work
-   under `C:\Users\Kalel\ORION`, that's `C:\Users\Kalel\ORION\memory\infrapilot`).
+   under `$ORION_HOME`, that's `$ORION_HOME/memory/infrapilot`).
    If there is no memory dir, say so and offer to start a first `/orion` run.
-2. Run `node C:\Users\Kalel\ORION\tools\validate-memory.mjs <memory-dir> --stats`
+2. Run `node $ORION_HOME/tools/validate-memory.mjs <memory-dir> --stats`
    — one cheap command; include its RESULT line. If INVALID, list the errors
    and offer to repair before anything else. The MODEL CALIBRATION table it
    prints is the learning signal: surface any "rate HARDER"/"CHEAPER tier"
@@ -27,7 +27,7 @@ READ-ONLY skill: no agents, no edits, minimal tokens.
    - If the validator warned about archivable objects or size, mention that a
      `/orion-close` (curation) is due.
 3b. **El cerebro, en una línea.** Corre
-   `node C:\Users\Kalel\ORION\tools\cerebro.mjs estado` e incluye una sola
+   `node $ORION_HOME/tools/cerebro.mjs estado` e incluye una sola
    línea: cuántos temas hay, cuántos objetos indexa y qué proyectos siguen sin
    ningún tema transversal. Si el proyecto que se va a trabajar aparece ahí, es
    señal de que su conocimiento está encerrado y no le sirve a nadie más.
@@ -39,8 +39,8 @@ READ-ONLY skill: no agents, no edits, minimal tokens.
    plan entero** (RFC-0008 N8-R11):
 
    ```bash
-   node C:\Users\Kalel\ORION\tools\plan.mjs estado <memory-dir>/plan.json
-   node C:\Users\Kalel\ORION\tools\plan.mjs siguiente <memory-dir>/plan.json --n 3
+   node $ORION_HOME/tools/plan.mjs estado <memory-dir>/plan.json
+   node $ORION_HOME/tools/plan.mjs siguiente <memory-dir>/plan.json --n 3
    ```
 
    Reporta el avance por nivel, el presupuesto que queda, las bloqueadas (cada

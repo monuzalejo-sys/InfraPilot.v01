@@ -1,171 +1,168 @@
 ---
 slug: entorno-de-la-maquina
-titulo: Lo que esta máquina puede y no puede hacer
-alias: [push, git push, subir el codigo, subir a github, publicar el repo, credential, credential manager, github desktop, desktop, commit, rama, remoto, terminal, consola, maquina, entorno, esta maquina, mi pc, computador, dos computadores, instalado, no esta instalado, falta instalar, python, pip, docker, node, npm, powershell, ps 5.1, bash, heredoc, comando largo, se corta, truncado, utf8, tildes, acentos, mojibake, encoding, json corrupto, puerto, puertos, localhost, launch.json, servidor local, dev server, arrancar el servidor, wifi, wifi del local, firewall, red local, red publica, lan, celular, telefono, escala de windows, permisos del agente, sandbox, scratchpad, limite de sesion]
-preguntas: ["por que no me deja hacer push desde la terminal", "por que no puedo subir el codigo a github desde aqui", "que hay instalado en esta maquina y que no", "por que el comando largo se corta a la mitad", "por que el celular no abre el sistema en la wifi del local", "en que puerto arranca cada proyecto"]
+titulo: Lo que cada máquina puede y no puede hacer (son DOS)
+alias: [push, git push, subir el codigo, subir a github, publicar el repo, credential, credential manager, github desktop, desktop, commit, rama, remoto, terminal, consola, maquina, entorno, esta maquina, mi pc, computador, dos computadores, dos maquinas, mac, macos, darwin, windows, en cual maquina estoy, instalado, no esta instalado, falta instalar, python, python3, pip, docker, brew, homebrew, node, npm, powershell, ps 5.1, bash, heredoc, comando largo, se corta, truncado, utf8, tildes, acentos, mojibake, encoding, json corrupto, puerto, puertos, localhost, launch.json, servidor local, dev server, arrancar el servidor, wifi, wifi del local, firewall, red local, red publica, lan, celular, telefono, escala de windows, permisos del agente, sandbox, scratchpad, limite de sesion, edge, chrome, chrome headless, pdf, orion_home]
+preguntas: ["en que maquina estoy trabajando", "puedo hacer push desde la terminal", "que hay instalado en esta maquina y que no", "por que el comando largo se corta a la mitad", "como genero un pdf aqui", "en que puerto arranca cada proyecto"]
 proyectos: [_permanent, infrapilot, prommter, wrd, villa-broaster, placita, estanco-contable, pollo-landing, landings]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-09-01
 ---
 
-# Lo que esta máquina puede y no puede hacer
+# Lo que cada máquina puede y no puede hacer (son DOS)
 
 ## Respuesta corta
 
-**El push por terminal no falla por tu repo: falla por la máquina.** Git Credential
-Manager no tiene consola donde pedir la clave (`no /dev/tty`) y aborta con *"User
-cancelled dialog"*. **Commitea siempre —a `main` o a una rama— y sube por GitHub
-Desktop, que ya está autenticado**, dejando escrita la lista de commits pendientes.
-La misma lógica manda en todo lo demás: aquí **no hay Python, ni Docker, ni
-poppler**; sí hay Node 24, npm, git y Edge. Y **todo comando de Bash de más de ~8 KB
-se trunca**: los archivos grandes se escriben con Write/Edit, nunca por heredoc.
-Antes de decir "no se puede", **mide qué SÍ hay** (`node -v`, `command -v python`):
-casi siempre existe el sustituto.
+**Hay dos máquinas y no se parecen: mide en cuál estás antes de citar cualquier
+límite.** `uname -s` responde en un segundo: `Darwin` es la **Mac**, cualquier otra
+cosa es el **PC Windows**. La mitad de las restricciones que este tema documentó
+durante meses son del PC y **en la Mac son falsas** — repetirlas ahí no es prudencia,
+es dar por imposible algo que funciona.
+
+**En la Mac: `git push` funciona** (`gh` autenticado como `kalelfelpem-glitch` hace de
+credential helper), **hay `python3` y `pip3`**, **no hay Edge pero hay Chrome**, y **no
+existe el techo de ~8 KB por comando**. En el PC: nada de eso — el push sale por GitHub
+Desktop, no hay Python, y el heredoc largo se trunca.
+
+Lo que NO cambia de máquina: **medir antes de rendirse**, y no confundir *"la máquina
+no puede"* con *"el agente murió"*.
 
 ## Por qué (qué lo pagó)
 
-Lo pagó el primer commit de ORION. El 2026-07-01, `git push -u origin main` murió con
-el diálogo de Git Credential Manager cancelado y sin `/dev/tty` donde pedir
-credenciales (`infrapilot/KN-001`). El hecho se ascendió a machine-level porque no
-era del repo: pasa en **todos** los repos de esta máquina (`_permanent/KN-001`). Hoy
-sigue vigente: `git config --global` devuelve `credential.helper=manager`, y GitHub
-Desktop está instalado en `C:\Users\Kalel\AppData\Local\GitHubDesktop`.
+Lo pagó una creencia que sobrevivió a su propia máquina. `_permanent/KN-001` decía
+—en presente, sin decir de qué computador hablaba— que el push por terminal no
+funciona. Nació de un fallo real: el 2026-07-01, en el PC, `git push -u origin main`
+murió con el diálogo de Git Credential Manager cancelado y sin `/dev/tty`
+(`infrapilot/KN-001`). De ahí salió una política sensata para ESE computador:
+autocommitear y no empujar nunca (`infrapilot/DEC-005`).
 
-De ahí salió una política, no un parche: ORION **autocommitea al pasar verificación y
-nunca hace push**, y lista los commits pendientes para el dueño
-(`infrapilot/DEC-005`). El costo de no tenerla escrita se ve en la cola: siete
-commits esperando en `infrapilot/PEND-004`, seis repos por re-agregar más los commits
-del asadero en `prommter/PEND-001`, y el primer push nunca hecho de
-`pollo-landing/PEND-002`.
+El problema es que la casa se mudó a la Mac el 2026-08-31 y **la creencia se mudó con
+ella**. Ninguna sesión intentó un push durante semanas porque la memoria decía que era
+imposible. El costo se puede señalar con el dedo: **`villa-app-repo` y
+`Equipo-villa-broaster` estuvieron cinco semanas vacíos en GitHub** mientras su código
+vivía suelto en `~/Downloads` sin control de versiones, y nadie lo notó — un repo vacío
+no da error, solo silencio (`villa-broaster/KN-016`). El 2026-09-01 el dueño derogó la
+regla y los dos subieron por terminal en un minuto; la política nueva está en
+`_permanent/DEC-001`.
 
-**La trampa más cara de este tema es una memoria que se contradice sola.**
-`villa-broaster/KN-014` registra como patrón *"git commit + git push origin
-feature/roles-puestos mantiene main limpio"*. Comprobado el 2026-08-24 en
-`C:\Users\Kalel\prommter\proyectos\villa-broaster\broaster-app`: la rama
-`feature/roles-puestos` existe **local**, y `git remote -v` no devuelve **nada** — no
-hay remoto, así que ese push no ocurrió nunca. La mitad buena del patrón (commitear a
-una rama en vez de dejarlo en stash) es real y salvó el trabajo; la mitad del push es
-un recuerdo inventado por un agente que asumió una máquina normal.
+La lección que deja no es sobre git. Es que **un hecho de máquina sin la máquina escrita
+al lado caduca en silencio** y se lleva por delante decisiones enteras. Por eso este
+tema pasó de hablar de "esta máquina" a hablar de las dos.
 
-El resto de los límites también se pagaron con fallos concretos:
+## Lo que hay en cada una
 
-- **Sin Python**: no hay `python` ni `python3`, así que reportlab/pypdf no son opción;
-  se descubrió generando el plan del asadero (`_permanent/KN-004`). Tampoco hay
-  `pdftoppm`, así que Read no renderiza páginas de PDF (`_permanent/KN-005`).
-- **Bash se trunca a ~8 KB**: un heredoc de ~150 líneas reventó con *unexpected EOF*
-  en la línea 145 y **no creó el archivo**; además el wrapper colapsa `\\` en `\`.
-  Pagado el 2026-08-21 escribiendo `edge-cdp.mjs` (`_permanent/KN-011`).
-- **PowerShell 5.1 corrompe UTF-8**: un `Get-Content -Raw` + `-replace` +
-  `Set-Content -Encoding utf8` sobre un JSON sin BOM lo devolvió con BOM y mojibake, y
-  el validador ORION reventó con *Unexpected token* (`prommter/KN-002`).
-- **El clasificador de permisos bloquea dos cosas**: `npm install` desde una URL/CDN, e
-  INSERT/UPDATE/DELETE contra bases compartidas sin permiso explícito
-  (`infrapilot/KN-019`). Por eso el parche del `xlsx` de SheetJS quedó como tarea del
-  dueño y no como algo que un agente pueda forzar (`infrapilot/KN-017`).
-- **El celular del dueño no entra por WiFi** aunque el server escuche en `0.0.0.0`: la
-  red del local está categorizada como **pública** en Windows y el firewall corta las
-  entrantes a node (`wrd/KN-009`).
+Medido el 2026-09-01 en la Mac y el 2026-08-24 en el PC:
 
-Y una barrera que resultó ser falsa, que es la razón de medir antes de rendirse: se
-creía que no se podía probar SQL sin Supabase ni Docker. `npm i embedded-postgres`
-levanta un PostgreSQL **18.4 real** en el scratchpad; así se validó
-`001_rol_actual.sql` con 37/37 asserts (`estanco-contable/KN-008`).
+| | Mac (`Darwin 22.6.0`, x86_64) | PC (Windows) |
+|---|---|---|
+| `git push` por terminal | **SÍ** — `gh` es el helper | NO — Credential Manager sin `/dev/tty` |
+| Python | **SÍ** — `python3` 3.9.6 y `pip3` | NO |
+| Navegador Chromium | **Chrome** (no hay Edge) | **Edge** en `Program Files (x86)` |
+| Viewport móvil real <480 px | **SÍ**, respeta 390 exactos | NO — Edge calculaba a ~480 |
+| Techo por comando de Bash | **sin techo** (15 KB entraron enteros) | ~8 KB, y trunca sin avisar |
+| `pdftoppm` / poppler | NO (pero hay `brew`) | NO |
+| Docker | NO | NO |
+| Node / npm / git | v24.18.0 · 11.16.0 · 2.39.2 | v24.16.0 · 11.13.0 · 2.55.0 |
+
+`ORION_HOME` vale `/Users/g/orion` en la Mac (declarado en `~/.claude/settings.json`) y
+`C:\Users\Kalel\ORION` en el PC. **Todo comando del runtime se escribe con la variable,
+nunca con la ruta literal** — es lo que hace que los mismos 21 archivos de agentes y
+skills sirvan en las dos.
 
 ## Cómo se aplica
 
-1. **Git, siempre igual**: `git add` + `git commit` (a `main` o a `feature/*`), y
-   **parar ahí**. Escribe el pendiente con los hashes exactos y el repo, para que el
-   dueño lo suba en GitHub Desktop en un minuto. Nunca `git push`.
-2. **Diagnostica antes de culpar al credential manager**: si `git remote -v` sale
-   vacío, el problema no es la autenticación, es que **falta crear el remoto** — ese
-   es el caso de `pollo-landing/PEND-002` y de `broaster-app` hoy.
-3. **Mide el entorno, no lo supongas**: `node -v`, `npm -v`, `git --version`,
-   `command -v python`, `command -v docker`. Cuesta un segundo y evita media hora de
-   plan imposible.
-4. **Archivos grandes con Write/Edit**; comandos Bash cortos (<~5 KB) y sin depender
-   de backslashes literales (`_permanent/KN-011`).
-5. **JSON y UTF-8 jamás con cmdlets de PS 5.1**: usa Edit o node. Si ya se corrompió,
-   `git checkout` del archivo y volver a aplicar con Edit (`prommter/KN-002`).
-6. **Puertos, de un archivo, no de memoria** — `C:\Users\Kalel\fable 5\.claude\launch.json`:
-   `wrd` 4181 (línea 8), `broaster-app` 3200 (14), `villa-app` 3201 (20), `placita`
-   3300 (26). Ese archivo es **compartido entre sesiones de proyectos distintos**: otra
-   sesión puede pisarlo, así que verifica que tu entrada siga ahí antes de arrancar
-   (`wrd/KN-001`).
-7. **Para probar desde el celular**: el server escucha en `0.0.0.0` e imprime la IP LAN
-   al arrancar (es DHCP: léela del log, no la memorices). Si no entra, es el perfil de
-   red — lo cambia **el dueño**: Configuración → Red e Internet → marcar "Red privada"
-   (`wrd/KN-009`).
-8. **Lo que solo puede hacer el dueño se escribe como Pending, no se intenta**: push,
-   `npm install` desde URL, escrituras a la base compartida, ajustes de seguridad de
-   Windows (`infrapilot/KN-019`, `infrapilot/KN-017`).
-9. **Cuidado con el navegador de esta máquina en `localhost:3300`**: su localStorage
-   guarda facturas de PRUEBA completas; si alguien configura ahí la clave de caja, la
-   siguiente sincronización sube datos falsos al negocio vivo (`placita/RSK-004`).
+1. **Mide la máquina antes de citar un límite**: `uname -s`, y si hace falta
+   `command -v python3`, `node -v`, `command -v docker`. Cuesta un segundo y evita
+   media hora de plan imposible — o, peor, dar por muerto algo que funciona.
+2. **En la Mac, publicar es parte de terminar**: al pasar la verificación se commitea
+   **y se empuja** (`_permanent/DEC-001`). Siguen pidiendo permiso `--force`,
+   reescribir historia publicada, borrar ramas remotas, y empujar a una `main` que
+   exija PR. En el PC, commitear y dejar la lista para GitHub Desktop.
+3. **Si un push grande muere con `RPC failed; HTTP 400 curl 22`, no es un permiso: es
+   el buffer.** `git config http.postBuffer 524288000` en ese repo y entra. Lo pagó el
+   repo del equipo, con 19 MB de PDFs.
+4. **Diagnostica antes de culpar a la autenticación**: si `git remote -v` sale vacío,
+   falta crear el remoto. Y antes de dar una historia por perdida, **pregúntale al
+   remoto** con `git ls-remote --heads origin` — los 35 commits del sistema de
+   villa-broaster estaban en GitHub mientras el clon local parecía vacío
+   (`villa-broaster/KN-035`).
+5. **PDF**: en la Mac, Chrome headless con `--print-to-pdf` sobre un HTML con
+   `@page`/`@media print` (`_permanent/KN-004`). Se verifica parseando la estructura con
+   node —`%PDF-`, contar `/Type /Page`, cerrar en `%%EOF`— porque `pdftoppm` no está
+   (`_permanent/KN-005`).
+6. **QA visual**: `node $ORION_HOME/tools/edge-cdp.mjs`, que localiza el navegador según
+   la plataforma (`_permanent/KN-010`). Si una medida sale rara, lo primero que hay que
+   mirar es si la página trae `<meta name="viewport">`: sin él, `innerWidth` se va a 980
+   sin importar lo que pidas (`_permanent/KN-009`).
+7. **Archivos grandes con Write/Edit igual**, aunque en la Mac el heredoc aguante: el
+   heredoc no avisa cuando algo sale mal a la mitad.
+8. **Comparar un árbol traído del PC contra un checkout en la Mac miente**: CRLF contra
+   LF marcó 166 archivos como distintos con cero diferencias reales. `diff
+   --strip-trailing-cr` (`villa-broaster/KN-035`). Y los archivos venidos de Windows
+   llegan con modo 700: git los ve como `100755` y ensucia el árbol con cambios de modo
+   sin contenido — `chmod 644/755` después de copiar.
+9. **Lo que solo puede hacer el dueño se escribe como Pending, no se intenta**:
+   `npm install` desde URL, escrituras a bases compartidas, ajustes de seguridad del
+   sistema, e invitaciones y protección de ramas en GitHub (`infrapilot/KN-019`).
+10. **Puertos, de un archivo, no de memoria** — `$ORION_HOME/.claude/launch.json`. En la
+    Mac hoy: `placita` 3300, `placita-pos` 4173. En el PC el archivo era compartido entre
+    sesiones y otra podía pisarlo, así que verifica tu entrada antes de arrancar
+    (`wrd/KN-001`).
 
 ## Cuándo NO aplica
 
 - **No confundas "la máquina no puede" con "el agente murió"**. Cuando un builder cae
   por límite de sesión, el código normalmente **ya está en disco**: audita disco, `tsc`
-  y build antes de re-spawnear — en una corrida los 4 builders muertos habían entregado
-  (`estanco-contable/KN-009`), y en otra el trabajo ya estaba commiteado
-  (`villa-broaster/KN-014`). Ver [[TEMA-olas-de-agentes]].
-- **Estas son verdades de ESTA máquina, no del stack ni de la máquina del cliente.** En
-  el mostrador de la plaza el sistema corre con `npm start -p 3300` desde
-  `iniciar-mercaplaza.bat` y el estado vive en el navegador: **2 PCs = 2 inventarios**
-  (`placita/KN-008`). Nada de lo de arriba explica eso.
-- **Toda medición tiene fecha.** El caso de `embedded-postgres` demuestra que una
-  imposibilidad puede caducar (`estanco-contable/KN-008`): si dudas, vuelve a medir
-  antes de repetir la restricción.
-- **Para juzgar cómo se VE algo**, este tema no es la fuente: el navegador embebido y
-  Edge headless tienen trampas propias (viewport mínimo ~492 px, `prefers-reduced-motion`
-  forzado, escala de Windows al 125%) que están en `landings/KN-003`, `_permanent/KN-008`,
-  `_permanent/KN-009` y `_permanent/KN-010`. Ver [[TEMA-verificar-con-evidencia]].
+  y build antes de re-spawnear (`estanco-contable/KN-009`, `villa-broaster/KN-014`).
+  Ver [[TEMA-olas-de-agentes]].
+- **Estas son verdades de las máquinas de trabajo, no del stack ni de la máquina del
+  cliente.** En el mostrador de la plaza el sistema corre con `npm start -p 3300` y el
+  estado vive en el navegador: **2 PCs = 2 inventarios** (`placita/KN-008`).
+- **Toda medición tiene fecha, y este tema es la prueba.** Media docena de sus
+  afirmaciones caducaron al cambiar de computador sin que nadie lo notara. Si dudas,
+  vuelve a medir antes de repetir la restricción — es más barato que la restricción.
+- **Los límites de PowerShell son del PC y allá siguen vigentes**: PS 5.1 corrompe JSON
+  UTF-8 con BOM y mojibake (`prommter/KN-002`). En la Mac no existe PowerShell, y por eso
+  se quitó de las herramientas de `orion-verifier`.
 
 ## Evidencia
 
-Medición propia del 2026-08-24 en esta máquina:
+Medición propia del 2026-09-01 en la Mac:
 
 ```
-node v24.16.0 · npm 11.13.0 · git 2.55.0.windows.1
-python: NO · python3: NO · pdftoppm: NO · docker: NO
-msedge: SI  (C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe)
-git config --global → credential.helper=manager
-GitHub Desktop: C:\Users\Kalel\AppData\Local\GitHubDesktop  (instalado)
-broaster-app → rama local feature/roles-puestos · git remote -v: (vacío)
+uname -s → Darwin 22.6.0 · x86_64
+node v24.18.0 · npm 11.16.0 · git 2.39.2
+python3 3.9.6 · pip3 SI · docker NO · pdftoppm NO · brew 6.0.20
+gh auth status → Logged in to github.com account kalelfelpem-glitch
+git config --global credential.helper → (sin helper global; gh lo provee)
+Chrome SI (/Applications/Google Chrome.app) · Edge NO
+push real: villa-app-repo 09859a5..de20b97 · Equipo-villa-broaster 4f91358..f3b5fe3
 ```
 
-- `_permanent/KN-001` — push por terminal imposible; GitHub Desktop es la vía. Aplica a todo repo de la máquina.
-- `infrapilot/KN-001` — el fallo original (`git push -u origin main`, 2026-07-01) del que salió el hecho.
-- `infrapilot/DEC-005` — política: autocommit al pasar verificación, push manual.
-- `infrapilot/PEND-004`, `prommter/PEND-001`, `pollo-landing/PEND-002` — la cola real de commits sin subir.
-- `villa-broaster/KN-014` — contradicción documentada: registra un `git push origin feature/*` que la máquina no permite; la rama existe local y sin remoto.
-- `_permanent/KN-004` — no hay Python; Edge headless en `Program Files (x86)` es el sustituto.
-- `_permanent/KN-005` — no hay `pdftoppm`: un PDF se verifica parseando su estructura con node.
-- `_permanent/KN-011` — Bash se trunca a ~8 KB y colapsa `\\`; archivos grandes con Write.
-- `prommter/KN-002` — PowerShell 5.1 corrompe JSON UTF-8 (BOM + mojibake); recuperación con `git checkout` + Edit.
-- `infrapilot/KN-019` — dos bloqueos del clasificador de permisos: `npm install` por URL y escrituras a BD compartida.
-- `infrapilot/KN-017` — consecuencia: el upgrade de `xlsx` por tarball CDN es acción manual del dueño.
-- `estanco-contable/KN-008` — se puede probar SQL real aquí: `embedded-postgres` (PostgreSQL 18.4) en el scratchpad, 37/37.
-- `wrd/KN-001` — `.claude/launch.json` es compartido entre sesiones; el puerto de wrd ya cambió de 4180 a 4181.
-- `wrd/KN-009` — firewall + WiFi "pública" bloquean el celular; lo arregla el dueño.
-- `placita/KN-008` — producción local: `iniciar-mercaplaza.bat`, `npm start -p 3300`, 2 PCs = 2 inventarios.
-- `placita/RSK-004` — el localStorage de `localhost:3300` de esta máquina contiene facturas de prueba.
-- `estanco-contable/KN-009` — muerte por límite de sesión ≠ falta de capacidad: el código ya suele estar en disco.
-- Puertos verificables: `C:\Users\Kalel\fable 5\.claude\launch.json:4-27`.
-- Herramienta de QA visual instalada y verificada: `C:\Users\Kalel\ORION\tools\edge-cdp.mjs` (`_permanent/KN-010`).
+- `_permanent/KN-001` — corregido: el push funciona aquí; el hecho viejo era del PC.
+- `_permanent/DEC-001` — política nueva: publicar es parte de terminar, con sus límites.
+- `_permanent/KN-004`, `KN-005` — PDF con Chrome; verificación sin poppler.
+- `_permanent/KN-009`, `KN-010` — el piso de viewport era de Edge; la herramienta ya es multiplataforma.
+- `_permanent/KN-011` — el techo de ~8 KB por comando era de Windows.
+- `_permanent/KN-018` — el kit completo de la Mac, pieza por pieza.
+- `villa-broaster/KN-016` — los repos vacíos y sus cinco semanas de silencio.
+- `villa-broaster/KN-035` — preguntarle al remoto antes de dar una historia por perdida; CRLF y modos 700.
+- `infrapilot/DEC-005` — la política vieja de autocommit, ya alineada con DEC-001.
+- `prommter/KN-002` — PowerShell 5.1 corrompe JSON UTF-8 (solo PC).
+- `estanco-contable/KN-008` — se puede probar SQL real: `embedded-postgres` en el scratchpad, 37/37.
 
 ### Huecos explícitos (el corpus NO lo respalda)
 
-- **No hay ninguna nota sobre si `git fetch`/`clone`/`pull` funcionan** en esta máquina.
-  Todo lo documentado es sobre `push`. No supongas que fallan igual: mídelo.
-- **No hay evidencia de despliegue a internet desde aquí.** `pollo-landing/PEND-001` y
-  `arroces/PEND-004` siguen bloqueados por "definir hosting"; ningún objeto describe un
-  deploy ejecutado desde esta máquina.
-- **No hay nota de impresora, báscula ni lector de barras conectados a ESTA máquina**;
-  lo que existe es código de esos periféricos en el sistema del local.
+- **No hay evidencia de despliegue a internet desde ninguna de las dos máquinas.**
+  `pollo-landing/PEND-001` y `arroces/PEND-004` siguen bloqueados por "definir hosting".
+- **Los síntomas del navegador embebido (`_permanent/KN-007`, `KN-008`) no se
+  reverificaron en la Mac.** La lección —la verdad visual es un navegador de verdad, no
+  el pane— se sostiene; los síntomas concretos, no están medidos aquí.
+- **No hay nota de impresora, báscula ni lector de barras conectados a la Mac.**
+- **El firewall y el WiFi "pública" que bloqueaban el celular (`wrd/KN-009`) son del
+  PC.** En la Mac no se ha probado el acceso desde el celular por LAN.
 
 ## Enlaces
 
-- [[TEMA-verificar-con-evidencia]] — cómo se mide un resultado en esta máquina (Edge, capturas, PDF).
+- [[TEMA-verificar-con-evidencia]] — cómo se mide un resultado (navegador, capturas, PDF).
 - [[TEMA-olas-de-agentes]] — qué hacer cuando el límite de sesión mata builders.
 - [[TEMA-modelos-y-costos]] — el otro límite duro del entorno: cuánto cuesta cada spawn.

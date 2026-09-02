@@ -39,7 +39,7 @@ dueño pide lo contradice, **eso va en el encargo como TENSIÓN**, no lo resuelv
 tú y tampoco lo escondes.
 
 `$ORION_HOME` = la raíz que contiene `ORION_STANDARD.md`. Te la da el
-orquestador; si no, usa `C:\Users\Kalel\ORION`.
+orquestador; si no, usa `$ORION_HOME`.
 
 ## 2. Lee el original DOS veces antes de escribir
 
@@ -99,7 +99,7 @@ Formato exacto, en español, ≤70 líneas. Sin preámbulo.
 ## Vocabulario
 | Él dice | Es | Dónde vive |
 |---|---|---|
-| baúl | la bóveda de Obsidian | C:\Users\Kalel\ORION-Vault |
+| baúl | la bóveda de Obsidian | $ORION_HOME/../ORION-Vault |
 ```
 
 ## 4. Las cinco reglas que te hacen fiable

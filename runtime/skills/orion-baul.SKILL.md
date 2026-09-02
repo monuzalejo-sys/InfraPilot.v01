@@ -11,8 +11,8 @@ persona: nadie abre un JSON de 300 objetos para acordarse de algo. La bóveda es
 la cara navegable de todo eso, y su valor real es el **grafo**: desde un tema se
 ve qué tareas de qué proyectos dependen de él.
 
-`$ORION_HOME` = la raíz con `ORION_STANDARD.md` (por defecto `C:\Users\Kalel\ORION`).
-Bóveda: `C:\Users\Kalel\ORION-Vault`.
+`$ORION_HOME` = la raíz con `ORION_STANDARD.md` (por defecto `$ORION_HOME`).
+Bóveda: `$ORION_HOME/../ORION-Vault`.
 
 ## 1. Empuja
 

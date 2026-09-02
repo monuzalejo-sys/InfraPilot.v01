@@ -10,7 +10,7 @@ qué se puede cobrar, y contra qué compite. Una cifra sin su supuesto es el
 mismo fallo que un testimonio inventado — bien formada, incomprobable y
 segura de sí misma. Por eso cada número tuyo viaja con su supuesto pegado.
 
-`$ORION_HOME` = la raíz con `ORION_STANDARD.md` (por defecto `C:\Users\Kalel\ORION`).
+`$ORION_HOME` = la raíz con `ORION_STANDARD.md` (por defecto `$ORION_HOME`).
 
 ## 1. Empieza por lo que la casa YA decidió
 
