@@ -1,0 +1,1072 @@
+{
+  "projectId": "villa-broaster",
+  "sessionCount": 27,
+  "sessions": [
+    {
+      "sessionId": "session-2026-08-01-semilla",
+      "runId": "orion-asadero-semilla",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-01T00:00:00.000Z",
+      "completedAt": "2026-08-01T00:00:00.000Z",
+      "objectsCreated": 11,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "notes": "Memoria sembrada con las decisiones de diseno acordadas con el dueno. Sin codigo todavia."
+    },
+    {
+      "sessionId": "session-2026-08-08-foco-broaster",
+      "runId": "orion-asadero-foco-broaster",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-08T00:00:00.000Z",
+      "completedAt": "2026-08-08T00:00:00.000Z",
+      "objectsCreated": 3,
+      "objectsMerged": 1,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [],
+      "notes": "Run de planificacion inline (sin spawns): foco del proyecto movido al cliente broaster (DEC-002), modelo broaster documentado (KN-004), pendiente de datos del cliente broaster (PEND-003), PEND-001 generalizado a ambos clientes con mitigacion (interfaz de facturacion). Plan de pendientes/mejoras entregado al dueno en conversacion. Sin codigo todavia."
+    },
+    {
+      "sessionId": "session-2026-08-08-build-broaster-app",
+      "runId": "orion-asadero-build-web",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-08T00:00:00.000Z",
+      "completedAt": "2026-08-08T00:00:00.000Z",
+      "objectsCreated": 4,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 53661,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "planning",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 15755,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:infra",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 79625,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 114853,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 72610,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:api",
+          "model": "haiku",
+          "verdict": "ok",
+          "tokens": 48670,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 113647,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 137823,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "haiku",
+          "verdict": "ok",
+          "tokens": 49765,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 46091,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "Build completo de broaster-app (web, no POS): dominio+contabilidad (opus, 39 tests), ola A paralela (landing opus + suscriptores haiku + pedido sonnet), ola B paralela (admin sonnet + comprobante haiku). QA final 9/9 PASS. 0 fix-cycles, 0 muertes de agentes (7 builders + analista + planner + verifier). Checkpoint 2 verificado por el orquestrador en navegador (pedido e2e L1-0001); pane oculto obligo a javascript_tool/form_input en vez de clicks del computer tool. Commit 5abe2d9 (push manual pendiente). Objetos: DEC-003, KN-005, KN-006, PEND-004."
+    },
+    {
+      "sessionId": "session-2026-08-10-villa-broaster",
+      "runId": "orion-asadero-villa-broaster",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-10T00:00:00.000Z",
+      "completedAt": "2026-08-10T00:00:00.000Z",
+      "objectsCreated": 4,
+      "objectsMerged": 3,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 65146,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 123822,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:api",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 68142,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 147427,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 136028,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 67067,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "Run completado: broaster-app pasó de placeholder a marca real Villa Broaster + login endurecido + modulo de gastos + rediseno rojo/amarillo. QA 8/8 PASS, 0 fix-cycles. 4 builders paralelos + analista + verifier. 0 muertes de agentes. Nota calibracion: build:lib BAJO de opus a sonnet respecto run anterior y salio ok con 0 fix-cycles — la palanca funcionó. Planning fue inline del orquestrador (sin medicion)."
+    },
+    {
+      "sessionId": "session-2026-08-10-mejoras",
+      "runId": "orion-asadero-mejoras-comparativa",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-10T00:00:00.000Z",
+      "completedAt": "2026-08-10T00:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 1,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 137007,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "haiku",
+          "verdict": "ok",
+          "tokens": 44440,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 85741,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "Run de mejoras: comparativa entre sedes + CSV contador (sonnet, e2e cuadro exacto), SEO/OG/favicon (haiku — trabajo tecnico ok pero invento la ciudad 'Rionegro' y duplico themeColor: 2 correcciones inline del orquestrador, ver KN-008), fix eslint PEND-005 inline (build:infra sin medicion). Analisis y planning INLINE: la memoria (brief + KN-005/DEC-002) cubrio el analisis — 0 spawns de fases cognitivas, solo 2 builders + verifier. QA 8/8 PASS, 0 fix-cycles. Reflexion inline del orquestrador (esta entrada)."
+    },
+    {
+      "sessionId": "session-2026-08-15-pivote-villa-app",
+      "runId": "orion-asadero-pivote-villa-app",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-15T00:00:00.000Z",
+      "completedAt": "2026-08-15T00:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 2,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 1,
+      "modelOutcomes": [
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 47292,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 89031,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 157218,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 73142,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "Pivote dos caras: villa-app (pública, stateless, :3201) + broaster-app (contable, :3200, landing/pedido borrados). QA 8/8 PASS con 1 fix-cycle trivial (metadata title /admin, fix inline orquestrador). Cross-flow verificado: orden L1-0001 creada desde villa-app vía proxy = misma orden y total en admin. Planning inline. Dev servers de builders quedaron corriendo (:3200, :3201). El QA usó Playwright/Edge headless propio porque los clicks del pane embebido no llegan al DOM. Objetos: DEC-007 (pivote), KN-009 (promos sin descuento falso), KN-005 (actualizado mapa bifurcado), PEND-004 (actualizado bifurcación)."
+    },
+    {
+      "sessionId": "session-2026-08-15-prompt-design",
+      "runId": "orion-asadero-prompt-claude-design",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-15T00:00:00.000Z",
+      "completedAt": "2026-08-15T00:00:00.000Z",
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [],
+      "notes": "Run trivial inline (0 spawns): prompt para Claude Design del rediseno visual de villa-app, con TODOS los datos reales embebidos (sedes/carta 23 productos/promos y cupones/paleta #e01e2b-#ff8a20/reglas KN-009 sin descuentos falsos y KN-008 no inventar datos). Entregable: C:/Users/Kalel/asadero/Prompt-Claude-Design-VillaApp.md, enviado al dueno y committeado."
+    },
+    {
+      "sessionId": "session-2026-08-20-sistema-completo",
+      "runId": "orion-asadero-sistema-completo",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-20T00:00:00.000Z",
+      "completedAt": "2026-08-20T00:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 1,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 63318,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 192625,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 166137,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "haiku",
+          "verdict": "ok",
+          "tokens": 72122,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 131051,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:visual",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 242961,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 112544,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "3 olas secuenciadas sin colision de archivos (A ordenes-vivo + B catalogo-dominio + C confirmacion-viva en paralelo; D UI catalogo; E pulido visual). QA 8/8 PASS. 0 fix-cycles (D auto-corrigio el bug de step nativo durante su build). CALIBRACION: build:visual INTERIOR bajo de opus a sonnet y salio ok — el registro sobrio del interior no necesita opus (la vitrina publica si lo uso en runs previos); build:lib sonnet ok por 2a vez consecutiva. El verifier sobrevivio 2 muertes de infra reanudado via SendMessage (no cuenta contra sonnet). Planning inline."
+    },
+    {
+      "sessionId": "session-2026-08-20-bases-caja",
+      "runId": "orion-asadero-bases-caja",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-20T00:00:00.000Z",
+      "completedAt": "2026-08-20T00:00:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 98166,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "Run de DISENO (sin build): bases del modulo de Caja para pedidos en punto fisico, con analisis comparativo de placita (que adoptar: cobro-en-bloque, grilla sin scroll, modulo puro; que no: bascula, multi-factura, PIN; hallazgo: placita NO tiene turnos de caja, TurnoCaja se disena desde cero con KN-001 de arroces). Entregable BASES-CAJA.md (commit a5686c1) + PEND-006 con plan de 5 pasos. Mismo run: repo MOVIDO a C:/Users/Kalel/prommter/proyectos/asadero (migracion empresa Prommter, ver memoria prommter), launch.json editado, smoke test PASS (23 productos por proxy, raiz 307). Diseno y reflexion inline del orquestrador."
+    },
+    {
+      "sessionId": "session-2026-08-22-repo-cliente-equipo",
+      "runId": "orion-villa-broaster-repo-cliente",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-22T00:00:00.000Z",
+      "completedAt": "2026-08-22T00:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 2,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 1,
+      "modelOutcomes": [
+        {
+          "phase": "build:visual",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 119494,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 72162,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "Análisis y planning INLINE del orquestrador (inventario en contexto; 'Orama' resuelto buscando en la máquina: cliente real con plantilla de login). Reorganización del repo con git mv (historia intacta), docs de equipo escritas por el orquestrador (facts-heavy, evitando invención de builders baratos). build:visual login en sonnet OK (2a vez consecutiva que sonnet basta para visual con referencia clara). QA 6/7 + 1 fix trivial de doc inline. Lección: el verificador aplicó la plantilla de tarjetas del propio repo a la tarjeta del dueño — las reglas escritas valen para todos. DEC-008 (repo y plan), KN-012 (login Orama), KN-005 (actualizado repo), PEND-004 (actualizado asignaciones)."
+    },
+    {
+      "sessionId": "session-2026-08-22-plan-equipo-tres-repos",
+      "runId": "orion-villa-broaster-plan-equipo",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-22T00:00:00.000Z",
+      "completedAt": "2026-08-22T00:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 2,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 179884,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 146963,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 56401,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "Dos builders paralelos (interactivo opus / PDFs sonnet) + actualización en vuelo por SendMessage cuando el dueño pidió separar repos; split de repos inline del orquestrador con subtree; QA 7/7 PASS. Calibración: build:visual opus ok para pieza de cara al equipo (alto estándar Orama); build:page sonnet ok para documentos formales largos. Análisis y planning inline. DEC-009 (tres repos), KN-013 (plan equipo dos piezas), KN-005 y PEND-004 actualizados."
+    },
+    {
+      "sessionId": "session-2026-08-22-planes-v2-marketing",
+      "runId": "orion-villa-broaster-planes-v2",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-22T14:00:00.000Z",
+      "completedAt": "2026-08-22T16:00:00.000Z",
+      "objectsCreated": 4,
+      "objectsMerged": 1,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 77953
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 295585
+        },
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 300726
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 185556
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 95742
+        }
+      ],
+      "notes": "Reenfoque + rediseño por feedback del proyecto (el primer plan interactivo fue rechazado visualmente; el segundo, vara Orama, quedó). Roles/puestos (build:lib opus) terminó completo y en verde pero se pausó en rama por orden literal. 4 muertes por límite de sesión reanudadas por SendMessage. Planning inline; analisis sonnet sobre la placita. QA formal del run pendiente (PEND-008 barrido de pruebas); los PDFs validados estructuralmente y por captura. DEC-010 (planes v2), PEND-007 (pausado en rama), PEND-008 (QA formal), KN-014 (lecciones operativas), KN-005 (actualizado con T-11 y docs)."
+    },
+    {
+      "sessionId": "session-2026-08-23-ritual-semanal",
+      "runId": "orion-villa-broaster-ritual-semanal",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-23T00:00:00.000Z",
+      "completedAt": "2026-08-23T00:00:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 122153,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "Ritual semanal de avance (DEC-011): docs/semanal con avance.json (juicio de ORION), plantilla celular, generar.mjs y PDF semana 1 (11 pags). Un builder sonnet; planning inline; reflexion inline del orquestador. El builder hallo y corrigio un desborde de portada; confirmo la regla de capturas: edge-cdp.mjs --shot, no --screenshot plano."
+    },
+    {
+      "sessionId": "session-2026-08-23-close-curation",
+      "runId": "orion-villa-broaster-curation",
+      "triggeredBy": "SESSION_CLOSE",
+      "startedAt": "2026-08-23T00:00:00.000Z",
+      "completedAt": "2026-08-23T00:00:00.000Z",
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "notes": "Curación de cierre de sesión (AMM): evaluación de 37 objetos activos (DEC-001..011 Accepted, KN-001..014 Current, PEND-001..008 Blocked/Ready, ROAD-001..005 Planned). Decisión: NO hay objetos claramente terminales para archivar. DEC-008/009 NO son redundantes con DEC-010/011 (cada uno registra una decisión distinta del proyecto). version bump a 14, snapshotDate actualizado. brief.md: línea sobre DEC-011 agregada sin regeneración completa."
+    },
+    {
+      "sessionId": "session-2026-08-23-qa-sitio-contabilidad",
+      "runId": "orion-villa-broaster-qa-sitio-contabilidad",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-23T01:00:00.000Z",
+      "completedAt": "2026-08-23T02:30:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 1,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "qa:sistema",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 174417,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "qa:vitrina",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 133270,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 88102,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 102038,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 77459,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "PEND-008 cerrado: barrido QA de sistema y vitrina (390/1280, API+navegador), 6 hallazgos, 5 corregidos en 2 builders paralelos, QAReport PASS 10/10, commits vitrina 8864817 y sistema abe11fe. Analisis/planning/reflexion inline. El usuario pidio velocidad al cierre: PDFs no regenerados."
+    },
+    {
+      "sessionId": "session-2026-08-23-referencia-hero",
+      "runId": "orion-villa-broaster-referencia-hero",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-23T03:00:00.000Z",
+      "completedAt": "2026-08-23T03:00:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [],
+      "notes": "Trivial inline: guardar spec de hero carrusel (TOONHUB) como referencia en docs/referencias + nota en T-07 + PEND-009. Sin spawns."
+    },
+    {
+      "sessionId": "session-2026-08-23-relectura-planes",
+      "runId": "orion-villa-broaster-relectura-planes",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-23T05:10:00.000Z",
+      "completedAt": "2026-08-23T05:50:00.000Z",
+      "objectsCreated": 0,
+      "objectsMerged": 1,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 299402,
+          "measurement_mode": "MEASURED"
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 254111,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "Relectura de planes por 2 builders paralelos con verificacion propia (edge-cdp, conteo de paginas). Orquestador verifico inline (grep de fixes + integridad de 5 PDFs). Sin verifier separado: tarea de prosa, evidencia ya medida."
+    },
+    {
+      "sessionId": "session-2026-08-24-prompt-v3-landing",
+      "runId": "orion-villa-broaster-prompt-v3",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-23T22:00:00.000Z",
+      "completedAt": "2026-08-24T02:00:00.000Z",
+      "objectsCreated": 0,
+      "objectsMerged": 1,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 1,
+      "modelOutcomes": [
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 1083934,
+          "measurement_mode": "MEASURED"
+        }
+      ],
+      "notes": "Rediseno v3 tras rechazo del v2. Workflow de 11 agentes (4 direcciones de arte en paralelo, 2 jurados con lentes distintas, 1 redactor, 3 verificadores adversariales, 1 corrector). El panel evito el fallo del v2: dos de los tres verificadores hallaron BLOQUEA reales (mandaba dibujar 23 productos citando solo 10 -> el medio habria inventado 13 nombres y precios; promos sin copy real). Leccion transversal ya en memoria landings: el medio importa tanto como la direccion."
+    },
+    {
+      "sessionId": "session-2026-08-24-app-instalable-y-roles",
+      "runId": "orion-villa-broaster-bloque-1-roles",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-24T19:00:00.000Z",
+      "completedAt": "2026-08-25T02:30:00.000Z",
+      "objectsCreated": 6,
+      "objectsMerged": 2,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [],
+      "notes": "Run INLINE, cero spawns de subagentes: el bloque era un merge con un conflicto puntual mas QA funcional, y la ceremonia completa habria costado mas que el trabajo (leccion modelos-y-costos). Sin medicion de tokens por spawn porque no hubo spawns; el consumo del orquestador no se metrifica en este entorno. Dos entregas: (1) el sistema contable como app instalable PWA para Windows y Android (commit 45de7b7), (2) integracion de roles y puestos con QA en vivo 8/8 y ronda adversarial de codigo (commit 42d527a). Hallazgo de proceso: predecir el conflicto con git merge-tree ANTES de mergear, mientras se escribia el reporte para el desarrollador, convirtio el merge en un trabajo de cinco minutos con la resolucion ya decidida."
+    },
+    {
+      "sessionId": "session-2026-08-25-modulo-caja",
+      "runId": "orion-villa-broaster-caja",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-25T02:40:00.000Z",
+      "completedAt": "2026-08-25T06:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 1,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 1,
+      "modelOutcomes": [
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 1179224,
+          "measurement_mode": "ESTIMATED",
+          "nota": "total del workflow de 10 agentes; el desglose por agente no viene separado en la notificacion"
+        },
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 358158,
+          "measurement_mode": "ESTIMATED",
+          "nota": "workflow de 3 agentes del arreglo movil"
+        }
+      ],
+      "notes": "Modulo de Caja completo (T-02, T-03, T-04). Dos workflows: 10 agentes para construir y auditar, 3 para el arreglo movil y su medicion. La AUDITORIA fue lo que pago el run: las tres lentes adversariales convergieron en un agujero de robo (cancelar una orden ya cobrada le sacaba la plata al arqueo) que ninguna suite de tests habria encontrado, porque los tests comprueban lo que alguien penso, y el agujero estaba justo en lo que nadie penso. Segunda leccion, cara: dos medidores en paralelo compartiendo puerto y data/ se pisaron."
+    },
+    {
+      "sessionId": "session-2026-08-26-tanda-n0",
+      "runId": "orion-villa-broaster-tanda-n0",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-26T02:00:00.000Z",
+      "completedAt": "2026-08-26T05:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "build:infra",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 260000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-007 cerrojo; reparto del total 991k del workflow entre 6 agentes"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 150000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-020 entorno"
+        },
+        {
+          "phase": "build:api",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 150000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-022 borde de rutas"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 210000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-021 una fuente por hecho"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 120000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-019 suite de dominio"
+        },
+        {
+          "phase": "build:infra",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 100000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-009 calidad de la vitrina"
+        }
+      ],
+      "notes": "7 tareas del plan cerradas (T-007,008,009,016,019,020,021,022 menos las inline). Total del workflow 991k MEDIDOS; el reparto por tarea es aproximado, el agregado es exacto. Cero fix-cycles: los briefs del plan traian criterios ejecutables y los seis agentes reportaron sus desviaciones en vez de esconderlas. El orquestador verifico los criterios inline (son comandos), por eso no se gasto un verificador por tarea."
+    },
+    {
+      "sessionId": "session-2026-08-26-tanda-n0b",
+      "runId": "orion-villa-broaster-tanda-n0b",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-26T06:00:00.000Z",
+      "completedAt": "2026-08-26T09:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "build:api",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 190000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-023 forma de respuesta"
+        },
+        {
+          "phase": "build:api",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 230000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-026 reloj del servidor"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 150000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-027 registro"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 300000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-028 dominio puro"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 280000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-024 dinero entero"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 169268,
+          "measurement_mode": "MEDIDO",
+          "nota": "T-025 derivados, relanzada sola tras morir; unica medicion exacta de la tanda"
+        },
+        {
+          "phase": "build:visual",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 130000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-031 registro visual"
+        },
+        {
+          "phase": "build:visual",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 140000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-033 escala tipografica"
+        },
+        {
+          "phase": "build:visual",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 160000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-035 contraste AA"
+        },
+        {
+          "phase": "build:infra",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 170000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-261 usuarios en carpeta aislada"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 150000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-032 formateador unico"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "escalate",
+          "tokens": 0,
+          "measurement_mode": "MEDIDO",
+          "nota": "T-025 primer intento: corte de conexion a mitad de respuesta. MUERTE DE INFRAESTRUCTURA, no fallo de capacidad — no debe subir ningun tier. Relanzada sola en opus y cerro ok con 169k."
+        }
+      ],
+      "notes": "13 tareas cerradas (11 por agentes, T-029/T-030/T-034 inline). Tests 209 -> 302. Un agente murio por corte de conexion y se relanzo solo, sin restos que limpiar. DOS CARRILES COLISIONARON pese a tener archivos declarados disjuntos: sus CRITERIOS obligaban a tocar las mismas 24 rutas (KN-023). El total del workflow fue 1.66M MEDIDOS; el reparto por tarea es aproximado salvo T-025, que se relanzo sola y por eso tiene medicion exacta."
+    },
+    {
+      "sessionId": "session-2026-08-29-tanda-n0d-cierre",
+      "runId": "orion-villa-broaster-tanda-n0d-cierre",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-29T13:00:00.000Z",
+      "completedAt": "2026-08-29T14:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 1,
+      "modelOutcomes": [
+        {
+          "phase": "adversarial",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 115000,
+          "measurement_mode": "MEDIDO",
+          "nota": "refutar T-052: sin agujero"
+        },
+        {
+          "phase": "adversarial",
+          "model": "opus",
+          "verdict": "fail",
+          "tokens": 115000,
+          "measurement_mode": "MEDIDO",
+          "nota": "refutar T-055: hallo el fusible fail-open. verdict fail = encontro defecto real, que es exito del adversarial"
+        }
+      ],
+      "notes": "Cierre de la tanda N0-D que murio por limite de sesion (resets 3:20am). Recuperado: T-050 (doc completo, agente murio al reportar) verificado y cerrado; T-047/T-054 ya cerradas por sus agentes; codigo de T-052/T-055 commiteado como checkpoint verde (317). La verificacion adversarial que faltaba se corrio aparte: T-052 limpia, T-055 con un agujero real (fusible fail-open) corregido en 1 ciclo. 38 -> 40 hechas. Tests 302 -> 319."
+    },
+    {
+      "sessionId": "session-2026-08-29-tanda-n0e",
+      "runId": "orion-villa-broaster-tanda-n0e",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-29T15:00:00.000Z",
+      "completedAt": "2026-08-29T18:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "build:visual",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 230000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "a11y T-177/178/179/180 en un solo agente; hallo 3 campos sin nombre accesible"
+        },
+        {
+          "phase": "build:infra",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 120000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-188+T-183 CI; el agente commiteo por su cuenta"
+        },
+        {
+          "phase": "build:infra",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 130000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-182/184/186 proceso; T-182 bloqueada con honestidad (sin gh y sin repo publicado)"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 210000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-181 guardia de datos de prueba"
+        },
+        {
+          "phase": "build:infra",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 90000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-185+T-187; el script revelo 15 rutas sin test"
+        },
+        {
+          "phase": "build:infra",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 120000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-189 presupuestos con numero medido"
+        }
+      ],
+      "notes": "12 tareas cerradas (9 por agentes, T-046 inline, T-048/T-049 escritas y BLOQUEADAS por falta de confirmacion del dueno). 41 -> 53 hechas. Tests 319 -> 330. Total del workflow 740k MEDIDOS; reparto por tarea aproximado. Dos agentes volvieron a verse el arbol a medias (un rojo de lint ajeno) — ya es patron conocido, KN-023. NUEVO: un agente commiteo por su cuenta sin que el brief se lo prohibiera; el commit era limpio y se acepto, pero los briefs deben decir que el commit lo hace el orquestador."
+    },
+    {
+      "sessionId": "session-2026-08-30-tanda-n1a",
+      "runId": "orion-villa-broaster-tanda-n1a",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-30T02:00:00.000Z",
+      "completedAt": "2026-08-30T05:00:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 1,
+      "modelOutcomes": [
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 180000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-262 red de tests de rutas; hallo la carrera del primer login"
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 150000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-001 cuadre visible"
+        },
+        {
+          "phase": "build:api",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 140000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-013 interfaz facturacion"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 220000,
+          "measurement_mode": "ESTIMATED",
+          "nota": "T-059 anulacion de cobro; 3 decisiones de negocio marcadas para el dueno"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 127029,
+          "measurement_mode": "MEDIDO",
+          "nota": "T-060 liquidacion; unico medido exacto (resume tras muerte de sesion)"
+        },
+        {
+          "phase": "build:infra",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 100000,
+          "measurement_mode": "ESTIMADO",
+          "nota": "T-190+T-191 linea base"
+        },
+        {
+          "phase": "build:page",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 90000,
+          "measurement_mode": "ESTIMADO",
+          "nota": "T-004 cupones por sede"
+        }
+      ],
+      "notes": "Tanda N1-A completa en dos mitades: la sesion murio con 6/7 agentes terminados y el trabajo integro en el arbol; el resume con cache corrio solo T-060 (127k medidos vs ~1.5M si se repetia todo). Tests 330 -> 378. La red de tests de rutas (T-262) se pago sola el dia que aterrizo: hallo la carrera del primer login que el fix del fusible habia introducido (KN-031), corregida inline por el orquestador con regresion en dos capas. T-059 dejo 3 decisiones de negocio marcadas para el dueno y su cableado al almacen como trabajo siguiente (T-010 desbloqueada)."
+    },
+    {
+      "sessionId": "session-2026-08-30-tanda-n1b",
+      "runId": "orion-villa-broaster-tanda-n1b",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-08-30T08:00:00.000Z",
+      "completedAt": "2026-08-31T02:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 200000,
+          "measurement_mode": "ESTIMADO",
+          "nota": "T-061 fecha de negocio; mato el bug de zona horaria que el estanco ya habia pagado"
+        },
+        {
+          "phase": "build:api",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 260000,
+          "measurement_mode": "ESTIMADO",
+          "nota": "T-063+074+077 en un agente; hallo el texto duplicado que decidia un codigo HTTP"
+        },
+        {
+          "phase": "build:api",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 130000,
+          "measurement_mode": "ESTIMADO",
+          "nota": "T-064 tabla de codigos; murio al reportar con el trabajo entero"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 120000,
+          "measurement_mode": "ESTIMADO",
+          "nota": "T-068 nucleo puro de Producto"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 175000,
+          "measurement_mode": "ESTIMADO",
+          "nota": "T-073+069 usuarios puro; frontera del bundle intacta"
+        }
+      ],
+      "notes": "Tanda N1-B en dos mitades por limite de sesion (mato 3 de 5 AL REPORTAR, no al construir: T-064 estaba entera, KN-034). El resume con cache corrio solo lo que faltaba: 295k en vez de ~1.5M. Tests 378 -> 446. Precedida por un barrido de criterios que ahorro ~1.7M cerrando 8 tareas ya cumplidas con evidencia (KN-032). Hallazgos que el catalogo no sabia: el bug de zona horaria del estanco vivo aqui con otra forma, y un texto de error duplicado que decidia un codigo HTTP (KN-033)."
+    },
+    {
+      "sessionId": "session-2026-09-01-mudanza-repos",
+      "runId": "orion-villa-broaster-mudanza-repos",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-09-02T02:38:21.000Z",
+      "completedAt": "2026-09-02T02:38:21.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [],
+      "nota": "Corrida INLINE del runtime: cero spawns de subagente (trabajo mecanico de archivos y git, el ciclo completo habria costado mas de lo que ahorraba). Sin modelOutcomes porque el consumo en linea no esta medido — no se inventa cifra. Hallazgo que pago la corrida: preguntar al remoto con ls-remote antes de dar una historia por perdida (KN-035)."
+    }
+  ],
+  "lastUpdated": "2026-09-02T02:38:21.000Z",
+  "totalContextSaved": 0,
+  "avgCompressionRatio": 1,
+  "avgKnowledgeDensity": 0,
+  "trendCompressionRatio": []
+}

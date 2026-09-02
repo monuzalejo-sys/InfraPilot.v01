@@ -1,0 +1,79 @@
+{
+  "costoTokens": 47145000,
+  "costoEstimadoCOP": 1023000,
+  "horasEquivalentes": 315,
+  "precioSugerido": {
+    "modelo": "mensualidad",
+    "montoCOP": 400000,
+    "permanenciaMeses": 12,
+    "incluye": [
+      "Publicación en internet de broaster-app y villa-app con datos reales del cliente (carta, precios por sede, teléfonos, horarios, fotos) y el manual del mostrador",
+      "Terminar las 236 tareas de nivel N0+N1 del plan (que el dueño opere de punta a punta con SUS datos, no con relleno) — es lo que falta para llamarlo listo, no solo publicado",
+      "Hosting con Node persistente, dominio y respaldo (arquitectura de disco atómico ya integrada al sistema, patrón .tmp+rename+.bak)",
+      "Soporte ante caídas, una mejora pequeña al mes y un reporte mensual de operación"
+    ],
+    "noIncluye": [
+      "Facturación electrónica DIAN (PEND-001 sigue sin decidir; todo comparable del nicho la cobra aparte o como módulo extra)",
+      "Migración a base de datos tipo Supabase (solo necesaria si algún día se quiere hosting serverless tipo Vercel)",
+      "Inventario/merma de insumos, tercera sede, marketing sobre la vitrina (M1-M4 de escalabilidad) y el endurecimiento N2/N3 más allá de las 7 tareas ya presupuestadas",
+      "Rediseño de marca o capacitación presencial más allá de la entrega y el manual del mostrador"
+    ]
+  },
+  "comparables": [
+    {
+      "nombre": "Alegra POS",
+      "url": "https://www.alegra.com/colombia/pos/precios/",
+      "precio": "25.900 a 199.900 COP/mes según ingresos declarados (plan Pyme 79.900 es el comparable a un negocio de 2 sedes chico)",
+      "queOfrece": "POS con modo restaurante, facturación DIAN incluida, usuario gratis para el contador, soporte 24/7, sin permanencia",
+      "dondeSaleCaro": "el plan escala por ingresos facturados, no por sede: un negocio que vende bien puede saltar de plan solo por volumen, no por crecer en locales"
+    },
+    {
+      "nombre": "Gestro",
+      "url": "https://somosgestro.com/precios/",
+      "precio": "79.000 COP/mes (1 sede) — 119.000 (2 sedes) — desde 169.000 (3-5 sedes)",
+      "queOfrece": "POS de restaurante colombiano, KDS, menú QR, tablero comparativo multi-sede, backups en tiempo real, sin comisión de ventas",
+      "dondeSaleCaro": "facturación electrónica DIAN es módulo aparte: activación anual 120.000 COP por NIT más cobro por documento"
+    },
+    {
+      "nombre": "Loggro Restobar",
+      "url": "https://loggro.com/restobar/planes/",
+      "precio": "120.990 COP/mes (Básico, 3 cajas/15 usuarios/30 mesas) — 219.990 (Premium, usuarios ilimitados, Rappi incluido)",
+      "queOfrece": "POS + comandas a cocina + zonas de preparación + integración con Rappi y facturación DIAN",
+      "dondeSaleCaro": "caja adicional 43.990 COP/mes y usuario adicional 18.990 COP/mes se acumulan rápido en 2 sedes con varios turnos y cajeros"
+    },
+    {
+      "nombre": "Loyverse",
+      "url": "https://loyverse.com/en-us/pricing",
+      "precio": "USD 0 el POS base; add-ons USD 25/mes/tienda (empleados), USD 25/mes/tienda (inventario avanzado), USD 5/mes (historial ilimitado)",
+      "queOfrece": "POS multi-tienda gratis, pantalla de cocina, fidelización, cobro con tarjeta integrado (Tap to Pay)",
+      "dondeSaleCaro": "el plan gratis limita el historial de ventas a 31 días; operar 2 sedes con roles reales y comparativa exige sumar add-ons por cada local"
+    },
+    {
+      "nombre": "Waro",
+      "url": "https://warocol.com/blog/software-para-restaurantes-precio",
+      "precio": "9.000 COP/mes + IVA (10.710 COP real)",
+      "queOfrece": "POS con food cost automático por IA (menu engineering, rentabilidad por plato) y domicilios propios sin comisión",
+      "dondeSaleCaro": "su propia página dice que la facturación DIAN sigue 'en desarrollo': el precio bajo no incluye lo legal todavía"
+    },
+    {
+      "nombre": "Soft Restaurant Colombia",
+      "url": "https://www.softrestaurant.com.co/soft-restaurant",
+      "precio": "no publicado — la página remite a contacto comercial, sin ninguna cifra",
+      "queOfrece": "suite completa (POS, Mobile Commander, menú digital, analítica) de un jugador multinacional establecido",
+      "dondeSaleCaro": "no se puede saber sin cotizar directamente; el hallazgo es justamente que este competidor no compite mostrando precio"
+    }
+  ],
+  "supuestos": [
+    "Tarifa usada: Sonnet 5 USD 3/M tokens entrada y USD 15/M salida (tarifa estándar sostenida, no la promocional USD 2/10 vigente solo hasta 2026-08-31); Opus 5 USD 5/25 por M; Haiku 4.5 USD 1/5 por M. Fuente: tabla de precios oficial de Anthropic (skill claude-api, cacheada 2026-06-24). El plan reparte los 47,15M tokens en 182 tareas sonnet (37,79M), 26 opus (9,29M) y 35 haiku (0,064M)",
+    "Mezcla input/output asumida 85/15 para poder convertir tokens a dólares por modelo; no medida por la casa — el propio tema modelos-y-costos del cerebro dice explícitamente que el corpus no registra precio por token ni en pesos ni en dólares (hueco confirmado, no inventado aquí)",
+    "Conversión USD a COP a 4.000, convención ya escrita por la casa en documentos/agencia/precios-v2.html:58-60 ('revisar si el dólar se mueve'), no una tasa de mercado verificada hoy",
+    "costoEstimadoCOP (~1.023.000) es SOLO el cómputo de API de los subagentes; no incluye las horas de Kalel orquestando, que es el verdadero costo de la casa y no tiene tarifa fijada",
+    "1 sesión de trabajo de subagente equivale a ~1,5 horas de acompañamiento humano (arranque + revisión); no hay medición de la casa para este número, es estimación propia declarada como tal",
+    "243 tareas del plan v7 se tradujeron a ~210 sesiones: 194 tareas 1-builder (1 sesión c/u) + 4 tareas 'ola' (~2 sesiones c/u, varios builders en paralelo) + 45 tareas 'inline' de 0 tokens (~8 sesiones, varias por sesión de orquestación) — de ahí las 315 horas equivalentes",
+    "El precio sigue el modelo B de la doctrina de cobro de la casa (mensualidad alta, sin cobro de arranque, permanencia por escrito), igual que Orama; los 12 meses de permanencia son propuesta propia — no hay convención de la casa para ese número, es el mismo hueco que Orama tiene abierto (permanencia 'a definir')",
+    "Se asume que Prommter provisiona y controla hosting/dominio; no está resuelto en memoria quién lo hace (PEND-004 sigue 'Ready', sin ejecutar) — de eso depende la cláusula de qué pasa si el cliente deja de pagar",
+    "El sistema sigue en modalidad disco (DEC-003): el hosting debe tener Node persistente (tipo Hostinger), nunca serverless efímero (Vercel), mientras no exista una migración a Supabase — esa migración no aparece como tarea explícita en las 243 del plan",
+    "La comisión de domicilio evitada (360.000-540.000 COP/mes sobre 60 domicilios/mes a 30.000 COP c/u, villa-broaster/KN-001) es el argumento de valor que sostiene el precio frente al cliente; asume que el cliente migra pedidos de apps a la vitrina propia, no es un ahorro automático",
+    "Costo de tenerlo vivo (hosting Node persistente 16.000-40.000 COP/mes citado de documentos/agencia/precios-v2.html:75-87, más dominio ~3.000-6.000 COP/mes estimado, respaldo ya incluido en la arquitectura): punto medio ~35.000 COP/mes, separado del costoEstimadoCOP de construir"
+  ]
+}
