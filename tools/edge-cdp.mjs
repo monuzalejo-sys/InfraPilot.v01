@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// edge-cdp.mjs — QA visual de páginas con Edge headless POR CDP (receta KN-003 de memory/landings).
+// edge-cdp.mjs — QA visual de páginas con un Chromium headless (Edge o Chrome) POR CDP (receta KN-003 de memory/landings).
 // Por qué: --screenshot a secas tiene piso de viewport ~492px y reduced-motion activo por defecto;
 // por CDP se emula el viewport real, se activa el movimiento y se miden overflow/animaciones/consola.
 // Uso:
 //   node edge-cdp.mjs --url <url|ruta> [--width 390] [--height 844] [--mobile] [--shot salida.png] [--full]
-//                     [--eval "<expresión JS>"] [--wait 2500] [--reduce] [--port 9333] [--edge <ruta msedge>]
+//                     [--eval "<expresión JS>"] [--wait 2500] [--reduce] [--port 9333] [--edge <ruta al navegador>]
 // Salida: JSON con viewport, métricas (scrollWidth/clientWidth/scrollHeight/animaciones/fuentes), eval, consola, excepciones.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, writeFileSync, rmSync, existsSync } from 'node:fs';
@@ -35,11 +35,22 @@ if (!opt.url) { console.error('falta --url'); process.exit(2); }
 let url = opt.url;
 if (!/^[a-z]+:\/\//i.test(url)) url = pathToFileURL(resolve(url)).href;
 
-const EDGE = opt.edge || [
-  'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
-  'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
-].find(existsSync);
-if (!EDGE) { console.error('no encuentro msedge.exe (usa --edge)'); process.exit(2); }
+// Lo que hace falta es el motor Chromium, no Edge en particular: Chrome habla el mismo CDP
+// y da las mismas medidas. En la Mac no hay Edge y sí hay Chrome, así que se busca por
+// plataforma en vez de dar Windows por hecho — antes esto moría con exit 2 fuera de Windows.
+const CANDIDATOS = process.platform === 'darwin'
+  ? ['/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+     '/Applications/Chromium.app/Contents/MacOS/Chromium']
+  : process.platform === 'win32'
+  ? ['C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+     'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe']
+  : ['/usr/bin/microsoft-edge', '/usr/bin/google-chrome', '/usr/bin/chromium'];
+const EDGE = opt.edge || CANDIDATOS.find(existsSync);
+if (!EDGE) {
+  console.error('no encuentro un navegador Chromium (pasa la ruta con --edge). Probé:\n  ' + CANDIDATOS.join('\n  '));
+  process.exit(2);
+}
 
 const profile = mkdtempSync(join(tmpdir(), 'edge-cdp-'));
 const edge = spawn(EDGE, [
@@ -62,7 +73,7 @@ async function waitTarget() {
     } catch {}
     await sleep(200);
   }
-  throw new Error('Edge no expuso un target de página en 15 s');
+  throw new Error('el navegador no expuso un target de página en 15 s');
 }
 
 let id = 0; const pending = new Map(); const listeners = [];

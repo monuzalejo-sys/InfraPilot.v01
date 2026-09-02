@@ -1,6 +1,6 @@
 {
   "projectId": "_permanent",
-  "snapshotDate": "2026-09-02T02:45:48.000Z",
+  "snapshotDate": "2026-09-02T03:12:36.000Z",
   "objects": [
     {
       "id": "KN-001",
@@ -52,28 +52,28 @@
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-01T00:00:00.000Z",
-      "updated": "2026-08-01T00:00:00.000Z",
+      "updated": "2026-09-02T03:12:36.000Z",
       "lifetime": "Permanent",
       "impact": "Medium",
       "priority": "Medium",
       "status": "Current",
       "dependencies": [],
-      "fact": "GENERAR PDF EN ESTA MAQUINA: no hay Python (ni `python` ni `python3`), asi que reportlab/pypdf NO son opcion. Lo que SI funciona: Microsoft Edge headless, ya instalado. Comando verificado 2026-08-01 (genero un PDF de 11 paginas): \"/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe\" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf=\"C:\\ruta\\salida.pdf\" \"file:///C:/ruta/entrada.html\" . Se escribe el documento en HTML con @page/@media print y sale un PDF con tipografia y maquetacion controladas.",
-      "context": "Descubierto al generar el plan del asadero. Edge esta en Program Files (x86)."
+      "fact": "GENERAR PDF EN LA MAC: se hace con CHROME headless, no con Edge — Edge NO esta instalado aqui. Comando verificado 2026-09-01 (genero un PDF valido de 1 pagina, %PDF-1.4, cierra en %%EOF): \"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf=\"/ruta/salida.pdf\" \"file:///ruta/entrada.html\". Escribir el documento en HTML con @page/@media print y sale con tipografia y maquetacion controladas. Ignorar el ruido de stderr 'CVDisplayLinkCreateWithCGDisplay failed' y 'Trying to load the allocator multiple times': el PDF sale igual. || CORRECCION: la version vieja de este objeto decia 'no hay Python (ni python ni python3)'. ESO ERA DEL PC WINDOWS. La Mac trae python3 y pip3 en /usr/bin, asi que reportlab/pypdf SI son opcion si algun dia hace falta armar un PDF por programa en vez de imprimir HTML.",
+      "context": "Reverificado en la Mac el 2026-09-01. Antes describia Edge en Program Files (x86) y negaba Python."
     },
     {
       "id": "KN-005",
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-01T00:00:00.000Z",
-      "updated": "2026-08-01T00:00:00.000Z",
+      "updated": "2026-09-02T03:12:36.000Z",
       "lifetime": "Permanent",
       "impact": "Medium",
       "priority": "Medium",
       "status": "Current",
       "dependencies": [],
-      "fact": "VERIFICAR UN PDF SIN poppler: `pdftoppm` no esta instalado, asi que la herramienta Read no puede renderizar paginas de PDF. Para comprobar que un PDF salio bien, parsear su estructura con node: contar /Type /Page, revisar que empiece por %PDF- y termine en %%EOF. Es suficiente para confirmar que no salio corrupto ni vacio.",
-      "context": "Usado 2026-08-01 tras generar el plan del asadero con Edge headless."
+      "fact": "VERIFICAR UN PDF SIN poppler: `pdftoppm` sigue sin estar instalado en la Mac (comprobado 2026-09-01), asi que la herramienta Read no puede renderizar paginas de PDF. Para comprobar que un PDF salio bien, parsear su estructura con node: que empiece por %PDF-, contar /Type /Page y que termine en %%EOF. Es suficiente para confirmar que no salio vacio ni truncado. || DIFERENCIA CON EL PC: aqui hay brew, asi que `brew install poppler` lo resolveria de verdad si alguna vez hace falta MIRAR el PDF y no solo validarlo. No se ha instalado: nadie lo ha necesitado todavia.",
+      "context": "Reverificado en la Mac el 2026-09-01."
     },
     {
       "id": "KN-006",
@@ -124,7 +124,7 @@
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-19T00:00:00.000Z",
-      "updated": "2026-08-19T00:00:00.000Z",
+      "updated": "2026-09-02T03:12:36.000Z",
       "lifetime": "Permanent",
       "impact": "Medium",
       "priority": "Medium",
@@ -132,14 +132,14 @@
       "dependencies": [
         "KN-008"
       ],
-      "fact": "EDGE HEADLESS TIENE PISO DE VIEWPORT ~480-500px: con --window-size mas angosto (p.ej. 390) el PNG sale de 390px pero el LAYOUT se calcula a ~480px+, asi que todo se ve corrido/recortado a la derecha aunque la pagina este bien. NO sirve para verificar layout movil <480px. Para movil: (1) asegurar <meta name=viewport> en la pagina, y (2) verificar overflow con JS en el pane embebido (resize_window preset mobile + document.documentElement.scrollWidth vs clientWidth), que funciona con el pane oculto. Ademas Edge headless falla intermitentemente sin escribir el PNG (LoadEnclaveImageW error 577 en stderr es ruido, no la causa) — reintentar con --user-data-dir fresco suele bastar.",
-      "context": "Descubierto 2026-08-19 verificando la propuesta de orama: el PNG a 390px mostraba todo recortado; el pane a <759px confirmo scrollWidth==clientWidth (sin overflow real)."
+      "fact": "EL PISO DE VIEWPORT ~480px NO EXISTE EN LA MAC. Verificado 2026-09-01 con Chrome por CDP: pidiendo --width 390 --mobile sobre una pagina con <meta name=viewport>, innerWidth y scrollWidth dan 390 exactos y el PNG sale 390x844. En el PC Windows, Edge headless calculaba el layout a ~480px+ aunque el PNG saliera de 390 y todo se veia corrido — por eso este objeto decia que no servia para verificar movil <480px. AQUI SI SIRVE, y eso es capacidad nueva, no solo paridad: el QA de layout movil real se puede hacer. || LO QUE NO CAMBIA: si la pagina NO trae <meta name=viewport>, innerWidth se va a 980 sin importar lo que se pida. Cuando una medida salga rara, ese meta es lo primero que hay que mirar.",
+      "context": "Reverificado en la Mac el 2026-09-01 con la herramienta ya arreglada. La limitacion era de Edge/Windows."
     },
     {
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-21T00:00:00.000Z",
-      "updated": "2026-08-21T00:00:00.000Z",
+      "updated": "2026-09-02T03:12:36.000Z",
       "lifetime": "Permanent",
       "status": "Current",
       "id": "KN-010",
@@ -149,35 +149,35 @@
         "KN-008",
         "KN-009"
       ],
-      "fact": "HERRAMIENTA DE QA VISUAL: C:/Users/Kalel/ORION/tools/edge-cdp.mjs (creada y validada 2026-08-21) empaqueta la receta CDP (landings KN-003): node edge-cdp.mjs --url <archivo|url> --width 390 --height 844 --mobile --shot out.png [--full] [--eval \"<js>\"] [--reduce] [--wait ms]. Lanza Edge headless con --remote-debugging-port, emula el viewport REAL (innerWidth 390 de verdad, no el piso de ~492 de --screenshot), pone prefers-reduced-motion en no-preference (las animaciones corren), navega y devuelve JSON con scrollWidth/clientWidth/overflowX/scrollHeight, getAnimations().length, fuentes cargadas, titulo, consola y excepciones, mas la captura PNG. Sin dependencias (Node 24 trae fetch y WebSocket). Es la verdad de terreno para QA movil y de movimiento; --screenshot a secas queda solo para capturas rapidas de escritorio.",
-      "context": "Probada contra fable 5/orama/propuesta-orama.html: 390x390 sin overflow, 6 animaciones vivas, 3 fuentes, consola limpia, PNG fiel."
+      "fact": "HERRAMIENTA DE QA VISUAL: /Users/g/orion/tools/edge-cdp.mjs — empaqueta la receta CDP. node tools/edge-cdp.mjs --url <archivo|url> --width 390 --height 844 --mobile --shot out.png [--full] [--eval \"<js>\"] [--reduce] [--wait ms] [--edge <ruta al navegador>]. || ARREGLADA 2026-09-01: buscaba msedge.exe en rutas de Windows y moria con exit 2 en cualquier otra plataforma. Ahora localiza el navegador segun process.platform (en la Mac: Edge si estuviera, si no Chrome, si no Chromium) — lo que hace falta es el motor Chromium, no Edge en particular, porque el CDP es el mismo. El nombre del archivo y el flag --edge se conservaron para no romper lo que ya los usa.",
+      "context": "Probada en la Mac el 2026-09-01: captura 390x844 correcta con Chrome."
     },
     {
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-21T00:00:00.000Z",
-      "updated": "2026-08-21T00:00:00.000Z",
+      "updated": "2026-09-02T03:12:36.000Z",
       "lifetime": "Permanent",
       "status": "Current",
       "id": "KN-011",
       "impact": "Medium",
       "priority": "High",
       "dependencies": [],
-      "fact": "LIMITE DEL TOOL BASH EN ESTA MAQUINA: un comando de mas de ~8 KB se TRUNCA (limite de linea de comandos de Windows al pasar por bash -c) — un heredoc de ~150 lineas fallo con unexpected EOF while looking for matching quote en la linea 145 y NO creo el archivo. Ademas el wrapper colapsa doble backslash en uno solo. Regla: archivos nuevos grandes o con backslashes se escriben con Write/Edit; los comandos Bash se mantienen cortos (<~5 KB) y sin depender de backslashes literales.",
-      "context": "Pagado 2026-08-21 escribiendo edge-cdp.mjs por heredoc; el mismo heredoc corto si funcionaba."
+      "fact": "EL LIMITE DE ~8 KB POR COMANDO ERA DE WINDOWS Y AQUI NO APLICA. Verificado 2026-09-01: un heredoc que genero 15 KB entro completo y escribio el archivo entero. En el PC, un comando de mas de ~8 KB se truncaba (limite de linea de comandos de Windows al pasar por bash -c) y un heredoc de ~150 lineas moria con 'unexpected EOF while looking for matching quote' SIN crear el archivo. || LO QUE SIGUE SIENDO BUENA IDEA: escribir archivos largos con Write en vez de heredocs gigantes, porque el heredoc no avisa cuando algo sale mal a la mitad.",
+      "context": "Reverificado en la Mac el 2026-09-01."
     },
     {
       "id": "KN-012",
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-24T09:00:00.000Z",
-      "updated": "2026-08-24T09:00:00.000Z",
+      "updated": "2026-09-02T03:12:36.000Z",
       "lifetime": "Permanent",
       "impact": "High",
       "priority": "High",
       "status": "Current",
       "dependencies": [],
-      "fact": "EXISTE UN CEREBRO TRANSVERSAL Y SE CONSULTA ANTES DE PENSAR. `node C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs buscar \"<pregunta>\"` responde con lo que YA sabe el ecosistema (11 memorias, ~275 objetos, sus metricas de costo por modelo, los documentos de doctrina y los temas curados) y devuelve la cita de donde salio cada cosa. Comandos: buscar, tema <slug>, probar (prueba de regresion), citas (verifica que ninguna cita este inventada), estado (huecos), exportar (vista de la boveda), indexar. Cuesta ~0 y se reindexa solo cuando algo cambia, asi que se llama varias veces por turno sin pensarlo. La FUENTE DE VERDAD de la capa transversal son los archivos de C:\\Users\\Kalel\\ORION\\cerebro\\temas\\; la boveda (ORION-Vault\\Cerebro) es una vista regenerable. Lo consumen el skill orion-cerebro (responder con cita), el agente orion-harvester (alimentarlo) y la fase 1 del skill orion (consultar antes de analizar).",
+      "fact": "EXISTE UN CEREBRO TRANSVERSAL Y SE CONSULTA ANTES DE PENSAR. `node /Users/g/orion/tools/cerebro.mjs buscar \"<pregunta>\"` responde con lo que YA sabe el ecosistema (11 memorias, ~275 objetos, sus metricas de costo por modelo, los documentos de doctrina y los temas curados) y devuelve la cita de donde salio cada cosa. Comandos: buscar, tema <slug>, probar (prueba de regresion), citas (verifica que ninguna cita este inventada), estado (huecos), exportar (vista de la boveda), indexar. Cuesta ~0 y se reindexa solo cuando algo cambia, asi que se llama varias veces por turno sin pensarlo. La FUENTE DE VERDAD de la capa transversal son los archivos de C:\\Users\\Kalel\\ORION\\cerebro\\temas\\; la boveda (ORION-Vault\\Cerebro) es una vista regenerable. Lo consumen el skill orion-cerebro (responder con cita), el agente orion-harvester (alimentarlo) y la fase 1 del skill orion (consultar antes de analizar).",
       "context": "Construido la noche del 2026-08-24. Antes de esto la boveda era un espejo pasivo: una nota por objeto, aislada por proyecto, y para saber si algo ya se habia aprendido habia que abrir once state.json — que en la practica nadie abria.",
       "source": "session 2026-08-24 bloque EL CEREBRO"
     },
@@ -186,7 +186,7 @@
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-24T09:00:00.000Z",
-      "updated": "2026-08-24T09:00:00.000Z",
+      "updated": "2026-09-02T03:12:36.000Z",
       "lifetime": "Permanent",
       "impact": "High",
       "priority": "High",
@@ -194,7 +194,7 @@
       "dependencies": [
         "KN-012"
       ],
-      "fact": "LA PRUEBA DE REGRESION DEL CEREBRO ES LA METRICA DE SI EL ECOSISTEMA APRENDE O SOLO ACUMULA. `cerebro.mjs probar` corre las preguntas de C:\\Users\\Kalel\\ORION\\cerebro\\preguntas-de-prueba.md —escritas como las hace el dueno, informales y sin tildes— y exige que el tema correcto salga PRIMERO. No mide cuanto sabe el cerebro: mide si responde a como se pregunta de verdad. Un tema impecable con alias malos falla ahi, y debe fallar, porque nadie lo encontraria nunca. Se corre en cada cierre de sesion y NO puede bajar: si bajo, algo se rompio o un tema nuevo le esta robando preguntas a otro. Medicion inicial 3/26 (12%) con cero temas; 26/26 (100%) con 12 temas escritos, la misma noche.",
+      "fact": "LA PRUEBA DE REGRESION DEL CEREBRO ES LA METRICA DE SI EL ECOSISTEMA APRENDE O SOLO ACUMULA. `cerebro.mjs probar` corre las preguntas de /Users/g/orion/cerebro/preguntas-de-prueba.md —escritas como las hace el dueno, informales y sin tildes— y exige que el tema correcto salga PRIMERO. No mide cuanto sabe el cerebro: mide si responde a como se pregunta de verdad. Un tema impecable con alias malos falla ahi, y debe fallar, porque nadie lo encontraria nunca. Se corre en cada cierre de sesion y NO puede bajar: si bajo, algo se rompio o un tema nuevo le esta robando preguntas a otro. Medicion inicial 3/26 (12%) con cero temas; 26/26 (100%) con 12 temas escritos, la misma noche. || VERIFICADO EN LA MAC 2026-09-01: `node tools/cerebro.mjs probar` da 65/66 (98%). El unico fallo es de alias, no de la herramienta: 'que hago si el dueno rechaza un diseno' devuelve aprendizajes-de-placita primero y generadores-de-diseno tercero.",
       "context": "El complemento es `cerebro.mjs citas`, que verifica mecanicamente que cada proyecto/ID citado exista: 454 citas comprobadas y 0 rotas en los 12 primeros temas. La promesa de 'nada inventado' no se sostiene a mano cuando hay docenas de citas.",
       "source": "session 2026-08-24 bloque EL CEREBRO"
     },
@@ -301,13 +301,13 @@
       "type": "Pending",
       "tier": "Permanent",
       "created": "2026-09-01T05:03:23.000Z",
-      "updated": "2026-09-02T02:45:48.000Z",
+      "updated": "2026-09-02T03:12:36.000Z",
       "lifetime": "Permanent",
       "impact": "High",
       "priority": "High",
-      "status": "Ready",
+      "status": "Done",
       "dependencies": [],
-      "task": "ACTUALIZAR LA BOVEDA A LA MAQUINA REAL: la memoria permanente describe el PC Windows (C:\\Users\\Kalel) pero ORION corre ahora TAMBIEN en la Mac (/Users/g/orion, casa migrada el 2026-08-31 con la carpeta completa desde ~/Downloads/ORION). Revisar los 17 KN uno a uno y corregir o partir por maquina los que mienten aqui: KN-001 [YA CORREGIDO 2026-09-01] (decia que git push de terminal no funciona -- en la Mac SI funciona: push a kalelfelpem-glitch/placita OK el 2026-08-31 via gh auth + credential helper local), KN-004 (dice que no hay Python -- la Mac tiene python3), KN-005 (pdftoppm: verificar en la Mac), KN-003 y todo KN con rutas o supuestos de Windows. Ademas cerrar los pendings de orion que la migracion ya resolvio y regenerar la boveda (vault/_INDEX.md y KN-*.md) al cierre. || AVANCE 2026-09-01: KN-001 corregido y verificado con un push real; politica de push automatico escrita en DEC-001. Siguen sin revisar KN-004 (Python), KN-005 (pdftoppm) y los demas KN con rutas de Windows.",
+      "task": "[HECHO 2026-09-01] Los 17 KN revisados uno a uno contra la Mac. CORREGIDOS con verificacion real: KN-001 (push si funciona), KN-004 (hay python3; el PDF sale con Chrome, no con Edge), KN-005 (pdftoppm sigue sin estar, pero hay brew), KN-009 (el piso de viewport de 480px era de Edge/Windows: Chrome respeta 390), KN-010 (ruta nueva + herramienta arreglada), KN-011 (el limite de 8 KB por comando era de Windows), KN-012 y KN-013 (rutas nuevas; el cerebro da 65/66). SIN CAMBIOS por no depender de la maquina: KN-002, KN-003, KN-006, KN-014 a KN-017. NUEVO KN-018 con el kit completo de la Mac. PENDIENTE MENOR, no bloquea: KN-007 y KN-008 hablan del navegador embebido frente a Edge headless — la leccion (la verdad visual es el navegador de verdad, no el pane) se sostiene, pero no se reverificaron los sintomas concretos en la Mac. Y las memorias de PROYECTO todavia citan rutas C:\\ en su contenido (p. ej. landings/KN-005): eso se cura solo cuando se toque cada proyecto.",
       "reason": "Pedido del dueno el 2026-09-01 ('ahora que ya tienes la boveda y el conocimiento'): una boveda que describe otra maquina produce decisiones equivocadas -- p. ej. no intentar un push que si se puede, o buscar herramientas por rutas de Windows."
     },
     {
@@ -326,9 +326,25 @@
       "title": "PUSH AUTOMATICO: publicar deja de ser accion exclusiva del dueno (2026-09-01)",
       "reason": "Peticion literal del dueno el 2026-09-01: 'quiero que cambies la regla de el push a automatico'. La regla vieja ('ningun agente corre git push, es accion exclusiva del dueno') no era una decision de seguridad: era la cicatriz de una maquina donde el push no funcionaba. En la Mac funciona, y mantenerla solo dejaba trabajo verificado sin publicar durante semanas — fue exactamente lo que dejo dos repos vacios cinco semanas.",
       "description": "REGLA NUEVA: despues de que la verificacion pase en verde y el commit quede hecho (DEC-005 autocommit), el agente HACE PUSH sin pedir permiso, a la rama por defecto de los repos propios del dueno. || LIMITES QUE SIGUEN VIGENTES, porque no son fricción sino formas de no destruir: (1) JAMAS --force ni --force-with-lease, y jamas reescribir historia ya publicada — eso se pide siempre; (2) JAMAS borrar ramas ni tags remotos; (3) si el repo tiene PR obligatorio sobre main, el camino es rama + PR, nunca push directo — la regla nueva no pisa la proteccion, se acomoda a ella; (4) no se publica nada si el chequeo de secretos encuentra algo (claves, .env reales, tokens); (5) repos de OTRA persona u organizacion: no aplica, se pregunta. || PENDIENTE DE DECISION: los tres repos de villa-broaster son privados y con un solo colaborador. Si alguno pasa a PUBLICO, confirmar con el dueno si el automatico tambien vale ahi — publicar al mundo no es lo mismo que publicar a un repo privado propio."
+    },
+    {
+      "id": "KN-018",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-09-02T03:12:36.000Z",
+      "updated": "2026-09-02T03:12:36.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-001"
+      ],
+      "fact": "EL KIT DE LA MAC, VERIFICADO PIEZA POR PIEZA (2026-09-01). Lo que HAY: node v24, python3 y pip3 en /usr/bin, brew, gh autenticado, Google Chrome (NO Edge), Safari. Lo que NO hay: Edge, pdftoppm/poppler. || RUNTIME: `node tools/instalar-orion.mjs` escribe 13 agentes y 8 skills en ~/.claude. Estaba SIN INSTALAR hasta hoy — la sesion solo veia los 7 agentes de fase y 5 skills que trae el plugin, y faltaban los agentes arquitecto/bibliotecario/estratega/harvester/landing/traductor y las skills orion-baul, orion-cerebro y orion-plan. El instalador es idempotente y guarda .bak; correrlo es barato y es lo primero que hay que comprobar en una maquina nueva. Las skills se cargan de inmediato; los agentes piden reiniciar la sesion. || BOVEDA: baul.mjs y export-vault.mjs la buscan en $ORION/../ORION-Vault, o sea /Users/g/ORION-Vault. Estaba en ~/Downloads y por eso `baul.mjs estado` respondia 'no existe la boveda'. Movida a su sitio: 1137 notas, repo git propio sin remoto. Quedo una copia duplicada sin git en ~/Downloads/5f470c5d-ORIONVault. || HERRAMIENTAS COMPROBADAS: cerebro.mjs (buscar y probar), plan.mjs, costos.mjs, baul.mjs, check-r8.mjs, runtime.mjs, generar-instalador.mjs, validate-memory.mjs y generate-vault.mjs (pide <memory-dir>, no falla). || TRAMPA MEDIDA: `export-vault.mjs --help` NO imprime ayuda — toma el argumento como carpeta destino y escribe una boveda entera en ./--help/. generar-instalador.mjs tampoco tiene --help: reescribe el instalador. Con estas dos, mirar el codigo antes de tantear.",
+      "context": "Auditoria de paridad Windows -> Mac pedida por el dueno el 2026-09-01: 'quiero que orion sea igual, que mas necesitas para estar listo'."
     }
   ],
   "archives": [],
   "lastAmmRun": "2026-08-24T11:00:00.000Z",
-  "version": 13
+  "version": 14
 }
