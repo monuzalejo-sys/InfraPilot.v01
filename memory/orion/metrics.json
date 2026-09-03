@@ -196,6 +196,14 @@
           "tokens": 29286,
           "measurement_mode": "MEASURED",
           "nota": "7 condiciones PASS. Valido su propio grep contra un archivo de control sintetico para descartar un falso negativo — eso no se lo pedi yo."
+        },
+        {
+          "phase": "library",
+          "model": "haiku",
+          "verdict": "ok",
+          "tokens": 51984,
+          "measurement_mode": "MEASURED",
+          "nota": "orion-bibliotecario, prueba de fuego del runtime portado: cruzo cerebro + codigo de los repos + memoria + boveda y devolvio coordenadas verificadas. 31 tool_uses. 52k en haiku es CARO para el tier — la fase library barre muchas fuentes; si se repite, medir sonnet antes de asumir que haiku ahorra."
         }
       ],
       "nota": "Construccion inline: edicion masiva de 21 archivos ya en contexto, delegar habria obligado a releerlos (RFC-0004 N4-R10). Un solo spawn, el verifier, que ademas sirvio de prueba de fuego del runtime recien instalado. Costo medido: 29.286 tokens."
