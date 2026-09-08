@@ -1,6 +1,6 @@
 {
   "projectId": "villa-broaster",
-  "snapshotDate": "2026-09-08T19:59:21.327Z",
+  "snapshotDate": "2026-09-08T20:02:45.569Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -859,6 +859,23 @@
       "title": "El objetivo es ver las dos sedes en vivo desde el celular: la base de datos deja de ser opcional",
       "description": "EL DUENO DECLARO EL OBJETIVO DEL PRODUCTO (2026-09-08) Y ESO CIERRA EL HUECO 3 DE persistencia.md: el sistema corre en los DOS locales, la landing publica de ventas entra pedidos al sistema, y el dueno ve el movimiento de ambas sedes desde CUALQUIER CELULAR EN TIEMPO REAL. Textual: control total y que puedan verlo en tiempo real. Y no es solo para villa-broaster: dijo que ese es el fin PARA TODOS los proyectos de negocios. CONSECUENCIA DIRECTA: la base de datos centralizada deja de ser opcional. Dos carpetas en dos PCs no se ven entre si ni las ve un celular; el objetivo declarado exige almacen centralizado (18 metodos de AlmacenDatos + 4 de AlmacenUsuarios) y el sistema publicado en internet. La recomendacion previa de VPS-sin-base valia para dos cajas independientes, que es justo lo que el dueno descarto.",
       "reason": "persistencia.md §8 lo decia exacto: lo que decide no es el precio del hosting sino si el negocio quiere ver las dos sedes en una sola pantalla en vivo; si lo quiere, la base hay que escribirla igual y el hosting deja de importar. El dueno lo quiere. QUEDA ABIERTA UNA SOLA PREGUNTA DE ARQUITECTURA: si la caja puede detenerse cuando se cae internet en el local. Si NO puede, aplica el patron local-primero con outbox ya probado en placita (KN-038: sube al foco o cada 4s, baja cada 10s, y con cola pendiente NO se baja nada; KN-051: dos trampas de convergencia ya pagadas). Si SI puede, todo-en-la-nube es mucho menos trabajo."
+    },
+    {
+      "id": "DEC-015",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-09-08T20:02:45.569Z",
+      "updated": "2026-09-08T20:02:45.569Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-014"
+      ],
+      "title": "La caja nunca para: local primero, nube despues (patron placita)",
+      "description": "ARQUITECTURA ELEGIDA POR EL DUENO (2026-09-08), respuesta a la pregunta que dejo abierta DEC-014: si se cae internet en el local, la caja NO puede dejar de vender. Por lo tanto cada local sigue escribiendo en SU almacen y sube por outbox cuando hay conexion; la nube es espejo y punto de encuentro, no requisito para cobrar. La nube es ademas donde caen los pedidos de la landing publica y lo que el dueno mira desde el celular. Tiempos del patron ya verificados en placita (KN-038): sube al foco o cada 4s con tope 200 filas por viaje, baja al abrir o cada 10s, y CON COLA PENDIENTE NO SE BAJA NADA. Descartada la ruta todo-en-la-nube, que era la mitad de trabajo pero detiene el mostrador en cada corte.",
+      "reason": "Es un negocio de comida con dos sedes: un corte de internet a la hora del almuerzo con la caja detenida son ventas perdidas y fila en el mostrador. El dueno lo decidio explicitamente frente a la alternativa mas barata. Consecuencia de alcance: entra el outbox y el sincronizador ademas de los 22 metodos del almacen centralizado. Las dos trampas de convergencia ya estan pagadas en placita/KN-051 (no rearmar a mano la respuesta del servidor; adoptar el cambio del servidor SIN volver a encolar) y curadas en el tema la-caja-no-puede-parar. Los consecutivos siguen siendo por local (L1-/L2-) y por eso dos cajas desconectadas no colisionan; los pedidos nacidos en la nube son el caso donde la nube manda y el local adopta."
     }
   ],
   "archives": [
@@ -937,5 +954,5 @@
     }
   ],
   "lastAmmRun": "2026-09-03T00:00:00.000Z",
-  "version": 37
+  "version": 38
 }
