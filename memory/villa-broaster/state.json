@@ -1,6 +1,6 @@
 {
   "projectId": "villa-broaster",
-  "snapshotDate": "2026-09-02T02:53:11.000Z",
+  "snapshotDate": "2026-09-08T16:53:16.150Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -15,7 +15,7 @@
       "dependencies": [],
       "reason": "Peticion del dueno 2026-08-01 para presentar a su cliente.",
       "title": "Sistema para punto de venta de POLLO ASADO (y otros productos de comida) con facturacion, ",
-      "description": "Sistema para punto de venta de POLLO ASADO (y otros productos de comida) con facturacion, inventario, toma de pedido en punto fisico, domicilios por canal propio, pagina publica como destino de campanas, y plan de mercadeo. El plan completo se entrego al dueno en PDF: C:/Users/Kalel/asadero/Plan-Asadero.pdf (11 paginas, generado con Edge headless desde plan-asadero.html)."
+      "description": "Sistema para punto de venta de POLLO ASADO (y otros productos de comida) con facturacion, inventario, toma de pedido en punto fisico, domicilios por canal propio, pagina publica como destino de campanas, y plan de mercadeo. El plan completo se entrego al dueno en PDF: [PDF generado en Windows, no verificado post-mudanza a Mac: Plan-Asadero.pdf]."
     },
     {
       "id": "DEC-002",
@@ -111,29 +111,14 @@
       ],
       "reason": "Run completado 2026-08-15: el dueno pidio 'pagina publica como destino de campanas'. Pivote arquitectonico de DOS CARAS: villa-app (pública) consume APIs de broaster-app (contable) vía proxy, ambas Next.js, ambas estateless (disco en broaster). QA 8/8 PASS con 1 fix-cycle trivial (metadata title de /admin).",
       "title": "Pivote arquitectonico: DOS CARAS (villa-app pública + broaster-app contable)",
-      "description": "ARQUITECTURA BIFURCADA (verificado QA 8/8 PASS 2026-08-15): (A) villa-app (C:\\Users\\Kalel\\asadero\\villa-app, puerto 3201): app pública móvil-first estilo Rappi, PROTOTIPO VISUAL aprobado a nivel 'quiero ver cómo se ve, no es el resultado final'. STATELESS: consume APIs públicas de broaster-app vía rewrites de Next.js (/api/* → http://localhost:3200/api/*). Componentes: components/tienda/ (Tienda orquestador, Promos, BarraCarrito), components/orden/Confirmacion. Carrito en localStorage, domicilio prioritario, checkout una pantalla. Paleta: capas #0a0a0a/#141414/#212121/#2b2b2b, rojo marca SUBIDO a #e01e2b (fondo oscuro), naranja #ff8a20 (precios/acentos), textos cálidos claros, ratios AA en villa-app/app/globals.css. (B) broaster-app (C:\\Users\\Kalel\\asadero\\broaster-app, puerto 3200): SOFTWARE CONTABLE puro, / redirige 307 a /admin. Landing y /pedido BORRADOS (viven en historia git, commits fb163b4/db19168). Marca/sedes reubicadas en components/marca/datos.ts (fuente única: NEGOCIO, LOCALES_PUBLICOS, NOMBRE_LOCAL). formatoCop fusionado en components/admin/formato.ts. Título 'Sistema contable · Villa Broaster'. Rutas: / (redirect /admin), /admin (5 pestañas: Ordenes, Inventario, Gastos, Comparativa, Usuarios), /comprobante/[id]. APIs públicas: GET /api/productos, POST /api/ordenes, GET /api/ordenes/[id], POST /api/suscriptores (280 tests cubriendo dominio, almacén, acceso). CROSS-FLOW VERIFICADO: orden L1-0001 creada desde villa-app vía proxy = misma orden y total en admin."
-    },
-    {
-      "id": "DEC-008",
-      "type": "Decision",
-      "tier": "Project",
-      "created": "2026-08-22T00:00:00.000Z",
-      "updated": "2026-09-02T02:37:20.000Z",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "High",
-      "status": "Accepted",
-      "dependencies": [],
-      "reason": "Run completado 2026-08-22: análisis y planning del repositorio del cliente, estructura del equipo, y estándar de login aplicado al sistema.",
-      "title": "Repo del CLIENTE y plan de equipo (2026-08-22)",
-      "description": "REPOSITORIO RENOMBRADO: asadero → villa-broaster, raíz C:/Users/Kalel/prommter/proyectos/villa-broaster. ESTRUCTURA RAÍZ: broaster-app/ (sistema contable, puerto 3200), villa-app/ (vitrina pública, puerto 3201), docs/ (propuestas PDF/HTML, BASES-CAJA.md, Prompt-Claude-Design-VillaApp.md), tareas/ (T-01..T-10), memory/villa-broaster/ (ORION), README.md (onboarding: arrancar en 10 min, 4 invariantes, flujo rama→verificar→PR), PLAN-EQUIPO.md (lo que hay, lo que falta E1-E7 por rol, camino por especialidad, ritmo semanal SIN dueño, definición de hecho, checklist revisión senior). EQUIPO: (1) desarrollador senior 8 años = módulo Caja (T-02, T-03, T-04) + despliegue (T-05) + revisor técnico; (2) diseñador landing novato = vitrina branding (T-06, T-07); (3) diseñadora novata = identidad + revisión login + textos (T-08, T-09); (4) dueño = solo desbloqueos críticos (T-10: datos reales GitHub, invitar equipo, proteger main, hosting, dominio, DIAN). COMANDOS VERIFICACIÓN: ambas apps con `npm run verificar` (broaster-app: typecheck+lint+tests; villa-app: typecheck) como PUERTA DE PR. PRINCIPIO: 'que funcione aun sin yo trabajar' — toda tarea tiene definición de hecho + criteria, branches con protección main. || NOTA 2026-09-01: las rutas C:/Users/Kalel/... y los nombres de repo de este objeto quedaron obsoletos con la mudanza a la Mac — la verdad vigente esta en DEC-013."
+      "description": "ARQUITECTURA BIFURCADA (verificado QA 8/8 PASS 2026-08-15): (A) villa-app (villa-app/ en local, puerto 3201; ruta histórica Windows no válida post-mudanza a Mac: ver DEC-013): app pública móvil-first estilo Rappi, PROTOTIPO VISUAL aprobado a nivel 'quiero ver cómo se ve, no es el resultado final'. STATELESS: consume APIs públicas de broaster-app vía rewrites de Next.js (/api/* → http://localhost:3200/api/*). Componentes: components/tienda/ (Tienda orquestador, Promos, BarraCarrito), components/orden/Confirmacion. Carrito en localStorage, domicilio prioritario, checkout una pantalla. Paleta: capas #0a0a0a/#141414/#212121/#2b2b2b, rojo marca SUBIDO a #e01e2b (fondo oscuro), naranja #ff8a20 (precios/acentos), textos cálidos claros, ratios AA en villa-app/app/globals.css. (B) broaster-app (broaster-app/ en local, puerto 3200; ruta histórica Windows no válida post-mudanza a Mac: ver DEC-013): SOFTWARE CONTABLE puro, / redirige 307 a /admin. Landing y /pedido BORRADOS (viven en historia git, commits fb163b4/db19168). Marca/sedes reubicadas en components/marca/datos.ts (fuente única: NEGOCIO, LOCALES_PUBLICOS, NOMBRE_LOCAL). formatoCop fusionado en components/admin/formato.ts. Título 'Sistema contable · Villa Broaster'. Rutas: / (redirect /admin), /admin (5 pestañas: Ordenes, Inventario, Gastos, Comparativa, Usuarios), /comprobante/[id]. APIs públicas: GET /api/productos, POST /api/ordenes, GET /api/ordenes/[id], POST /api/suscriptores (280 tests cubriendo dominio, almacén, acceso). CROSS-FLOW VERIFICADO: orden L1-0001 creada desde villa-app vía proxy = misma orden y total en admin."
     },
     {
       "id": "DEC-009",
       "type": "Decision",
       "tier": "Project",
       "created": "2026-08-22T00:00:00.000Z",
-      "updated": "2026-09-02T02:37:20.000Z",
+      "updated": "2026-09-03T00:00:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
@@ -141,7 +126,10 @@
       "dependencies": [],
       "reason": "Petición literal del dueño 2026-08-22: 'no quiero que el diseñador de landing pueda dañar el trabajo del programador, toca separar el trabajo'.",
       "title": "TRES REPOS por rol (2026-08-22)",
-      "description": "Estructura de repositorios bifurcada por responsabilidad. (A) REPO EQUIPO: C:/Users/Kalel/prommter/proyectos/villa-broaster (repo principal, raíz compartida). Contenido: README.md (onboarding 10 min + 4 invariantes), PLAN-EQUIPO.md (interactivo móvil-first + planes por rol formales en PDF), docs/ (propuestas, BASES-CAJA.md, Prompt-Design), tareas/ (T-01..T-10), memory/villa-broaster/ (ORION). Gitignore: broaster-app/ (folder del repo privado), villa-app/ (folder del repo privado). Protección: main branch. Activación T-10: dueño crea 3 remotos privados e invita por rol con acceso según especialidad. (B) REPO SISTEMA (contable): villa-broaster-sistema (GitHub privado, dueño + senior). Git history: preservada con 'git subtree split' desde broaster-app/ del repo equipo (9 commits). Ruta local: C:/Users/Kalel/prommter/proyectos/villa-broaster/broaster-app (launch.json intacto, rutas internas sin cambios). Contenido: sistema contable Next.js puerto 3200, landing y /pedido borrados, marca/datos en components/marca/, admin 5 pestañas (Órdenes/Inventario/Gastos/Comparativa/Usuarios), APIs públicas, tests 68. Acceso: solo dueño y senior escriben; diseñador de landing entra por PR revisada para T-09. (C) REPO VITRINA (pública): villa-broaster-vitrina (GitHub privado, diseñador landing + diseñadora). Git history: preservada con 'git subtree split' desde villa-app/ del repo equipo (4 commits). Ruta local: C:/Users/Kalel/prommter/proyectos/villa-broaster/villa-app (launch.json intacto, rutas internas sin cambios). Contenido: vitrina pública Next.js puerto 3201, stateless, consume /api/* de broaster-app vía rewrite, componentes tienda/orden, carrito localStorage, paleta oscura #0a0a0a/#141414/#2b2b2b, rojo #e01e2b, naranja #ff8a20. Acceso: diseñador landing + diseñadora, PRs revisadas por el senior. MEMORIA ORION: permanece en el repo equipo (regla: repo-exterior). CRITERIO DE SEPARACIÓN: 'no bloquear a un rol por el trabajo del otro' — sistema y vitrina comparten cero archivos en disco, comunican por HTTP. || NOTA 2026-09-01: las rutas C:/Users/Kalel/... y los nombres de repo de este objeto quedaron obsoletos con la mudanza a la Mac — la verdad vigente esta en DEC-013."
+      "description": "Estructura de repositorios bifurcada por responsabilidad. (A) REPO EQUIPO: Equipo-villa-broaster (repo principal, raíz compartida; ruta Windows histórica no válida: ver DEC-013). Contenido: README.md (onboarding 10 min + 4 invariantes), PLAN-EQUIPO.md (interactivo móvil-first + planes por rol formales en PDF), docs/ (propuestas, BASES-CAJA.md, Prompt-Design), tareas/ (T-01..T-10), memory/villa-broaster/ (ORION). Gitignore: broaster-app/ (folder del repo privado), villa-app/ (folder del repo privado). Protección: main branch. Activación T-10: dueño crea 3 remotos privados e invita por rol con acceso según especialidad. (B) REPO SISTEMA (contable): broaster-app-repo (GitHub privado, dueño + senior; nombres y rutas históricos Windows en DEC-013). Git history: preservada con 'git subtree split' desde broaster-app/ del repo equipo (9 commits). Contenido: sistema contable Next.js puerto 3200, landing y /pedido borrados, marca/datos en components/marca/, admin 5 pestañas (Órdenes/Inventario/Gastos/Comparativa/Usuarios), APIs públicas, tests 68. Acceso: solo dueño y senior escriben; diseñador de landing entra por PR revisada para T-09. (C) REPO VITRINA (pública): villa-app-repo (GitHub privado, diseñador landing + diseñadora; nombres y rutas históricos Windows en DEC-013). Git history: preservada con 'git subtree split' desde villa-app/ del repo equipo (4 commits). Contenido: vitrina pública Next.js puerto 3201, stateless, consume /api/* de broaster-app vía rewrite, componentes tienda/orden, carrito localStorage, paleta oscura #0a0a0a/#141414/#2b2b2b, rojo #e01e2b, naranja #ff8a20. Acceso: diseñador landing + diseñadora, PRs revisadas por el senior. MEMORIA ORION: vive en /Users/g/orion/memory/villa-broaster/ (fuera del repo equipo). CRITERIO DE SEPARACIÓN: 'no bloquear a un rol por el trabajo del otro' — sistema y vitrina comparten cero archivos en disco, comunican por HTTP. ABSORBIÓ DEC-008 (repo del cliente, plan equipo) que cubrían aspecto similar. Nombres obsoletos: villa-broaster-sistema y villa-broaster-vitrina (ver DEC-013).",
+      "supersedes": [
+        "DEC-008"
+      ]
     },
     {
       "id": "DEC-011",
@@ -245,7 +233,7 @@
         "DEC-003",
         "KN-010"
       ],
-      "fact": "Mapa de arquitectura bifurcada con TRES REPOS (QA 8/8 PASS 2026-08-15 pivote DOS CARAS; 7/7 PASS 2026-08-22 plan equipo y repos separados). REPOSITORIO PRINCIPAL (EQUIPO): C:/Users/Kalel/prommter/proyectos/villa-broaster (raíz compartida renombrada 2026-08-22), estructura broaster-app/ + villa-app/ + docs/ + tareas/ + README + PLAN-EQUIPO.md + memory/villa-broaster/. Gitignore: broaster-app/ y villa-app/ ignorados (repos privados). DOCUMENTACIÓN BIFURCADA: (A) docs/plan-equipo.html = FRAGMENTO interactivo 126 KB v2 REDISEÑADO (Orama-grade: hero cinematográfico oscuro, cifras animadas, diagrama SVG E1-E8, barras progreso), mobil-first, Google Fonts Bricolage Grotesque/Instrument Sans/Caveat, tablero E1-E7 + stepper flujo + stepper Caja + tabs por rol (Senior/Landing/Diseñadora/Marketing), acordeones T-01..T-10, calendario 4 semanas, sección 'Para el programador'. Abre en navegador, publicable como Artifact. (B) docs/planes/plan-{desarrollador-senior,disenador-landing,disenadora,marketing}.{html,pdf} = planes formales A4 (19/13/12/13 páginas) generados con Edge headless CDP (emulación móvil 390x800 en vez de --screenshot de escritorio que recorta), PDF via generador Edge command-line. Contenido fiel a tareas/ + PLAN-EQUIPO. REPOS PRIVADOS (GitHub, git history preservada con subtree split 2026-08-22): (1) villa-broaster-sistema (dueño+senior): broaster-app/ 9 commits, Next.js puerto 3200, landing/pedido borrados, admin 5 pestañas (Órdenes/Inventario/Gastos/Comparativa/Usuarios), APIs públicas, tests 68, marca/datos components/marca/datos.ts. Ruta local: C:/Users/Kalel/prommter/proyectos/villa-broaster/broaster-app (launch.json intacto). (2) villa-broaster-vitrina (landing+diseñadora): villa-app/ 4 commits, Next.js puerto 3201, stateless, consume /api/* de broaster-app vía rewrite, componentes tienda/orden/Confirmacion, carrito localStorage, paleta oscura #0a0a0a/#141414/#2b2b2b, rojo #e01e2b, naranja #ff8a20. Ruta local: C:/Users/Kalel/prommter/proyectos/villa-broaster/villa-app (launch.json intacto). CONFIRMACIÓN EN VIVO (2026-08-20): villa-app polling 10s, PARA estado terminal. ÓRDENES POLLING INTELIGENTE (2026-08-20): broaster-app GET /api/admin/órdenes cada 8s cuando rango=HOY y pestaña visible, badge+animar+beep+título dinámico. CATÁLOGO (2026-08-20): anexar (leer→decidir→escribir serializado, slug=prefijo+normalizado, colisión→-2/-3, 10 altas simultáneas verificadas), editar (PATCH parcial). UI UNIFICADA (2026-08-20): components/admin/ui.ts recetas puras (TARJETA/FILA/BOTON_*/CAMPO/claseChip/ESTADO_VACIO), tokens --shadow-tarjeta y --animate-entrada, prefers-reduced-motion CERO anim. LOGIN ORAMA (2026-08-22): LoginForm+LoginMedia, hero media 57%/formulario 43% desktop, ≤720px media fijo+panel pie, vidrio blur 24px, entrada cascada.82s, Ken Burns 28s, tokens --login-* adicivos, H1 14.86:1 AAA/botón 11.97:1 AAA, timing-safe sha256+timingSafeEqual. TAREAS (2026-08-22): T-11 (usuarios/roles/puestos) creada e implementada en rama feature/roles-puestos (commit f064c81): usuarios admin/cajero con PIN (scrypt), puesto por equipo (localStorage), cookie firmada HMAC {usuarioId, rol, puesto, exp}, exigirSeccion con 401/403, cajero solo Órdenes con sede fija, pestaña Usuarios, bloqueo por usuario+puesto; 107 tests en verde, e2e admin OK. PAUSADO POR ORDEN DEL PROYECTO ('nada de código aún'). LECCIONES OPERATIVAS: (1) msedge --headless --screenshot RECORTA en Windows (mínimo escritorio) — usar CDP emulación móvil (ORION/tools/edge-cdp.mjs); (2) builders dejan espurios con variables sin expandir ($name literal) — revisar git status pre-commit; (3) auditar GÉNERO gramatical en docs por rol (builder escribió femenino al landing, requirió corrección); (4) NO hay renderizador PDF interno — verificar estructura PDF + captura HTML fuente. READMEs por app + rutas invariantes.",
+      "fact": "Mapa de arquitectura bifurcada con TRES REPOS (QA 8/8 PASS 2026-08-15 pivote DOS CARAS; 7/7 PASS 2026-08-22 plan equipo y repos separados). REPOSITORIO PRINCIPAL (EQUIPO): [repos en /Users/g/orion/prommter post-mudanza: ver DEC-013] (raíz compartida renombrada 2026-08-22), estructura broaster-app/ + villa-app/ + docs/ + tareas/ + README + PLAN-EQUIPO.md + memory/villa-broaster/. Gitignore: broaster-app/ y villa-app/ ignorados (repos privados). DOCUMENTACIÓN BIFURCADA: (A) docs/plan-equipo.html = FRAGMENTO interactivo 126 KB v2 REDISEÑADO (Orama-grade: hero cinematográfico oscuro, cifras animadas, diagrama SVG E1-E8, barras progreso), mobil-first, Google Fonts Bricolage Grotesque/Instrument Sans/Caveat, tablero E1-E7 + stepper flujo + stepper Caja + tabs por rol (Senior/Landing/Diseñadora/Marketing), acordeones T-01..T-10, calendario 4 semanas, sección 'Para el programador'. Abre en navegador, publicable como Artifact. (B) docs/planes/plan-{desarrollador-senior,disenador-landing,disenadora,marketing}.{html,pdf} = planes formales A4 (19/13/12/13 páginas) generados con Edge headless CDP (emulación móvil 390x800 en vez de --screenshot de escritorio que recorta), PDF via generador Edge command-line. Contenido fiel a tareas/ + PLAN-EQUIPO. REPOS PRIVADOS (GitHub, git history preservada con subtree split 2026-08-22): (1) villa-broaster-sistema (dueño+senior): broaster-app/ 9 commits, Next.js puerto 3200, landing/pedido borrados, admin 5 pestañas (Órdenes/Inventario/Gastos/Comparativa/Usuarios), APIs públicas, tests 68, marca/datos components/marca/datos.ts. Ruta local: [repos en /Users/g/orion/prommter post-mudanza: ver DEC-013]/broaster-app (launch.json intacto). (2) villa-broaster-vitrina (landing+diseñadora): villa-app/ 4 commits, Next.js puerto 3201, stateless, consume /api/* de broaster-app vía rewrite, componentes tienda/orden/Confirmacion, carrito localStorage, paleta oscura #0a0a0a/#141414/#2b2b2b, rojo #e01e2b, naranja #ff8a20. Ruta local: [repos en /Users/g/orion/prommter post-mudanza: ver DEC-013]/villa-app (launch.json intacto). CONFIRMACIÓN EN VIVO (2026-08-20): villa-app polling 10s, PARA estado terminal. ÓRDENES POLLING INTELIGENTE (2026-08-20): broaster-app GET /api/admin/órdenes cada 8s cuando rango=HOY y pestaña visible, badge+animar+beep+título dinámico. CATÁLOGO (2026-08-20): anexar (leer→decidir→escribir serializado, slug=prefijo+normalizado, colisión→-2/-3, 10 altas simultáneas verificadas), editar (PATCH parcial). UI UNIFICADA (2026-08-20): components/admin/ui.ts recetas puras (TARJETA/FILA/BOTON_*/CAMPO/claseChip/ESTADO_VACIO), tokens --shadow-tarjeta y --animate-entrada, prefers-reduced-motion CERO anim. LOGIN ORAMA (2026-08-22): LoginForm+LoginMedia, hero media 57%/formulario 43% desktop, ≤720px media fijo+panel pie, vidrio blur 24px, entrada cascada.82s, Ken Burns 28s, tokens --login-* adicivos, H1 14.86:1 AAA/botón 11.97:1 AAA, timing-safe sha256+timingSafeEqual. TAREAS (2026-08-22): T-11 (usuarios/roles/puestos) creada e implementada en rama feature/roles-puestos (commit f064c81): usuarios admin/cajero con PIN (scrypt), puesto por equipo (localStorage), cookie firmada HMAC {usuarioId, rol, puesto, exp}, exigirSeccion con 401/403, cajero solo Órdenes con sede fija, pestaña Usuarios, bloqueo por usuario+puesto; 107 tests en verde, e2e admin OK. PAUSADO POR ORDEN DEL PROYECTO ('nada de código aún'). LECCIONES OPERATIVAS: (1) msedge --headless --screenshot RECORTA en Windows (mínimo escritorio) — usar CDP emulación móvil (ORION/tools/edge-cdp.mjs); (2) builders dejan espurios con variables sin expandir ($name literal) — revisar git status pre-commit; (3) auditar GÉNERO gramatical en docs por rol (builder escribió femenino al landing, requirió corrección); (4) NO hay renderizador PDF interno — verificar estructura PDF + captura HTML fuente. READMEs por app + rutas invariantes.",
       "context": "Construido olas A+B paralelas 2026-08-08 + dominio secuencial + gastos + comparativa 2026-08-10 + sistema vivo 2026-08-20 (3 olas: órdenes+catálogo+confirmación paralelas + UI + visual); actualizado pivote DOS CARAS 2026-08-15; renombrado repo a villa-broaster 2026-08-22; plan equipo en dos piezas (interactivo+PDFs) + 3 repos con subtree split 2026-08-22; T-11 completo en rama feature/roles-puestos. Tests: 68 (dominio+almacén+acceso) + 107 (roles)."
     },
     {
@@ -343,7 +331,7 @@
       "priority": "High",
       "status": "Current",
       "dependencies": [],
-      "fact": "LOGIN ESTÁNDAR DE CALIDAD 'estilo Orama' aplicado al sistema (2026-08-22). Referencia: plantilla orama/prompts/plantilla-login-pixel-locked.md (cliente Prommter, inmobiliaria Popayán, repositorio prommter/proyectos/orama). IMPLEMENTACIÓN EN BROASTER-APP: broaster-app/components/admin/LoginForm.tsx + LoginMedia.tsx. ARQUITECTURA: composición partida — hero media 57% / formulario panel 43% en desktop; en ≤~720px la media es fondo absoluto con position:fixed y el panel va al pie con safe-area-inset-bottom. TARJETA DE VIDRIO: backdrop-filter blur 24px, border-radius 24px, borde cálido 1px (--color-borde-login). ENTRADA ESCALONADA: loginCard animación .82s + loginUp cascada en items (input/button), cubic-bezier(.16,1,.3,1), fill both. KEN BURNS 28s sobre ilustración SVG propia (HUECO documentado en LoginMedia para <video> cuando cliente entregue material). TOKENS ADITIVOS: --login-texto (alto contraste H1), --login-subtexto, --login-pie, --login-error, --login-crema (fondo vidrio), --login-boton-fin. ACCESIBILIDAD: prefers-reduced-motion desactiva TODAS las animaciones (verificado: 0 anim), sin sorpresas. CONTRASTE MEDIDO (2026-08-22): H1 14.86:1 (AAA), subtítulo 10.21:1 (AA+), pie 7.68:1 (AA), botón 11.97:1 (AAA). LÓGICA INTACTA: clave única (timing-safe sha256+timingSafeEqual), manejo de errores API con bloqueo tras 5 intentos/15 min (lib/acceso/intentos.ts), router.refresh() tras auth exitosa. CERO DATOS INVENTADOS: form prompts, labels, error messages codificados sin randomización.",
+      "fact": "LOGIN ESTÁNDAR DE CALIDAD 'estilo Orama' aplicado al sistema (2026-08-22). Referencia: plantilla orama/prompts/plantilla-login-pixel-locked.md (cliente Prommter, inmobiliaria Popayán, repositorio prommter/orama). IMPLEMENTACIÓN EN BROASTER-APP: broaster-app/components/admin/LoginForm.tsx + LoginMedia.tsx. ARQUITECTURA: composición partida — hero media 57% / formulario panel 43% en desktop; en ≤~720px la media es fondo absoluto con position:fixed y el panel va al pie con safe-area-inset-bottom. TARJETA DE VIDRIO: backdrop-filter blur 24px, border-radius 24px, borde cálido 1px (--color-borde-login). ENTRADA ESCALONADA: loginCard animación .82s + loginUp cascada en items (input/button), cubic-bezier(.16,1,.3,1), fill both. KEN BURNS 28s sobre ilustración SVG propia (HUECO documentado en LoginMedia para <video> cuando cliente entregue material). TOKENS ADITIVOS: --login-texto (alto contraste H1), --login-subtexto, --login-pie, --login-error, --login-crema (fondo vidrio), --login-boton-fin. ACCESIBILIDAD: prefers-reduced-motion desactiva TODAS las animaciones (verificado: 0 anim), sin sorpresas. CONTRASTE MEDIDO (2026-08-22): H1 14.86:1 (AAA), subtítulo 10.21:1 (AA+), pie 7.68:1 (AA), botón 11.97:1 (AAA). LÓGICA INTACTA: clave única (timing-safe sha256+timingSafeEqual), manejo de errores API con bloqueo tras 5 intentos/15 min (lib/acceso/intentos.ts), router.refresh() tras auth exitosa. CERO DATOS INVENTADOS: form prompts, labels, error messages codificados sin randomización.",
       "context": "Estándar aplicado 2026-08-22 en reorganización del repositorio. Orama es cliente real Prommter (inmobiliaria, Popayán) con plantilla de login probada en producción. Nivel de calidad: entrada visual memorable + accesibilidad rigorosa + seguridad timing-safe + UX fluida."
     },
     {
@@ -436,34 +424,6 @@
       "reason": "Separación de responsabilidades por rol pedida por el dueño. Sistema y vitrina listos en local; falta activación GitHub y hosting real."
     },
     {
-      "id": "ROAD-001",
-      "type": "Roadmap",
-      "tier": "Project",
-      "created": "2026-08-01T00:00:00.000Z",
-      "updated": "2026-08-27T00:00:00.000Z",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "High",
-      "status": "Done",
-      "dependencies": [],
-      "milestone": "E1 — El punto vende y cuadra",
-      "description": "COMPLETADO 2026-08-25: Toma de pedido rapida (6 toques, sin scroll a 390px), cobro con efectivo/transferencia/datafono (2 toques), comprobante en pantalla (L{1,2}-XXXX lineas congeladas), cierre de turno con arqueo (TurnoCaja, arqueo sin romper desglose por canal). Resultado: se acaban los descuadres. Modulo de Caja con 176 tests verde, auditoria triple adversarial detecto agujero de robo (cancelar orden cobrada) y doble carrera (cobro y cierre simultaneos). Implementado PEND-006."
-    },
-    {
-      "id": "ROAD-002",
-      "type": "Roadmap",
-      "tier": "Project",
-      "created": "2026-08-01T00:00:00.000Z",
-      "updated": "2026-08-27T00:00:00.000Z",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "High",
-      "status": "Done",
-      "dependencies": [],
-      "milestone": "E2 — El inventario dice la verdad",
-      "description": "COMPLETADO 2026-08-25: Registro de gastos (concepto obligatorio, G{local}-XXXX consecutivos, anular sin borrado), desglose por canal (ventasLocal vs ventasDomicilio explicito), neto=cierre, cierre por turno. Modulo de gastos + comparativa entre sedes + CSV contador. Resultado: aparece el costo real de operacion y margen neto por local. Suite: 60 tests de contabilidad, 14 de almacen-disco, 7 de intentos (bloqueo tras 5 fallos/15 min)."
-    },
-    {
       "id": "ROAD-003",
       "type": "Roadmap",
       "tier": "Project",
@@ -553,22 +513,6 @@
       ],
       "fact": "LOS TRES REPOS DE GITHUB ESTABAN VACIOS Y NADIE LO SABIA (hallado 2026-08-24). El dueno creo los tres remotos privados (Equipo-villa-broaster, Sistema-villa-broaster-sistema, Vitrina-villa-broaster-vitrina) y los CLONO DENTRO de las carpetas de trabajo: villa-broaster/Equipo villa-broaster/, broaster-app/Sistema villa-broaster-sistema/, villa-app/Vitrina villa-broaster-vitrina/. Cada clon traia solo Initial commit con un .gitattributes; el trabajo real (32 + 11 + 5 = 48 commits) nunca salio del computador, y el dueno creia que ya estaba publicado. PATRON A VIGILAR: un clon vacio anidado dentro de la carpeta de trabajo se ve identico a un repo publicado — aparece como carpeta sin trackear en git status y no da ningun error. CORREGIDO: los tres clones se retiraron (movidos al scratchpad, no borrados) y se enlazo cada repo local con su remoto por git remote add. NO SE PUDO HACER FETCH NI PUSH: git por terminal en esta maquina no autentica (could not read Username for https://github.com) y los repos son privados — confirma entorno-de-la-maquina. Procedimiento escrito en docs/REPOS.md: borrar los 3 repos vacios y recrearlos SIN README para evitar la divergencia del Initial commit, luego GitHub Desktop > Add local repository > Push origin, y despues accesos por rol + proteccion de main. || DESENLACE (2026-09-01): el patron se confirmo pero la correccion salio a medias. De los tres remotos, SOLO el del sistema termino publicado — y con OTRO nombre, broaster-app-repo (35 commits, incluido el merge 'Unir con el repositorio de GitHub' que absorbio el Initial commit). Los otros dos siguieron vacios cinco semanas mientras su contenido vivia suelto en ~/Downloads sin control de versiones. Cerrado hoy: villa-app-repo y Equipo-villa-broaster quedaron poblados y commiteados en local (ver DEC-012 y KN-035); falta el push del dueno. || CERRADO DEL TODO 2026-09-01: los tres repos quedaron publicados. villa-app-repo (de20b97) y Equipo-villa-broaster (f3b5fe3) subieron por terminal desde la Mac — local y remoto en el mismo commit, cero pendientes en los tres. El push del repo del equipo (19 MB de PDFs en docs/) fallo primero con 'RPC failed; HTTP 400' y entro tras subir http.postBuffer a 500 MB. La regla 'ningun agente hace push' quedo derogada por el dueno (politica DEC-001 de la memoria permanente).",
       "context": "Run 2026-08-24. El dueno pregunto si los repos ya quedaban publicados; la respuesta medida es que no."
-    },
-    {
-      "id": "PEND-010",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-08-24T20:45:00.000Z",
-      "updated": "2026-09-02T02:53:11.000Z",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "High",
-      "status": "Done",
-      "dependencies": [
-        "KN-016"
-      ],
-      "task": "[HECHO 2026-09-01 en su mayor parte] Los TRES repos estan publicados y sincronizados: broaster-app-repo f5abd4b, villa-app-repo de20b97, Equipo-villa-broaster f3b5fe3. LO QUE QUEDA, y es accion del dueno en la web de GitHub: (1) invitar por rol — Equipo-villa-broaster = las 3 personas Read, broaster-app-repo = senior Write, villa-app-repo = disenador de landing + disenadora Write; (2) borrar los dos repos obsoletos y vacios, Sistema-villa-broaster-sistema y Vitrina-villa-broaster-vitrina. (3) PROTEGER MAIN NO SE PUEDE HOY: GitHub responde 403 'Upgrade to GitHub Pro or make this repository public' — las reglas de rama no existen en repos privados del plan gratuito. O se paga Pro, o los repos se hacen publicos, o la puerta de calidad se sostiene por acuerdo del equipo y no por la plataforma. Decision del dueno.",
-      "reason": "El codigo ya esta arriba; falta abrirles la puerta a las tres personas y decidir que hacer con la proteccion de main."
     },
     {
       "id": "KN-017",
@@ -847,7 +791,7 @@
       "status": "Accepted",
       "title": "Los TRES repos canonicos y la mudanza a la Mac (2026-09-01)",
       "reason": "Peticion literal del dueno 2026-09-01: 'recuerda que los repos son 3: villa app repo, broaster app repo y equipo villa broaster'. Los nombres de DEC-009 quedaron obsoletos y dos clones sobraban.",
-      "description": "LOS TRES REPOS SON, con estos nombres exactos en la cuenta kalelfelpem-glitch: (A) broaster-app-repo = el SISTEMA contable (broaster-app, :3200, PWA); (B) villa-app-repo = la VITRINA publica (villa-app, :3201, stateless); (C) Equipo-villa-broaster = el repo del EQUIPO (README, PLAN-EQUIPO.md, PENDIENTES-GIT.md, tareas/, docs/). OBSOLETOS, no usar: Sistema-villa-broaster-sistema y Vitrina-villa-broaster-vitrina — son los nombres viejos de DEC-009/PEND-004; sus remotos siguen vacios en GitHub y sus clones locales se retiraron de la casa. RUTAS NUEVAS (la maquina ya no es Windows): los tres repos viven en /Users/g/orion/prommter/<nombre-del-repo>, dentro de la empresa prommter, que orion ignora por .gitignore porque son vehiculos de publicacion con remoto propio. La MEMORIA ORION ya no viaja en el repo del equipo: vive en /Users/g/orion/memory/villa-broaster/ — fuera del repo que las tres personas del equipo leen, porque contiene decisiones internas, costos y notas de negocio. Toda ruta C:/Users/Kalel/... que quede en objetos viejos (DEC-008, DEC-009, PEND-004) describe la maquina anterior y no debe seguirse."
+      "description": "LOS TRES REPOS SON, con estos nombres exactos en la cuenta kalelfelpem-glitch: (A) broaster-app-repo = el SISTEMA contable (broaster-app, :3200, PWA); (B) villa-app-repo = la VITRINA publica (villa-app, :3201, stateless); (C) Equipo-villa-broaster = el repo del EQUIPO (README, PLAN-EQUIPO.md, PENDIENTES-GIT.md, tareas/, docs/). OBSOLETOS, no usar: Sistema-villa-broaster-sistema y Vitrina-villa-broaster-vitrina — son los nombres viejos de DEC-009/PEND-004; sus remotos siguen vacios en GitHub y sus clones locales se retiraron de la casa. RUTAS NUEVAS (la maquina ya no es Windows): los tres repos viven en /Users/g/orion/prommter/<nombre-del-repo>, dentro de la empresa prommter, que orion ignora por .gitignore porque son vehiculos de publicacion con remoto propio. La MEMORIA ORION ya no viaja en el repo del equipo: vive en /Users/g/orion/memory/villa-broaster/ — fuera del repo que las tres personas del equipo leen, porque contiene decisiones internas, costos y notas de negocio. Toda ruta $HOME/... que quede en objetos viejos (DEC-008, DEC-009, PEND-004) describe la maquina anterior y no debe seguirse."
     },
     {
       "id": "KN-035",
@@ -865,6 +809,22 @@
       "status": "Current",
       "title": "La historia si estaba en GitHub, y el CRLF hace mentir al diff",
       "fact": "Al mudar el proyecto a la Mac (2026-09-01) el arbol de ~/Downloads/villa-broaster NO tenia .git: parecia que los 44+21+5 commits se habian perdido en la migracion desde Windows. NO era asi. `git ls-remote --heads origin` sobre los cinco remotos mostro que broaster-app-repo tenia main en f5abd4b (35 commits, mas la rama feature/roles-puestos en f064c81) mientras el clon local seguia en su Initial commit 1eabd82. El dueno SI habia empujado el sistema por GitHub Desktop; lo que estaba desactualizado era el clon, no el remoto. PRIMERA LECCION: antes de dar por perdida una historia, preguntarle al REMOTO con ls-remote — cuesta un segundo y evita fundar un repo nuevo encima de 35 commits vivos. Un `git fetch` + `reset --hard origin/main` lo recupero entero. SEGUNDA LECCION: comparar ese arbol restaurado contra la copia de Downloads dio 166 archivos 'differ' con diff -rq — y CERO diferencias reales. Todo era CRLF (Windows) contra LF (checkout en Mac con `* text=auto` en .gitattributes). Un diff plano entre un arbol traido de Windows y un checkout de git en Mac SIEMPRE va a mentir: comparar con `diff --strip-trailing-cr` antes de creer que hay trabajo divergente. TERCERA: los archivos venidos de Windows llegan con modo 700; git los ve como 100755 y ensucia el arbol con cambios de modo sin contenido. Normalizar con chmod 644/755 despues de copiar."
+    },
+    {
+      "id": "KN-036",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-09-08T16:53:16.150Z",
+      "updated": "2026-09-08T16:53:16.150Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "DEC-003"
+      ],
+      "fact": "LA PUERTA DE CALIDAD NO CONSTRUIA Y POR ESO LA APP NO SE PODIA DESPLEGAR. npm run verificar era typecheck+lint+test+contraste+rutas-sin-test: 446 tests en verde con next build ROTO. Causa: lib/servidor/entorno.ts hace process.exit(1) al CARGARSE si falta ADMIN_CLAVE y NODE_ENV===production, y next build corre con NODE_ENV=production aunque no atienda peticiones; como Next reparte la fase entre workers, lo unico visible era build worker exited with code: 1. Arreglado con construyendo = NEXT_PHASE === phase-production-build (medido: vale eso al construir y no existe en next start) y obligatoria: produccion && !construyendo. El build entro a verificar y verificar:completo se elimino (existia y no lo corria ni el CI ni nadie). Efecto secundario resuelto: next-env.d.ts alterna entre .next/dev/types y .next/types segun el ultimo comando, asi que se fue al .gitignore para que verificar no ensucie el arbol. Commit 15c0777, 478/478 tests.",
+      "context": "Lo destapo el dueno pegando el registro de npm run build el 2026-09-08, no la puerta. El mismo patron ya se habia pagado en infrapilot/KN-005 (cliente Groq instanciado a nivel de modulo rompia el build sin GROQ_API_KEY, commit 5efdde3): dos proyectos, misma causa raiz —trabajo en tiempo de carga de modulo que se ejecuta al compilar—. Generalizado al tema del cerebro construir-no-es-arrancar."
     }
   ],
   "archives": [
@@ -907,8 +867,41 @@
       "reason": "Merged",
       "supersededBy": "DEC-003",
       "note": "Fusionado con DEC-003. DEC-012 especificaba entregable como PWA (no web nativa); DEC-003 ahora integra: stack/persistencia permanecen, forma entrega es PWA (manifest, SW, standalone display)."
+    },
+    {
+      "id": "ARC-6",
+      "archivedId": "ROAD-001",
+      "archivedType": "Roadmap",
+      "reason": "Expired",
+      "note": "E1 completado 2026-08-25: Caja (176 tests, auditoría triple adversarial, agujero de robo hallado/cerrado, doble carrera resuelta).",
+      "archivedAt": "2026-09-03T00:00:00.000Z"
+    },
+    {
+      "id": "ARC-7",
+      "archivedId": "ROAD-002",
+      "archivedType": "Roadmap",
+      "reason": "Expired",
+      "note": "E2 completado 2026-08-25: Gastos (G{local}-XXXX, concepto obligatorio), desglose canal, neto=cierre, comparativa + CSV contador.",
+      "archivedAt": "2026-09-03T00:00:00.000Z"
+    },
+    {
+      "id": "ARC-8",
+      "archivedId": "PEND-010",
+      "archivedType": "Pending",
+      "reason": "Expired",
+      "note": "Los tres repos publicados: broaster-app-repo f5abd4b, villa-app-repo de20b97, Equipo-villa-broaster f3b5fe3. Queda acción del dueño: invitar por rol, borrar repos obsoletos, decidir protección main (GitHub Pro o pública).",
+      "archivedAt": "2026-09-03T00:00:00.000Z"
+    },
+    {
+      "id": "ARC-9",
+      "archivedId": "DEC-008",
+      "archivedType": "Decision",
+      "reason": "Merged",
+      "supersededBy": "DEC-009",
+      "note": "Bifurcación de repos (TRES REPOS por rol) documentada completamente en DEC-009. Rutas Windows y nombres obsoletos reemplazados en DEC-013. Integración de estructura, equipo, plan y verificación cubierta en DEC-009, DEC-010, DEC-011, DEC-013.",
+      "archivedAt": "2026-09-03T00:00:00.000Z"
     }
   ],
-  "lastAmmRun": "2026-08-31T02:00:00.000Z",
-  "version": 33
+  "lastAmmRun": "2026-09-03T00:00:00.000Z",
+  "version": 35
 }

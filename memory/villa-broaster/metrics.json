@@ -1,6 +1,6 @@
 {
   "projectId": "villa-broaster",
-  "sessionCount": 27,
+  "sessionCount": 28,
   "sessions": [
     {
       "sessionId": "session-2026-08-01-semilla",
@@ -262,7 +262,7 @@
       "outcome": "DONE",
       "fixCycles": 0,
       "modelOutcomes": [],
-      "notes": "Run trivial inline (0 spawns): prompt para Claude Design del rediseno visual de villa-app, con TODOS los datos reales embebidos (sedes/carta 23 productos/promos y cupones/paleta #e01e2b-#ff8a20/reglas KN-009 sin descuentos falsos y KN-008 no inventar datos). Entregable: C:/Users/Kalel/asadero/Prompt-Claude-Design-VillaApp.md, enviado al dueno y committeado."
+      "notes": "Run trivial inline (0 spawns): prompt para Claude Design del rediseno visual de villa-app, con TODOS los datos reales embebidos (sedes/carta 23 productos/promos y cupones/paleta #e01e2b-#ff8a20/reglas KN-009 sin descuentos falsos y KN-008 no inventar datos). Entregable: $HOME/asadero/Prompt-Claude-Design-VillaApp.md, enviado al dueno y committeado."
     },
     {
       "sessionId": "session-2026-08-20-sistema-completo",
@@ -348,7 +348,7 @@
           "measurement_mode": "MEASURED"
         }
       ],
-      "notes": "Run de DISENO (sin build): bases del modulo de Caja para pedidos en punto fisico, con analisis comparativo de placita (que adoptar: cobro-en-bloque, grilla sin scroll, modulo puro; que no: bascula, multi-factura, PIN; hallazgo: placita NO tiene turnos de caja, TurnoCaja se disena desde cero con KN-001 de arroces). Entregable BASES-CAJA.md (commit a5686c1) + PEND-006 con plan de 5 pasos. Mismo run: repo MOVIDO a C:/Users/Kalel/prommter/proyectos/asadero (migracion empresa Prommter, ver memoria prommter), launch.json editado, smoke test PASS (23 productos por proxy, raiz 307). Diseno y reflexion inline del orquestrador."
+      "notes": "Run de DISENO (sin build): bases del modulo de Caja para pedidos en punto fisico, con analisis comparativo de placita (que adoptar: cobro-en-bloque, grilla sin scroll, modulo puro; que no: bascula, multi-factura, PIN; hallazgo: placita NO tiene turnos de caja, TurnoCaja se disena desde cero con KN-001 de arroces). Entregable BASES-CAJA.md (commit a5686c1) + PEND-006 con plan de 5 pasos. Mismo run: repo MOVIDO a $ORION_HOME/prommter/asadero (migracion empresa Prommter, ver memoria prommter), launch.json editado, smoke test PASS (23 productos por proxy, raiz 307). Diseno y reflexion inline del orquestrador."
     },
     {
       "sessionId": "session-2026-08-22-repo-cliente-equipo",
@@ -1062,9 +1062,23 @@
       "fixCycles": 0,
       "modelOutcomes": [],
       "nota": "Corrida INLINE del runtime: cero spawns de subagente (trabajo mecanico de archivos y git, el ciclo completo habria costado mas de lo que ahorraba). Sin modelOutcomes porque el consumo en linea no esta medido — no se inventa cifra. Hallazgo que pago la corrida: preguntar al remoto con ls-remote antes de dar una historia por perdida (KN-035)."
+    },
+    {
+      "sessionId": "session-2026-09-08-build-roto",
+      "runId": "orion-villa-broaster-construir-no-es-arrancar",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-09-08T16:53:57.516Z",
+      "completedAt": "2026-09-08T16:53:57.516Z",
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [],
+      "nota": "Corrida INLINE, cero spawns: la pregunta era de estado y el arreglo cabia en un archivo que ya estaba en contexto. Sin modelOutcomes porque el consumo en linea no esta medido — no se inventa cifra. Lo que pago la corrida: la puerta de calidad no construia, asi que 446 tests en verde convivian con una app que no compilaba, y lo destapo el dueno pegando el registro de npm run build, no la puerta. Segunda leccion: el clon local iba 4 commits por detras del remoto (incluida la carta real del cliente, T-259) y se estuvo a punto de reportar un estado viejo — git fetch antes de dar cualquier estado."
     }
   ],
-  "lastUpdated": "2026-09-02T02:38:21.000Z",
+  "lastUpdated": "2026-09-08T16:53:57.516Z",
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,

@@ -30,24 +30,43 @@ reales (KN-035). Usar `diff --strip-trailing-cr`.
 
 ## Medición en verde (2026-09-08, verificado en esta Mac)
 
-Alguien preguntó "¿ya está listo?" y se comprobó corriendo, no leyendo:
+Se preguntó "¿ya está listo?" y se respondió corriendo, no leyendo. **La primera
+respuesta estuvo incompleta y conviene saber por qué:** `npm run verificar` daba
+446/446 en verde, y con eso se dijo que el software funcionaba. Entonces el dueño
+pegó el registro de `npm run build` y la app **no compilaba**. La puerta no
+construía: `verificar` era typecheck + lint + tests + contraste, y el
+`verificar:completo` que sí construía no lo corría **ni el CI ni nadie**.
 
-| Comprobación | Resultado |
+Causa y arreglo en `construir-no-es-arrancar` (tema del cerebro) y en KN-036:
+`lib/servidor/entorno.ts` mataba el proceso al cargarse si faltaba `ADMIN_CLAVE`
+en producción, y `next build` corre en producción sin atender peticiones. Ahora
+la fase se distingue con `NEXT_PHASE`, el build entró a `verificar`,
+`verificar:completo` desapareció y `next-env.d.ts` se fue al `.gitignore`.
+Commit `15c0777`.
+
+| Comprobación (tras integrar el remoto) | Resultado |
 |---|---|
-| `npm run verificar` en broaster-app | verde: typecheck + lint + **446/446 tests** + 28 pares de contraste sin uno bajo AA + rutas-sin-test |
+| `npm run verificar` en broaster-app, ya **con build** | verde: **478/478 tests**, 28 pares de contraste sin uno bajo AA, `next build` en 0 **sin ADMIN_CLAVE** |
+| `npm run start` sin `ADMIN_CLAVE` | sale 1 con el nombre de la variable: la guardia del arranque **sigue mordiendo** |
+| Arranque con clave | `/api/productos` 200, `/admin` 200, `/` 307 |
 | `npm run verificar` en villa-app | verde: **29/29 tests** |
-| Los tres repos vs GitHub | sincronizados, cero commits locales sin publicar |
-| `plan.mjs estado` | **78/262 tareas** hechas, etapa N1, 14 bloqueadas — todas decisiones del dueño, ninguna de código |
+| `plan.mjs estado` | **78/262** tareas, etapa N1, 14 bloqueadas — todas decisiones del dueño |
 
-El brief anterior decía 330 tests; son 446. Y la migración de rutas de Windows
-dejó restos SIN COMMITEAR en el repo del equipo (5 documentos citando
-`C:\Users\Kalel` y el Edge de Program Files): cerrado en `f4496e7`. La lección
-es que una mudanza no termina cuando el código corre, sino cuando los documentos
-que otro va a seguir dejan de citar una máquina que ya no existe.
+**El remoto iba por delante del clon local**: 4 commits que esta máquina no tenía,
+incluido **T-259, la carta real del cliente** (14 productos: presas, chuletas de
+pollo y cerdo, nuggets, arroz con pollo solo sábados, consomé, papas, yuca, papa
+horneada, arepa, jugo; pechuga a precio distinto por sede) más
+`scripts/sembrar-demo.mjs`. **Los precios siguen siendo de ejemplo**, así que
+PEND-003 baja de "no hay carta" a "falta la lista de precios y los teléfonos".
+Antes de dar un estado, hacer `git fetch`: el clon miente.
 
-**El software funciona; la puesta en marcha no ha empezado.** No está desplegado
-en ninguna parte (hosting sin elegir, T-039) y los datos del broaster siguen
-siendo de ejemplo (PEND-003).
+La migración de rutas de Windows también dejó restos sin commitear en el repo del
+equipo (5 documentos citando `C:\Users\Kalel`): cerrado en `f4496e7`. Una mudanza
+no termina cuando el código corre, sino cuando los documentos que otro va a
+seguir dejan de citar una máquina que ya no existe.
+
+**El software funciona y ya compila; la puesta en marcha sigue sin empezar.** No
+está desplegado en ninguna parte (hosting sin elegir, T-039).
 
 ## Estado integral (2026-08-27)
 
