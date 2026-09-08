@@ -1,6 +1,6 @@
 {
   "projectId": "villa-broaster",
-  "snapshotDate": "2026-09-08T16:53:16.150Z",
+  "snapshotDate": "2026-09-08T18:32:06.686Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -825,6 +825,22 @@
       ],
       "fact": "LA PUERTA DE CALIDAD NO CONSTRUIA Y POR ESO LA APP NO SE PODIA DESPLEGAR. npm run verificar era typecheck+lint+test+contraste+rutas-sin-test: 446 tests en verde con next build ROTO. Causa: lib/servidor/entorno.ts hace process.exit(1) al CARGARSE si falta ADMIN_CLAVE y NODE_ENV===production, y next build corre con NODE_ENV=production aunque no atienda peticiones; como Next reparte la fase entre workers, lo unico visible era build worker exited with code: 1. Arreglado con construyendo = NEXT_PHASE === phase-production-build (medido: vale eso al construir y no existe en next start) y obligatoria: produccion && !construyendo. El build entro a verificar y verificar:completo se elimino (existia y no lo corria ni el CI ni nadie). Efecto secundario resuelto: next-env.d.ts alterna entre .next/dev/types y .next/types segun el ultimo comando, asi que se fue al .gitignore para que verificar no ensucie el arbol. Commit 15c0777, 478/478 tests.",
       "context": "Lo destapo el dueno pegando el registro de npm run build el 2026-09-08, no la puerta. El mismo patron ya se habia pagado en infrapilot/KN-005 (cliente Groq instanciado a nivel de modulo rompia el build sin GROQ_API_KEY, commit 5efdde3): dos proyectos, misma causa raiz —trabajo en tiempo de carga de modulo que se ejecuta al compilar—. Generalizado al tema del cerebro construir-no-es-arrancar."
+    },
+    {
+      "id": "KN-037",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-09-08T18:32:06.686Z",
+      "updated": "2026-09-08T18:32:06.686Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-036"
+      ],
+      "fact": "EL PUERTO ESTABA CLAVADO EN 3200 Y ESO ES UN 503 EN CUALQUIER HOSTING. El script start era next start -p 3200, que IGNORA la variable PORT: medido, con PORT=3210 la app seguia atendiendo en 3200 y el 3210 no respondia. Un hosting elige el puerto, lo pasa en PORT y pone un proxy delante; la app arranca bien, escribe que arranco, y el proxy responde 503 porque no hay nadie donde el busca. Arreglado con scripts/arrancar.mjs: PORT si la plataforma la define, 3200 si no (el PC de la caja no la define y necesita ese numero fijo — es el de la pantalla y el destino del proxy de villa-app). Va en Node y no en el script de npm porque el PC de la caja corre cmd, donde la sintaxis de shell llegaria literal. PORT invalido avisa y cae a 3200 en vez de tumbar el arranque. Commit f03baa1, 478/478.",
+      "context": "Lo destapo el dueno con un 503 en Hostinger el 2026-09-08. Las tres causas de un 503 quedaron en docs/DESPLIEGUE.md §7 con la tabla que las distingue por el registro: clave que falta, puerto equivocado, repo equivocado (Equipo-villa-broaster es documentacion, no tiene package.json). PRECEDENTE UTIL: placita/KN-033 — dropshoping.com.co ya opera en Hostinger y las variables se cargaron con Importar .env del panel, luego redesplegar. Generalizado en el tema construir-no-es-arrancar."
     }
   ],
   "archives": [
@@ -903,5 +919,5 @@
     }
   ],
   "lastAmmRun": "2026-09-03T00:00:00.000Z",
-  "version": 35
+  "version": 36
 }

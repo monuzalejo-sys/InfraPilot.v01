@@ -1,8 +1,8 @@
 ---
 slug: construir-no-es-arrancar
 titulo: Construir no es arrancar — el trabajo en tiempo de carga que revienta el build
-alias: [build, next build, npm run build, compilar, compilacion, no compila, falla el build, build roto, build worker, build worker exited, exited with code 1, worker murio, arranque, arrancar, start, next start, npm run start, despliegue, desplegar, deploy, ci, github actions, workflow, pipeline, variable de entorno, variables de entorno, env, process.env, falta la variable, falta configurar, api key, clave, admin_clave, groq_api_key, secreto, guardia de entorno, guarda de entorno, module scope, nivel de modulo, top level, al importar, al cargar el modulo, process.exit, exit 1, throw al importar, cliente instanciado, instanciar cliente, next_phase, phase-production-build, node_env, production, puerta de calidad, verificar, npm run verificar, la puerta no construye, tests en verde pero no compila, pasa local y falla en ci, no se puede desplegar]
-preguntas: ["por que falla npm run build si los tests estan en verde", "que es build worker exited with code 1", "por que me pide una variable de entorno para compilar", "donde instancio un cliente que necesita api key en next", "mi puerta de calidad esta en verde pero la app no despliega", "como distingo compilar de arrancar en next", "por que el build pide la clave si no atiende peticiones"]
+alias: [build, next build, npm run build, compilar, compilacion, no compila, falla el build, build roto, build worker, build worker exited, exited with code 1, worker murio, arranque, arrancar, start, next start, npm run start, despliegue, desplegar, deploy, ci, github actions, workflow, pipeline, variable de entorno, variables de entorno, env, process.env, falta la variable, falta configurar, api key, clave, admin_clave, groq_api_key, secreto, guardia de entorno, guarda de entorno, module scope, nivel de modulo, top level, al importar, al cargar el modulo, process.exit, exit 1, throw al importar, cliente instanciado, instanciar cliente, next_phase, phase-production-build, node_env, production, puerta de calidad, verificar, npm run verificar, la puerta no construye, tests en verde pero no compila, pasa local y falla en ci, no se puede desplegar, 503, error 503, da 503, service unavailable, el hosting responde 503, la app no responde, no carga en el hosting, puerto, port, process.env.port, puerto fijo, puerto clavado, next start -p, hostinger, vercel, railway, render, passenger, pm2, proxy, portero, la app arranca pero no responde]
+preguntas: ["por que falla npm run build si los tests estan en verde", "que es build worker exited with code 1", "por que me pide una variable de entorno para compilar", "donde instancio un cliente que necesita api key en next", "mi puerta de calidad esta en verde pero la app no despliega", "como distingo compilar de arrancar en next", "por que el build pide la clave si no atiende peticiones", "por que el hosting me da 503", "mi app arranca pero el hosting responde 503", "como se elige el puerto en un hosting"]
 proyectos: [_permanent, infrapilot, villa-broaster]
 confianza: alta
 actualizado: 2026-09-08
@@ -91,3 +91,34 @@ cada verificación deja el árbol sucio con un archivo que nadie editó y que di
 de sí mismo "no editar" — en villa-broaster el dueño llegó a commitear un
 "Update next-env.d.ts" a mano desde la web de GitHub para acallarlo. Va al
 `.gitignore`: `tsc --noEmit` pasa sin él.
+
+## El hermano del build roto: arrancar no es estar accesible
+
+El mismo día, el mismo proyecto, otro 503 —esta vez del **portero del
+hosting**, que es lo que responde cuando detrás no hay nadie escuchando donde
+él busca. **Un hosting elige el puerto**, lo pasa en `PORT` y pone un proxy
+delante. `next start -p 3200` (o cualquier puerto clavado en el script `start`)
+**ignora `PORT`**: la aplicación arranca feliz, escribe "listo" en su registro,
+y nadie la encuentra. Medido en villa-broaster: con `PORT=3210` definido,
+seguía atendiendo en 3200 y el 3210 no respondía.
+
+El arreglo tiene que servir a dos mundos que no se parecen —el PC de un local,
+que necesita un puerto FIJO porque es el número que la cajera ve, y un hosting,
+que exige obediencia— así que ni `-p 3200` a secas ni `next start` a secas
+sirven. Un lanzador de diez líneas resuelve los dos: `PORT` si está, el puerto
+del local si no. **En Node y no en el script de npm**: `${PORT:-3200}` es
+sintaxis de shell y un PC con Windows corre `cmd`, donde llegaría literal.
+
+**Cómo se lee un 503 sin adivinar** — el registro de la aplicación en el panel
+del hosting lo dice en un vistazo:
+
+| El registro dice | Qué pasa |
+|---|---|
+| "falta configurar `<VARIABLE>`" | La app se negó a arrancar a propósito: define la variable |
+| Nada, o "arrancó bien", y aun así 503 | Escucha en un puerto donde el proxy no la busca |
+| `Cannot find module` / falla al instalar | Se importó el repositorio equivocado (típico: el de documentación, que no tiene `package.json`) |
+
+La lección que une las tres filas con el resto del tema: **ninguna la ve la
+puerta de calidad local.** Tests, tipos, lint y hasta el build pueden estar en
+verde mientras la app es indesplegable. Lo único que prueba que se puede
+desplegar es desplegar.

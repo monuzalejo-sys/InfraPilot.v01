@@ -1,6 +1,6 @@
 {
   "projectId": "villa-broaster",
-  "sessionCount": 28,
+  "sessionCount": 29,
   "sessions": [
     {
       "sessionId": "session-2026-08-01-semilla",
@@ -1076,9 +1076,23 @@
       "fixCycles": 0,
       "modelOutcomes": [],
       "nota": "Corrida INLINE, cero spawns: la pregunta era de estado y el arreglo cabia en un archivo que ya estaba en contexto. Sin modelOutcomes porque el consumo en linea no esta medido — no se inventa cifra. Lo que pago la corrida: la puerta de calidad no construia, asi que 446 tests en verde convivian con una app que no compilaba, y lo destapo el dueno pegando el registro de npm run build, no la puerta. Segunda leccion: el clon local iba 4 commits por detras del remoto (incluida la carta real del cliente, T-259) y se estuvo a punto de reportar un estado viejo — git fetch antes de dar cualquier estado."
+    },
+    {
+      "sessionId": "session-2026-09-08-503-hostinger",
+      "runId": "orion-villa-broaster-puerto-y-503",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-09-08T18:32:06.686Z",
+      "completedAt": "2026-09-08T18:32:06.686Z",
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [],
+      "nota": "Corrida INLINE, cero spawns. Lo que pago la corrida: dos fallos de despliegue seguidos que NINGUNA puerta local veia — el build que no compilaba y el puerto clavado. Tests, tipos, lint y hasta el build pueden estar en verde con la app indesplegable. Tambien: el cerebro tenia el precedente de Hostinger en otro proyecto (placita/KN-033) y preguntar salio mas barato que diagnosticar."
     }
   ],
-  "lastUpdated": "2026-09-08T16:53:57.516Z",
+  "lastUpdated": "2026-09-08T18:32:06.686Z",
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
