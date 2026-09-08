@@ -1,6 +1,6 @@
 {
   "projectId": "villa-broaster",
-  "snapshotDate": "2026-09-08T18:32:06.686Z",
+  "snapshotDate": "2026-09-08T19:59:21.327Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -841,6 +841,24 @@
       ],
       "fact": "EL PUERTO ESTABA CLAVADO EN 3200 Y ESO ES UN 503 EN CUALQUIER HOSTING. El script start era next start -p 3200, que IGNORA la variable PORT: medido, con PORT=3210 la app seguia atendiendo en 3200 y el 3210 no respondia. Un hosting elige el puerto, lo pasa en PORT y pone un proxy delante; la app arranca bien, escribe que arranco, y el proxy responde 503 porque no hay nadie donde el busca. Arreglado con scripts/arrancar.mjs: PORT si la plataforma la define, 3200 si no (el PC de la caja no la define y necesita ese numero fijo — es el de la pantalla y el destino del proxy de villa-app). Va en Node y no en el script de npm porque el PC de la caja corre cmd, donde la sintaxis de shell llegaria literal. PORT invalido avisa y cae a 3200 en vez de tumbar el arranque. Commit f03baa1, 478/478.",
       "context": "Lo destapo el dueno con un 503 en Hostinger el 2026-09-08. Las tres causas de un 503 quedaron en docs/DESPLIEGUE.md §7 con la tabla que las distingue por el registro: clave que falta, puerto equivocado, repo equivocado (Equipo-villa-broaster es documentacion, no tiene package.json). PRECEDENTE UTIL: placita/KN-033 — dropshoping.com.co ya opera en Hostinger y las variables se cargaron con Importar .env del panel, luego redesplegar. Generalizado en el tema construir-no-es-arrancar."
+    },
+    {
+      "id": "DEC-014",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-09-08T19:59:21.327Z",
+      "updated": "2026-09-08T19:59:21.327Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-003",
+        "KN-037"
+      ],
+      "title": "El objetivo es ver las dos sedes en vivo desde el celular: la base de datos deja de ser opcional",
+      "description": "EL DUENO DECLARO EL OBJETIVO DEL PRODUCTO (2026-09-08) Y ESO CIERRA EL HUECO 3 DE persistencia.md: el sistema corre en los DOS locales, la landing publica de ventas entra pedidos al sistema, y el dueno ve el movimiento de ambas sedes desde CUALQUIER CELULAR EN TIEMPO REAL. Textual: control total y que puedan verlo en tiempo real. Y no es solo para villa-broaster: dijo que ese es el fin PARA TODOS los proyectos de negocios. CONSECUENCIA DIRECTA: la base de datos centralizada deja de ser opcional. Dos carpetas en dos PCs no se ven entre si ni las ve un celular; el objetivo declarado exige almacen centralizado (18 metodos de AlmacenDatos + 4 de AlmacenUsuarios) y el sistema publicado en internet. La recomendacion previa de VPS-sin-base valia para dos cajas independientes, que es justo lo que el dueno descarto.",
+      "reason": "persistencia.md §8 lo decia exacto: lo que decide no es el precio del hosting sino si el negocio quiere ver las dos sedes en una sola pantalla en vivo; si lo quiere, la base hay que escribirla igual y el hosting deja de importar. El dueno lo quiere. QUEDA ABIERTA UNA SOLA PREGUNTA DE ARQUITECTURA: si la caja puede detenerse cuando se cae internet en el local. Si NO puede, aplica el patron local-primero con outbox ya probado en placita (KN-038: sube al foco o cada 4s, baja cada 10s, y con cola pendiente NO se baja nada; KN-051: dos trampas de convergencia ya pagadas). Si SI puede, todo-en-la-nube es mucho menos trabajo."
     }
   ],
   "archives": [
@@ -919,5 +937,5 @@
     }
   ],
   "lastAmmRun": "2026-09-03T00:00:00.000Z",
-  "version": 36
+  "version": 37
 }
