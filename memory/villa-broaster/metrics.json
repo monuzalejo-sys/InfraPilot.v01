@@ -1,6 +1,6 @@
 {
   "projectId": "villa-broaster",
-  "sessionCount": 29,
+  "sessionCount": 30,
   "sessions": [
     {
       "sessionId": "session-2026-08-01-semilla",
@@ -1090,9 +1090,23 @@
       "fixCycles": 0,
       "modelOutcomes": [],
       "nota": "Corrida INLINE, cero spawns. Lo que pago la corrida: dos fallos de despliegue seguidos que NINGUNA puerta local veia — el build que no compilaba y el puerto clavado. Tests, tipos, lint y hasta el build pueden estar en verde con la app indesplegable. Tambien: el cerebro tenia el precedente de Hostinger en otro proyecto (placita/KN-033) y preguntar salio mas barato que diagnosticar."
+    },
+    {
+      "sessionId": "session-2026-09-08-paso-1-vps",
+      "runId": "orion-villa-broaster-publicar-en-vps",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-09-08T22:55:55.000Z",
+      "completedAt": "2026-09-08T22:55:55.000Z",
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [],
+      "nota": "Corrida INLINE, cero spawns. Paso 1 del objetivo DEC-014/DEC-015: dejar el despliegue en VPS preparado y documentado (no ejecutado: el servidor es del dueno y no se piden credenciales). Hallazgo que pago la corrida: el lanzador del puerto resolvia next por PATH y systemd no trae PATH — habria arrancado a mano y fallado como servicio, con nadie mirando. Arreglado en los DOS repos y comprobado arrancando con node directo, sin npm. Segundo hallazgo: villa-app tenia el MISMO puerto clavado que broaster-app; el defecto era de familia, no de un repo. Tercero: el remoto de villa-app tambien iba por delante (carta real con fotos) — van dos veces en la misma sesion que el clon local estaba atrasado."
     }
   ],
-  "lastUpdated": "2026-09-08T18:32:06.686Z",
+  "lastUpdated": "2026-09-08T22:55:55.000Z",
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,

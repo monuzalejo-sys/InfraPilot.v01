@@ -1,7 +1,7 @@
 ---
 slug: construir-no-es-arrancar
 titulo: Construir no es arrancar — el trabajo en tiempo de carga que revienta el build
-alias: [build, next build, npm run build, compilar, compilacion, no compila, falla el build, build roto, build worker, build worker exited, exited with code 1, worker murio, arranque, arrancar, start, next start, npm run start, despliegue, desplegar, deploy, ci, github actions, workflow, pipeline, variable de entorno, variables de entorno, env, process.env, falta la variable, falta configurar, api key, clave, admin_clave, groq_api_key, secreto, guardia de entorno, guarda de entorno, module scope, nivel de modulo, top level, al importar, al cargar el modulo, process.exit, exit 1, throw al importar, cliente instanciado, instanciar cliente, next_phase, phase-production-build, node_env, production, puerta de calidad, verificar, npm run verificar, la puerta no construye, tests en verde pero no compila, pasa local y falla en ci, no se puede desplegar, 503, error 503, da 503, service unavailable, el hosting responde 503, la app no responde, no carga en el hosting, puerto, port, process.env.port, puerto fijo, puerto clavado, next start -p, hostinger, vercel, railway, render, passenger, pm2, proxy, portero, la app arranca pero no responde]
+alias: [build, next build, npm run build, compilar, compilacion, no compila, falla el build, build roto, build worker, build worker exited, exited with code 1, worker murio, arranque, arrancar, start, next start, npm run start, despliegue, desplegar, deploy, ci, github actions, workflow, pipeline, variable de entorno, variables de entorno, env, process.env, falta la variable, falta configurar, api key, clave, admin_clave, groq_api_key, secreto, guardia de entorno, guarda de entorno, module scope, nivel de modulo, top level, al importar, al cargar el modulo, process.exit, exit 1, throw al importar, cliente instanciado, instanciar cliente, next_phase, phase-production-build, node_env, production, puerta de calidad, verificar, npm run verificar, la puerta no construye, tests en verde pero no compila, pasa local y falla en ci, no se puede desplegar, 503, error 503, da 503, service unavailable, el hosting responde 503, la app no responde, no carga en el hosting, puerto, port, process.env.port, puerto fijo, puerto clavado, next start -p, hostinger, vercel, railway, render, passenger, pm2, proxy, portero, la app arranca pero no responde, systemd, servicio, service, unit, pm2, pm2 cluster, supervisor, arranca a mano pero no como servicio, path, PATH, command not found, next not found, no encuentra next, npm no esta, ExecStart]
 preguntas: ["por que falla npm run build si los tests estan en verde", "que es build worker exited with code 1", "por que me pide una variable de entorno para compilar", "donde instancio un cliente que necesita api key en next", "mi puerta de calidad esta en verde pero la app no despliega", "como distingo compilar de arrancar en next", "por que el build pide la clave si no atiende peticiones", "por que el hosting me da 503", "mi app arranca pero el hosting responde 503", "como se elige el puerto en un hosting"]
 proyectos: [_permanent, infrapilot, villa-broaster]
 confianza: alta
@@ -122,3 +122,31 @@ La lección que une las tres filas con el resto del tema: **ninguna la ve la
 puerta de calidad local.** Tests, tipos, lint y hasta el build pueden estar en
 verde mientras la app es indesplegable. Lo único que prueba que se puede
 desplegar es desplegar.
+
+## Tercer hermano: arranca a mano y falla como servicio
+
+El lanzador que resuelve el puerto suele terminar llamando al binario del
+framework **por PATH** (`spawn("next start …", {shell:true})`, o `npm run start`).
+Funciona en tu terminal y **falla como servicio del sistema**: `systemd` no trae
+el PATH de una sesión interactiva, así que `next` no aparece y el servicio muere
+al arrancar — precisamente cuando nadie está mirando la pantalla.
+
+Se resuelve resolviendo el binario **por ruta**, deducida del propio archivo del
+lanzador y no del directorio desde el que lo llamen:
+
+```js
+const RAIZ = dirname(dirname(fileURLToPath(import.meta.url)))
+const BIN = join(RAIZ, "node_modules", ".bin", enWindows ? "next.cmd" : "next")
+spawn(BIN, ["start", "-p", String(puerto)], { cwd: RAIZ, stdio: "inherit", shell: enWindows })
+```
+
+De paso desaparece el `shell: true` fuera de Windows: los argumentos viajan como
+lista y no hay línea de comandos que nadie tenga que interpretar. **Compruébalo
+arrancando con `node` directo, sin npm** — si eso funciona, el servicio va a
+funcionar.
+
+**Y el supervisor importa.** Para un sistema cuya cola de escrituras vive DENTRO
+de un proceso, `pm2` es una trampa: su modo cluster levanta varias copias sobre
+la misma carpeta y se pisan los datos. `systemd` levanta una sola, que es lo que
+hace falta. La elección del supervisor es una decisión de integridad de datos, no
+de gusto.
