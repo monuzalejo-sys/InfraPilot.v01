@@ -19,7 +19,7 @@ están en `/Users/g/orion/prommter/` y **los tres tienen su contenido**:
 permanente). Después de verificar en verde y commitear, el agente publica solo.
 Siguen prohibidos el `--force`, reescribir historia publicada y borrar ramas remotas.
 
-Lo que queda para el dueño (PEND-010): invitar a las 3 personas por rol y borrar en
+Lo que queda para el dueño (completado en esencia por 2026-09-01, archivado): invitar a las 3 personas por rol en GitHub y borrar en
 GitHub los dos repos obsoletos. **Proteger `main` no se puede** en repos privados del
 plan gratuito (403 'Upgrade to GitHub Pro') — hay que decidir entre pagar Pro, hacerlos
 públicos, o sostener la puerta de calidad por acuerdo.
@@ -27,6 +27,27 @@ públicos, o sostener la puerta de calidad por acuerdo.
 Al comparar árboles traídos de Windows contra un checkout en la Mac, el diff
 miente: CRLF vs LF marcó 166 archivos como distintos con cero diferencias
 reales (KN-035). Usar `diff --strip-trailing-cr`.
+
+## Medición en verde (2026-09-08, verificado en esta Mac)
+
+Alguien preguntó "¿ya está listo?" y se comprobó corriendo, no leyendo:
+
+| Comprobación | Resultado |
+|---|---|
+| `npm run verificar` en broaster-app | verde: typecheck + lint + **446/446 tests** + 28 pares de contraste sin uno bajo AA + rutas-sin-test |
+| `npm run verificar` en villa-app | verde: **29/29 tests** |
+| Los tres repos vs GitHub | sincronizados, cero commits locales sin publicar |
+| `plan.mjs estado` | **78/262 tareas** hechas, etapa N1, 14 bloqueadas — todas decisiones del dueño, ninguna de código |
+
+El brief anterior decía 330 tests; son 446. Y la migración de rutas de Windows
+dejó restos SIN COMMITEAR en el repo del equipo (5 documentos citando
+`C:\Users\Kalel` y el Edge de Program Files): cerrado en `f4496e7`. La lección
+es que una mudanza no termina cuando el código corre, sino cuando los documentos
+que otro va a seguir dejan de citar una máquina que ya no existe.
+
+**El software funciona; la puesta en marcha no ha empezado.** No está desplegado
+en ninguna parte (hosting sin elegir, T-039) y los datos del broaster siguen
+siendo de ejemplo (PEND-003).
 
 ## Estado integral (2026-08-27)
 
@@ -58,8 +79,8 @@ Líneas congeladas al crear orden. Desglose canal explícito (ventasLocal vs ven
 
 ## Objetos clave
 
-**DEC-001/DEC-002** Proyecto + foco broaster. **DEC-003** Stack + PWA (fusionó DEC-012 2026-08-27). **DEC-004** Marca rojo/amarillo. **DEC-005** Timing-safe. **DEC-006/DEC-007/DEC-008/DEC-009** Modulo gastos, pivote dos caras, repo cliente, tres repos. **DEC-010/DEC-011** Planes v2, ritual semanal (ORION juez, PDF celular).
+**DEC-001/DEC-002** Proyecto + foco broaster. **DEC-003** Stack + PWA (fusionó DEC-012 2026-08-27). **DEC-004** Marca rojo/amarillo. **DEC-005** Timing-safe. **DEC-006/DEC-007** Módulo gastos, pivote dos caras. **DEC-009** Tres repos por rol (absorbió DEC-008 2026-09-03). **DEC-010/DEC-011** Planes v2, ritual semanal (ORION juez, PDF celular). **DEC-013** Repos canónicos post-mudanza Mac.
 
 **KN-001/KN-002/KN-004** Palancas del negocio, modelo inventario, Broaster vs asadero. **KN-005** Mapa bifurcado (68 tests). **KN-007** Gastos (G-XXXX). **KN-010** Sistema vivo (polling 8s). **KN-012** Login Orama. **KN-013** Plan dos piezas. **KN-015** QA formal (6 hallazgos). **KN-017** Contrato login {usuarioId, clave, puesto}. **KN-019** Prohibiciones en pares. **KN-020/KN-023** Olas de agentes, colisión de criterios. **KN-021** Presupuesto -52% (verificador gratis cuando criterios son comandos). **KN-024** Grep + navegador para verificar.
 
-**ROAD-001/ROAD-002** Done (Caja, Gastos). **ROAD-003/ROAD-004/ROAD-005** Planned (página, tanda, crecer).
+**ROAD-001/ROAD-002** Done/Archived (Caja E1, Gastos E2 — completadas 2026-08-25). **ROAD-003/ROAD-004/ROAD-005** Planned (página E3, tanda E4, crecer E5).
