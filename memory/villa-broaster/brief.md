@@ -1,8 +1,15 @@
-# villa-broaster — brief (2026-09-01, post-mudanza)
+# villa-broaster — brief (2026-09-08)
 
 ## Qué es
 
-Cliente Villa Broaster (pollo broaster, dos sedes: Villa del Viento y Vía al Bosque). **TRES repos** (nombres exactos, DEC-013): `Equipo-villa-broaster` (README, PLAN-EQUIPO.md, PENDIENTES-GIT.md, tareas/ T-01..T-11, docs/), `broaster-app-repo` (broaster-app :3200, PWA, solo senior), `villa-app-repo` (villa-app :3201, stateless, diseñadores). Los nombres `villa-broaster-sistema` y `villa-broaster-vitrina` están OBSOLETOS. Ruta: `/Users/g/orion/prommter/<repo>` — la máquina ya no es Windows. La memoria ORION vive aparte, en `/Users/g/orion/memory/villa-broaster/`, fuera del repo que lee el equipo.
+Cliente Villa Broaster (pollo broaster, dos sedes: Villa del Viento y Vía al Bosque). **TRES repos** (nombres exactos, DEC-013): `Equipo-villa-broaster` (README, PLAN-EQUIPO.md, PENDIENTES-GIT.md, tareas/ T-01..T-11, docs/), `broaster-app-repo` (broaster-app :3200, PWA, solo senior), `villa-app-repo` (villa-app :3201, stateless, diseñadores). Los nombres `villa-broaster-sistema` y `villa-broaster-vitrina` están OBSOLETOS. **Se trabaja desde DOS máquinas** (la Mac y el PC), así que la fuente de verdad
+NO es ningún clon: es el **remoto de GitHub**. En la Mac los repos están en
+`/Users/g/orion/prommter/<repo>` y la memoria ORION en
+`/Users/g/orion/memory/villa-broaster/`; en el PC las rutas son las suyas. La
+memoria vive aparte del repo que lee el equipo, en el repo `orion`. **Primer
+comando de cualquier sesión, en cualquier máquina: `git fetch`** — el 2026-09-08
+los clones locales estaban por detrás del remoto DOS veces en un solo día, y una
+de ellas casi hizo reportar un estado de hace una semana.
 
 ## Mudanza a la Mac (2026-09-01) — leer primero
 
@@ -28,45 +35,82 @@ Al comparar árboles traídos de Windows contra un checkout en la Mac, el diff
 miente: CRLF vs LF marcó 166 archivos como distintos con cero diferencias
 reales (KN-035). Usar `diff --strip-trailing-cr`.
 
-## Medición en verde (2026-09-08, verificado en esta Mac)
+## Sesión del 2026-09-08 — el rumbo quedó definido (leer esto antes que nada)
 
-Se preguntó "¿ya está listo?" y se respondió corriendo, no leyendo. **La primera
-respuesta estuvo incompleta y conviene saber por qué:** `npm run verificar` daba
-446/446 en verde, y con eso se dijo que el software funcionaba. Entonces el dueño
-pegó el registro de `npm run build` y la app **no compilaba**. La puerta no
-construía: `verificar` era typecheck + lint + tests + contraste, y el
-`verificar:completo` que sí construía no lo corría **ni el CI ni nadie**.
+### Lo que el dueño decidió, y que manda sobre todo lo anterior
 
-Causa y arreglo en `construir-no-es-arrancar` (tema del cerebro) y en KN-036:
-`lib/servidor/entorno.ts` mataba el proceso al cargarse si faltaba `ADMIN_CLAVE`
-en producción, y `next build` corre en producción sin atender peticiones. Ahora
-la fase se distingue con `NEXT_PHASE`, el build entró a `verificar`,
-`verificar:completo` desapareció y `next-env.d.ts` se fue al `.gitignore`.
-Commit `15c0777`.
+**El objetivo del producto (DEC-014):** el sistema corre en los DOS locales, la
+landing pública mete pedidos al sistema, y el dueño ve el movimiento de ambas
+sedes **desde cualquier celular, en tiempo real**. Textual suyo: *control total*.
+Y añadió que ese es el fin **para todos sus proyectos de negocios**, no solo este.
+Eso cierra el HUECO 3 de `persistencia.md`, que era la pregunta que bloqueaba la
+arquitectura entera.
 
-| Comprobación (tras integrar el remoto) | Resultado |
+**La arquitectura (DEC-015):** preguntado si la caja puede dejar de vender cuando
+se cae internet, respondió **NO**. Por lo tanto: **local primero, nube después**.
+Cada sede escribe en su almacén y sube por outbox; la nube es espejo y punto de
+encuentro, no requisito para cobrar. Descartado el todo-en-la-nube, que era la
+mitad de trabajo. El patrón está curado en el tema **`la-caja-no-puede-parar`** con
+los tiempos ya medidos en placita (sube al foco o cada 4 s, baja cada 10, y **con
+cola pendiente no se baja nada**) y sus dos trampas de convergencia pagadas.
+
+**Consecuencia de alcance:** entran el almacén centralizado (18 métodos de
+`AlmacenDatos` + 4 de `AlmacenUsuarios`) y el outbox/sincronizador. Los
+consecutivos siguen siendo por local (`L1-`/`L2-`), así que dos cajas
+desconectadas no colisionan; el caso a resolver es el pedido nacido en la nube,
+donde la nube manda y el local adopta el número.
+
+### Infraestructura real (medida contra el servidor, no supuesta)
+
+| Hecho | Estado |
 |---|---|
-| `npm run verificar` en broaster-app, ya **con build** | verde: **478/478 tests**, 28 pares de contraste sin uno bajo AA, `next build` en 0 **sin ADMIN_CLAVE** |
-| `npm run start` sin `ADMIN_CLAVE` | sale 1 con el nombre de la variable: la guardia del arranque **sigue mordiendo** |
-| Arranque con clave | `/api/productos` 200, `/admin` 200, `/` 307 |
-| `npm run verificar` en villa-app | verde: **29/29 tests** |
-| `plan.mjs estado` | **78/262** tareas, etapa N1, 14 bloqueadas — todas decisiones del dueño |
+| **VPS Hostinger KVM 1 comprado** | IP `2.25.89.240`, confirmada de Hostinger por whois |
+| **El VPS NO está vacío** | Responde con **Traefik**: trae una plantilla de aplicación. Hay que dejarlo limpio antes de instalar nada (DESPLIEGUE.md §8.0) — el dueño ya dijo que quiere reinstalarlo limpio |
+| **`prommter.org`** | Es el dominio de **la agencia**, y NO apunta al VPS: va al hosting compartido y responde **503**. Ese era el 503 que el dueño veía |
+| **Dominios** | Decidido: **uno por negocio**, con `caja.<dominio>` para el sistema. Villa Broaster necesita el suyo, a nombre del CLIENTE |
+| **Capacidad** | El sistema consume **108 MB de RAM** medidos. En 4 GB caben 3-4 negocios; el límite es 1 vCPU, no la memoria |
+| **Costos** | VPS ~$12/mes al renovar. Supabase Pro $25/mes si algún día entra base gestionada — su plan Free pausa proyectos tras una semana sin uso y por eso no sirve para una caja. Cerrado el HUECO 7 en `costos.md` §3.1 |
 
-**El remoto iba por delante del clon local**: 4 commits que esta máquina no tenía,
-incluido **T-259, la carta real del cliente** (14 productos: presas, chuletas de
-pollo y cerdo, nuggets, arroz con pollo solo sábados, consomé, papas, yuca, papa
-horneada, arepa, jugo; pechuga a precio distinto por sede) más
-`scripts/sembrar-demo.mjs`. **Los precios siguen siendo de ejemplo**, así que
-PEND-003 baja de "no hay carta" a "falta la lista de precios y los teléfonos".
-Antes de dar un estado, hacer `git fetch`: el clon miente.
+### Software: dos defectos de despliegue arreglados hoy
 
-La migración de rutas de Windows también dejó restos sin commitear en el repo del
-equipo (5 documentos citando `C:\Users\Kalel`): cerrado en `f4496e7`. Una mudanza
-no termina cuando el código corre, sino cuando los documentos que otro va a
-seguir dejan de citar una máquina que ya no existe.
+1. **No compilaba.** La guardia de entorno mataba `next build` pidiendo
+   `ADMIN_CLAVE` para compilar. Compilar no es arrancar (KN-036, tema
+   `construir-no-es-arrancar`). Y la puerta `verificar` **no construía**, por eso
+   446 tests en verde convivían con una app indesplegable: el build entró a la
+   puerta y `verificar:completo` desapareció.
+2. **El puerto estaba clavado** en 3200/3201 en los DOS repos, así que en un
+   hosting la app escuchaba donde el proxy no la busca — un 503 sin un error en el
+   registro (KN-037). Ahora `scripts/arrancar.mjs` obedece `PORT` y resuelve el
+   binario **por ruta y no por PATH**, porque systemd no trae PATH y el servicio
+   habría muerto al arrancar.
 
-**El software funciona y ya compila; la puesta en marcha sigue sin empezar.** No
-está desplegado en ninguna parte (hosting sin elegir, T-039).
+**Verde al cierre:** broaster-app **478/478** + build, villa-app **30/30** +
+build, arranque comprobado con `node` directo sin npm. Despliegue preparado y
+publicado: `despliegue/*.service` en cada repo, `docs/despliegue/Caddyfile.ejemplo`
+y el procedimiento entero en **`docs/DESPLIEGUE.md` §8** (repo del equipo).
+
+**AVISO que va primero en cualquier despliegue:** publicar en el VPS **no conecta
+los PCs de los locales**. El servidor queda con su carpeta vacía. Si alguien cobra
+en el local y alguien cobra en el servidor, son dos contabilidades que nadie podrá
+cuadrar.
+
+### Para quien trabaje en la LANDING DE VENTAS (villa-app)
+
+- **La carta real ya llegó** (T-259, commit `2601186`): 14 productos con foto —
+  presas, chuletas de pollo y cerdo, nuggets, arroz con pollo **solo sábados**,
+  consomé, papas, yuca, papa horneada, arepa, jugo— y la pechuga a **precio
+  distinto por sede**. **Los precios siguen siendo de ejemplo**: PEND-003 bajó de
+  "no hay carta" a "faltan precios reales y teléfonos".
+- **PEND-009** (hero carrusel móvil) sigue Ready; el PROMPT v3 está en
+  `docs/claude-design/PROMPT.md`. Con la carta real ya se puede avanzar en todo
+  salvo los precios, que **no se inventan** (tema `cero-datos-inventados`: lo que
+  falte va como hueco numerado y VISIBLE, nunca relleno verosímil).
+- La vitrina **no guarda nada** y localiza el sistema por `SISTEMA_URL`; ya
+  resolvió por su cuenta el problema de construir-vs-arrancar usando la fase que
+  Next entrega a la config. No meterle estado.
+- **Los clones locales han ido por detrás del remoto DOS veces en un solo día**
+  (broaster-app y villa-app). **`git fetch` antes de dar cualquier estado o tocar
+  cualquier archivo.**
 
 ## Estado integral (2026-08-27)
 
