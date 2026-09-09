@@ -1,6 +1,6 @@
 {
   "projectId": "villa-broaster",
-  "snapshotDate": "2026-09-09T01:16:43.417Z",
+  "snapshotDate": "2026-09-09T02:02:13.973Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -893,6 +893,25 @@
       "title": "Cada negocio con su PROPIO dominio, no un subdominio de la agencia",
       "description": "CORRECCION EXPLICITA DEL DUENO (2026-09-08): cada negocio lleva su propio dominio comprado, NO un subdominio de prommter.com ni de prommter.org. Textual: quiero cada uno con su propio dominio. Queda DESCARTADO el esquema villabroaster.prommter.com / caja.villabroaster.prommter.com que se habia propuesto como atajo para esta semana. La estructura correcta es: <negocio>.<tld> para la vitrina publica (lo que ve quien va a pedir) y caja.<negocio>.<tld> para el sistema (lo que ve el equipo). prommter.com y prommter.org se quedan para la agencia y hoy apuntan al hosting compartido (2.57.91.91 y 2.57.91.144), no al VPS. El VPS es 2.25.89.240.",
       "reason": "Quien va a pedir pollo no entra a la web de una agencia de software: el subdominio de la agencia resta credibilidad al negocio del cliente y confunde a quien compra. Y el dominio se registra a nombre del CLIENTE, para que el dia que las partes se separen cada uno se lleve lo suyo sin discusion. Comprar el dominio no retrasa la entrega: los NS de Hostinger ya son los suyos, asi que un dominio nuevo apuntado al VPS propaga en minutos, no en dias. Un solo VPS sirve varios dominios a la vez con el proxy delante — ya medido: el sistema consume 108 MB y en 4 GB caben 3-4 negocios."
+    },
+    {
+      "id": "KN-038",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-09-09T02:02:13.973Z",
+      "updated": "2026-09-09T02:02:13.973Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "DEC-015",
+        "DEC-016",
+        "KN-036",
+        "KN-037"
+      ],
+      "fact": "EL SISTEMA ESTA PUBLICADO Y VIVO EN INTERNET (2026-09-08). https://villabroaster.prommter.online (vitrina, HTTP 200) y https://caja.villabroaster.prommter.online/admin (panel, HTTP 200, titulo Sistema contable Villa Broaster), ambos con certificado propio de Lets Encrypt emitido ese dia. LA API PUBLICA 14 PRODUCTOS: la carta real, con la pechuga a 12000 en el local 1 y 12500 en el local 2 — el precio por sede funciona de punta a punta. VPS Hostinger KVM 1, IP 2.25.89.240, Ubuntu 24.04.4. Node 24.20.0, Caddy como proxy con HTTPS automatico, systemd con un servicio por app (broaster-app :3200, villa-app :3201), usuario villabroaster sin privilegios, repos clonados con una deploy key de SOLO LECTURA por repositorio. La ADMIN_CLAVE se genero con openssl en el servidor, escrita a /etc/villa-broaster/broaster-app.env con permisos 600 y SIN mostrarse en pantalla: no paso por la conversacion ni por el contexto de nadie.",
+      "context": "Los dos arreglos del mismo dia fueron los que hicieron posible esto: sin KN-036 el npm run build habria muerto en el servidor pidiendo ADMIN_CLAVE para compilar, y sin KN-037 las apps habrian escuchado en un puerto que el proxy no busca. Tres trampas mas se pagaron durante el despliegue y quedaron en docs/DESPLIEGUE.md: (1) GitHub rechaza la misma deploy key en dos repos; (2) sudo -u NO cambia HOME, asi que el ~/.ssh/config del usuario no se lee y el error miente hablando de resolucion de nombres; (3) un servidor nuevo no conoce a github.com y SSH se para a preguntar la huella, bloqueando el comando y tragandose como respuestas todo lo que se pegue despues. PENDIENTE: la prueba de humo de punta a punta (un pedido real desde la vitrina que aparezca en el panel) no se hizo para no meter un dato de prueba en la contabilidad del cliente sin permiso."
     }
   ],
   "archives": [
@@ -971,5 +990,5 @@
     }
   ],
   "lastAmmRun": "2026-09-03T00:00:00.000Z",
-  "version": 39
+  "version": 40
 }

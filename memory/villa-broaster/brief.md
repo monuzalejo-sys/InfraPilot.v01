@@ -35,6 +35,32 @@ Al comparar árboles traídos de Windows contra un checkout en la Mac, el diff
 miente: CRLF vs LF marcó 166 archivos como distintos con cero diferencias
 reales (KN-035). Usar `diff --strip-trailing-cr`.
 
+## EL SISTEMA ESTÁ VIVO EN INTERNET (2026-09-08)
+
+| Dirección | Qué es | Estado verificado |
+|---|---|---|
+| **https://villabroaster.prommter.online** | La vitrina: lo que ve quien va a pedir | **200**, certificado propio de Let's Encrypt |
+| **https://caja.villabroaster.prommter.online/admin** | El panel del equipo | **200**, "Sistema contable · Villa Broaster" |
+
+**La API publica los 14 productos de la carta real**, con la pechuga a 12.000 en
+el local 1 y 12.500 en el local 2: el precio por sede funciona de punta a punta.
+
+VPS Hostinger KVM 1 (`2.25.89.240`, Ubuntu 24.04.4) · Node 24.20.0 · Caddy con
+HTTPS automático · un servicio systemd por app (`broaster-app` :3200,
+`villa-app` :3201) · usuario `villabroaster` sin privilegios · una **deploy key
+de solo lectura por repositorio**.
+
+**La `ADMIN_CLAVE` se generó con `openssl` en el servidor y NO se mostró en
+pantalla**: vive solo en `/etc/villa-broaster/broaster-app.env` con permisos 600.
+No pasó por ninguna conversación. Se recupera con
+`sudo cat /etc/villa-broaster/broaster-app.env`.
+
+**PENDIENTE:** la prueba de humo de punta a punta —un pedido real desde la
+vitrina que aparezca en el panel— no se hizo, para no meter un dato de prueba en
+la contabilidad del cliente sin permiso. Es lo primero al retomar.
+
+Detalles y las tres trampas del despliegue, en KN-038 y en `docs/DESPLIEGUE.md`.
+
 ## Sesión del 2026-09-08 — el rumbo quedó definido (leer esto antes que nada)
 
 ### Lo que el dueño decidió, y que manda sobre todo lo anterior
