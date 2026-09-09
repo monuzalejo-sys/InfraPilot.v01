@@ -67,7 +67,7 @@ donde la nube manda y el local adopta el número.
 | **VPS Hostinger KVM 1 comprado** | IP `2.25.89.240`, confirmada de Hostinger por whois |
 | **El VPS NO está vacío** | Responde con **Traefik**: trae una plantilla de aplicación. Hay que dejarlo limpio antes de instalar nada (DESPLIEGUE.md §8.0) — el dueño ya dijo que quiere reinstalarlo limpio |
 | **`prommter.org`** | Es el dominio de **la agencia**, y NO apunta al VPS: va al hosting compartido y responde **503**. Ese era el 503 que el dueño veía |
-| **Dominios** | Decidido: **uno por negocio**, con `caja.<dominio>` para el sistema. Villa Broaster necesita el suyo, a nombre del CLIENTE |
+| **Dominios (DEC-016)** | **Cada negocio con su PROPIO dominio comprado**, corrección explícita del dueño. `<negocio>.<tld>` para la vitrina y `caja.<negocio>.<tld>` para el sistema. **DESCARTADO** el atajo `villabroaster.prommter.com`: quien va a pedir pollo no entra a la web de una agencia. `prommter.com`/`.org` se quedan para la agencia y hoy apuntan al hosting compartido, no al VPS. El dominio va a nombre del CLIENTE |
 | **Capacidad** | El sistema consume **108 MB de RAM** medidos. En 4 GB caben 3-4 negocios; el límite es 1 vCPU, no la memoria |
 | **Costos** | VPS ~$12/mes al renovar. Supabase Pro $25/mes si algún día entra base gestionada — su plan Free pausa proyectos tras una semana sin uso y por eso no sirve para una caja. Cerrado el HUECO 7 en `costos.md` §3.1 |
 

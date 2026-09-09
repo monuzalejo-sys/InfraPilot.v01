@@ -1,6 +1,6 @@
 {
   "projectId": "villa-broaster",
-  "snapshotDate": "2026-09-08T20:02:45.569Z",
+  "snapshotDate": "2026-09-09T01:16:43.417Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -876,6 +876,23 @@
       "title": "La caja nunca para: local primero, nube despues (patron placita)",
       "description": "ARQUITECTURA ELEGIDA POR EL DUENO (2026-09-08), respuesta a la pregunta que dejo abierta DEC-014: si se cae internet en el local, la caja NO puede dejar de vender. Por lo tanto cada local sigue escribiendo en SU almacen y sube por outbox cuando hay conexion; la nube es espejo y punto de encuentro, no requisito para cobrar. La nube es ademas donde caen los pedidos de la landing publica y lo que el dueno mira desde el celular. Tiempos del patron ya verificados en placita (KN-038): sube al foco o cada 4s con tope 200 filas por viaje, baja al abrir o cada 10s, y CON COLA PENDIENTE NO SE BAJA NADA. Descartada la ruta todo-en-la-nube, que era la mitad de trabajo pero detiene el mostrador en cada corte.",
       "reason": "Es un negocio de comida con dos sedes: un corte de internet a la hora del almuerzo con la caja detenida son ventas perdidas y fila en el mostrador. El dueno lo decidio explicitamente frente a la alternativa mas barata. Consecuencia de alcance: entra el outbox y el sincronizador ademas de los 22 metodos del almacen centralizado. Las dos trampas de convergencia ya estan pagadas en placita/KN-051 (no rearmar a mano la respuesta del servidor; adoptar el cambio del servidor SIN volver a encolar) y curadas en el tema la-caja-no-puede-parar. Los consecutivos siguen siendo por local (L1-/L2-) y por eso dos cajas desconectadas no colisionan; los pedidos nacidos en la nube son el caso donde la nube manda y el local adopta."
+    },
+    {
+      "id": "DEC-016",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-09-09T01:16:43.417Z",
+      "updated": "2026-09-09T01:16:43.417Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-014"
+      ],
+      "title": "Cada negocio con su PROPIO dominio, no un subdominio de la agencia",
+      "description": "CORRECCION EXPLICITA DEL DUENO (2026-09-08): cada negocio lleva su propio dominio comprado, NO un subdominio de prommter.com ni de prommter.org. Textual: quiero cada uno con su propio dominio. Queda DESCARTADO el esquema villabroaster.prommter.com / caja.villabroaster.prommter.com que se habia propuesto como atajo para esta semana. La estructura correcta es: <negocio>.<tld> para la vitrina publica (lo que ve quien va a pedir) y caja.<negocio>.<tld> para el sistema (lo que ve el equipo). prommter.com y prommter.org se quedan para la agencia y hoy apuntan al hosting compartido (2.57.91.91 y 2.57.91.144), no al VPS. El VPS es 2.25.89.240.",
+      "reason": "Quien va a pedir pollo no entra a la web de una agencia de software: el subdominio de la agencia resta credibilidad al negocio del cliente y confunde a quien compra. Y el dominio se registra a nombre del CLIENTE, para que el dia que las partes se separen cada uno se lleve lo suyo sin discusion. Comprar el dominio no retrasa la entrega: los NS de Hostinger ya son los suyos, asi que un dominio nuevo apuntado al VPS propaga en minutos, no en dias. Un solo VPS sirve varios dominios a la vez con el proxy delante — ya medido: el sistema consume 108 MB y en 4 GB caben 3-4 negocios."
     }
   ],
   "archives": [
@@ -954,5 +971,5 @@
     }
   ],
   "lastAmmRun": "2026-09-03T00:00:00.000Z",
-  "version": 38
+  "version": 39
 }
