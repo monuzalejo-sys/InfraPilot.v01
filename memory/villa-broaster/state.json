@@ -1,6 +1,6 @@
 {
   "projectId": "villa-broaster",
-  "snapshotDate": "2026-09-09T02:11:05.324Z",
+  "snapshotDate": "2026-09-09T02:24:14.146Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -882,7 +882,7 @@
       "type": "Decision",
       "tier": "Project",
       "created": "2026-09-09T01:16:43.417Z",
-      "updated": "2026-09-09T01:16:43.417Z",
+      "updated": "2026-09-09T02:24:14.146Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
@@ -891,7 +891,7 @@
         "DEC-014"
       ],
       "title": "Cada negocio con su PROPIO dominio, no un subdominio de la agencia",
-      "description": "CORRECCION EXPLICITA DEL DUENO (2026-09-08): cada negocio lleva su propio dominio comprado, NO un subdominio de prommter.com ni de prommter.org. Textual: quiero cada uno con su propio dominio. Queda DESCARTADO el esquema villabroaster.prommter.com / caja.villabroaster.prommter.com que se habia propuesto como atajo para esta semana. La estructura correcta es: <negocio>.<tld> para la vitrina publica (lo que ve quien va a pedir) y caja.<negocio>.<tld> para el sistema (lo que ve el equipo). prommter.com y prommter.org se quedan para la agencia y hoy apuntan al hosting compartido (2.57.91.91 y 2.57.91.144), no al VPS. El VPS es 2.25.89.240.",
+      "description": "CORRECCION EXPLICITA DEL DUENO (2026-09-08): cada negocio lleva su propio dominio comprado, NO un subdominio de prommter.com ni de prommter.org. Textual: quiero cada uno con su propio dominio. Queda DESCARTADO el esquema villabroaster.prommter.com / caja.villabroaster.prommter.com que se habia propuesto como atajo para esta semana. La estructura correcta es: <negocio>.<tld> para la vitrina publica (lo que ve quien va a pedir) y caja.<negocio>.<tld> para el sistema (lo que ve el equipo). prommter.com y prommter.org se quedan para la agencia y hoy apuntan al hosting compartido (2.57.91.91 y 2.57.91.144), no al VPS. El VPS es 2.25.89.240. CONFIRMADO POR EL DUENO AL CIERRE (2026-09-08): por ahora se MANTIENE el esquema actual —villabroaster.prommter.online y caja.villabroaster.prommter.online— porque funciona y lo quiere manejar asi. El dominio propio del negocio NO es urgente y entra cuando el cliente firme; el cambio son dos registros A y una linea del Caddyfile, y las dos direcciones pueden convivir mientras la gente se acostumbra. NO volver a proponerselo hasta que se cumpla una de estas tres: el cliente firma, se va a repartir la direccion en local/empaque/volantes, o piden correo propio o aparecer en Google.",
       "reason": "Quien va a pedir pollo no entra a la web de una agencia de software: el subdominio de la agencia resta credibilidad al negocio del cliente y confunde a quien compra. Y el dominio se registra a nombre del CLIENTE, para que el dia que las partes se separen cada uno se lleve lo suyo sin discusion. Comprar el dominio no retrasa la entrega: los NS de Hostinger ya son los suyos, asi que un dominio nuevo apuntado al VPS propaga en minutos, no en dias. Un solo VPS sirve varios dominios a la vez con el proxy delante — ya medido: el sistema consume 108 MB y en 4 GB caben 3-4 negocios."
     },
     {
@@ -1006,5 +1006,5 @@
     }
   ],
   "lastAmmRun": "2026-09-03T00:00:00.000Z",
-  "version": 41
+  "version": 42
 }
