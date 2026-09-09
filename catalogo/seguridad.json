@@ -3074,6 +3074,697 @@
         "tema:donde-vive-el-dato",
         "tema:dominio-migraciones-y-copias"
       ]
+    },
+    {
+      "id": "sec.abuso.techo-por-identidad-ip-y-global",
+      "titulo": "Poner techo por cuenta, por IP y global a la vez",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un techo solo por cuenta no frena a quien rota de cuenta con miles de IPs distintas; uno solo por IP no frena un botnet golpeando la misma cuenta desde direcciones distintas; y sin un techo global de la ruta, mil cuentas cada una bajo su propio límite individual tumban igual el servidor entre todas.",
+      "queHacer": [
+        "Definir tres contadores independientes por ruta sensible: por identidad (usuario o llave de API), por IP de origen y global de la ruta.",
+        "Rechazar con 429 en cuanto CUALQUIERA de los tres se supera, no solo el más estricto de los tres.",
+        "Documentar en una tabla del código el techo y la ventana de cada uno de los tres, por ruta.",
+        "Si el contador remoto (Redis u otro almacén compartido) no responde, la ruta de venta local del mostrador sigue funcionando sin él; solo las rutas expuestas a internet quedan fail-closed cuando su propio contador falla.",
+        "Cubrir con test el caso donde el ataque distribuye entre cuentas o entre IPs para no caer en un solo techo."
+      ],
+      "aceptacion": [
+        {
+          "check": "Rotar de IP con la misma cuenta sigue bloqueando",
+          "comando": "npm test -- techo-triple",
+          "espera": "test verde: la petición que excede el techo por cuenta responde 429 aunque cambie la IP en cada intento"
+        },
+        {
+          "check": "Existen los tres contadores en el código",
+          "comando": "grep -rc \"techoPorIdentidad\\|techoPorIp\\|techoGlobal\" lib/servidor/limitar.ts",
+          "espera": "3 o más coincidencias"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "publico"
+        ],
+        "traficoAnonimo": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/limitar.ts",
+        "tests/seguridad/techo-triple.test.ts"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar"
+      ]
+    },
+    {
+      "id": "sec.abuso.ventana-deslizante",
+      "titulo": "Contar con ventana deslizante, no con contador que se reinicia en punto",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un contador fijo por minuto se pone en cero en el segundo 0. Un atacante manda el techo completo en el segundo 59 y otro techo completo en el segundo 1 del minuto siguiente: el doble del límite real cruzando el borde en dos segundos, sin que ningún conteo individual lo vea.",
+      "queHacer": [
+        "Reemplazar el contador de ventana fija por una ventana deslizante o un algoritmo de cubeta con goteo (token bucket) que mire los últimos N segundos desde el instante de la petición, no desde el reloj de pared.",
+        "Guardar las marcas de tiempo de las peticiones recientes (o el estado de la cubeta) en el mismo almacén que ya usan los demás contadores.",
+        "Probar explícitamente el caso frontera: ráfaga en los últimos 2 segundos de una ventana seguida de otra ráfaga en los primeros 2 segundos de la siguiente."
+      ],
+      "aceptacion": [
+        {
+          "check": "Una ráfaga a caballo entre dos minutos se bloquea igual que una ráfaga dentro de un solo minuto",
+          "comando": "npm test -- ventana-deslizante",
+          "espera": "test verde: el conteo de la ráfaga a caballo entre los dos minutos también dispara el 429 al superar el techo"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/ventana-deslizante.ts",
+        "tests/seguridad/ventana-deslizante.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.abuso.retry-after-obedecible",
+      "titulo": "Responder todo 429 con Retry-After que el cliente pueda obedecer",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin `Retry-After`, un cliente propio (la app móvil, una integración) no sabe cuánto esperar y reintenta a ciegas cada segundo, multiplicando la carga justo cuando el servidor ya está saturado.",
+      "queHacer": [
+        "Calcular en segundos cuánto falta para que la ventana o la cubeta de esa identidad/IP se libere.",
+        "Devolver ese número en la cabecera `Retry-After` en TODA respuesta 429, sin excepción de ruta.",
+        "Centralizar el cálculo en una sola función que usan todos los limitadores, para que no queden rutas con 429 sin cabecera.",
+        "Documentar en la referencia de la API que un 429 sin reintento antes de `Retry-After` se puede volver a bloquear más largo."
+      ],
+      "aceptacion": [
+        {
+          "check": "Todo 429 trae Retry-After numérico",
+          "comando": "npm test -- retry-after",
+          "espera": "test verde: cada ruta limitada probada devuelve 429 con cabecera Retry-After y valor entero mayor que 0"
+        },
+        {
+          "check": "Ninguna ruta limitada responde 429 sin la cabecera",
+          "comando": "grep -rL \"Retry-After\" $(grep -rl \"429\" app/api) 2>/dev/null",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/respuesta-429.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.abuso.techo-por-costo-real",
+      "titulo": "Dar techo más bajo a lo que cuesta plata que a lo que solo lee",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un límite único para toda la API trata igual una consulta que solo lee de la caché y un envío de correo, SMS, llamada a un modelo o exportación que cuesta dinero real por cada uso: el atacante (o el error de un cliente en bucle) encuentra el techo más flojo de los dos y lo explota ahí.",
+      "queHacer": [
+        "Clasificar cada ruta en categorías de costo: lectura simple, escritura normal, acción que cuesta dinero por uso (correo, SMS, IA, exportación de archivos).",
+        "Asignar a cada categoría su propio techo en la configuración del limitador, con la categoría de costo por uso siempre la más estricta.",
+        "Poner además un techo de gasto acumulado por identidad y por día en las rutas de costo por uso, no solo un techo de peticiones por minuto.",
+        "Revisar la tabla de clasificación cada vez que se agrega una ruta nueva que llama a un servicio de pago por uso."
+      ],
+      "aceptacion": [
+        {
+          "check": "La ruta de costo por uso tiene techo más bajo que la de solo lectura",
+          "comando": "node -e \"const c=require('./lib/servidor/categorias-limite.js'); console.log(c.costoPorUso.techo < c.lectura.techo)\"",
+          "espera": "true"
+        },
+        {
+          "check": "Toda ruta que llama a un servicio de pago por uso está clasificada",
+          "comando": "grep -rl \"sendMessage\\|generarPDF\\|openai\\|anthropic\\|twilio\" app/api | xargs grep -L \"categoriaCostoPorUso\"",
+          "espera": "0 archivos"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "publico"
+        ],
+        "correoSaliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/categorias-limite.ts"
+      ],
+      "cerebro": [
+        "tema:modelos-y-costos"
+      ]
+    },
+    {
+      "id": "sec.abuso.limite-antes-de-la-base",
+      "titulo": "Aplicar el límite antes de tocar la base de datos",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el conteo de intentos se hace después de consultar la base, cada petición del ataque ya gastó una consulta real antes de que el límite la frene: mil peticiones bloqueadas igual saturaron la base mil veces.",
+      "queHacer": [
+        "Mover la comprobación del límite al principio del manejador de la ruta o a un middleware previo, antes de cualquier `SELECT`, `INSERT` o `UPDATE`.",
+        "Guardar los contadores en memoria o en un almacén rápido (Redis) separado de la base transaccional, para que consultarlos no compita con las consultas de negocio.",
+        "Verificar con una prueba que ninguna consulta a la base ocurre cuando la petición viene bloqueada.",
+        "En rutas con caché de solo lectura, permitir que la respuesta cacheada salga sin tocar la base incluso dentro del límite, para no gastar cupo en vano."
+      ],
+      "aceptacion": [
+        {
+          "check": "Una petición bloqueada no genera consulta a la base",
+          "comando": "npm test -- limite-antes-de-base",
+          "espera": "test verde: con el contador espiado, 0 consultas a la base cuando la petición 21 responde 429"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/limitar-antes-de-base.ts",
+        "tests/seguridad/limite-antes-de-base.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.abuso.bloqueo-no-se-salta-con-ip-nueva",
+      "titulo": "Impedir saltar el bloqueo cambiando de IP en el mismo minuto",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si el bloqueo vive solo en la IP, cambiar de red (VPN, proxy, datos móviles) lo resetea gratis y en segundos; un servicio de IPs rotativas cuesta centavos y anula por completo un límite pensado solo por dirección.",
+      "queHacer": [
+        "Atar el bloqueo también a la identidad (cuenta, correo intentado, llave de API) o a una huella de dispositivo, no solo a la IP.",
+        "Hacer que el retroceso (backoff) se acumule por identidad aunque la IP cambie entre intentos.",
+        "No confiar ciegamente en `X-Forwarded-For` como única fuente de IP: validar contra la lista de proxys de confianza antes de usarla para calcular el bloqueo.",
+        "Probar el caso donde el mismo ataque cambia de IP en cada intento contra la misma cuenta."
+      ],
+      "aceptacion": [
+        {
+          "check": "El bloqueo por cuenta persiste aunque cambie la IP",
+          "comando": "npm test -- bloqueo-anti-rotacion-ip",
+          "espera": "test verde: 5 intentos fallidos contra la misma cuenta desde 5 IPs distintas terminan igual bloqueados en el 6º"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "publico"
+        ],
+        "traficoAnonimo": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/bloqueo-por-identidad.ts",
+        "tests/seguridad/bloqueo-anti-rotacion-ip.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.abuso.registro-de-bloqueos",
+      "titulo": "Registrar de cada bloqueo lo necesario para distinguir ataque de error",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin ruta, IP, identidad, motivo y hora de cada bloqueo, un pico de 429 se ve igual si es un ataque real o un cliente propio mal configurado reintentando en bucle, y nadie puede decidir si subir el límite o mandar una alerta.",
+      "queHacer": [
+        "Registrar en cada 429: ruta, identidad (si la hay), IP, motivo del bloqueo (cuál de los techos se superó) y hora exacta.",
+        "Agrupar el registro por identidad y por IP para poder ver de un vistazo si el origen es uno solo (cliente mal configurado) o disperso (ataque).",
+        "Poner una alerta cuando el volumen de 429 de una sola ruta pasa un umbral fijo en una ventana corta.",
+        "No registrar el cuerpo completo de la petición bloqueada si trae datos personales o credenciales; solo los campos de arriba."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada bloqueo queda con los cinco campos mínimos",
+          "comando": "npm test -- registro-bloqueos",
+          "espera": "test verde: el registro de un 429 trae ruta, identidad-o-null, ip, motivo y hora"
+        },
+        {
+          "check": "El registro de bloqueo no guarda el cuerpo crudo de la petición",
+          "comando": "grep -rn \"req.body\" lib/servidor/registro-bloqueos.ts",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/registro-bloqueos.ts",
+        "tests/seguridad/registro-bloqueos.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.abuso.no-bloquear-importacion-legitima",
+      "titulo": "No dejar por fuera al cliente legítimo que hace una importación grande",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un límite pensado para tráfico normal corta a mitad de camino la carga de un catálogo de 5.000 productos: el cliente ve un error en la petición 21 sin saber si perdió las primeras 20 o las últimas, y reintenta duplicando lo que sí entró.",
+      "queHacer": [
+        "Ofrecer para las operaciones masivas conocidas (importación, carga de catálogo) una ruta o modo por lotes con su propio techo, mayor que el de uso normal, en vez de forzar la operación a través de la ruta de un solo registro.",
+        "Hacer la ruta por lotes idempotente: reintentar el mismo lote no duplica lo que ya entró.",
+        "Devolver de la ruta por lotes cuántos registros del lote se procesaron y cuáles fallaron, no un corte silencioso a la mitad.",
+        "Documentar el límite de tamaño de lote y el techo de lotes por hora para que el cliente pueda planear la carga completa."
+      ],
+      "aceptacion": [
+        {
+          "check": "Una carga de 5000 registros por la ruta por lotes no dispara 429 a mitad de camino",
+          "comando": "npm test -- importacion-masiva",
+          "espera": "test verde: la carga completa de 5000 registros en lotes de 500 termina con 0 respuestas 429"
+        },
+        {
+          "check": "Reenviar el mismo lote no duplica registros",
+          "comando": "npm test -- importacion-idempotente",
+          "espera": "test verde: enviar el mismo lote dos veces deja el mismo conteo de filas que enviarlo una vez"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/importar/**",
+        "tests/seguridad/importacion-masiva.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.llaves.se-muestra-una-vez-y-se-guarda-hash",
+      "titulo": "Mostrar la llave de API una sola vez y guardarla como hash",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si la llave se puede volver a ver en el panel después de creada, quien entre a esa cuenta (o a un respaldo de la base) se la lleva completa; guardando solo el hash, ni el propio sistema puede revelarla otra vez.",
+      "queHacer": [
+        "Generar la llave con un prefijo visible fijo (para identificarla en logs) seguido de una parte aleatoria larga.",
+        "Mostrar el valor completo una única vez, en el momento de creación, con aviso de que no se podrá volver a ver.",
+        "Guardar en la base solo el hash de la parte aleatoria y el prefijo, nunca el valor completo.",
+        "Comparar en cada uso con el mismo hash, nunca reconstruyendo ni desencriptando la llave original.",
+        "No incluir el valor completo de la llave en ningún log ni mensaje de error."
+      ],
+      "aceptacion": [
+        {
+          "check": "La base no guarda la llave en claro",
+          "comando": "grep -rn \"valorCompleto\\|llave_texto\" prisma/schema.prisma lib/servidor/llaves-api.ts 2>/dev/null",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El endpoint de listar llaves nunca devuelve el valor completo",
+          "comando": "npm test -- llaves-listar-no-revela",
+          "espera": "test verde: la respuesta de listar llaves trae solo el prefijo, nunca la llave completa"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/llaves-api.ts",
+        "app/api/llaves/**",
+        "tests/seguridad/llaves-listar-no-revela.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.llaves.alcance-no-permisos-totales",
+      "titulo": "Dar a cada llave un alcance, no los permisos totales de la cuenta",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una llave con todos los permisos de la cuenta convierte cualquier filtración (un log, un repositorio, un archivo de configuración copiado) en un compromiso total; una llave de solo-lectura filtrada solo compromete lectura.",
+      "queHacer": [
+        "Definir una lista cerrada de alcances (por ejemplo: `lectura`, `escritura`, `exportar`, `administrar-llaves`) que una llave puede tener.",
+        "Exigir elegir al menos un alcance al crear la llave; sin selección no se crea.",
+        "Comprobar el alcance en cada ruta de la API antes de ejecutar la acción, no solo validar que la llave existe.",
+        "Rechazar con 403 (no 401) cuando la llave es válida pero le falta el alcance que la ruta exige."
+      ],
+      "aceptacion": [
+        {
+          "check": "Una llave de solo lectura no puede escribir",
+          "comando": "npm test -- llaves-alcance",
+          "espera": "test verde: una llave con alcance `lectura` recibe 403 al intentar POST/PUT/DELETE"
+        },
+        {
+          "check": "Toda ruta de la API pública comprueba el alcance",
+          "comando": "grep -rL \"comprobarAlcance(\" app/api/publica/**/*.ts",
+          "espera": "0 archivos"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/alcance-llaves.ts",
+        "tests/seguridad/llaves-alcance.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.llaves.rotar-y-revocar-sin-apagar",
+      "titulo": "Rotar y revocar llaves sin apagar el sistema",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin rotación en caliente, cambiar una llave filtrada obliga a un corte del servicio mientras todos los clientes actualizan al mismo tiempo; con dos llaves activas a la vez, la migración se hace sin apagar nada.",
+      "queHacer": [
+        "Permitir más de una llave activa por cliente al mismo tiempo, cada una con su propia fecha de creación.",
+        "Al crear una llave nueva para reemplazar una vieja, dejar la vieja activa por una ventana de gracia configurable antes de revocarla.",
+        "Hacer que revocar una llave la invalide de inmediato en el servidor, no cuando expire una caché.",
+        "Avisar (correo o panel) cuando una llave con ventana de gracia está por vencer sin que el cliente haya migrado."
+      ],
+      "aceptacion": [
+        {
+          "check": "Revocar una llave la invalida en la siguiente petición",
+          "comando": "npm test -- llaves-revocar-inmediato",
+          "espera": "test verde: la petición inmediatamente después de revocar responde 401"
+        },
+        {
+          "check": "Dos llaves activas del mismo cliente funcionan a la vez",
+          "comando": "npm test -- llaves-rotacion-en-caliente",
+          "espera": "test verde: la llave vieja y la nueva responden 200 durante la ventana de gracia"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/rotacion-llaves.ts",
+        "tests/seguridad/llaves-rotacion-en-caliente.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.llaves.ultimo-uso-visible",
+      "titulo": "Mostrar cuándo se usó por última vez cada llave",
+      "nivel": "N2",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Sin fecha de último uso, una llave de un proveedor que ya no se usa queda activa indefinidamente, invisible como una puerta que nadie recuerda que quedó abierta.",
+      "queHacer": [
+        "Actualizar `ultimoUso` en la llave cada vez que se usa para autenticar una petición, sin que eso bloquee la petición si falla la escritura.",
+        "Mostrar la fecha de último uso junto a cada llave en el panel del cliente.",
+        "Marcar visualmente las llaves sin uso en los últimos 90 días.",
+        "Ofrecer desde el panel revocar directamente una llave marcada como sin uso."
+      ],
+      "aceptacion": [
+        {
+          "check": "Usar una llave actualiza su fecha de último uso",
+          "comando": "npm test -- llaves-ultimo-uso",
+          "espera": "test verde: tras una petición autenticada, `ultimoUso` de la llave cambia a la hora de esa petición"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/ultimo-uso-llave.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.llaves.token-caduca-y-se-renueva",
+      "titulo": "Hacer caducar el token de acceso de máquina y definir cómo se renueva",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un token de acceso que no caduca, si se filtra en un log o una integración de terceros, sirve para siempre; uno de vida corta con renovación limita la ventana de daño al tiempo que tarda alguien en notar la filtración.",
+      "queHacer": [
+        "Emitir tokens de acceso de máquina con vida corta (minutos u horas, no días) y un token de renovación separado de vida más larga.",
+        "Guardar el token de renovación con el mismo cuidado que una contraseña: hash, nunca en claro.",
+        "Invalidar toda la cadena de renovación (no solo el token de acceso) cuando se detecta un uso sospechoso.",
+        "Documentar en la referencia de la API el tiempo de vida de cada tipo de token y el endpoint de renovación."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un token de acceso vencido deja de servir",
+          "comando": "npm test -- token-caduca",
+          "espera": "test verde: un token con expiración pasada responde 401 aunque la firma sea válida"
+        },
+        {
+          "check": "El token de renovación se guarda como hash",
+          "comando": "grep -rn \"tokenRenovacion.*texto\\|refreshToken.*plain\" lib/servidor/tokens.ts",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/tokens.ts",
+        "tests/seguridad/token-caduca.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.sesion.cerrar-mis-sesiones-desde-otro-dispositivo",
+      "titulo": "Dejar que la persona cierre ella misma su sesión en otro dispositivo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando un cliente de la web pierde el celular o deja la sesión abierta en un computador público, necesita poder cerrarla él mismo desde su cuenta sin esperar a que alguien del equipo intervenga por él.",
+      "queHacer": [
+        "Guardar por sesión: dispositivo o navegador, hora de inicio, última actividad e IP aproximada (ciudad, no la IP cruda).",
+        "Mostrar en la configuración de la cuenta la lista de sesiones propias con un botón para cerrar cada una.",
+        "Ofrecer un botón de 'cerrar todas las demás sesiones' que preserva únicamente la sesión actual.",
+        "Cerrar una sesión la invalida en el servidor de inmediato."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cerrar una sesión propia desde el panel la invalida al instante",
+          "comando": "npm test -- cerrar-mi-sesion",
+          "espera": "test verde: la petición siguiente con la cookie de la sesión cerrada responde 401"
+        },
+        {
+          "check": "Una persona no puede cerrar la sesión de otra cuenta",
+          "comando": "npm test -- cerrar-sesion-ajena-prohibido",
+          "espera": "test verde: intentar cerrar el id de sesión de otra cuenta responde 403 o 404"
+        }
+      ],
+      "aplicaSi": {
+        "autoservicio": true,
+        "traficoAnonimo": true,
+        "superficies": [
+          "publico",
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/cuenta/sesiones/**",
+        "app/api/cuenta/sesiones/**",
+        "tests/seguridad/cerrar-mi-sesion.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.auth.segundo-factor-y-codigos-de-respaldo",
+      "titulo": "Ofrecer segundo factor con códigos de respaldo",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Sin segundo factor, una clave filtrada en otro sitio (reuso de contraseñas) basta para entrar; sin códigos de respaldo, perder el celular con la app de códigos dejaría a la persona fuera de su propia cuenta para siempre.",
+      "queHacer": [
+        "Implementar segundo factor por app de autenticación (TOTP), no solo por SMS, que se puede interceptar por SIM swap.",
+        "Al activar el segundo factor, generar de una vez 10 códigos de respaldo de un solo uso y mostrar que solo se ven ahora.",
+        "Guardar los códigos de respaldo como hash, igual que las claves, e invalidar cada uno tras usarlo.",
+        "Dejar el segundo factor como opcional para la cuenta normal pero exigirlo en las acciones más sensibles (cambio de correo, de clave, exportación de datos).",
+        "No permitir desactivar el segundo factor sin volver a confirmar la clave actual."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un código de respaldo usado no sirve una segunda vez",
+          "comando": "npm test -- segundo-factor-codigos-respaldo",
+          "espera": "test verde: reusar el mismo código de respaldo responde rechazo en el segundo intento"
+        },
+        {
+          "check": "Los códigos de respaldo se guardan como hash",
+          "comando": "grep -rn \"codigosRespaldo.*texto\\|backupCodes.*plain\" lib/servidor/segundo-factor.ts",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "autoservicio": true,
+        "traficoAnonimo": true,
+        "superficies": [
+          "publico",
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/segundo-factor.ts",
+        "app/cuenta/seguridad/**",
+        "tests/seguridad/segundo-factor-codigos-respaldo.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "sec.auth.recuperacion-con-token-de-un-solo-uso",
+      "titulo": "Recuperar acceso con token de un solo uso y vida corta",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un enlace de recuperación que no caduca o se puede reusar es una llave maestra permanente escondida en la bandeja de un correo: si ese correo se filtra alguna vez, la cuenta queda abierta para siempre, no solo el día del cambio.",
+      "queHacer": [
+        "Generar un token aleatorio largo, guardarlo como hash y mandar solo el valor en claro por correo.",
+        "Poner una expiración corta (15 a 30 minutos) y verificarla en el servidor, no solo en el enlace.",
+        "Invalidar el token en cuanto se usa una vez, aunque el cambio de clave falle después por otra razón.",
+        "Responder siempre el mismo mensaje genérico al pedir recuperación, exista o no esa cuenta con ese correo.",
+        "Cerrar todas las sesiones activas de la cuenta cuando la recuperación termina en un cambio de clave exitoso."
+      ],
+      "aceptacion": [
+        {
+          "check": "El token de recuperación no sirve una segunda vez",
+          "comando": "npm test -- recuperacion-token-un-uso",
+          "espera": "test verde: usar el mismo enlace de recuperación dos veces falla en el segundo intento"
+        },
+        {
+          "check": "Un token con más de 30 minutos se rechaza",
+          "comando": "npm test -- recuperacion-token-vencido",
+          "espera": "test verde: un token con timestamp de hace 31 minutos responde rechazo"
+        }
+      ],
+      "aplicaSi": {
+        "autoservicio": true,
+        "correoSaliente": true,
+        "superficies": [
+          "publico",
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/recuperar-clave/**",
+        "lib/servidor/recuperacion.ts",
+        "tests/seguridad/recuperacion-token-un-uso.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.auth.cambio-de-correo-confirma-en-el-viejo",
+      "titulo": "Confirmar el cambio de correo también en el correo viejo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si solo se avisa al correo nuevo, quien tomó la sesión (robada o dejada abierta en un equipo público) cambia el correo de recuperación y saca al dueño real de su propia cuenta sin que se entere hasta que ya es tarde.",
+      "queHacer": [
+        "Al pedir cambio de correo, mandar un aviso inmediato al correo VIEJO con la opción de revertir o bloquear el cambio con un enlace de un solo uso.",
+        "No completar el cambio hasta que el correo NUEVO confirme, y dejar una ventana donde el correo viejo puede cancelar aunque el nuevo ya haya confirmado.",
+        "Registrar el cambio de correo en la bitácora de la cuenta con la IP y el dispositivo desde donde se pidió.",
+        "Exigir reingresar la clave (o el segundo factor si está activo) antes de iniciar un cambio de correo."
+      ],
+      "aceptacion": [
+        {
+          "check": "El correo viejo puede cancelar un cambio en curso",
+          "comando": "npm test -- cambio-correo-cancelable",
+          "espera": "test verde: usar el enlace de cancelación del correo viejo deja el correo original activo aunque el nuevo ya haya confirmado"
+        },
+        {
+          "check": "Cambiar de correo exige reingresar la clave",
+          "comando": "grep -n \"reautenticar\\|verificarClaveActual\" app/api/cuenta/cambiar-correo/route.ts",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "autoservicio": true,
+        "correoSaliente": true,
+        "superficies": [
+          "publico",
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/cuenta/cambiar-correo/**",
+        "lib/servidor/cambio-correo.ts",
+        "tests/seguridad/cambio-correo-cancelable.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "sec.auth.cuenta-autoregistrada-se-verifica-antes-de-operar",
+      "titulo": "Verificar la cuenta que se crea sola antes de dejarla operar",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin verificación, un formulario público de registro se vuelve una fábrica de cuentas falsas para spam, para agotar pruebas gratis o para esconder intentos de fraude detrás de identidades desechables.",
+      "queHacer": [
+        "Dejar la cuenta recién creada en estado limitado (puede ver, no puede escribir ni gastar) hasta confirmar el correo o el teléfono con un código de un solo uso.",
+        "Poner límite de registros nuevos por IP y por minuto, con el mismo mecanismo de techo del resto de la API.",
+        "Bloquear dominios de correo desechable conocidos en el formulario de registro.",
+        "Expirar y borrar las cuentas nunca verificadas después de un plazo fijo (por ejemplo 7 días)."
+      ],
+      "aceptacion": [
+        {
+          "check": "Una cuenta sin verificar no puede ejecutar acciones de escritura",
+          "comando": "npm test -- cuenta-sin-verificar-limitada",
+          "espera": "test verde: una cuenta recién creada sin confirmar recibe 403 al intentar una acción de escritura"
+        },
+        {
+          "check": "El registro está limitado por IP",
+          "comando": "grep -n \"limitar(\" app/api/registro/route.ts",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "autoservicio": true,
+        "traficoAnonimo": true,
+        "superficies": [
+          "publico",
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/registro/**",
+        "lib/servidor/verificacion-cuenta.ts",
+        "tests/seguridad/cuenta-sin-verificar-limitada.test.ts"
+      ],
+      "cerebro": []
     }
   ]
 }

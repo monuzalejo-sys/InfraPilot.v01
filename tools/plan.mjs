@@ -118,10 +118,23 @@ function cargarCatalogo() {
 /* `aplicaSi` contra el perfil: las listas se cumplen si ALGUNO coincide (con `*`
    como comodín «que tenga al menos uno»), los booleanos si son idénticos, las
    cadenas si son iguales. Ausente = aplica siempre. */
+// Un sinónimo en el perfil hace que un arquetipo no entre y el plan salga corto sin
+// que nadie se entere. Estos son los sinónimos que ya se escribieron en planes reales.
+const ALIAS = {
+  superficies: { "web-publica": "publico", "web-pública": "publico", "publica": "publico", "pública": "publico" },
+}
+const normalizar = (clave, v) => {
+  const mapa = ALIAS[clave]
+  if (!mapa) return v
+  const lista = Array.isArray(v) ? v : v == null ? [] : [v]
+  return lista.map((x) => mapa[x] ?? x)
+}
+
 function aplica(arq, perfil) {
   const cond = arq.aplicaSi ?? {}
-  for (const [clave, esperado] of Object.entries(cond)) {
-    const real = perfil[clave]
+  for (const [clave, esperadoBruto] of Object.entries(cond)) {
+    const esperado = normalizar(clave, esperadoBruto)
+    const real = ALIAS[clave] ? normalizar(clave, perfil[clave]) : perfil[clave]
     if (Array.isArray(esperado)) {
       if (esperado.includes("*")) { if (!Array.isArray(real) || real.length === 0) return false; continue }
       const reales = Array.isArray(real) ? real : real == null ? [] : [real]

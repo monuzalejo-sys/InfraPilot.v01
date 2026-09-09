@@ -1958,6 +1958,785 @@
       "cerebro": [
         "tema:donde-vive-el-dato"
       ]
+    },
+    {
+      "id": "ops.ci.cache-de-dependencias-con-tope-medido",
+      "titulo": "Cachear dependencias en CI y medir cuánto baja el tiempo del pipeline",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin caché, cada push reinstala node_modules desde cero: un pipeline que podría tardar 40 segundos tarda 4 minutos, y a las 15 veces por día que sube código un equipo de dos personas eso es más de una hora diaria mirando un círculo girar.",
+      "queHacer": [
+        "Identificar la carpeta o archivo que consume el tiempo de instalación (node_modules, ~/.cache, la carpeta del gestor de paquetes).",
+        "Configurar la acción de caché de CI usando el hash del lockfile como clave, no una clave fija que nunca cambia.",
+        "Confirmar que la caché se invalida cuando el lockfile cambia (nueva clave), no que sirve dependencias viejas por error.",
+        "Medir el tiempo del paso de instalación antes y después del cambio, en dos corridas reales.",
+        "Dejar escrito el tiempo de referencia para detectar cuando la caché deje de funcionar y el pipeline se ponga lento de nuevo sin explicación."
+      ],
+      "aceptacion": [
+        {
+          "check": "El workflow de CI declara una caché con clave basada en el hash del lockfile",
+          "comando": "grep -n 'hashFiles' .github/workflows/*.yml | grep -i lock",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "El tiempo del paso de instalar bajó frente a la corrida sin caché",
+          "comando": "docs/tiempos-ci.md — comparar la columna 'con caché' contra 'sin caché'",
+          "espera": "el tiempo con caché es menor"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        ".github/workflows/*.yml",
+        "docs/tiempos-ci.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.ci.rapido-antes-que-lento",
+      "titulo": "Correr primero tipos y lint, y solo si pasan seguir a integración y e2e",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el pipeline corre todo en paralelo o en el orden que quedó escrito por accidente, un error de tipo que se detecta en 8 segundos espera 6 minutos a que termine el e2e para aparecer en rojo, y quien programa ya se fue a hacer otra cosa.",
+      "queHacer": [
+        "Listar los pasos actuales del pipeline en el orden en que corren hoy.",
+        "Reordenar para que tipos y lint corran primero, como paso independiente.",
+        "Hacer que el paso de integración y e2e dependa (`needs`) de que tipos y lint hayan pasado, no que corran en paralelo sin relación.",
+        "Confirmar con un cambio de prueba que rompe un tipo: el pipeline debe fallar en el primer paso sin llegar a levantar el e2e."
+      ],
+      "aceptacion": [
+        {
+          "check": "El job de e2e/integración declara needs sobre el job de tipos/lint",
+          "comando": "grep -n 'needs:' .github/workflows/*.yml",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Un tipo roto detiene el pipeline antes del e2e",
+          "comando": "git commit --allow-empty -m 'test: tipo roto a propósito' && git push && sleep 30 && gh run list --limit 1",
+          "espera": "el run falla en el job de tipos/lint sin job de e2e iniciado"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        ".github/workflows/*.yml"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.ci.secreto-tiene-origen-y-dueno",
+      "titulo": "Dejar escrito de dónde saca CI cada secreto y quién lo puede rotar",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un secreto de CI copiado a mano desde el .env de un desarrollador queda huérfano: nadie sabe si sigue vigente, nadie lo rota cuando esa persona se va, y el día que expira el pipeline falla con un error que no dice cuál de los doce secretos fue.",
+      "queHacer": [
+        "Listar cada secreto que usa el pipeline (nombre de la variable, no el valor).",
+        "Por cada uno, escribir de qué proveedor sale, quién lo generó y en qué panel se rota.",
+        "Confirmar que ninguno se guardó pegado en el yml o en un commit, solo en el almacén de secretos de CI.",
+        "Dejar el nombre de quién es responsable de rotarlo si la persona que lo creó se va del proyecto."
+      ],
+      "aceptacion": [
+        {
+          "check": "Existe una tabla de secretos de CI con origen y responsable",
+          "comando": "grep -c '|' docs/secretos-ci.md",
+          "espera": "1+ líneas por cada secreto declarado en el workflow"
+        },
+        {
+          "check": "Ningún secreto real vive en el yml en texto plano",
+          "comando": "grep -nE 'ghp_|sk-|AKIA[0-9A-Z]{16}' .github/workflows/*.yml",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
+      "porCada": null,
+      "posee": [
+        "docs/secretos-ci.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.ci.un-solo-build-se-promueve-a-cada-ambiente",
+      "titulo": "Construir el artefacto una sola vez y promover ese mismo build a cada ambiente",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si el pipeline reconstruye el código en cada ambiente (staging con su propio build, producción con el suyo), lo que pasó la prueba en staging no es exactamente lo que llega a producción: una dependencia que se resolvió distinto entre las dos compilaciones puede romper solo en el ambiente que nadie probó a mano.",
+      "queHacer": [
+        "Confirmar si el pipeline hoy corre `build` una vez por ambiente o una sola vez en total.",
+        "Cambiar el pipeline para que el paso de build produzca un único artefacto versionado (imagen, carpeta empaquetada, o release).",
+        "Hacer que el paso de despliegue a cada ambiente tome ese mismo artefacto por su identificador, no dispare un build nuevo.",
+        "Verificar comparando el hash o el identificador del artefacto desplegado en staging contra el que llega a producción tras aprobar."
+      ],
+      "aceptacion": [
+        {
+          "check": "El job de deploy usa el artefacto del job de build, no corre build de nuevo",
+          "comando": "grep -n 'needs:\\|artifact' .github/workflows/*.yml",
+          "espera": "1+ líneas mostrando que deploy depende del artefacto de build"
+        },
+        {
+          "check": "El identificador del artefacto en staging y en producción es el mismo",
+          "comando": "diff <(echo $ID_STAGING) <(echo $ID_PRODUCCION)",
+          "espera": "sin diferencias"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        ".github/workflows/*.yml"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.ci.pipeline-se-puede-reintentar-a-mano",
+      "titulo": "Dejar el pipeline disparable a mano para reintentar sin volver a hacer push",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Si la única forma de reintentar un pipeline que falló por un corte de red del proveedor es un commit vacío, cada falla ajena al código deja un commit basura en el historial o, peor, a alguien esperando media hora a que otro cambio real dispare el run.",
+      "queHacer": [
+        "Añadir el disparador `workflow_dispatch` al workflow principal de CI.",
+        "Confirmar que el dispatch manual corre exactamente los mismos pasos que el disparado por push, sin una rama paralela de configuración.",
+        "Probar el botón de re-run y el dispatch manual una vez desde la interfaz o `gh workflow run`.",
+        "Dejar escrito en el README quién tiene permiso para disparar el pipeline a mano."
+      ],
+      "aceptacion": [
+        {
+          "check": "El workflow declara workflow_dispatch",
+          "comando": "grep -n 'workflow_dispatch' .github/workflows/*.yml",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Un dispatch manual corre y termina",
+          "comando": "gh workflow run verificar.yml && sleep 20 && gh run list --limit 1",
+          "espera": "1 línea con estado in_progress o completed"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        ".github/workflows/*.yml"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.ci.main-roto-bloquea-todo-lo-nuevo",
+      "titulo": "Declarar que main en rojo detiene todo merge nuevo hasta arreglarlo",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin esta regla escrita, cuando main queda roto cada quien sigue fusionando su propia rama encima porque su PR sí pasó localmente, y a la hora hay cinco cambios apilados sobre una base rota que nadie sabe cuál de los cinco hay que revertir primero.",
+      "queHacer": [
+        "Escribir la regla: si el pipeline de main está en rojo, ningún merge nuevo entra hasta que quede en verde de nuevo, salvo el fix del rojo mismo.",
+        "Dejar quién se entera primero cuando main se pone rojo (mismo canal que ops.observabilidad.quien-se-entera-primero si ya existe, o uno nuevo si este proyecto no lo tiene).",
+        "Definir que el primer commit permitido sobre main roto es el que lo arregla o lo revierte, no una feature nueva.",
+        "Probar el escenario una vez: romper main a propósito en una rama de práctica y confirmar que la regla se sigue."
+      ],
+      "aceptacion": [
+        {
+          "check": "La regla de main-roto-bloquea está escrita",
+          "comando": "grep -n 'main en rojo\\|main roto' docs/flujo-git.md CONTRIBUTING.md 2>/dev/null",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
+      "porCada": null,
+      "posee": [
+        "docs/flujo-git.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.ci.ci-corre-en-cada-push-no-solo-al-abrir-pr",
+      "titulo": "Disparar CI en cada push a cualquier rama, no solo cuando se abre el PR",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Si CI solo corre al abrir el PR, alguien puede acumular 40 commits de trabajo sobre una rama rota tres días sin enterarse, y descubre el problema justo cuando quiere pedir revisión, con el doble de código para depurar de una vez.",
+      "queHacer": [
+        "Revisar el disparador `on:` del workflow principal.",
+        "Añadir `push` sobre todas las ramas (o al menos sobre `feature/**`), no solo `pull_request`.",
+        "Confirmar que el costo de correr CI en cada push no dispara pasos caros (e2e completo) si no hace falta: usar el pipeline rápido de tipos/lint en cada push y reservar el pesado para el PR.",
+        "Probar subiendo un commit a una rama sin PR abierto y confirmar que CI corrió solo."
+      ],
+      "aceptacion": [
+        {
+          "check": "El workflow dispara con push además de pull_request",
+          "comando": "grep -n '^on:' -A5 .github/workflows/*.yml | grep -i push",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        ".github/workflows/*.yml"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.ci.version-de-runtime-fijada-igual-en-ci-y-local",
+      "titulo": "Fijar la misma versión de Node en CI y en local, no dejarla a la deriva",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Sin una versión fijada, CI usa la que trae la imagen del proveedor ese mes y el desarrollador la que instaló hace un año: un cambio que pasa en la máquina de alguien falla en CI, o viceversa, y el tiempo se va discutiendo cuál de las dos versiones tiene la razón.",
+      "queHacer": [
+        "Escribir la versión exacta de Node en un archivo `.nvmrc` o en `engines` de package.json.",
+        "Hacer que el workflow de CI lea ese mismo archivo para fijar su versión, en vez de un número repetido a mano en el yml.",
+        "Confirmar que la versión local (`node -v`) coincide con la fijada.",
+        "Repetir para cualquier otro runtime que el proyecto use (Python, Deno) si aplica."
+      ],
+      "aceptacion": [
+        {
+          "check": "El workflow de CI lee la versión desde el archivo del proyecto, no un número suelto",
+          "comando": "grep -n 'node-version-file\\|\\.nvmrc' .github/workflows/*.yml",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "La versión local coincide con la fijada",
+          "comando": "diff <(cat .nvmrc) <(node -v | tr -d v)",
+          "espera": "sin diferencias"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        ".nvmrc",
+        "package.json"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.ci.notificacion-inmediata-cuando-ci-se-pone-rojo",
+      "titulo": "Avisar por un canal que alguien mira cuando el pipeline de main se pone rojo",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Un pipeline que solo muestra su color en la pestaña de Actions de GitHub se pone rojo en silencio: nadie lo revisa hasta que va a hacer merge, y para entonces main puede llevar horas rota sin que quien la rompió se haya enterado.",
+      "queHacer": [
+        "Elegir el canal donde el equipo ya mira avisos (el mismo de incidentes si existe uno).",
+        "Configurar el workflow para notificar a ese canal cuando el job del branch principal termina en fallo.",
+        "Confirmar que el aviso trae el nombre del commit y del autor, no solo 'CI falló'.",
+        "Probar rompiendo el pipeline a propósito en una rama de práctica y confirmar que el aviso llega."
+      ],
+      "aceptacion": [
+        {
+          "check": "El workflow tiene un paso de notificación condicionado a fallo en la rama principal",
+          "comando": "grep -n 'if: failure()' .github/workflows/*.yml",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
+      "porCada": null,
+      "posee": [
+        ".github/workflows/*.yml"
+      ],
+      "cerebro": [
+        "tema:que-es-estar-verificado"
+      ]
+    },
+    {
+      "id": "ops.git.trabajo-pausado-va-a-rama-nunca-a-stash",
+      "titulo": "Mandar a una rama, nunca a stash, el trabajo terminado que el dueño manda pausar",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Un stash vive solo en la máquina de quien lo hizo: si esa sesión se cierra, se reinicia el entorno o pasa a otro agente, el trabajo terminado (con sus tests en verde) desaparece sin dejar rastro y hay que rehacerlo desde cero.",
+      "queHacer": [
+        "Cuando llegue la orden de pausar algo ya terminado, hacer commit completo en una rama `feature/<lo-que-sea>`, nunca dejarlo en el árbol de trabajo ni en stash.",
+        "Subir esa rama al remoto para que sobreviva aunque se pierda la máquina local.",
+        "Dejar en la descripción del commit o en un PR en borrador por qué quedó pausado y qué falta para retomarlo.",
+        "Confirmar que `git status` en main queda limpio mientras la rama pausada existe aparte."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay cambios en stash ni en el árbol de trabajo sin commitear",
+          "comando": "git stash list && git status --porcelain",
+          "espera": "ambas salidas vacías"
+        },
+        {
+          "check": "La rama pausada existe y está subida al remoto",
+          "comando": "git branch -r | grep feature/",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/flujo-git.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.git.nadie-empuja-directo-a-main",
+      "titulo": "Bloquear el push directo a main: todo cambio entra por pull request",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Un push directo a main salta cualquier revisión y cualquier check: basta un `git push` distraído para que código sin revisar quede desplegándose solo. Con humanos en el equipo esto deja de ser disciplina y tiene que ser candado del repositorio — cuando ORION trabaja solo, la política de la casa es publicar directo y este arquetipo no aplica.",
+      "queHacer": [
+        "Activar en la configuración del repositorio la protección de la rama main contra push directo.",
+        "Exigir que todo cambio, sin excepción, entre por pull request, incluyendo cambios de configuración y de documentación.",
+        "Confirmar que ni siquiera quien administra el repositorio tiene el atajo activado para saltarse la regla.",
+        "Probar intentando un push directo de prueba a main y confirmar que el servidor lo rechaza."
+      ],
+      "aceptacion": [
+        {
+          "check": "La rama main está protegida contra push directo",
+          "comando": "gh api repos/:owner/:repo/branches/main/protection --jq '.restrictions, .enforce_admins.enabled'",
+          "espera": "enforce_admins en true"
+        },
+        {
+          "check": "Un push directo a main es rechazado",
+          "comando": "git push origin HEAD:main",
+          "espera": "rechazado con 'protected branch'"
+        }
+      ],
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
+      "porCada": null,
+      "posee": [
+        "docs/proteccion-main.md"
+      ],
+      "cerebro": [
+        "tema:olas-de-agentes"
+      ]
+    },
+    {
+      "id": "ops.git.mensaje-de-commit-dice-el-porque",
+      "titulo": "Exigir que el mensaje de commit diga por qué, no solo qué archivo tocó",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Un historial lleno de 'fix', 'cambios' y 'ajustes' no sirve para nada seis meses después: cuando algo se rompe y hay que buscar cuál commit lo causó, nadie puede decidir por el mensaje si ese cambio es sospechoso o no, y toca abrir cada uno a mano.",
+      "queHacer": [
+        "Definir el formato mínimo: una línea corta que diga qué cambia, y si hace falta, un cuerpo que diga por qué.",
+        "Prohibir mensajes genéricos de una palabra ('fix', 'wip', 'cambios') salvo en commits de work-in-progress explícitamente marcados como tal.",
+        "Configurar un hook o un check de CI que rechace commits que no cumplan el mínimo (longitud, no vacío, no genérico).",
+        "Revisar los últimos 20 commits reales del repo contra la regla como línea base."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún commit reciente usa un mensaje genérico de una palabra",
+          "comando": "git log --oneline -20 | grep -icE '^[a-f0-9]+ (fix|wip|cambios|update)$'",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/convencion-commits.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.git.pr-no-supera-el-tope-de-archivos",
+      "titulo": "Partir el PR que supera el tope de archivos acordado, no pedir revisarlo entero",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un PR de 60 archivos no lo revisa nadie de verdad: quien aprueba hace scroll, ve que 'se ve bien' y aprueba por cansancio, que es exactamente el escenario en que un cambio de permisos o de dinero se cuela sin que nadie lo haya mirado.",
+      "queHacer": [
+        "Acordar y escribir el tope de archivos por PR (ej. 15) para este repo.",
+        "Configurar un check de CI que cuente los archivos cambiados contra el tope y falle si lo supera.",
+        "Cuando un cambio real necesite más, partirlo en PRs encadenados con dependencia explícita entre ellos, no forzar la excepción en silencio.",
+        "Documentar la excepción válida (ej. actualización masiva de un lockfile o de traducciones) para que el check no bloquee lo que no aporta riesgo real."
+      ],
+      "aceptacion": [
+        {
+          "check": "Existe un check de CI que cuenta archivos del PR contra el tope",
+          "comando": "grep -n 'files_changed\\|changed-files' .github/workflows/*.yml",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "El tope numérico está escrito, no solo en la cabeza de alguien",
+          "comando": "grep -rn 'archivos por PR\\|files.*tope\\|MAX_FILES' docs/ .github/",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
+      "porCada": null,
+      "posee": [
+        ".github/workflows/*.yml",
+        "docs/flujo-git.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.git.tag-de-version-atado-a-lo-desplegado",
+      "titulo": "Etiquetar con un tag de versión exactamente el commit que quedó desplegado",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin un tag atado al despliegue, la pregunta 'qué versión está corriendo en producción ahora mismo' solo se responde adivinando por fecha, y un rollback a 'la versión de antes' puede aterrizar tres commits antes o después del que de verdad estaba en producción.",
+      "queHacer": [
+        "Al terminar cada despliegue a producción, crear un tag (`v1.4.2` o similar) sobre el commit exacto que se desplegó.",
+        "Subir el tag al remoto en el mismo momento del despliegue, no después ni a mano al final del día.",
+        "Dejar la convención de versionado escrita (semver o la que use el proyecto).",
+        "Confirmar que el tag más reciente coincide con el commit que responde en la URL de salud del sistema."
+      ],
+      "aceptacion": [
+        {
+          "check": "El tag más reciente existe y apunta al commit desplegado",
+          "comando": "git tag --sort=-creatordate | head -1 | xargs -I{} git rev-parse {}",
+          "espera": "coincide con el commit que reporta /api/salud o /version en producción"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/tags-de-version.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.git.revertir-lo-ultimo-publicado-en-un-comando",
+      "titulo": "Poder revertir lo último publicado con un solo comando ensayado",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si revertir requiere que alguien recuerde a mano cuál era el commit anterior, resuelva conflictos de merge en caliente y vuelva a desplegar manualmente, el tiempo entre 'algo se rompió' y 'ya volvió a la normalidad' se mide en media hora de pánico en vez de dos minutos.",
+      "queHacer": [
+        "Escribir un script o un comando único (`npm run revertir-ultimo` o similar) que revierta el último merge a main y dispare el despliegue de esa reversión.",
+        "Basarlo en el tag de versión anterior, no en adivinar el commit por el log.",
+        "Ensayarlo una vez en un ambiente que no sea producción, cronometrando cuánto tarda de punta a punta.",
+        "Dejar escrito quién tiene permiso para ejecutarlo sin pedir aprobación previa, dado que es una acción de emergencia."
+      ],
+      "aceptacion": [
+        {
+          "check": "El comando de reversión existe y corre",
+          "comando": "npm run revertir-ultimo -- --dry-run",
+          "espera": "termina sin error mostrando el commit al que revertiría"
+        },
+        {
+          "check": "El ensayo real está cronometrado y escrito",
+          "comando": "grep -n 'minutos\\|segundos' docs/rollback-git.md",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/rollback-git.md",
+        "scripts/revertir-ultimo.*"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.git.el-lockfile-se-versiona-siempre",
+      "titulo": "Versionar siempre el lockfile y bloquear el PR que lo excluye",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Sin lockfile versionado, dos instalaciones del mismo package.json en dos máquinas (o en CI contra local) pueden resolver versiones distintas de una dependencia transitiva, y un bug que 'solo pasa en producción' termina siendo una versión de librería que nadie fijó.",
+      "queHacer": [
+        "Confirmar que el lockfile del gestor de paquetes (package-lock.json, pnpm-lock.yaml, yarn.lock) está en el repo, no en .gitignore.",
+        "Añadir un check de CI que falle si `npm ci` (o equivalente) detecta que el lockfile no coincide con package.json.",
+        "Prohibir en la plantilla de PR el uso de `npm install` sin lockfile actualizado y commiteado junto al cambio de dependencia.",
+        "Confirmar que solo hay UN gestor de paquetes en uso (no conviven package-lock.json y yarn.lock al tiempo)."
+      ],
+      "aceptacion": [
+        {
+          "check": "El lockfile está versionado",
+          "comando": "git ls-files | grep -E 'package-lock.json|pnpm-lock.yaml|yarn.lock'",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Solo existe un gestor de paquetes activo",
+          "comando": "ls package-lock.json pnpm-lock.yaml yarn.lock 2>/dev/null | wc -l",
+          "espera": "1"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        ".github/workflows/verificar-lockfile.yml"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.git.ramas-muertas-se-limpian-por-calendario",
+      "titulo": "Borrar por calendario las ramas ya fusionadas, no dejarlas acumularse",
+      "nivel": "N2",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Con 10 repos activos, cada uno acumulando ramas de agentes y de humanos que ya se fusionaron, `git branch -a` deja de servir para responder 'qué está en curso ahora mismo' y cualquiera pierde diez minutos identificando cuáles siguen vivas.",
+      "queHacer": [
+        "Configurar el repositorio para borrar automáticamente la rama al fusionar su PR.",
+        "Para las que ya existen y quedaron huérfanas, correr una limpieza puntual de ramas ya mezcladas a main.",
+        "Dejar un recordatorio recurrente (mensual) para repetir la limpieza en repos donde el borrado automático no aplica.",
+        "Excluir de la limpieza las ramas pausadas por orden explícita del dueño (ver ops.git.trabajo-pausado-va-a-rama-nunca-a-stash), que no están muertas, están en espera."
+      ],
+      "aceptacion": [
+        {
+          "check": "El repo borra la rama automáticamente al fusionar",
+          "comando": "gh api repos/:owner/:repo --jq '.delete_branch_on_merge'",
+          "espera": "true"
+        },
+        {
+          "check": "No quedan ramas remotas ya fusionadas a main",
+          "comando": "git branch -r --merged origin/main | grep -v 'main$'",
+          "espera": "0 líneas, o solo las marcadas como pausadas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/limpieza-de-ramas.md"
+      ],
+      "cerebro": [
+        "tema:olas-de-agentes"
+      ]
+    },
+    {
+      "id": "ops.nube.mapa-de-que-corre-donde-y-quien-lo-paga",
+      "titulo": "Mapear qué servicio corre en qué proveedor y de qué cuenta sale el cobro",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con cuentas de hosting divergentes entre proyectos del mismo ecosistema, no saber qué corre en cuál cuenta lleva a pagar dos veces por lo mismo, dejar un servicio corriendo en una cuenta que ya nadie revisa, o descubrir el día del corte que el dominio vencido estaba en una tarjeta distinta a la que se pensaba.",
+      "queHacer": [
+        "Listar cada servicio remoto que el proyecto usa: hosting, base de datos, dominio, correo saliente, almacenamiento.",
+        "Por cada uno, escribir el proveedor, la cuenta (usuario/correo) que lo administra y el medio de pago que lo cobra.",
+        "Confirmar con el dueño que la lista está completa comparándola contra los cobros reales del último mes.",
+        "Repetir esta confirmación cada vez que se añada un servicio nuevo, no solo una vez al arrancar."
+      ],
+      "aceptacion": [
+        {
+          "check": "Existe el mapa de servicio, proveedor, cuenta y cobro",
+          "comando": "grep -c '|' docs/mapa-nube.md",
+          "espera": "1+ líneas por cada servicio remoto en uso"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/mapa-nube.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.nube.variable-de-entorno-en-los-tres-ambientes-o-no-arranca",
+      "titulo": "Validar al arrancar que cada variable de entorno requerida existe en el ambiente",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin esta validación, un servicio arranca en desarrollo con la variable puesta a mano, pasa staging porque alguien la copió, y falla en producción a media noche con un error de 'undefined' tres capas abajo de donde en realidad falta la variable.",
+      "queHacer": [
+        "Listar las variables de entorno que el sistema necesita para arrancar, sin las cuales no debe intentar servir tráfico.",
+        "Escribir una validación al inicio del proceso que revise todas y falle rápido, con un mensaje que nombre cuál falta.",
+        "Confirmar que la validación corre en desarrollo, staging y producción por igual, no solo en uno.",
+        "Probar quitando una variable requerida en un ambiente de prueba y confirmar que el arranque falla con el mensaje correcto, no con un error genérico."
+      ],
+      "aceptacion": [
+        {
+          "check": "El arranque falla rápido y nombra la variable que falta",
+          "comando": "unset DATABASE_URL && npm start",
+          "espera": "el proceso termina con código distinto de 0 y el mensaje nombra DATABASE_URL"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/validar-entorno.*"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "ops.nube.certificado-y-dominio-avisan-antes-de-vencer",
+      "titulo": "Avisar con anticipación cuando el certificado o el dominio están por vencer",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "La renovación automática del certificado o del dominio puede fallar en silencio (tarjeta vencida, DNS movido, cuenta suspendida), y el primer aviso que recibe el negocio es el candado roto en la pantalla de un cliente, ya con el sitio caído para el público.",
+      "queHacer": [
+        "Confirmar la fecha de vencimiento real del dominio y del certificado TLS, no asumir que la renovación automática nunca falla.",
+        "Configurar una alerta (correo o monitor externo) que avise 30 y 7 días antes del vencimiento de cada uno.",
+        "Probar la alerta con una fecha simulada cercana para confirmar que de verdad llega antes de que sea tarde.",
+        "Dejar escrito quién recibe la alerta y qué hace al recibirla (a qué panel entra, qué tarjeta revisa)."
+      ],
+      "aceptacion": [
+        {
+          "check": "El certificado tiene más de 7 días de vigencia hoy",
+          "comando": "echo | openssl s_client -servername <dominio> -connect <dominio>:443 2>/dev/null | openssl x509 -noout -enddate",
+          "espera": "fecha de vencimiento con más de 7 días de anticipación, o alerta ya disparada si es menos"
+        },
+        {
+          "check": "Existe la configuración de alerta de vencimiento",
+          "comando": "grep -rn '30 días\\|7 días\\|expiry\\|vencimiento' docs/alertas-nube.md",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/alertas-nube.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.nube.ambiente-de-pruebas-se-parece-al-real",
+      "titulo": "Hacer que el ambiente de pruebas use el mismo motor y versión que producción",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Probar contra SQLite local cuando producción corre Postgres deja pasar bugs de concurrencia y de tipos de dato que solo aparecen con el motor real, y la primera vez que se detectan es con datos de un cliente de verdad.",
+      "queHacer": [
+        "Confirmar qué motor de base de datos, versión de runtime y proveedor usa producción.",
+        "Configurar el ambiente de staging o de pruebas con el mismo motor y la misma versión, no un sustituto más simple.",
+        "Documentar las diferencias que sí quedan (tamaño de instancia, volumen de datos) para que nadie las confunda con paridad total.",
+        "Correr al menos una vez la suite de integración contra staging y confirmar que se comporta igual que contra producción para el mismo caso."
+      ],
+      "aceptacion": [
+        {
+          "check": "Staging y producción declaran el mismo motor y versión",
+          "comando": "diff <(grep -i 'motor\\|engine\\|version' docs/ambiente-staging.md) <(grep -i 'motor\\|engine\\|version' docs/ambiente-produccion.md)",
+          "espera": "sin diferencias en motor y versión"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/ambiente-staging.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.nube.rollback-con-limite-de-minutos-medido",
+      "titulo": "Medir que volver a la versión anterior toma menos de un tope de minutos acordado",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Saber que el rollback funciona no dice cuánto tarda: un rollback que existe pero toma 25 minutos en un negocio que no puede estar caído más de 5 es, en la práctica, una promesa que no se puede cumplir cuando de verdad hace falta.",
+      "queHacer": [
+        "Acordar con el dueño el tope de minutos aceptable para volver a la versión anterior en este proyecto.",
+        "Cronometrar de punta a punta un rollback real (o en staging): desde que se decide hasta que el sistema responde con la versión anterior.",
+        "Si el tiempo medido supera el tope, identificar el paso más lento (build, propagación de DNS, caché del proveedor) y atacarlo primero.",
+        "Repetir la medición cada vez que cambie la infraestructura de despliegue, no confiar en una medición de hace un año."
+      ],
+      "aceptacion": [
+        {
+          "check": "El rollback medido está por debajo del tope acordado",
+          "comando": "grep -n 'minutos' docs/rollback-git.md",
+          "espera": "el número medido es menor o igual al tope escrito"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rollback-git.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.nube.proveedor-se-puede-cambiar-sin-reescribir-la-app",
+      "titulo": "Aislar al proveedor de nube detrás de una capa que se pueda reemplazar",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando el código llama directo a los SDK propietarios del proveedor por todo el sistema, cambiar de proveedor (o migrar de un plan gratuito que se acabó) obliga a reescribir cada punto de contacto en vez de cambiar una sola capa, y el proyecto queda preso de un aumento de precio que no puede negociar.",
+      "queHacer": [
+        "Identificar los servicios del proveedor que el código llama directo (almacenamiento, correo, colas, autenticación).",
+        "Envolver cada uno en una interfaz propia del proyecto, de forma que el resto del código nunca importe el SDK del proveedor directamente.",
+        "Confirmar que solo el archivo de la interfaz depende del SDK; el resto del código depende de la interfaz.",
+        "Si hay presupuesto, probar el cambio con un proveedor alterno detrás de la misma interfaz como prueba de que sí se puede."
+      ],
+      "aceptacion": [
+        {
+          "check": "El SDK del proveedor solo se importa desde la capa de interfaz",
+          "comando": "grep -rl 'from .aws-sdk\\|from .@supabase' --include='*.ts' . | grep -v 'lib/servidor/proveedores/'",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/proveedores/**"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.nube.limites-del-plan-gratis-conocidos-antes-de-escalar",
+      "titulo": "Documentar los límites silenciosos del plan gratis antes de escalar",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un plan gratuito no avisa cuando se acerca a su tope de funciones concurrentes, minutos de cómputo o filas en la base de datos: el sistema simplemente empieza a rechazar peticiones o a tardar más, y parece un bug de código cuando en realidad es un techo de plan que nadie escribió.",
+      "queHacer": [
+        "Revisar la página de límites del plan actual de cada proveedor en uso (funciones concurrentes, tiempo de ejecución, filas, ancho de banda).",
+        "Escribir esos límites en un documento junto al uso actual medido, no solo el número del plan.",
+        "Marcar a qué porcentaje de cada límite el negocio debe empezar a evaluar subir de plan.",
+        "Revisar el uso real contra esos límites cuando el volumen del negocio cambie de forma notoria, no solo una vez al inicio."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los límites del plan gratuito están documentados junto al uso actual",
+          "comando": "grep -n 'límite\\|tope' docs/limites-plan.md",
+          "espera": "1+ líneas por cada proveedor en uso"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/limites-plan.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "ops.nube.region-cercana-a-donde-vive-el-cliente-real",
+      "titulo": "Elegir la región del hosting cercana al cliente real, no la de fábrica",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "La región por defecto de la mayoría de proveedores queda en Estados Unidos: para un negocio con clientes en Colombia, eso añade 100-200 ms a cada petición que no hacían falta, y en un flujo de cobro esa demora se siente como lentitud del sistema, no del internet.",
+      "queHacer": [
+        "Confirmar en qué región está desplegado hoy cada servicio (hosting, base de datos).",
+        "Comparar contra la región más cercana disponible del mismo proveedor a donde está el cliente real.",
+        "Si no coincide, migrar o reconfigurar hacia la región correcta, confirmando que la base de datos y el hosting quedan en regiones cercanas entre sí también (no solo al cliente).",
+        "Medir la latencia real desde una conexión típica del cliente antes y después del cambio."
+      ],
+      "aceptacion": [
+        {
+          "check": "La latencia medida desde una conexión del país del cliente bajó tras el cambio de región",
+          "comando": "curl -s -o /dev/null -w '%{time_total}\\n' https://<dominio-del-cliente>/api/salud",
+          "espera": "tiempo menor al medido antes del cambio de región"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/mapa-nube.md"
+      ],
+      "cerebro": []
     }
   ]
 }

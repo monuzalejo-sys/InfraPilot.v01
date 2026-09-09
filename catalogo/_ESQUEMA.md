@@ -65,6 +65,48 @@ Norma: RFC-0008 §3. Un archivo JSON por categoría, en esta carpeta.
 | `posee` | Archivos o globs que la tarea posee en exclusiva. Puede llevar `{{entidad}}`. **Obligatorio** si `ceremonia` no es `inline`: sin esto, dos tareas de la misma ola se pisan. |
 | `cerebro` | Conocimiento previo que aplica: `tema:<slug>` de `cerebro/temas/`, o `<proyecto>/<ID>` de una memoria. Si no hay ninguno, lista vacía — no inventes citas. |
 
+## El vocabulario de `aplicaSi` (cerrado — un sinónimo rompe el filtro en silencio)
+
+El generador compara valores **exactos** contra el perfil. Un sinónimo por
+descriptivo que sea hace que el arquetipo no entre y que el plan salga corto
+**sin que nadie se entere**. Ya pasó: los planes reales escribieron
+`web-publica` donde el catálogo dice `publico`, y 5 arquetipos —entre ellos
+`sec.permisos.la-landing-no-es-puerta-de-administracion`— fueron inalcanzables
+durante meses. Hoy `plan.mjs` normaliza ese alias, pero la regla sigue: usa
+estos valores y ninguno más.
+
+**Listas** (aplica si coincide alguno; `["*"]` = «que tenga al menos uno»):
+
+| clave | valores |
+|---|---|
+| `superficies` | `publico` (alias aceptado: `web-publica`) · `panel-interno` · `caja` · `api` · `vitrina` · `landing` · `movil` |
+| `stack` | `nextjs` · `react` · `node` · `typescript` · `tailwind` · `postgres` · `supabase` · `sqlite` · `mysql` · `json-en-disco` · `static` |
+| `entidades` / `rutas` / `roles` | abiertos; en `aplicaSi` se usan casi siempre como `["*"]` |
+
+**Booleanos** — y aquí está la regla que protege a los proyectos de mostrador:
+**una clave booleana en `true` solo dispara si el perfil la declara en `true`
+a propósito.** Un perfil que no la menciona nunca recibe esas tareas. Por eso
+nada de nube, CDN, tenants ni suscripciones aterriza en el plan de una caja
+registradora que corre en el computador del local (tema `la-caja-no-puede-parar`):
+
+| clave | significa | qué desbloquea |
+|---|---|---|
+| `publico` | hay pantalla que ve cualquiera | landing, SEO, contraste al sol |
+| `dineroReal` | se mueve plata de verdad | invariantes contables, auditoría |
+| `datosPersonales` | se guardan datos de personas | habeas data, borrado, logs sin cédulas |
+| `multiUsuario` | más de una persona lo usa | roles, sesiones, permisos |
+| `nube` | algo corre en un servidor remoto que pagamos | hosting, CDN, dominios, ambientes |
+| `multiTenant` | varios clientes distintos en la misma base | aislamiento por tenant y su prueba |
+| `suscripcion` | se cobra recurrente por internet | pasarela, planes, reintentos de cobro |
+| `autoservicio` | la cuenta se crea sola, sin que un humano apruebe | onboarding, verificación de correo |
+| `equipoCliente` | el cliente invita a su propia gente | invitaciones, transferir propiedad |
+| `correoSaliente` | el sistema le escribe a alguien | cola de correo, rebotes, SPF/DKIM |
+| `apiPublica` | alguien de afuera consume nuestra API | versionado, llaves, paginación |
+| `traficoAnonimo` | cualquiera del planeta puede tocar la puerta | rate limiting, protección de abuso |
+| `tiempoReal` | la pantalla se entera sola de los cambios | canal en vivo, reconexión, tope |
+
+Otros: `equipo` (`solo-orion` / `orion+humanos`) · `modo` (`genesis` / `evolucion`) · `etapa` (`N0`…`N4`).
+
 ## Las tres reglas que hacen bueno un arquetipo
 
 1. **El `porQue` nombra el daño, no el beneficio.** «Sin índice, la consulta de

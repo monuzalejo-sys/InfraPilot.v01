@@ -39,8 +39,37 @@ aplican comparando contra estos valores exactos; un sinónimo tuyo —por
 descriptivo que sea— hace que esos arquetipos no entren y el plan salga corto
 sin que nadie se entere:
 
-- `superficies`: `web-publica` · `panel-interno` · `caja` · `api` · `movil`
+- `superficies`: `publico` · `panel-interno` · `caja` · `api` · `vitrina` · `landing` · `movil`
+  (escribe `publico`; `web-publica` se sigue aceptando por los planes viejos, pero
+  es alias, no el nombre)
 - `equipo`: `solo-orion` · `orion+humanos`
+
+**Y hay trece INTERRUPTORES que si no declaras, apagan tareas enteras.** Son
+booleanos: el catálogo tiene arquetipos que **solo** entran si tú los pones en
+`true`. Si no los declaras, el plan sale corto y nadie se entera —que es
+exactamente el fallo que este archivo te advierte dos párrafos arriba. Al revés
+también manda: un sistema de mostrador que corre en el computador del local
+**no debe** llevar `nube`, y así no recibe hosting, CDN ni tenants (tema
+`la-caja-no-puede-parar`). Decide cada uno mirando el repo, no por costumbre:
+
+| interruptor | ponlo en `true` si… |
+|---|---|
+| `publico` | hay una pantalla que puede ver cualquiera sin entrar |
+| `dineroReal` | se mueve plata de verdad, no cifras de ejemplo |
+| `datosPersonales` | se guardan datos de personas identificables |
+| `multiUsuario` | lo usa más de una persona |
+| `nube` | algo corre en un servidor remoto que alguien paga cada mes |
+| `multiTenant` | varios clientes distintos comparten la misma base |
+| `suscripcion` | se cobra recurrente por internet |
+| `autoservicio` | la cuenta se crea sola, sin que un humano la apruebe |
+| `equipoCliente` | el cliente invita a su propia gente |
+| `correoSaliente` | el sistema le escribe a alguien (correo, no notificación interna) |
+| `apiPublica` | alguien de afuera consume nuestra API |
+| `traficoAnonimo` | cualquiera del planeta puede tocar la puerta |
+| `tiempoReal` | la pantalla se entera sola de los cambios, sin recargar |
+
+Los que no apliquen: **omítelos o `false`**, nunca `true` «por si acaso». Cada
+`true` de más son decenas de tareas reales que alguien va a construir.
 
 Lo descriptivo (que el panel sea una PWA instalable, que haya comprobante
 impreso) va en tu prosa, donde se lee, **no en el perfil**, donde se compara.

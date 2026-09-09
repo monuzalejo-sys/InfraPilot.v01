@@ -2879,6 +2879,707 @@
         "tema:dominio-migraciones-y-copias",
         "tema:que-es-estar-verificado"
       ]
+    },
+    {
+      "id": "be.correo.transaccional-por-cola",
+      "titulo": "Mandar el correo transaccional desde una cola, nunca dentro de la petición",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el proveedor de correo tarda 3 s en responder y el envío está dentro del handler de `POST /registro`, la persona que se registra espera esos 3 s completos, y si el proveedor se cae la petición entera falla aunque el registro ya se haya guardado.",
+      "queHacer": [
+        "Sacar toda llamada al proveedor de correo del cuerpo de la petición HTTP: encolar un trabajo `enviar-correo` con destinatario, plantilla y datos.",
+        "El handler responde en cuanto el trabajo queda encolado, no cuando el correo sale.",
+        "Reusar la cola genérica de trabajos con reintento y tope ya existente en el catálogo (`be.trabajos.cola-con-reintento-y-tope`); este arquetipo no reinventa el mecanismo de reintento, solo obliga a que el correo pase por él.",
+        "Medir el tiempo entre encolar y entregar; si pasa de un umbral (ej. 5 min) para correo de recuperación de clave, alertar porque ese correo caduca.",
+        "Probar que la ruta que dispara el correo responde igual de rápido con el proveedor apagado."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna ruta llama al proveedor de correo de forma síncrona",
+          "comando": "grep -rlnE \"(sendMail|resend\\.|sendgrid|ses\\.send)\" app/api/ | xargs -r grep -L \"trabajos/cola\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La ruta responde igual de rápido con el proveedor caído",
+          "comando": "npm test -- correo-por-cola",
+          "espera": "test verde: con el proveedor simulado caído, la ruta responde en menos de 200ms y el trabajo queda en la cola"
+        }
+      ],
+      "aplicaSi": {
+        "correoSaliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/correo/enviar.ts",
+        "tests/correo-por-cola.test.ts"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar"
+      ]
+    },
+    {
+      "id": "be.correo.plantilla-en-un-solo-lugar",
+      "titulo": "Guardar cada plantilla de correo en un solo archivo, visible sin mandar nada",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin un lugar único, el texto del correo de bienvenida vive copiado en dos rutas: se corrige el error de ortografía en una y la otra lo sigue mandando durante meses.",
+      "queHacer": [
+        "Crear `lib/servidor/correo/plantillas/` con un archivo por plantilla (bienvenida, recuperar-clave, factura, etc.), cada uno exportando asunto y cuerpo como función de sus datos.",
+        "Ninguna ruta ni trabajo arma el texto del correo a mano: todos llaman a la plantilla.",
+        "Dejar un comando o página de desarrollo que renderiza cualquier plantilla con datos de ejemplo y la muestra en pantalla, sin enviar nada.",
+        "Cada plantilla declara sus campos obligatorios y lanza si falta uno, en vez de mandar un correo con huecos en blanco."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay texto de correo armado fuera de las plantillas",
+          "comando": "grep -rnE \"asunto *=.*['\\\"]\" app/ lib/ --include=*.ts | grep -v lib/servidor/correo/plantillas",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Existe el visor de plantillas sin envío",
+          "comando": "npm run correo:previsualizar -- bienvenida 2>&1 | grep -c '@'",
+          "espera": "salida sin error y 0 líneas con '@' (no se marcó ningún destinatario real)"
+        }
+      ],
+      "aplicaSi": {
+        "correoSaliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/correo/plantillas/**",
+        "scripts/correo-previsualizar.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.correo.rebote-y-queja-detienen-el-envio",
+      "titulo": "Registrar rebote y queja del proveedor y dejar de escribirle a esa dirección",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Sin lista de supresión, un correo que rebota (dirección inválida) o que alguien marca como spam se sigue mandando en cada evento: el proveedor ve una tasa de rebote alta y empieza a bloquear TODO el dominio, no solo esa dirección.",
+      "queHacer": [
+        "Recibir el webhook de rebote/queja del proveedor de correo (reusa la verificación de firma de `be.integracion.webhook-firmado-y-idempotente`).",
+        "Guardar la dirección suprimida con motivo (rebote duro, rebote blando repetido, queja) y fecha.",
+        "Antes de encolar cualquier correo, consultar la lista de supresión; si la dirección está, no encolar y registrar por qué se omitió.",
+        "El rebote blando aislado no suprime; el mismo rebote 3 veces seguidas sí.",
+        "Dejar un reporte que cuenta cuántas direcciones están suprimidas y desde cuándo."
+      ],
+      "aceptacion": [
+        {
+          "check": "Una dirección suprimida no recibe correo nuevo",
+          "comando": "npm test -- supresion-correo",
+          "espera": "test verde: tras registrar la supresión, encolar un correo a esa dirección no crea trabajo"
+        },
+        {
+          "check": "El motivo de supresión queda guardado",
+          "comando": "grep -c \"motivo\" lib/servidor/correo/supresion.ts",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "correoSaliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/webhooks/correo/**",
+        "lib/servidor/correo/supresion.ts",
+        "tests/supresion-correo.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.correo.dominio-verificado-antes-de-produccion",
+      "titulo": "Verificar SPF, DKIM y DMARC del dominio de envío antes de mandar en producción",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin SPF/DKIM configurados, el correo transaccional llega a spam o se rechaza silenciosamente: la persona nunca ve el enlace de recuperar clave y nadie en el equipo se entera de que el correo nunca llegó.",
+      "queHacer": [
+        "Configurar los registros SPF, DKIM y DMARC del dominio de envío en el proveedor DNS antes de activar el envío en producción.",
+        "Escribir un chequeo de arranque que consulte esos registros y falle el despliegue si faltan o no coinciden con lo esperado.",
+        "Documentar en `docs/correo.md` el dominio de envío, quién administra el DNS y cómo se rota si el proveedor cambia.",
+        "Mandar un correo de prueba a una casilla de verificación de entregabilidad y guardar el resultado antes del primer envío real."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los registros DNS del dominio de envío existen",
+          "comando": "dig +short TXT _dmarc.$(node -e \"console.log(require('./lib/servidor/correo/config').dominio)\") ; echo EXIT=$?",
+          "espera": "1+ líneas de salida con un registro DMARC"
+        },
+        {
+          "check": "El arranque en producción falla si falta el DNS",
+          "comando": "NODE_ENV=production node -e \"require('./lib/servidor/correo/verificar-dominio').verificar()\"; echo EXIT=$?",
+          "espera": "EXIT distinto de 0 si el DNS no está configurado"
+        }
+      ],
+      "aplicaSi": {
+        "correoSaliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/correo/verificar-dominio.ts",
+        "docs/correo.md"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "be.correo.enlace-caduca-y-de-un-solo-uso",
+      "titulo": "Hacer que el enlace del correo caduque y sirva una sola vez",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un enlace de recuperar clave o de invitación sin caducidad ni consumo único queda válido para siempre: si el correo se reenvía, se filtra en un log o queda en una bandeja compartida, cualquiera que lo encuentre semanas después entra con él.",
+      "queHacer": [
+        "Generar el token del enlace con una expiración corta y escrita (ej. 30 min para recuperar clave, 7 días para invitación) según el caso de uso.",
+        "Marcar el token como usado en la misma transacción que se aplica su efecto (cambiar clave, aceptar invitación); un segundo uso del mismo token se rechaza.",
+        "El rechazo por token vencido o ya usado no revela cuál de los dos motivos fue.",
+        "Probar: usar el token una vez funciona, la segunda vez falla, y pasada la expiración falla aunque no se haya usado."
+      ],
+      "aceptacion": [
+        {
+          "check": "El token no sirve dos veces",
+          "comando": "npm test -- token-de-un-solo-uso",
+          "espera": "test verde: el segundo uso del mismo token responde con rechazo, no con éxito"
+        },
+        {
+          "check": "El token vencido se rechaza aunque no se haya usado",
+          "comando": "npm test -- token-vencido",
+          "espera": "test verde"
+        }
+      ],
+      "aplicaSi": {
+        "correoSaliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/correo/token-de-un-uso.ts",
+        "tests/token-de-un-solo-uso.test.ts",
+        "tests/token-vencido.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.correo.reintento-no-duplica-el-envio",
+      "titulo": "Hacer que el reintento del trabajo de correo no mande el mismo correo dos veces",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El trabajo de correo se reintenta porque el proveedor tardó en confirmar, pero el correo sí salió: sin idempotencia, la persona recibe la misma factura o el mismo enlace de recuperar clave repetido, y el segundo enlace invalida al primero que ya estaba usando.",
+      "queHacer": [
+        "Antes de encolar, generar una clave de envío estable (ej. tipo de correo + entidad + versión del evento) y guardarla con restricción de unicidad.",
+        "Si el trabajo se reintenta con la misma clave y el envío anterior ya se confirmó como entregado, no volver a llamar al proveedor.",
+        "Si el envío anterior quedó en estado desconocido (el proveedor no confirmó ni rechazó), preguntar al proveedor por ese identificador antes de reintentar, si la API lo permite.",
+        "Probar: lanzar el mismo trabajo dos veces seguidas y comprobar que el proveedor solo recibe una llamada de envío."
+      ],
+      "aceptacion": [
+        {
+          "check": "Dos ejecuciones del mismo trabajo de correo llaman al proveedor una sola vez",
+          "comando": "npm test -- correo-idempotente",
+          "espera": "test verde: proveedor simulado recibe 1 llamada tras 2 ejecuciones del mismo trabajo"
+        }
+      ],
+      "aplicaSi": {
+        "correoSaliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/correo/clave-de-envio.ts",
+        "tests/correo-idempotente.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.correo.ambiente-de-prueba-no-sale-a-real",
+      "titulo": "Impedir que el correo de un ambiente que no es producción salga a lo real",
+      "nivel": "N0",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Un script de prueba corrido contra la base de staging con datos copiados de producción manda el correo de recuperar clave a la dirección real de un cliente, que ve un enlace que no pidió y no sabe si es un fraude.",
+      "queHacer": [
+        "Leer el ambiente (`NODE_ENV` o equivalente) en el módulo de envío de correo, no en cada llamador.",
+        "Si el ambiente no es producción, redirigir TODO envío a una bandeja de captura local (ej. Mailhog) o a una dirección de prueba fija, y anexar en el asunto a quién iba dirigido realmente.",
+        "Registrar cada intercepción para poder auditar cuántos correos se hubieran mandado.",
+        "Dejar una variable explícita para forzar el envío real desde un ambiente de prueba (ej. una demo con el dueño) y que quede registrada quién la activó."
+      ],
+      "aceptacion": [
+        {
+          "check": "Fuera de producción, el correo no llega a un dominio externo",
+          "comando": "NODE_ENV=staging npm test -- correo-no-sale-a-real",
+          "espera": "test verde: con NODE_ENV distinto de production, el proveedor real recibe 0 llamadas"
+        }
+      ],
+      "aplicaSi": {
+        "correoSaliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/correo/enviar.ts"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "be.tiempo-real.lista-explicita-de-lo-que-vive-en-vivo",
+      "titulo": "Declarar por escrito qué vista se actualiza sola y cuál no",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin una lista explícita, cada pantalla nueva termina suscrita al canal en vivo por costumbre: el contador de conexiones abiertas crece con vistas que nadie mira fijo y que se pueden recargar solas cada 30 s sin que nadie note la diferencia.",
+      "queHacer": [
+        "Escribir en `docs/tiempo-real.md` la lista de vistas que se actualizan solas, con la razón de negocio (alguien la mira fijo esperando el cambio) y las que NO, aunque técnicamente podrían.",
+        "Cada suscripción nueva al canal en vivo cita en un comentario cuál línea de esa lista la autoriza.",
+        "Revisar la lista cada vez que se agregue una suscripción nueva: si no está en la lista, no se conecta.",
+        "Dejar fuera de la lista, por defecto, cualquier vista de reporte o histórico: esas se recargan al abrir, no en vivo."
+      ],
+      "aceptacion": [
+        {
+          "check": "Toda suscripción en vivo cita su entrada en la lista",
+          "comando": "grep -rln \"suscribir(\" app/ lib/ | xargs -r grep -L \"docs/tiempo-real.md\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La lista existe y no está vacía",
+          "comando": "grep -c '^- ' docs/tiempo-real.md",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "tiempoReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/tiempo-real.md"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar"
+      ]
+    },
+    {
+      "id": "be.tiempo-real.reconexion-recupera-lo-perdido",
+      "titulo": "Recuperar en la reconexión lo que pasó mientras el canal estuvo caído",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El wifi del local se corta 40 s y el canal en vivo se reconecta solo, pero sin recuperación la pantalla queda con el estado de antes del corte: si en esos 40 s entraron dos pedidos, la persona no los ve hasta que recargue a mano.",
+      "queHacer": [
+        "Guardar en el cliente el identificador o la marca de tiempo del último evento aplicado.",
+        "Al reconectar, pedir al servidor todo lo ocurrido desde ese punto antes de volver a escuchar eventos nuevos, y aplicarlo en orden.",
+        "Si el hueco es tan grande que el servidor ya no tiene el historial (retención vencida), pedir el estado completo en vez de un parche a medias.",
+        "Probar: desconectar el canal, generar eventos, reconectar, y comprobar que la pantalla queda igual que si nunca se hubiera caído."
+      ],
+      "aceptacion": [
+        {
+          "check": "Tras una caída con eventos de por medio, el cliente queda al día",
+          "comando": "npm test -- reconexion-recupera-eventos",
+          "espera": "test verde: simulando 3 eventos durante la caída, tras reconectar el cliente los tiene los 3"
+        }
+      ],
+      "aplicaSi": {
+        "tiempoReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/tiempo-real/reconexion.ts",
+        "tests/reconexion-recupera-eventos.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.tiempo-real.autorizacion-en-el-saludo",
+      "titulo": "Cortar en el saludo la conexión sin permiso, no después de mandar datos",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el canal en vivo acepta la conexión y solo filtra los eventos que manda, entre que se conecta y que se filtra el primer evento hay una ventana donde el mensaje ya salió: revisar permisos DESPUÉS del primer dato es tarde.",
+      "queHacer": [
+        "Verificar sesión, rol y alcance (a qué canal se puede suscribir) en el handshake de conexión, antes de aceptar la suscripción.",
+        "Si la verificación falla, cerrar la conexión con un código explícito y sin mandar ningún evento, ni siquiera de bienvenida.",
+        "Revalidar el permiso si la sesión puede expirar mientras el canal sigue abierto (no basta con validar una sola vez al conectar).",
+        "Probar con una sesión sin permiso: la conexión se cierra antes de que llegue el primer mensaje del canal."
+      ],
+      "aceptacion": [
+        {
+          "check": "Sin permiso, no llega ningún evento del canal",
+          "comando": "npm test -- autorizacion-en-el-saludo",
+          "espera": "test verde: conexión sin permiso se cierra y el contador de eventos recibidos queda en 0"
+        }
+      ],
+      "aplicaSi": {
+        "tiempoReal": true,
+        "multiUsuario": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/tiempo-real/autorizacion.ts",
+        "tests/autorizacion-en-el-saludo.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "be.tiempo-real.tope-de-conexiones-abiertas",
+      "titulo": "Medir y limitar el número de conexiones en vivo abiertas a la vez",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cada conexión en vivo abierta consume memoria y un slot del servidor; sin medirlas ni ponerles tope, una pestaña que nadie cierra en 40 computadores del equipo se acumula hasta tumbar al servidor en la hora pico, sin que ninguna alerta lo haya anunciado.",
+      "queHacer": [
+        "Contar las conexiones abiertas en un medidor visible (log periódico o panel interno), no solo confiar en la métrica del proveedor de hosting.",
+        "Fijar un tope máximo de conexiones simultáneas; al llegarlo, rechazar la conexión nueva con un mensaje explícito en vez de degradar todas las existentes.",
+        "Cerrar del lado del servidor las conexiones inactivas después de un tiempo sin responder al ping/pong.",
+        "Alertar cuando el conteo pase del 80% del tope, no solo cuando ya lo tocó."
+      ],
+      "aceptacion": [
+        {
+          "check": "El tope de conexiones existe y se aplica",
+          "comando": "npm test -- tope-de-conexiones",
+          "espera": "test verde: la conexión número tope+1 se rechaza con el mensaje esperado"
+        },
+        {
+          "check": "El conteo de conexiones abiertas se expone",
+          "comando": "grep -rn \"conexionesAbiertas\" lib/servidor/tiempo-real/ | wc -l",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "tiempoReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/tiempo-real/tope-de-conexiones.ts",
+        "tests/tope-de-conexiones.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.tiempo-real.caida-del-canal-degrada-a-recargar",
+      "titulo": "Hacer que la caída del canal en vivo degrade a recargar, no rompa la pantalla",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el canal en vivo se cae y la pantalla asume que siempre va a haber datos empujados, la vista se queda congelada en el último estado sin avisar: la persona sigue trabajando sobre información vieja creyendo que está al día.",
+      "queHacer": [
+        "Detectar la pérdida de conexión (más de N segundos sin latido) y mostrar de inmediato un aviso visible de que la vista dejó de actualizarse sola.",
+        "Mientras el canal está caído, caer a refrescar por consulta periódica (polling) en vez de dejar la pantalla muda.",
+        "Al reconectar el canal, quitar el aviso y volver al modo en vivo sin que la persona tenga que recargar la página a mano.",
+        "Probar: cortar el canal, comprobar que aparece el aviso y que la vista se sigue refrescando por polling."
+      ],
+      "aceptacion": [
+        {
+          "check": "Con el canal caído, la vista sigue refrescando por polling",
+          "comando": "npm test -- degradar-a-polling",
+          "espera": "test verde: tras simular la caída del canal, la vista ejecuta al menos una consulta de refresco"
+        }
+      ],
+      "aplicaSi": {
+        "tiempoReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/tiempo-real/degradar-a-polling.ts",
+        "tests/degradar-a-polling.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.api.version-declarada-y-plazo-de-retiro",
+      "titulo": "Declarar la versión de la API y fijar plazo para retirar la anterior",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin versión explícita, un cambio de forma en la respuesta rompe a TODO cliente externo el mismo día del despliegue; con versión pero sin plazo de retiro escrito, la versión vieja se queda viva para siempre porque nadie decide cuándo apagarla.",
+      "queHacer": [
+        "Elegir un solo esquema de versión (prefijo de ruta `/v1/` o cabecera `Api-Version`) y aplicarlo a toda ruta pública, no solo a las nuevas.",
+        "Al sacar una versión nueva incompatible, mantener la anterior sirviendo y escribir en `docs/api-versiones.md` la fecha en que deja de responder.",
+        "La versión vieja responde con una cabecera de aviso (`Sunset` o equivalente) durante el plazo de gracia, antes de apagarse.",
+        "Pasada la fecha de retiro, la versión vieja responde 410 con un mensaje que dice a qué versión migrar, no un 404 silencioso."
+      ],
+      "aceptacion": [
+        {
+          "check": "Toda ruta pública declara versión",
+          "comando": "grep -rLE \"(v1|v2|Api-Version)\" app/api/publica/ 2>/dev/null",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La versión retirada responde 410 con el mensaje de migración",
+          "comando": "npm test -- version-retirada",
+          "espera": "test verde: petición a la versión pasada de fecha responde 410 y menciona la versión nueva"
+        }
+      ],
+      "aplicaSi": {
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/api-versiones.md",
+        "lib/servidor/api/version.ts",
+        "tests/version-retirada.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.api.campo-obsoleto-con-fecha-de-retiro",
+      "titulo": "Marcar obsoleto un campo de la API con fecha antes de quitarlo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Quitar un campo de la respuesta sin aviso previo rompe al cliente externo que lo leía, sin que nada de nuestro lado se haya roto: el error aparece del otro lado y llega como un reclamo, no como una prueba roja.",
+      "queHacer": [
+        "Cuando un campo se va a quitar, marcarlo en el contrato de la ruta como obsoleto con la fecha desde la que se avisó y la fecha en que se quita.",
+        "Seguir devolviendo el campo obsoleto durante todo el plazo de gracia, con su valor correcto, no vacío.",
+        "Registrar en el log del servidor cuándo un cliente todavía lee el campo obsoleto, para saber si ya se puede quitar sin dejar a nadie roto.",
+        "Solo quitar el campo en el mismo cambio que documenta su retiro en `docs/api-versiones.md`, nunca antes de la fecha anunciada."
+      ],
+      "aceptacion": [
+        {
+          "check": "El campo obsoleto sigue presente antes de su fecha de retiro",
+          "comando": "npm test -- campo-obsoleto-vigente",
+          "espera": "test verde: la respuesta incluye el campo marcado obsoleto mientras la fecha de retiro no ha pasado"
+        },
+        {
+          "check": "El contrato deja constancia de la fecha de retiro",
+          "comando": "grep -c \"obsoleto\" lib/servidor/api/contratos/*.ts",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/api/contratos/**",
+        "tests/campo-obsoleto-vigente.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.api.cuota-por-cliente-de-api",
+      "titulo": "Poner cuota de peticiones por cliente de API y responder 429 con espera",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin cuota por cliente, el script mal escrito de un solo integrador externo puede saturar la API compartida y tumbar el servicio para todos los demás clientes que sí se estaban comportando.",
+      "queHacer": [
+        "Contar peticiones por llave de API (no por IP: varios clientes pueden compartir salida) en una ventana de tiempo fija.",
+        "Pasada la cuota, responder 429 con cabecera `Retry-After` indicando cuándo puede volver a intentar.",
+        "Dejar la cuota configurable por cliente, para poder subírsela a uno sin tocar código.",
+        "Registrar cada rechazo por cuota para poder avisarle al cliente antes de que llame a soporte confundido."
+      ],
+      "aceptacion": [
+        {
+          "check": "Pasada la cuota, la API responde 429 con Retry-After",
+          "comando": "npm test -- cuota-por-cliente",
+          "espera": "test verde: la petición número cuota+1 del mismo cliente responde 429 con cabecera Retry-After"
+        }
+      ],
+      "aplicaSi": {
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/api/cuota.ts",
+        "tests/cuota-por-cliente.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.api.origenes-permitidos-explicitos",
+      "titulo": "Declarar la lista explícita de orígenes permitidos, nunca un comodín abierto",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Un CORS abierto con `*` en una API que además acepta credenciales deja que cualquier página en internet llame a la API en nombre de quien la tenga abierta en otra pestaña.",
+      "queHacer": [
+        "Mantener la lista de orígenes permitidos en configuración, no repetida en cada ruta.",
+        "Rechazar con CORS cerrado (sin las cabeceras de permiso) cualquier origen que no esté en la lista.",
+        "Si la API acepta credenciales (cookies o sesión), prohibir por código que la lista contenga `*`.",
+        "Agregar un origen nuevo requiere cambiar la lista, no el código de cada ruta."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay comodín en la configuración de orígenes con credenciales",
+          "comando": "grep -rn \"Access-Control-Allow-Origin.*\\*\" lib/servidor/api/ | grep -l credentials",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Un origen fuera de la lista no recibe las cabeceras de CORS",
+          "comando": "npm test -- origenes-permitidos",
+          "espera": "test verde: petición con Origin no listado no trae Access-Control-Allow-Origin en la respuesta"
+        }
+      ],
+      "aplicaSi": {
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/api/cors.ts",
+        "tests/origenes-permitidos.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.api.identificador-de-peticion-devuelto-al-cliente",
+      "titulo": "Devolver al cliente el identificador de petición para que lo cite en soporte",
+      "nivel": "N2",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando un integrador externo reporta un error, sin un identificador que pueda copiar y pegar, buscar su petición en los logs es cruzar hora aproximada y payload a mano; con miles de peticiones por minuto eso no se encuentra.",
+      "queHacer": [
+        "Reusar el identificador de traza que ya se genera internamente por petición (`be.observabilidad.traza-de-punta-a-punta`) y devolverlo en una cabecera de respuesta, en toda ruta pública, éxito o error.",
+        "Incluir el mismo identificador dentro del cuerpo del error, no solo en la cabecera, porque no todo cliente lee cabeceras.",
+        "Documentar en la referencia de la API que ese identificador es el que hay que mandar a soporte.",
+        "Probar que buscar ese identificador en el log del servidor encuentra la línea de esa petición exacta."
+      ],
+      "aceptacion": [
+        {
+          "check": "Toda respuesta pública trae el identificador de petición",
+          "comando": "npm test -- identificador-en-respuesta",
+          "espera": "test verde: la respuesta de éxito y la de error traen la misma cabecera de identificador"
+        }
+      ],
+      "aplicaSi": {
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/api/identificador-de-peticion.ts",
+        "tests/identificador-en-respuesta.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.eventos.firmar-la-carga-saliente",
+      "titulo": "Firmar el cuerpo de cada webhook que el sistema manda hacia afuera",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Sin firma, el endpoint del cliente no puede distinguir un webhook real de uno que alguien más le mande haciéndose pasar por el sistema: acepta un evento de pago falso porque nada garantiza de dónde vino.",
+      "queHacer": [
+        "Generar un secreto propio por suscripción de webhook (por cliente, no uno global compartido).",
+        "Firmar el cuerpo crudo con HMAC usando ese secreto e incluir la firma y una marca de tiempo en la cabecera de la entrega.",
+        "Documentar públicamente cómo verificar la firma, con un ejemplo de código, para que el cliente no tenga que adivinar.",
+        "Dejar rotar el secreto de una suscripción sin tumbar las entregas en curso: aceptar el secreto viejo y el nuevo durante una ventana de traslape."
+      ],
+      "aceptacion": [
+        {
+          "check": "Toda entrega de webhook sale firmada",
+          "comando": "npm test -- webhook-saliente-firmado",
+          "espera": "test verde: la entrega simulada trae cabecera de firma que valida contra el secreto de la suscripción"
+        }
+      ],
+      "aplicaSi": {
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/eventos/firmar.ts",
+        "tests/webhook-saliente-firmado.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.eventos.reintento-de-entrega-por-suscripcion",
+      "titulo": "Reintentar la entrega de webhook por suscripción, con espera creciente y tope",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El endpoint de un cliente puede estar caído mientras los de los demás clientes responden bien; sin un reintento independiente por suscripción, una cola compartida mezcla los fallos de uno con las entregas de todos y un solo cliente caído retrasa al resto.",
+      "queHacer": [
+        "Reusar el mecanismo de espera creciente y tope de `be.trabajos.cola-con-reintento-y-tope`, aplicado por suscripción de webhook, no a una cola global de trabajos genéricos.",
+        "Considerar entregado solo un 2xx de respuesta del endpoint del cliente; cualquier otro código o tiempo de espera vencido cuenta como fallo.",
+        "Cada intento de entrega queda guardado con su código de respuesta y cuánto tardó, no solo el resultado final.",
+        "Al agotar el tope de reintentos de una entrega, marcarla fallida sin tumbar las entregas siguientes de esa misma suscripción."
+      ],
+      "aceptacion": [
+        {
+          "check": "El reintento de una suscripción no bloquea a las demás",
+          "comando": "npm test -- reintento-por-suscripcion",
+          "espera": "test verde: con una suscripción fallando, una segunda suscripción sigue recibiendo entregas a tiempo"
+        }
+      ],
+      "aplicaSi": {
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/eventos/reintento.ts",
+        "tests/reintento-por-suscripcion.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.eventos.bitacora-de-entregas-visible-al-cliente",
+      "titulo": "Dejar ver al cliente qué evento se le intentó entregar y qué respondió",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando el endpoint del cliente no recibió un evento, sin una bitácora visible la única forma de averiguar qué pasó es que soporte busque a mano en el log del servidor: el cliente no puede ni confirmar si el sistema lo intentó.",
+      "queHacer": [
+        "Guardar por cada intento de entrega: evento, fecha, código de respuesta del endpoint del cliente y cuerpo de respuesta truncado.",
+        "Exponer esa bitácora en el panel del cliente o en un endpoint de solo lectura de su propia cuenta, nunca la de otro cliente.",
+        "Dejar un botón o llamada para reenviar a mano un evento puntual de la bitácora, sin reprocesar todos los demás.",
+        "Retener la bitácora al menos el tiempo que el catálogo ya fija para la purga de trabajos (`be.trabajos.purga-con-regla-no-con-cron-a-ciegas`), no menos."
+      ],
+      "aceptacion": [
+        {
+          "check": "La bitácora de un cliente no expone la de otro",
+          "comando": "npm test -- bitacora-de-entregas-aislada",
+          "espera": "test verde: pedir la bitácora con la sesión del cliente A no devuelve entregas del cliente B"
+        },
+        {
+          "check": "Cada intento guardado tiene código de respuesta",
+          "comando": "grep -c \"codigoRespuesta\" lib/servidor/eventos/bitacora.ts",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/eventos/bitacora.ts",
+        "tests/bitacora-de-entregas-aislada.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "be.eventos.suscripcion-caida-se-pausa-sola",
+      "titulo": "Pausar sola la suscripción cuyo endpoint lleva días fallando y avisar a alguien",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un endpoint de cliente que se cayó hace una semana sigue acumulando reintentos de cada evento nuevo indefinidamente: la cola de salida crece con entregas que nunca van a funcionar y compite por recursos con las suscripciones que sí están sanas.",
+      "queHacer": [
+        "Contar fallos consecutivos por suscripción, no por evento individual.",
+        "Pasado un umbral de días u horas de fallo consecutivo, pausar la suscripción: dejar de intentar entregas nuevas y guardarlas como pendientes, no perderlas.",
+        "Notificar al dueño de la suscripción (correo o panel) que se pausó y por qué, con el número de eventos pendientes.",
+        "Al reactivar manualmente la suscripción, decidir explícitamente si se reintentan los eventos acumulados o se descartan; nunca reintentar los acumulados por defecto sin que alguien lo pida."
+      ],
+      "aceptacion": [
+        {
+          "check": "Tras el umbral de fallos consecutivos, la suscripción queda pausada",
+          "comando": "npm test -- suscripcion-se-pausa",
+          "espera": "test verde: tras N fallos consecutivos simulados, el estado de la suscripción pasa a pausada y no genera más intentos"
+        }
+      ],
+      "aplicaSi": {
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/eventos/pausa-por-fallos.ts",
+        "tests/suscripcion-se-pausa.test.ts"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar"
+      ]
     }
   ]
 }

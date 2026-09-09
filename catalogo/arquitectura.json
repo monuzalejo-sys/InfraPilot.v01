@@ -1,0 +1,2214 @@
+{
+  "categoria": "arquitectura",
+  "nombre": "Arquitectura",
+  "meta": "Que la forma del sistema sea una decisión tomada a propósito y escrita —con su fecha y la alternativa que se descartó— y que un comando pueda demostrar que el código de hoy todavía la respeta.",
+  "arquetipos": [
+    {
+      "id": "arq.decision.adr-con-fecha-y-alternativa",
+      "titulo": "Escribir cada decisión de arquitectura con su fecha y la alternativa descartada",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin el registro escrito, a los tres meses nadie recuerda por qué la caja escribe primero en el disco local, y alguien 'arregla' el sistema apuntándolo a la nube. El argumento ya se pagó una vez y se vuelve a discutir desde cero, esta vez sin la persona que sabía por qué.",
+      "queHacer": [
+        "Crear `docs/arquitectura/decisiones/` y dentro `PLANTILLA.md` con cinco secciones fijas: `fecha:`, `## Contexto`, `## Decisión`, `## Alternativas descartadas`, `## Consecuencias`.",
+        "Numerar los archivos `0001-titulo-corto.md`, correlativo y para siempre: el número es la cita con la que otro documento se refiere a la decisión.",
+        "Una decisión por archivo. Si el archivo explica dos cosas, son dos decisiones y una de las dos no se tomó.",
+        "En `## Alternativas descartadas` va la opción que de verdad se consideró y la razón concreta por la que perdió; 'no nos gustó' no es una razón.",
+        "Un ADR vigente no se edita: cambiar de rumbo es escribir el siguiente (ver `arq.decision.reemplazar-no-editar`)."
+      ],
+      "aceptacion": [
+        {
+          "check": "Todo ADR trae fecha, decisión y alternativa descartada",
+          "comando": "for f in docs/arquitectura/decisiones/[0-9]*.md; do grep -q '^fecha:' \"$f\" && grep -q '## Decisión' \"$f\" && grep -q '## Alternativas descartadas' \"$f\" || echo \"INCOMPLETO $f\"; done",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Hay decisiones escritas y la numeración no se repite",
+          "comando": "ls docs/arquitectura/decisiones/[0-9][0-9][0-9][0-9]-*.md | wc -l; ls docs/arquitectura/decisiones/[0-9]*.md | sed 's#.*/##' | cut -d- -f1 | sort | uniq -d",
+          "espera": "1+ archivos y 0 líneas de números repetidos"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "api",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/decisiones/**"
+      ],
+      "cerebro": [
+        "tema:encargos-verificables",
+        "tema:memoria-y-cierre"
+      ]
+    },
+    {
+      "id": "arq.decision.antes-de-la-primera-linea",
+      "titulo": "Cerrar las cinco decisiones de forma antes de la primera línea de código",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Estas cinco no se pueden aplazar sin pagarlas: cambiar dónde vive el dato con 200 pantallas escritas es reescribir el proyecto. Aplazarlas no las evita, solo las encarece.",
+      "queHacer": [
+        "Abrir `docs/arquitectura/decisiones-de-arranque.md` con exactamente cinco encabezados, uno por decisión: dónde vive el dato · quién escribe cada hecho · qué corre en el servidor y qué en el navegador · cómo se identifica la persona · qué NO se va a construir.",
+        "Cada encabezado enlaza al ADR que la resuelve. El archivo es un índice, no el sitio donde se argumenta.",
+        "Ninguna de las cinco se cierra con 'ya veremos': lo que de verdad no se puede decidir hoy es un HUECO y se escribe como pregunta al dueño, con la fecha en que hay que responderla.",
+        "Hasta que las cinco tengan ADR, no se abre trabajo de construcción que dependa de ellas."
+      ],
+      "aceptacion": [
+        {
+          "check": "Están las cinco y ninguna quedó abierta",
+          "comando": "grep -c '^## ' docs/arquitectura/decisiones-de-arranque.md; grep -inE 'pendiente|por decidir|ya veremos|TBD' docs/arquitectura/decisiones-de-arranque.md",
+          "espera": "5 encabezados y 0 líneas abiertas"
+        },
+        {
+          "check": "Cada una apunta a un ADR que existe",
+          "comando": "grep -oE 'decisiones/[0-9]{4}-[a-z0-9-]+[.]md' docs/arquitectura/decisiones-de-arranque.md | while read r; do test -f \"docs/arquitectura/$r\" || echo \"ROTO $r\"; done",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "modo": "genesis"
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/decisiones-de-arranque.md",
+        "docs/arquitectura/decisiones/000*.md"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:planes-de-ejecucion"
+      ]
+    },
+    {
+      "id": "arq.decision.caduca-y-se-revisa",
+      "titulo": "Ponerle condición de revisión a la decisión que depende de un supuesto",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "«Guardamos en JSON sobre disco porque son 200 filas» es verdad en enero y mentira en julio. Sin una condición escrita, nadie vuelve a mirar: el error se descubre el día que la pantalla del mes tarda cuatro segundos y ya no hay tiempo de migrar con calma.",
+      "queHacer": [
+        "En todo ADR cuyo argumento dependa de un número del negocio, agregar la línea `revisar-si:` con una condición MEDIBLE: `filas de ventas > 20000`, `usuarios activos > 50`, `archivo de datos > 5 MB`.",
+        "Agregar `revisar-en:` con una fecha límite, para los supuestos que ningún contador puede medir.",
+        "Escribir `tools/arq-caducadas.mjs`: lee los ADR, evalúa cada condición contra el sistema real (consulta o `du`) y lista las decisiones vencidas con su umbral y su valor de hoy.",
+        "Engancharlo a la puerta de calidad como AVISO, no como bloqueo: una decisión vencida no impide desplegar, impide olvidarla."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna decisión con supuesto se quedó sin condición de revisión",
+          "comando": "grep -lE 'porque son|por ahora|mientras sean|con este volumen' docs/arquitectura/decisiones/[0-9]*.md | xargs -r grep -L 'revisar-si:'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El comando de revisión corre y da una cuenta",
+          "comando": "node tools/arq-caducadas.mjs; echo EXIT=$?",
+          "espera": "EXIT=0 e imprime `N decisiones revisadas, M vencidas` con el umbral y el valor real de cada vencida"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "api",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "tools/arq-caducadas.mjs",
+        "docs/arquitectura/decisiones/**"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "arq.decision.reemplazar-no-editar",
+      "titulo": "Marcar reemplazada la decisión vieja en vez de editar su texto",
+      "nivel": "N2",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Si el ADR se edita, el sistema pierde la única prueba de que alguien alguna vez pensó distinto, y el siguiente que proponga la idea vieja no encontrará por qué se descartó. Además el código antiguo queda citando una decisión que ya no dice lo que decía.",
+      "queHacer": [
+        "Todo ADR arranca con `estado: vigente`. Cambiar de rumbo es escribir un ADR nuevo y poner en el viejo `estado: reemplazada-por-NNNN`.",
+        "El ADR nuevo trae `reemplaza: NNNN` y en `## Contexto` dice qué cambió en el mundo, no qué estaba mal en la cabeza del que decidió.",
+        "Agregar el campo `tema:` (un slug corto) para poder detectar dos decisiones vigentes sobre lo mismo, que es el síntoma de que una se editó a escondidas.",
+        "Los estados válidos son tres y solo tres: `vigente`, `reemplazada-por-NNNN`, `descartada`."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay estados inventados",
+          "comando": "grep -h '^estado:' docs/arquitectura/decisiones/[0-9]*.md | grep -vE '^estado: (vigente|descartada|reemplazada-por-[0-9]{4})$'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Ninguna referencia de reemplazo apunta al vacío",
+          "comando": "grep -ho 'reemplazada-por-[0-9]\\{4\\}' docs/arquitectura/decisiones/[0-9]*.md | sed 's/.*-//' | while read n; do ls docs/arquitectura/decisiones/$n-*.md >/dev/null 2>&1 || echo \"ROTA $n\"; done",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "No hay dos decisiones vigentes sobre el mismo tema",
+          "comando": "grep -l '^estado: vigente' docs/arquitectura/decisiones/[0-9]*.md | xargs -r grep -h '^tema:' | sort | uniq -d",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "api",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/decisiones/**"
+      ],
+      "cerebro": [
+        "tema:memoria-y-cierre"
+      ]
+    },
+    {
+      "id": "arq.decision.regla-separada-de-coordenada",
+      "titulo": "Separar la regla que no caduca de la coordenada archivo:símbolo que sí",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El diagnóstico del propio ecosistema ya lo cobró: la memoria afirma que `fechaNegocio` vive en `facturacion.ts` cuando se movió a `jornada.ts`. Una coordenada muerta no solo miente: hace que se deje de creer el documento entero, regla incluida, y entonces la arquitectura escrita deja de servir para decidir.",
+      "queHacer": [
+        "Partir todo documento de arquitectura en dos bloques con encabezado fijo: `## Regla` (prosa, sin rutas ni números de línea — lo que seguirá siendo cierto si mañana se renombra todo) y `## Coordenadas` (una lista `archivo#simbolo`).",
+        "Prohibido el número de línea suelto: se cita `lib/venta/cobrar.ts#cobrar`, nunca `lib/venta/cobrar.ts:87`. El símbolo sobrevive a un formateo; la línea no.",
+        "Escribir `tools/arq-coordenadas.mjs`: por cada coordenada abre el archivo, busca el símbolo y falla nombrando la coordenada rota y el documento que la cita.",
+        "Engancharlo a la puerta de calidad: una coordenada rota es un fallo de la documentación, igual que un test rojo.",
+        "Cuando una coordenada se rompe, la reparación es actualizar la coordenada — NUNCA borrar la regla."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna regla lleva rutas incrustadas",
+          "comando": "for f in docs/arquitectura/*.md; do sed -n '/^## Regla/,/^## Coordenadas/p' \"$f\" | grep -nE '[a-zA-Z0-9_/.-]+[.](ts|tsx|js|mjs|sql):?[0-9]*' && echo \"EN $f\"; done",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Toda coordenada citada existe hoy en el código",
+          "comando": "node tools/arq-coordenadas.mjs; echo EXIT=$?",
+          "espera": "EXIT=0 e imprime `N coordenadas verificadas, 0 rotas`"
+        },
+        {
+          "check": "El comando detecta de verdad una coordenada muerta",
+          "comando": "printf '\\n- lib/no-existe.ts#fantasma\\n' >> docs/arquitectura/mapa.md; node tools/arq-coordenadas.mjs; echo EXIT=$?; git checkout docs/arquitectura/mapa.md",
+          "espera": "EXIT distinto de 0 y la coordenada `lib/no-existe.ts#fantasma` nombrada"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "api",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "tools/arq-coordenadas.mjs",
+        "docs/arquitectura/*.md"
+      ],
+      "cerebro": [
+        "tema:cero-datos-inventados",
+        "tema:verificar-con-evidencia",
+        "tema:memoria-y-cierre"
+      ]
+    },
+    {
+      "id": "arq.decision.mapa-generado-del-codigo",
+      "titulo": "Generar el mapa de módulos desde los imports reales, no dibujarlo a mano",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un diagrama dibujado a mano es verdad el día que se dibuja. A los dos meses muestra tres flechas que ya no existen y esconde la que sí importa, que es justo la que alguien está a punto de romper.",
+      "queHacer": [
+        "Escribir `tools/arq-mapa.mjs`: recorre los imports reales del código y emite `docs/arquitectura/mapa.generado.md` con un diagrama Mermaid módulo → módulo.",
+        "El archivo generado lleva en la primera línea `<!-- generado por tools/arq-mapa.mjs — no editar a mano -->`.",
+        "El mapa a mano, si existe, se borra: dos mapas es peor que ninguno.",
+        "La puerta de calidad regenera y compara: si el mapa del repositorio no es el que sale del código de hoy, falla."
+      ],
+      "aceptacion": [
+        {
+          "check": "El mapa del repositorio es el que sale del código de hoy",
+          "comando": "node tools/arq-mapa.mjs > docs/arquitectura/mapa.generado.md && git diff --exit-code docs/arquitectura/mapa.generado.md; echo EXIT=$?",
+          "espera": "EXIT=0"
+        },
+        {
+          "check": "No quedó un mapa dibujado a mano compitiendo",
+          "comando": "ls docs/arquitectura/ | grep -iE 'mapa|diagrama' | grep -v 'generado'",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "typescript",
+          "nextjs",
+          "node",
+          "react"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "tools/arq-mapa.mjs",
+        "docs/arquitectura/mapa.generado.md"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "arq.decision.veredicto-del-dueno-si-cuesta-plata",
+      "titulo": "Exigir el veredicto escrito del dueño en la decisión que cuesta plata",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Elegir entre un VPS propio y un servicio administrado no es una decisión técnica: es una cuota mensual y un candado de años. Tomada por dentro del equipo técnico, el dueño se entera con la primera factura y con el sistema ya construido encima.",
+      "queHacer": [
+        "Marcar con `impacto-plata: si` todo ADR que cree una cuota recurrente, un candado de proveedor o un costo de salida (migrar afuera).",
+        "En esos ADR va una tabla con el costo mensual estimado hoy, el costo al doble de volumen, y qué costaría irse.",
+        "El ADR no pasa a `estado: vigente` sin la línea `veredicto-dueno:` con fecha: sin veredicto no se siembra.",
+        "Si el dueño no responde, la decisión se queda en `estado: propuesta` y el trabajo que depende de ella no arranca."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna decisión con costo quedó vigente sin firma",
+          "comando": "grep -l 'impacto-plata: si' docs/arquitectura/decisiones/[0-9]*.md | xargs -r grep -l '^estado: vigente' | xargs -r grep -L 'veredicto-dueno:'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Cada veredicto trae fecha",
+          "comando": "grep -h 'veredicto-dueno:' docs/arquitectura/decisiones/[0-9]*.md | grep -vcE '[0-9]{4}-[0-9]{2}-[0-9]{2}'",
+          "espera": "0"
+        }
+      ],
+      "aplicaSi": {
+        "equipo": "orion+humanos"
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/decisiones/**"
+      ],
+      "cerebro": [
+        "tema:modelos-y-costos",
+        "tema:un-vps-varios-negocios"
+      ]
+    },
+    {
+      "id": "arq.frontera.mapa-de-modulos-con-puerta",
+      "titulo": "Partir el sistema en módulos y darle a cada uno una puerta y un dueño",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "ola",
+      "porQue": "Sin módulos con puerta, cualquier archivo importa cualquier archivo: a los seis meses tocar el precio obliga a leer el repositorio entero para saber quién se entera, y dos agentes de la misma ola se pisan porque nadie sabía qué era de quién.",
+      "queHacer": [
+        "Escribir `docs/arquitectura/modulos.md`: una fila por módulo con qué resuelve, qué expone, qué NO hace, y qué otros módulos puede importar.",
+        "Cada módulo vive en su carpeta y expone un solo archivo `index.ts`: esa es su puerta, y lo que no salga por ahí no existe para los demás.",
+        "El campo «qué NO hace» es obligatorio y es el que de verdad define la frontera; un módulo sin límite escrito se los come todos.",
+        "La lista de módulos del disco y la tabla del documento se cotejan con un comando, no con la memoria de nadie."
+      ],
+      "aceptacion": [
+        {
+          "check": "Todo módulo tiene su puerta",
+          "comando": "for d in lib/*/; do test -f \"$d/index.ts\" || echo \"SIN PUERTA $d\"; done",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El disco y el documento dicen lo mismo",
+          "comando": "for d in lib/*/; do m=$(basename \"$d\"); grep -q \"| $m \" docs/arquitectura/modulos.md || echo \"SIN FILA $m\"; done",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Ningún módulo se quedó sin declarar qué NO hace",
+          "comando": "grep -c 'no-hace:' docs/arquitectura/modulos.md; ls -d lib/*/ | wc -l",
+          "espera": "los dos números son iguales"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "typescript",
+          "nextjs",
+          "node",
+          "react"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/modulos.md",
+        "lib/*/index.ts"
+      ],
+      "cerebro": [
+        "tema:olas-de-agentes",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "arq.frontera.import-prohibido-rompe-la-puerta",
+      "titulo": "Hacer que un import prohibido rompa la puerta de calidad",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una frontera escrita en un documento la cruza cualquiera sin enterarse, y el import queda ahí para siempre. Esto es lo único que separa la arquitectura escrita de la arquitectura viva: si cruzarla no pone nada en rojo, en tres meses no hay frontera.",
+      "queHacer": [
+        "Declarar las fronteras como datos en `arquitectura.reglas.json`: una lista de `{ \"desde\": \"lib/dominio/**\", \"noImporta\": [\"next/*\", \"@/app/*\", \"@/components/*\"], \"porque\": \"…\" }`.",
+        "Implementarlas con `no-restricted-imports` de ESLint si el proyecto ya usa ESLint; si no, con `tools/fronteras.mjs`, que recorre los imports reales y compara contra el JSON.",
+        "El comando sale con código distinto de 0 y nombra archivo, línea, import cruzado y el `porque` de la regla: el que la cruzó tiene que poder leer el motivo sin abrir el documento.",
+        "Engancharlo a `npm run verificar` ANTES de los tests: cuesta menos de un segundo y ahorra el test que nadie escribió.",
+        "Probar que falla de verdad: meter un import prohibido a propósito, ver el rojo, quitarlo. Un guardián que nunca se vio fallar no es un guardián."
+      ],
+      "aceptacion": [
+        {
+          "check": "Hoy nadie cruza la frontera",
+          "comando": "node tools/fronteras.mjs; echo EXIT=$?",
+          "espera": "EXIT=0 e imprime `0 cruces`"
+        },
+        {
+          "check": "El comando falla de verdad cuando se cruza",
+          "comando": "mkdir -p lib/dominio && printf \"import { headers } from 'next/headers'\\n\" > lib/dominio/__prueba-frontera.ts; node tools/fronteras.mjs; echo EXIT=$?; rm lib/dominio/__prueba-frontera.ts",
+          "espera": "EXIT distinto de 0 y la línea `lib/dominio/__prueba-frontera.ts` nombrada con el import prohibido"
+        },
+        {
+          "check": "La puerta de calidad lo corre",
+          "comando": "grep -n 'fronteras' package.json",
+          "espera": "1+ líneas, dentro del script `verificar`"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "typescript",
+          "nextjs",
+          "node",
+          "react"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "arquitectura.reglas.json",
+        "tools/fronteras.mjs"
+      ],
+      "cerebro": [
+        "tema:que-es-estar-verificado",
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "arq.frontera.dominio-sin-framework",
+      "titulo": "Dejar el dominio sin un solo import del framework",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si la regla que calcula el vuelto importa `next/headers` o el cliente de la base, probarla exige levantar medio sistema. Nadie levanta medio sistema para probar una suma, y así las reglas de plata terminan siendo lo menos probado del repositorio.",
+      "queHacer": [
+        "Mover a `lib/dominio/` las reglas que serían ciertas aunque el sistema fuera de papel: qué es una venta válida, cómo se calcula un total, cuándo se puede anular.",
+        "Esas funciones reciben datos y devuelven datos o un error del dominio. No leen, no escriben, no miran la hora del sistema: la fecha entra como parámetro.",
+        "Los efectos (base, red, archivos, reloj) viven fuera y se le pasan al dominio ya resueltos.",
+        "Agregar la regla correspondiente a `arquitectura.reglas.json` para que el import prohibido rompa la puerta.",
+        "Los tests del dominio corren sin servidor y sin base: si necesitan `docker`, el dominio no está limpio."
+      ],
+      "aceptacion": [
+        {
+          "check": "El dominio no importa framework ni infraestructura",
+          "comando": "grep -rnE \"from '(next|react|@supabase|pg|better-sqlite3|@/app|@/components)\" lib/dominio/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El dominio no lee el reloj ni el entorno",
+          "comando": "grep -rnE 'Date[.]now[(][)]|new Date[(][)]|process[.]env' lib/dominio/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Los tests del dominio corren solos",
+          "comando": "npm test -- dominio",
+          "espera": "exit 0, sin levantar servidor ni base"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "typescript",
+          "nextjs",
+          "node",
+          "react"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/dominio/**",
+        "tests/dominio/**"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "arq.frontera.sin-ciclos-entre-modulos",
+      "titulo": "Prohibir los ciclos de dependencia entre módulos",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un ciclo entre dos módulos los convierte en uno solo que finge ser dos: no se puede probar uno sin el otro, no se puede borrar ninguno, y en tiempo de carga aparecen valores `undefined` que solo se explican leyendo el orden de los imports.",
+      "queHacer": [
+        "Correr el detector de ciclos sobre `lib/` y `app/` y anotar los ciclos que ya existen: ese es el número que hay que bajar a cero.",
+        "Romper cada ciclo por el lado del dato, no del código: normalmente uno de los dos módulos solo necesita un tipo, y el tipo se sube a `tipos/`.",
+        "Fijar la dirección permitida en `arquitectura.reglas.json`: pantalla → aplicación → dominio, nunca al revés.",
+        "Dejar el detector corriendo en la puerta de calidad para que el primer ciclo nuevo se vea el día que nace."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay ciclos",
+          "comando": "npx madge --circular --extensions ts,tsx lib app; echo EXIT=$?",
+          "espera": "EXIT=0 y `No circular dependency found`"
+        },
+        {
+          "check": "La puerta de calidad lo corre",
+          "comando": "grep -n 'madge' package.json",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "typescript",
+          "nextjs",
+          "node",
+          "react"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "arquitectura.reglas.json",
+        "package.json"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "arq.frontera.la-puerta-es-el-indice",
+      "titulo": "Prohibir importar el interior de un módulo saltándose su índice",
+      "nivel": "N2",
+      "dificultad": "trivial",
+      "ceremonia": "1-builder",
+      "porQue": "Si la pantalla importa `lib/ventas/internos/calculo`, ese archivo dejó de ser interno sin que nadie lo decidiera: renombrarlo ya rompe la pantalla, y el módulo perdió el derecho a reorganizarse por dentro, que era todo lo que ganaba con ser módulo.",
+      "queHacer": [
+        "Cada módulo exporta por `index.ts` exactamente lo que otros necesitan; lo demás se queda adentro.",
+        "Prohibir por regla los imports con dos o más segmentos hacia adentro de otro módulo.",
+        "Si alguien necesita algo interno, la respuesta no es abrir la ruta: es exportarlo por la puerta a propósito, y entonces pasa a ser contrato del módulo.",
+        "Agregar la regla a `arquitectura.reglas.json` para que la compruebe el mismo comando de fronteras."
+      ],
+      "aceptacion": [
+        {
+          "check": "Nadie entra por la ventana",
+          "comando": "grep -rnE \"from '@/lib/[a-z0-9-]+/[a-z]\" app/ components/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Las puertas exportan algo",
+          "comando": "for f in lib/*/index.ts; do grep -q 'export' \"$f\" || echo \"PUERTA VACÍA $f\"; done",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "typescript",
+          "nextjs",
+          "react"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/*/index.ts",
+        "arquitectura.reglas.json"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "arq.frontera.proveedor-en-un-solo-archivo",
+      "titulo": "Dejar el nombre del proveedor fuera del dominio y en un solo archivo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando el tipo `Venta` tiene un campo `stripe_payment_intent` o el dominio habla de `supabaseId`, cambiar de proveedor deja de ser cambiar un módulo y pasa a ser una migración de base más un cambio de contrato en toda la aplicación. El candado no lo pone el proveedor: lo pone el nombre regado.",
+      "queHacer": [
+        "Nombrar los conceptos por el negocio: `referenciaDePago`, no `stripeIntentId`; `identificadorExterno`, no `supabaseUserId`.",
+        "El SDK del proveedor se importa en UN archivo por proveedor (`lib/proveedores/<nombre>.ts`), que expone verbos del negocio: `cobrar`, `enviarComprobante`.",
+        "El dominio y los tipos compartidos no mencionan al proveedor ni una vez, ni en comentarios.",
+        "Anotar en el ADR del proveedor qué costaría cambiarlo hoy: cuántos archivos y cuántas columnas."
+      ],
+      "aceptacion": [
+        {
+          "check": "El dominio y los tipos no nombran proveedores",
+          "comando": "grep -rniE 'supabase|stripe|groq|twilio|firebase|wompi|mercadopago' lib/dominio/ tipos/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Cada SDK se importa en un solo archivo",
+          "comando": "grep -rlE \"from '(@supabase/|stripe|groq-sdk|twilio)\" app/ lib/ components/ | grep -v '^lib/proveedores/'",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "typescript",
+          "nextjs",
+          "node"
+        ],
+        "nube": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/proveedores/**",
+        "tipos/**"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "arq.frontera.la-pantalla-no-habla-con-la-base",
+      "titulo": "Prohibir que un componente de pantalla hable con la base",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una consulta dentro de un componente es una consulta que nadie puede limitar, cachear ni auditar, y que se dispara tantas veces como veces se pinte el componente. Y el día que hay que revisar quién puede ver qué, la respuesta está repartida en cuarenta archivos de pantalla.",
+      "queHacer": [
+        "Los componentes reciben datos por parámetros o por un módulo de acceso; no arman consultas.",
+        "Toda lectura y escritura pasa por `lib/<modulo>/` con funciones con nombre de negocio: `ventasDelTurno`, no `select`.",
+        "Agregar la regla a `arquitectura.reglas.json` y comprobarla con el comando de fronteras.",
+        "Lo que hoy consulta desde la pantalla se mueve de una vez: dejar «los viejos como están» es dejar la frontera sin comprobar."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún componente consulta directo",
+          "comando": "grep -rnE 'createClient|prisma[.]|[.]from[(]|SELECT ' components/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Las lecturas tienen nombre de negocio",
+          "comando": "grep -rlE 'createClient|prisma[.]' app/ lib/ | grep -v -E '^(lib/|app/api/)'",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "nextjs",
+          "react",
+          "typescript"
+        ],
+        "superficies": [
+          "panel-interno",
+          "caja",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "components/**",
+        "arquitectura.reglas.json"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "arq.frontera.carpeta-por-negocio",
+      "titulo": "Agrupar los archivos por pedazo de negocio, no por tipo de archivo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con carpetas `components/`, `hooks/` y `utils/`, cambiar «cómo se anula una venta» toca siete carpetas y nadie ve nunca el pedazo completo. Con `lib/ventas/` se ve entero, se puede probar entero y se puede borrar entero el día que el negocio lo quite.",
+      "queHacer": [
+        "Nombrar las carpetas de `lib/` por lo que el dueño llamaría por su nombre: `ventas`, `inventario`, `turnos`, `clientes`.",
+        "Adentro de cada una va todo lo suyo: reglas, acceso a datos, tipos propios y sus tests.",
+        "Lo genuinamente transversal (formato de plata, fechas) vive en un módulo con nombre propio, no en un cajón `utils`.",
+        "Un cajón genérico se permite solo mientras sea pequeño: pasado el tope se reparte entre módulos reales."
+      ],
+      "aceptacion": [
+        {
+          "check": "Hay carpetas con nombre de negocio",
+          "comando": "ls -d lib/*/ | sed 's#.*/\\([^/]*\\)/#\\1#' | grep -cvE '^(utils|helpers|common|shared|misc|lib|types)$'",
+          "espera": "3+"
+        },
+        {
+          "check": "El cajón genérico no creció",
+          "comando": "find lib/utils lib/helpers lib/common lib/misc -type f 2>/dev/null | wc -l",
+          "espera": "un número menor que 10"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "typescript",
+          "nextjs",
+          "react",
+          "node"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/**"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "arq.contrato.tipo-declarado-una-sola-vez",
+      "titulo": "Declarar el tipo de {{entidad}} una sola vez en todo el repositorio",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando `{{entidad}}` está escrita en el cliente y otra vez en el servidor, el día que se agrega un campo una de las dos se queda vieja y el compilador no dice nada: el error sale en el total de la pantalla, no en la compilación, y aparece semanas después.",
+      "queHacer": [
+        "Dejar la definición de `{{entidad}}` en `tipos/{{entidad}}.ts` y borrar las copias: cliente, servidor y pruebas importan de ahí.",
+        "Si el cliente necesita menos campos que el servidor, se deriva del tipo original (`Pick`, `Omit`), no se escribe otro a mano.",
+        "El tipo describe la ENTIDAD del negocio; la fila de la base y la respuesta de la API se derivan de él, no al revés.",
+        "Dejar un comentario de cabecera con quién escribe `{{entidad}}` y quién solo la lee."
+      ],
+      "aceptacion": [
+        {
+          "check": "Solo hay una definición de {{entidad}}",
+          "comando": "grep -rnE '(interface|type) {{entidad}}[ =<]' app/ lib/ components/ tipos/ | wc -l",
+          "espera": "1"
+        },
+        {
+          "check": "Los demás la importan",
+          "comando": "grep -rn '{{entidad}}' app/ lib/ components/ --include=*.ts --include=*.tsx -l | wc -l",
+          "espera": "2+"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "typescript"
+        ],
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": "entidad",
+      "posee": [
+        "tipos/{{entidad}}.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "arq.contrato.el-borde-valida-adentro-se-confia",
+      "titulo": "Dejar de re-validar adentro lo que el borde ya validó",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando cada función vuelve a preguntar «¿y si viene vacío?», el sitio donde de verdad entró la basura deja de ser localizable: cinco capas la toleran en silencio y la sexta la guarda. Y la guarda defensiva que nunca se cumple nunca se prueba, así que el día que sí se cumple hace cualquier cosa.",
+      "queHacer": [
+        "Fijar la frontera: `lib/contratos/` valida lo que entra (cuerpo, query, respuesta de terceros, archivo leído) y devuelve tipos ya cerrados; de ahí para adentro los campos no son opcionales.",
+        "Borrar del dominio las guardas que repiten lo que el esquema ya garantiza. Que un total no sea negativo es NEGOCIO y se queda; que sea un número es CONTRATO y se va.",
+        "Lo que no se puede garantizar con tipos —una fila que puede no existir— se devuelve como resultado explícito (`{ok:false, codigo}`), no como `null` suelto que cada quien interpreta.",
+        "Ningún tipo del dominio nace opcional «por si acaso»: si el campo de verdad puede faltar, son dos tipos distintos y el que llama elige.",
+        "Dejar escrito en `docs/arquitectura/contratos.md` cuál es el borde exacto, para que el siguiente sepa dónde validar."
+      ],
+      "aceptacion": [
+        {
+          "check": "El dominio no repite las guardas del contrato",
+          "comando": "grep -rnE 'typeof [a-zA-Z]+ [!=]== .(string|number)|isNaN[(]|Array[.]isArray[(]' lib/dominio/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Los tipos del dominio no son opcionales por si acaso",
+          "comando": "grep -rnE '^[[:space:]]+[a-zA-Z]+[?]:' tipos/dominio/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El borde sí rechaza",
+          "comando": "npm test -- contratos-borde",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "typescript"
+        ],
+        "superficies": [
+          "api",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/contratos/**",
+        "docs/arquitectura/contratos.md"
+      ],
+      "cerebro": [
+        "tema:encargos-verificables"
+      ]
+    },
+    {
+      "id": "arq.contrato.una-sola-forma-de-error",
+      "titulo": "Devolver siempre la misma forma de error en todo el sistema",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si una ruta devuelve `{error:\"…\"}`, otra `{message:\"…\"}` y una tercera texto plano, la pantalla acaba con tres maneras de leer un fallo y la cuarta ruta rompe la pantalla en silencio: el usuario ve «cargando» para siempre porque nadie supo que eso era un error.",
+      "queHacer": [
+        "Fijar la forma única: `{ ok:false, codigo:\"VENTA_SIN_ITEMS\", mensaje:\"…\", detalle?:{} }`. El `codigo` es para el programa y el `mensaje` para la persona.",
+        "Poner el catálogo de códigos en un solo archivo (`lib/errores/codigos.ts`); agregar un código es agregar una línea ahí, no inventar una cadena en la ruta.",
+        "La pantalla decide por `codigo`, jamás comparando el texto del mensaje: el texto se traduce y se reescribe, el código no.",
+        "Un error inesperado también sale con la forma canónica y un código genérico; lo que no puede pasar es que salga un `500` con HTML adentro.",
+        "El estado HTTP acompaña, no reemplaza: 400 para el cliente, 409 para el conflicto, 500 para lo nuestro."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna ruta inventa su propia forma",
+          "comando": "grep -rnE 'json[(][ ]*[{][ ]*(error|message)[ ]*:' app/api/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La pantalla no ramifica por el texto",
+          "comando": "grep -rnE \"(mensaje|message)[ ]*[=!]== *['\\\"]\" app/ components/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Toda ruta con fallo responde la forma canónica",
+          "comando": "npm test -- forma-del-error",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/errores/**",
+        "docs/arquitectura/contratos.md"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "arq.contrato.versionar-cuando-cambia-de-forma",
+      "titulo": "Versionar el contrato el día que cambia de forma, no después",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un consumidor que no controlamos —la caja de otro local, un script del contador— se rompe en silencio cuando un campo cambia de nombre, y se entera el día del cierre de mes. Versionar después del daño no sirve: la versión vieja ya no existe.",
+      "queHacer": [
+        "Escribir el contrato de la versión vigente en `docs/arquitectura/contrato-v1.md`: rutas, campos, tipos y qué es opcional.",
+        "Congelarlo con una prueba que solo mira la forma de la respuesta, no el contenido: agregar un campo pasa, renombrar o quitar uno falla.",
+        "Agregar campos SÍ es compatible; renombrar, quitar o cambiar de tipo NO: eso abre `v2` y `v1` sigue viva con fecha de retiro escrita.",
+        "Anunciar el retiro de `v1` con fecha en el mismo documento, y medir cuántas peticiones siguen llegando a `v1` antes de apagarla."
+      ],
+      "aceptacion": [
+        {
+          "check": "La prueba congelada del contrato sigue verde",
+          "comando": "npm test -- contrato-v1",
+          "espera": "exit 0"
+        },
+        {
+          "check": "Ninguna respuesta trae campos fuera del documento",
+          "comando": "node tools/contrato-cotejar.mjs v1; echo EXIT=$?",
+          "espera": "EXIT=0 y `0 campos fuera del contrato`"
+        },
+        {
+          "check": "Cada versión viva tiene fecha de retiro",
+          "comando": "grep -L 'retiro:' docs/arquitectura/contrato-v*.md",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "apiPublica": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/contrato-v*.md",
+        "tools/contrato-cotejar.mjs",
+        "tests/contrato/**"
+      ],
+      "cerebro": [
+        "tema:encargos-verificables"
+      ]
+    },
+    {
+      "id": "arq.contrato.mismo-nombre-en-las-tres-capas",
+      "titulo": "Llamar a {{entidad}} igual en la base, en la API y en la pantalla",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando la tabla dice `orders`, la API `pedidos` y la pantalla «comandas», cada capa necesita un traductor, y cada traductor es un sitio donde se pierde un campo al agregarlo. Además el dueño y el programador dejan de poder hablar del mismo hecho.",
+      "queHacer": [
+        "Escribir `docs/arquitectura/glosario.md`: término del negocio, nombre de tabla, nombre en la API, texto de pantalla. Una fila por concepto.",
+        "El nombre lo pone el dueño, en su idioma, y ese nombre baja hasta la columna de la base.",
+        "Listar en `docs/arquitectura/sinonimos-prohibidos.txt` los nombres viejos o traducidos que quedaron regados, para que un grep los cace.",
+        "Renombrar es una migración (expandir-migrar-contraer), no un `sed` sobre el repositorio."
+      ],
+      "aceptacion": [
+        {
+          "check": "{{entidad}} está en el glosario con sus tres nombres",
+          "comando": "grep -c '| {{entidad}} |' docs/arquitectura/glosario.md",
+          "espera": "1"
+        },
+        {
+          "check": "No quedan sinónimos regados",
+          "comando": "grep -rniFf docs/arquitectura/sinonimos-prohibidos.txt app/ lib/ components/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": "entidad",
+      "posee": [
+        "docs/arquitectura/glosario.md",
+        "docs/arquitectura/sinonimos-prohibidos.txt"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "arq.contrato.un-solo-tipo-para-plata-y-fecha",
+      "titulo": "Fijar un solo tipo para la plata y uno para la fecha en todo el sistema",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si la plata viaja a veces como número y a veces como texto «12.500», y la fecha unas veces en UTC y otras en hora local, el descuadre aparece en el informe del mes y nadie sabe en qué capa se torció. Un peso perdido por redondeo se multiplica por cada línea de cada venta.",
+      "queHacer": [
+        "Decidir y escribir la representación de la plata: entero en la unidad mínima del país (pesos sin decimales en Colombia) con un tipo propio `Pesos`, nunca coma flotante.",
+        "Decidir la representación del tiempo: instante en ISO-8601 con zona para lo que pasó, y `fecha de negocio` aparte para lo que el dueño llama «el día», que puede cerrar a las 2 a.m.",
+        "El formateo a texto vive en un solo módulo (`lib/formato/`); ninguna pantalla llama a `toLocaleString` por su cuenta.",
+        "El borde rechaza plata con decimales y fechas sin zona: entra normalizado o no entra.",
+        "Probar los dos casos que siempre duelen: el redondeo del descuento y la venta hecha después de medianoche."
+      ],
+      "aceptacion": [
+        {
+          "check": "La plata no es un number suelto en los tipos",
+          "comando": "grep -rnE '(precio|total|monto|valor|subtotal)[a-zA-Z]*[ ]*[?]?:[ ]*number' tipos/ lib/dominio/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Solo un módulo formatea",
+          "comando": "grep -rn 'toLocaleString\\|Intl.NumberFormat\\|Intl.DateTimeFormat' app/ components/ lib/ | grep -v 'lib/formato/'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El redondeo y la medianoche están probados",
+          "comando": "npm test -- plata-y-fecha",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/formato/**",
+        "tipos/plata.ts",
+        "tests/dominio/plata-y-fecha.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:invertir-formulas-redondeadas",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "arq.contrato.la-pantalla-recibe-vista-no-fila",
+      "titulo": "Devolverle a la pantalla una vista, no la fila cruda de la tabla",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el `select *` sale directo como JSON, renombrar una columna rompe la pantalla sin avisar, y el costo de compra o el hash del PIN viajan al navegador sin que nadie lo haya decidido: quedan en el HTML, visibles para cualquiera que abra el inspector.",
+      "queHacer": [
+        "Declarar por cada respuesta la lista explícita de campos que salen; lo que no está en la lista no viaja.",
+        "El armado de la vista vive en un solo sitio por entidad, no en cada ruta.",
+        "La consulta pide columnas por nombre: `select *` queda prohibido en el camino que alimenta pantallas.",
+        "Probarlo con una comprobación que compare las claves de la respuesta contra la lista declarada, no leyéndolo a ojo."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay select estrella hacia la pantalla",
+          "comando": "grep -rniE \"select[(] *['\\\"][*]|SELECT [*]\" app/ lib/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La respuesta no trae campos de más",
+          "comando": "npm test -- vista-publica",
+          "espera": "exit 0: las claves de la respuesta son exactamente las declaradas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno"
+        ],
+        "stack": [
+          "postgres",
+          "supabase",
+          "sqlite",
+          "mysql"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/vistas/**",
+        "tests/contrato/vista-publica.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "arq.estado.cada-estado-tiene-dueno",
+      "titulo": "Escribir para cada estado si manda el servidor, el cliente o la URL",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Sin la tabla escrita, el mismo dato termina viviendo en tres sitios y ganando el último que escribió: la persona filtra, recarga, y ve otra cosa. Ese bug no se reproduce en el escritorio de nadie porque depende de en qué orden se pintó la pantalla.",
+      "queHacer": [
+        "Escribir `docs/arquitectura/estado.md`: una fila por estado con dueño (servidor / cliente / URL), dónde vive, quién lo puede cambiar y qué pasa al recargar.",
+        "Regla por defecto: lo que es un hecho del negocio manda el servidor; lo que es una preferencia de vista manda la URL; solo lo efímero (un menú abierto) vive en el cliente.",
+        "Ningún estado del servidor se copia a un store del cliente para «tenerlo a mano»: si hay copia, es caché y se declara como tal (ver `arq.estado.la-copia-es-de-lectura`).",
+        "Cotejar la tabla contra los stores que existen de verdad en el código, con un comando."
+      ],
+      "aceptacion": [
+        {
+          "check": "Todo store del cliente tiene su fila",
+          "comando": "for f in lib/estado/*.ts; do s=$(basename \"$f\" .ts); grep -q \"| $s \" docs/arquitectura/estado.md || echo \"SIN FILA $s\"; done",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Ninguna fila se quedó sin dueño",
+          "comando": "grep -c '^| ' docs/arquitectura/estado.md; grep -icE '\\| *(servidor|cliente|URL) *\\|' docs/arquitectura/estado.md",
+          "espera": "los dos números coinciden salvo la fila de encabezado"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "react",
+          "nextjs",
+          "typescript"
+        ],
+        "superficies": [
+          "panel-interno",
+          "publico",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/estado.md",
+        "lib/estado/**"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "arq.estado.la-url-manda-en-lo-compartible",
+      "titulo": "Escribir en la URL todo filtro que alguien quiera compartir o recargar",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el filtro «ventas de ayer del turno de la noche» vive en `useState`, el dueño no puede mandarle ese enlace al contador, recargar lo borra, y el botón de atrás del navegador saca a la persona de la pantalla en vez de deshacer el filtro.",
+      "queHacer": [
+        "Poner en la query string todo lo que define QUÉ se está viendo: filtros, rango de fechas, página, orden, pestaña.",
+        "La pantalla lee siempre de la URL; cambiar un filtro es navegar, no guardar en memoria.",
+        "Los nombres de los parámetros son parte del contrato: se escriben en `docs/arquitectura/estado.md` y no se renombran a la ligera.",
+        "Nada personal ni secreto va en la URL: la URL se comparte por WhatsApp y queda en los registros del servidor."
+      ],
+      "aceptacion": [
+        {
+          "check": "El enlace con filtro devuelve la vista filtrada",
+          "comando": "curl -s 'http://localhost:3000/ventas?desde=2026-01-01&turno=noche' | grep -c '2026-01-01'",
+          "espera": "1+"
+        },
+        {
+          "check": "Los filtros no viven en memoria del componente",
+          "comando": "grep -rniE 'useState.*(filtro|desde|hasta|busqueda|pagina|orden)' app/ components/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "nextjs",
+          "react"
+        ],
+        "superficies": [
+          "panel-interno",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/estado/url.ts",
+        "docs/arquitectura/estado.md"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "arq.estado.precedencia-url-local-default",
+      "titulo": "Fijar el orden URL > guardado local > valor por defecto y probarlo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin un orden fijo, abrir un enlace con `?sede=norte` muestra la sede que quedó guardada en ese navegador, y la persona jura que el enlace está malo. Es el mismo enlace mostrando dos cosas distintas según quién lo abra.",
+      "queHacer": [
+        "Escribir la resolución en un solo sitio (`lib/estado/resolver.ts`): mira la URL, luego lo guardado, luego el valor por defecto, y devuelve el valor y de dónde salió.",
+        "Cuando gana la URL, lo guardado se actualiza para que la próxima visita sin parámetros sea coherente.",
+        "Ninguna pantalla lee `localStorage` por su cuenta: lo hace el resolvedor.",
+        "Probar los tres casos: solo URL, solo guardado, ninguno de los dos."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los tres casos de precedencia están probados",
+          "comando": "npm test -- precedencia-estado",
+          "espera": "exit 0, 3 casos"
+        },
+        {
+          "check": "Nadie lee el almacenamiento local por fuera del resolvedor",
+          "comando": "grep -rn 'localStorage' app/ components/ | grep -v 'lib/estado/'",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "nextjs",
+          "react"
+        ],
+        "superficies": [
+          "panel-interno",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/estado/resolver.ts",
+        "tests/estado/precedencia.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "arq.estado.la-copia-es-de-lectura",
+      "titulo": "Declarar cada copia de datos como de lectura y nombrar quién la pisa",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Duplicar es diseño solo si la copia es de lectura y se deja pisar por el dueño. Si los dos lados pueden editar la misma copia, es deuda: los datos divergen callados y el descuadre se descubre cuadrando a mano contra el papel.",
+      "queHacer": [
+        "Escribir `docs/arquitectura/copias.md`: una fila por caché, réplica, cola de subida o tabla desnormalizada, con qué duplica, quién es el dueño del original, cómo se invalida y qué se hace si diverge.",
+        "Cada copia declara explícitamente que es de LECTURA. Lo que se escribe mientras tanto viaja aparte, en una cola de subida, no editando la copia.",
+        "El dueño pisa la copia sin preguntar; la copia no pisa al dueño nunca.",
+        "Probarlo con un test de convergencia: escribir en el dueño, sincronizar, comprobar que la copia se rindió."
+      ],
+      "aceptacion": [
+        {
+          "check": "Toda copia está declarada",
+          "comando": "grep -c '^| ' docs/arquitectura/copias.md",
+          "espera": "1+ filas"
+        },
+        {
+          "check": "La copia se deja pisar y no pisa",
+          "comando": "npm test -- convergencia-de-copias",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/copias.md",
+        "tests/estado/convergencia.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:la-caja-no-puede-parar"
+      ]
+    },
+    {
+      "id": "arq.estado.la-venta-es-local-la-nube-es-espejo",
+      "titulo": "Escribir la venta en el almacén local y dejar la nube como espejo",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un mostrador que necesita internet para cobrar es un mostrador que cierra cuando se cae la conexión, y se cae. La lección ya está pagada: la venta se hace y se guarda en el LOCAL, se encola lo que cambió, y sube cuando puede.",
+      "queHacer": [
+        "El camino de cobro escribe SOLO en el almacén local y responde sin esperar a nadie: ni red, ni impresora, ni nube.",
+        "Lo que cambió entra a una cola de subida; el subidor es otro proceso u otro momento, nunca la misma petición.",
+        "Con cola pendiente de subir NO se baja nada: primero se vacía lo propio, después se escucha al servidor.",
+        "Escribir el ADR que lo fija, para que el siguiente que proponga «guardar directo en la nube» encuentre la razón escrita.",
+        "Probarlo con la red bloqueada, no leyendo el código: cobrar sin señal y comprobar que la venta quedó y quedó encolada."
+      ],
+      "aceptacion": [
+        {
+          "check": "El camino de cobro no toca la red",
+          "comando": "grep -rniE 'fetch[(]|createClient|supabase' lib/venta/cobrar.ts app/caja/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Se cobra con la red caída",
+          "comando": "npm test -- cobro-sin-red",
+          "espera": "exit 0: la venta queda guardada y encolada con la red bloqueada"
+        },
+        {
+          "check": "Con cola pendiente no se baja",
+          "comando": "npm test -- cola-pendiente-no-baja",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/venta/cobrar.ts",
+        "lib/sincronizacion/**",
+        "tests/caja/cobro-sin-red.test.ts"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar",
+        "tema:donde-vive-el-dato",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "arq.estado.nada-vive-en-memoria-del-proceso",
+      "titulo": "No guardar en memoria del proceso nada que deba sobrevivir al reinicio",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un `Map` global con los carritos abiertos funciona perfecto hasta el primer redespliegue, que es cada vez que se sube un cambio. Y con dos procesos, la mitad de las peticiones no encuentran su carrito: el error es intermitente y se culpa al usuario.",
+      "queHacer": [
+        "Listar lo que hoy vive en variables de módulo del servidor: sesiones, carritos, contadores, colas, cachés.",
+        "Lo que debe sobrevivir a un reinicio se persiste (base o disco); lo que no, se declara caché con límite y expulsión y se acepta perderlo.",
+        "Ningún contador de negocio (consecutivos, totales del turno) vive en memoria: eso se pide a la base con una escritura atómica.",
+        "Probar el reinicio de verdad: escribir, matar el proceso, levantarlo, leer."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay estado global sin declarar",
+          "comando": "grep -rnE 'globalThis[.][a-zA-Z]+[ ]*=|^const [a-zA-Z]+ = new (Map|Set)[(][)]' lib/servidor/ app/api/ | grep -v 'lib/cache/'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El dato sobrevive al reinicio",
+          "comando": "npm test -- sobrevive-reinicio",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node",
+          "nextjs"
+        ],
+        "superficies": [
+          "api",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/**",
+        "tests/servidor/sobrevive-reinicio.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:construir-no-es-arrancar"
+      ]
+    },
+    {
+      "id": "arq.flujo.camino-completo-escrito-y-probado",
+      "titulo": "Escribir el camino de {{ruta}} de punta a punta y probarlo entero",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando el camino no está escrito, cada quien conoce su pedazo y nadie el todo: al fallar, tres personas miran tres capas distintas y ninguna ve que el paso que falta es el cuarto. Y el dueño no puede decir si lo que hace el sistema es lo que él pidió.",
+      "queHacer": [
+        "Escribir `docs/arquitectura/flujos/{{ruta}}.md` con los pasos numerados: quién ejecuta cada uno, qué escribe, qué devuelve y qué pasa si falla.",
+        "Marcar en la lista cuál es el paso que ya no se puede deshacer: ese es el punto de no retorno del flujo.",
+        "Escribir una prueba de punta a punta que recorra esos mismos pasos en ese mismo orden, y que falle si alguien mete un paso nuevo sin documentarlo.",
+        "El documento se escribe en el idioma del dueño: si él no puede leer y decir «sí, así es», está escrito para el público equivocado."
+      ],
+      "aceptacion": [
+        {
+          "check": "El flujo está escrito con pasos numerados",
+          "comando": "grep -cE '^[0-9]+[.] ' docs/arquitectura/flujos{{ruta}}.md",
+          "espera": "3+"
+        },
+        {
+          "check": "La prueba recorre el camino completo",
+          "comando": "npm test -- flujo{{ruta}}",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ],
+        "rutas": [
+          "*"
+        ]
+      },
+      "porCada": "ruta",
+      "posee": [
+        "docs/arquitectura/flujos{{ruta}}.md",
+        "tests/flujo{{ruta}}.test.ts"
+      ],
+      "cerebro": [
+        "tema:encargos-verificables"
+      ]
+    },
+    {
+      "id": "arq.flujo.sincrono-o-en-cola-por-milisegundos",
+      "titulo": "Decidir qué se hace ya y qué se encola, con un número de milisegundos",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Mandar el correo dentro de la petición del cobro hace que un proveedor lento tumbe la caja; encolarlo todo hace que la persona no sepa si su acción sirvió. La frontera tiene que ser un número escrito, no el gusto del que escribió esa ruta.",
+      "queHacer": [
+        "Fijar el número en `docs/arquitectura/flujos/regla.md`: todo trabajo que dependa de un tercero, o que pase del tope declarado (por ejemplo 300 ms), sale de la petición y se encola.",
+        "Lo que el usuario necesita ver para seguir trabajando se hace síncrono, aunque cueste; lo demás se encola.",
+        "Ninguna ruta de escritura espera a un tercero: se guarda el hecho, se encola el efecto, se responde.",
+        "Medir la ruta después del cambio y anotar el p95: sin la medición no se sabe si la regla se cumplió."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna ruta espera a un tercero",
+          "comando": "grep -rnE \"await (enviarCorreo|enviarWhatsapp|fetch[(]['\\\"]https)\" app/api/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La ruta responde por debajo del tope declarado",
+          "comando": "for i in $(seq 1 20); do curl -s -o /dev/null -w '%{time_total}\\n' -X POST http://localhost:3000/api/ventas -H 'content-type: application/json' -d @tests/fixtures/venta.json; done | sort -n | tail -2 | head -1",
+          "espera": "un valor por debajo del tope escrito en docs/arquitectura/flujos/regla.md"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/flujos/regla.md",
+        "lib/trabajos/**"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar"
+      ]
+    },
+    {
+      "id": "arq.flujo.idempotencia-decidida-por-escrito",
+      "titulo": "Decidir y anotar qué escrituras se pueden repetir sin daño",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "La repetición no es un caso raro: es el botón que la cajera oprime dos veces porque la pantalla no respondió, el webhook que el proveedor reenvía, el reintento de la cola. Si nadie decidió cuáles se pueden repetir, la respuesta la da el azar y el resultado es una venta doble.",
+      "queHacer": [
+        "Escribir `docs/arquitectura/idempotencia.md`: una fila por operación de escritura con `idempotente: si/no`, la clave con la que se detecta la repetición, y qué pasa si llega dos veces.",
+        "La decisión es de diseño, no de implementación: aquí se decide y se inventaría; la implementación por ruta es otra tarea.",
+        "Toda operación marcada `si` tiene detrás algo que la sostiene —una restricción única en la base o un registro de claves vistas—, no solo la buena voluntad del código.",
+        "Toda operación marcada `no` lleva escrito por qué es aceptable, y qué ve la persona si repite.",
+        "Cotejar la tabla contra las rutas de escritura reales, con un comando."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna escritura quedó fuera de la tabla",
+          "comando": "node tools/idempotencia-cotejar.mjs; echo EXIT=$?",
+          "espera": "EXIT=0 y `0 rutas de escritura sin fila`"
+        },
+        {
+          "check": "Cada idempotente tiene su clave declarada",
+          "comando": "grep 'idempotente: si' docs/arquitectura/idempotencia.md | grep -vc 'clave:'",
+          "espera": "0"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/idempotencia.md",
+        "tools/idempotencia-cotejar.mjs"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "arq.flujo.si-falla-el-paso-3-de-5",
+      "titulo": "Escribir y probar qué queda si el flujo se corta a la mitad",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un flujo de cinco pasos que no dice qué pasa cuando falla el tercero deja media venta escrita: el inventario descontado y el documento sin emitir. Eso no rompe nada visible; se descubre cuadrando a fin de mes, cuando ya no se sabe cuál fue.",
+      "queHacer": [
+        "Por cada flujo, marcar el punto de no retorno y ordenar los pasos para que lo irreversible quede de ÚLTIMO.",
+        "Todo lo anterior al punto de no retorno va en una transacción, o tiene su paso de compensación escrito.",
+        "Nombrar el invariante que tiene que cumplirse pase lo que pase: «no hay venta sin sus líneas», «no hay descuento de inventario sin venta».",
+        "Escribir una prueba que corte el flujo en CADA paso y compruebe el invariante en todos los cortes.",
+        "Dejar un comando que revise el invariante contra los datos reales, para cazar los cortes que ya ocurrieron."
+      ],
+      "aceptacion": [
+        {
+          "check": "Hay un corte probado por cada paso",
+          "comando": "npm test -- flujo-interrumpido",
+          "espera": "exit 0, tantos casos como pasos tiene el flujo"
+        },
+        {
+          "check": "Los datos reales cumplen el invariante",
+          "comando": "node tools/invariantes.mjs; echo EXIT=$?",
+          "espera": "EXIT=0 y `0 descuadres`"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "tools/invariantes.mjs",
+        "tests/flujo/interrumpido.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "arq.flujo.una-sola-puerta-de-escritura",
+      "titulo": "Dejar un solo camino de código por el que se escribe cada {{entidad}}",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si `{{entidad}}` se puede crear desde la pantalla, desde el importador y desde un script de arreglo, la regla que la valida está en tres sitios y a la tercera ya no coincide. El dato malo entra por la puerta que nadie recordaba que existía.",
+      "queHacer": [
+        "Concentrar toda escritura de `{{entidad}}` en `lib/{{entidad}}/escribir.ts`: crear, modificar y anular.",
+        "Los importadores y los scripts de mantenimiento llaman a esa misma función; no arman su propio `INSERT`.",
+        "Las reglas del negocio se comprueban ahí una vez, no en cada punto de entrada.",
+        "Comprobar con un grep que no queda ninguna escritura directa por fuera."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay escrituras directas por fuera de la puerta",
+          "comando": "grep -rniE \"insert into {{entidad}}|from[(]['\\\"]{{entidad}}['\\\"][)][.](insert|update|delete)\" app/ lib/ scripts/ | grep -v 'lib/{{entidad}}/escribir'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La puerta valida y está probada",
+          "comando": "npm test -- escribir-{{entidad}}",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "entidades": [
+          "*"
+        ],
+        "stack": [
+          "postgres",
+          "supabase",
+          "sqlite",
+          "mysql",
+          "json-en-disco"
+        ]
+      },
+      "porCada": "entidad",
+      "posee": [
+        "lib/{{entidad}}/escribir.ts",
+        "tests/dominio/escribir-{{entidad}}.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "arq.flujo.el-trabajo-largo-devuelve-recibo",
+      "titulo": "Devolver un recibo para consultar el trabajo que tarda",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una petición que tarda 40 s la corta el proxy a los 30, y la persona la vuelve a lanzar: ahora hay dos informes corriendo y ninguno responde. El trabajo largo dentro de una petición HTTP no es lento, es imposible.",
+      "queHacer": [
+        "La ruta acepta el trabajo, lo encola, y responde 202 con un identificador en menos de un segundo.",
+        "Hay una ruta para consultar el estado del trabajo: pendiente, corriendo, listo con su resultado, o fallido con su motivo.",
+        "El identificador se deriva de la petición (ver idempotencia): pedir dos veces el mismo informe devuelve el mismo recibo, no dos trabajos.",
+        "La pantalla muestra el progreso o al menos que el trabajo está vivo, y sobrevive a que la persona recargue."
+      ],
+      "aceptacion": [
+        {
+          "check": "La ruta acepta rápido y devuelve recibo",
+          "comando": "curl -s -o /dev/null -w '%{http_code} %{time_total}' -X POST http://localhost:3000/api/informes -H 'content-type: application/json' -d '{}'",
+          "espera": "202 y un tiempo menor que 1.0"
+        },
+        {
+          "check": "Pedir dos veces lo mismo no crea dos trabajos",
+          "comando": "npm test -- trabajo-largo",
+          "espera": "exit 0"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/informes/**",
+        "lib/trabajos/**"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "arq.limite.numeros-del-negocio-por-escrito",
+      "titulo": "Escribir cuántos usuarios, cuántas filas y cuántos KB va a aguantar",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin los números escritos nadie sabe si el sistema está holgado o al borde: se descubre el día que la pantalla del mes tarda cuatro segundos, y ese día ya es urgente. Un límite escrito convierte una emergencia futura en una tarea programada.",
+      "queHacer": [
+        "Escribir `docs/arquitectura/limites.md`: una fila por dimensión con el valor de HOY (medido), el tope declarado, y qué se rompe primero al pasarlo.",
+        "Las dimensiones mínimas: usuarios en simultáneo, filas de la tabla que más crece, tamaño del archivo más grande que sube alguien, peticiones por minuto en la hora pico, tamaño total del almacenamiento.",
+        "Prohibidos los adjetivos en la tabla: «bastante», «escalable» y «suficiente» no son números.",
+        "Cada tope tiene nombre y apellido: quién lo puso y con qué medición (ver `arq.limite.medido-no-estimado`)."
+      ],
+      "aceptacion": [
+        {
+          "check": "La tabla tiene las dimensiones mínimas",
+          "comando": "grep -c '^| ' docs/arquitectura/limites.md",
+          "espera": "5+ filas"
+        },
+        {
+          "check": "No hay adjetivos donde debería haber números",
+          "comando": "grep -inE '[|] *(muchos|pocos|suficiente|bastante|escalable|el necesario)' docs/arquitectura/limites.md",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "api",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/limites.md"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "arq.limite.medido-no-estimado",
+      "titulo": "Medir el límite con datos de verdad en vez de estimarlo",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una estimación de escritorio se equivoca por un orden de magnitud en cualquier dirección, y el que la escribió no vuelve a mirarla. Un número medido con 50.000 filas sirve para decidir; uno calculado a ojo solo sirve para tranquilizar.",
+      "queHacer": [
+        "Escribir `tools/carga.mjs`: llena una copia de la base con el volumen objetivo y mide la ruta más pesada, imprimiendo p50 y p95 en milisegundos.",
+        "Los datos de carga se parecen a los reales: mismas proporciones, mismos casos raros, no filas idénticas.",
+        "Anotar en `docs/arquitectura/limites.md` una línea `medido:` por cada tope: fecha, volumen usado y resultado.",
+        "Volver a medir cuando el volumen real llegue a la mitad del tope: la medición vieja es una estimación disfrazada."
+      ],
+      "aceptacion": [
+        {
+          "check": "La medición corre y da números",
+          "comando": "node tools/carga.mjs --filas 50000; echo EXIT=$?",
+          "espera": "EXIT=0 e imprime `p50=<ms> p95=<ms> filas=50000`"
+        },
+        {
+          "check": "Cada tope declarado tiene su medición",
+          "comando": "grep -c '^| ' docs/arquitectura/limites.md; grep -c 'medido:' docs/arquitectura/limites.md",
+          "espera": "los dos números coinciden salvo la fila de encabezado"
+        }
+      ],
+      "aplicaSi": {
+        "etapa": [
+          "N3",
+          "N4"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "tools/carga.mjs",
+        "docs/arquitectura/limites.md"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia",
+        "tema:que-es-estar-verificado"
+      ]
+    },
+    {
+      "id": "arq.limite.que-cede-primero-al-doblar",
+      "titulo": "Correr el sistema con el doble del volumen y anotar qué cede primero",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Saber que el sistema aguanta hoy no dice nada sobre mañana. Lo útil es saber CUÁL de las tres cosas se rompe primero —la consulta, la memoria o el disco—, porque eso decide qué se arregla y qué no vale la pena tocar.",
+      "queHacer": [
+        "Correr la medición con el doble y con el cuádruple del volumen de hoy, no con un número redondo inventado.",
+        "Registrar en cada corrida las tres cosas: tiempo de la consulta más lenta, memoria máxima del proceso, espacio en disco.",
+        "El comando imprime `CUELLO=<consulta|memoria|disco>` con su medición: el nombre del primero que se sale de su tope.",
+        "Escribir en `limites.md` qué se haría cuando llegue ese cuello — no hacerlo hoy, escribirlo hoy."
+      ],
+      "aceptacion": [
+        {
+          "check": "El ensayo nombra el primer cuello",
+          "comando": "node tools/carga.mjs --factor 2; echo EXIT=$?",
+          "espera": "EXIT=0 e imprime una línea `CUELLO=<nombre>` con su medición en ms, MB o GB"
+        },
+        {
+          "check": "El plan para ese cuello está escrito",
+          "comando": "grep -c 'cuando-llegue:' docs/arquitectura/limites.md",
+          "espera": "1+"
+        }
+      ],
+      "aplicaSi": {
+        "etapa": [
+          "N3",
+          "N4"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "tools/carga.mjs",
+        "docs/arquitectura/limites.md"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "arq.limite.tope-al-archivo-mas-grande",
+      "titulo": "Ponerle tope de tamaño al archivo que sube la persona y probarlo",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin tope, la foto de 12 MB del celular tumba el proceso o llena el disco del servidor. Y el disco lleno no avisa: la caja simplemente deja de guardar, y el mensaje que sale no habla de disco.",
+      "queHacer": [
+        "Fijar el tope en un solo sitio y escribirlo en `limites.md` con la razón: cuántos archivos por día por cuánto tiempo caben en el disco que hay.",
+        "Rechazar en el servidor con 413 antes de leer el cuerpo entero; la validación del navegador es cortesía, no defensa.",
+        "Decir en pantalla el tope en palabras de la persona («máximo 3 MB, como una foto normal del celular»), no en bytes.",
+        "Vigilar el disco: un aviso al 80% de ocupación, no un fallo al 100%."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un archivo pasado de tope se rechaza",
+          "comando": "head -c 20000000 /dev/urandom > /tmp/grande.bin; curl -s -o /dev/null -w '%{http_code}' -F archivo=@/tmp/grande.bin http://localhost:3000/api/subir; rm /tmp/grande.bin",
+          "espera": "413"
+        },
+        {
+          "check": "El tope está en un solo sitio y escrito",
+          "comando": "grep -rn 'MAX_ARCHIVO' lib/ | wc -l; grep -c 'archivo más grande' docs/arquitectura/limites.md",
+          "espera": "1 definición y 1 fila en el documento"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/limites.ts",
+        "app/api/subir/**"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina"
+      ]
+    },
+    {
+      "id": "arq.limite.ninguna-lista-sin-tope",
+      "titulo": "Prohibir que una ruta devuelva una lista sin tope declarado",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una ruta que devuelve «todas las ventas» funciona el primer mes y a los dos años manda 400.000 filas: el servidor se queda sin memoria armando el JSON y el navegador se congela. Y el que la escribió ya no está para explicar por qué no tenía tope.",
+      "queHacer": [
+        "Toda ruta de lista lleva `limite` con valor por defecto y tope máximo, ambos escritos en `limites.md`.",
+        "Pedir más del tope no es un error: se devuelve el tope y un cursor para seguir.",
+        "Los informes que de verdad necesitan todo no salen por HTTP: salen como trabajo con recibo (ver `arq.flujo.el-trabajo-largo-devuelve-recibo`).",
+        "Dejar un comando que recorra las rutas de lista y cace la que no tenga tope."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna ruta de lista quedó sin tope",
+          "comando": "node tools/rutas-sin-tope.mjs; echo EXIT=$?",
+          "espera": "EXIT=0 y `0 rutas de lista sin límite`"
+        },
+        {
+          "check": "Pedir de más devuelve el tope, no todo",
+          "comando": "curl -s 'http://localhost:3000/api/ventas?limite=99999' | node -e 'let d=\"\";process.stdin.on(\"data\",c=>d+=c).on(\"end\",()=>console.log(JSON.parse(d).items.length))'",
+          "espera": "un número menor o igual al tope declarado en limites.md"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "tools/rutas-sin-tope.mjs",
+        "lib/limites.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "arq.limite.meses-hasta-el-tope",
+      "titulo": "Calcular en cuántos meses el volumen de hoy alcanza el tope declarado",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "6.000 filas al mes contra un tope de 100.000 no es un problema hoy y sí lo es en dieciséis meses. Sin esa cuenta escrita, la migración se decide con el sistema ya lento y con el negocio encima, que es la peor hora para migrar.",
+      "queHacer": [
+        "Escribir `tools/proyeccion.mjs`: mide el crecimiento real de los últimos tres meses por dimensión y calcula cuántos meses faltan para el tope.",
+        "Guardar el resultado como línea `meses-restantes:` en `limites.md`, con la fecha del cálculo.",
+        "Cuando falten menos de seis meses, la dimensión pasa a ser una tarea del plan, no una nota.",
+        "Recalcular cada trimestre: el crecimiento cambia cuando el negocio cambia."
+      ],
+      "aceptacion": [
+        {
+          "check": "La proyección corre y da meses",
+          "comando": "node tools/proyeccion.mjs; echo EXIT=$?",
+          "espera": "EXIT=0 e imprime por dimensión `crecimiento/mes` y `meses-restantes`"
+        },
+        {
+          "check": "El documento tiene la proyección con fecha",
+          "comando": "grep -cE 'meses-restantes:.*[0-9]{4}-[0-9]{2}-[0-9]{2}' docs/arquitectura/limites.md",
+          "espera": "1+"
+        }
+      ],
+      "aplicaSi": {
+        "etapa": [
+          "N3",
+          "N4"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "tools/proyeccion.mjs",
+        "docs/arquitectura/limites.md"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "arq.evolucion.expandir-migrar-contraer",
+      "titulo": "Cambiar la forma del dato en tres pasos: expandir, migrar y contraer",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Cambiar la columna y el código en el mismo despliegue deja una ventana de minutos en que el código viejo y el esquema nuevo conviven, y en esa ventana se pierden escrituras. Con la caja abierta, esos minutos son ventas.",
+      "queHacer": [
+        "Paso 1 (expandir): agregar lo nuevo sin quitar lo viejo. El código anterior sigue funcionando sin cambios.",
+        "Paso 2 (migrar): llenar lo nuevo y hacer que el código escriba en los dos sitios mientras dure la ventana.",
+        "Paso 3 (contraer): cuando nada lee lo viejo, borrarlo. La contracción es un despliegue aparte con su propia fecha, no un «después lo quitamos».",
+        "Llevar `docs/arquitectura/migraciones-en-curso.md` con una fila por migración abierta y su `contraer:` con fecha. Una migración sin fecha de contracción se queda abierta para siempre.",
+        "La técnica SQL de cada columna es otra tarea; aquí se decide la ventana y se comprueba que el código viejo sobrevive a ella."
+      ],
+      "aceptacion": [
+        {
+          "check": "El código anterior funciona contra el esquema expandido",
+          "comando": "npm test -- codigo-viejo-esquema-nuevo",
+          "espera": "exit 0"
+        },
+        {
+          "check": "Ninguna migración abierta se quedó sin fecha de contracción",
+          "comando": "grep -c '^| ' docs/arquitectura/migraciones-en-curso.md; grep -cE 'contraer: *[0-9]{4}-[0-9]{2}-[0-9]{2}' docs/arquitectura/migraciones-en-curso.md",
+          "espera": "los dos números coinciden salvo la fila de encabezado"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql"
+        ],
+        "superficies": [
+          "api",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/migraciones-en-curso.md",
+        "tests/migracion/convivencia.test.ts"
+      ],
+      "cerebro": [
+        "tema:dominio-migraciones-y-copias"
+      ]
+    },
+    {
+      "id": "arq.evolucion.bandera-separa-desplegar-de-encender",
+      "titulo": "Separar desplegar de encender con una bandera de configuración",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si desplegar es encender, el error se descubre con el sistema ya sirviéndole a la caja y la única salida es revertir el despliegue entero, con todo lo bueno que iba en él. Con bandera, apagar es cambiar un valor y toma segundos.",
+      "queHacer": [
+        "Las banderas viven en configuración, no en el código, y se leen por un solo módulo (`lib/banderas/`).",
+        "Toda bandera nace apagada y con `retiro:` (fecha) en el registro: una bandera es temporal por definición.",
+        "Mientras la bandera exista, el camino viejo se conserva COMPLETO y probado; una bandera con el camino viejo roto no sirve para apagar nada.",
+        "Encender es una acción con hora y responsable anotados, no un efecto secundario de subir código.",
+        "Dejar `tools/banderas.mjs --vencidas` para que las banderas pasadas de fecha no se vuelvan permanentes."
+      ],
+      "aceptacion": [
+        {
+          "check": "Nadie lee banderas por fuera del módulo",
+          "comando": "grep -rnE 'BANDERA_|featureFlag|flags[.]' app/ lib/ components/ | grep -v 'lib/banderas/'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "No hay banderas pasadas de su fecha de retiro",
+          "comando": "node tools/banderas.mjs --vencidas; echo EXIT=$?",
+          "espera": "EXIT=0 y `0 banderas vencidas`"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "panel-interno",
+          "api",
+          "caja"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/banderas/**",
+        "tools/banderas.mjs"
+      ],
+      "cerebro": [
+        "tema:construir-no-es-arrancar"
+      ]
+    },
+    {
+      "id": "arq.evolucion.borrar-el-camino-viejo",
+      "titulo": "Borrar el camino viejo el día que la migración termina",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "El `if (bandera)` que sobrevive a la migración duplica cada cambio futuro, y el día que alguien toca solo una de las dos ramas las dos verdades se separan en silencio. El código muerto no es neutro: cobra intereses.",
+      "queHacer": [
+        "Cuando una bandera lleva 30 días encendida al 100%, borrar la rama vieja, la bandera y sus tests, todo en el mismo cambio.",
+        "Toda marca `@deprecated` lleva fecha de retiro en el mismo comentario; sin fecha, no se acepta la marca.",
+        "Correr el detector de exportaciones muertas después de borrar: lo que quedó sin usar se va también.",
+        "El borrado va en su propio cambio, separado de cualquier funcionalidad nueva, para que revertirlo sea barato."
+      ],
+      "aceptacion": [
+        {
+          "check": "No quedan exportaciones muertas",
+          "comando": "npx ts-prune | grep -v 'used in module' | wc -l",
+          "espera": "0"
+        },
+        {
+          "check": "Toda marca de obsoleto tiene fecha de retiro",
+          "comando": "grep -rniE '@deprecated' app/ lib/ components/ | grep -vE '[0-9]{4}-[0-9]{2}-[0-9]{2}'",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "typescript"
+        ],
+        "modo": "evolucion"
+      },
+      "porCada": null,
+      "posee": [
+        "lib/banderas/**"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "arq.evolucion.partir-el-modulo-que-crecio",
+      "titulo": "Partir en dos el módulo que pasó del tope de archivos declarado",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un módulo de 40 archivos ya no lo entiende nadie entero, y cada cambio ahí toca cosas que no tienen que ver. Pero «partirlo cuando se sienta grande» no pasa nunca: se parte con un número escrito o no se parte.",
+      "queHacer": [
+        "Fijar el tope en `docs/arquitectura/modulos.md` (por ejemplo 15 archivos por módulo) y medirlo con un comando.",
+        "Partir por el eje del negocio, no por el tamaño: buscar el subconjunto de archivos que casi no importa a los demás; esa es la costura.",
+        "El módulo nuevo nace con su `index.ts`, su fila en la tabla y su «qué NO hace».",
+        "Actualizar `arquitectura.reglas.json` y volver a correr el comando de fronteras: partir mal se ve como un ciclo nuevo.",
+        "Los tests se mueven con su módulo en el mismo cambio."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún módulo pasa del tope",
+          "comando": "for d in lib/*/; do n=$(ls \"$d\" | wc -l); [ \"$n\" -gt 15 ] && echo \"$d $n\"; done",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La partición no dejó cruces ni ciclos",
+          "comando": "node tools/fronteras.mjs && npx madge --circular --extensions ts,tsx lib; echo EXIT=$?",
+          "espera": "EXIT=0"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "typescript",
+          "nextjs",
+          "node"
+        ],
+        "modo": "evolucion"
+      },
+      "porCada": null,
+      "posee": [
+        "lib/**",
+        "docs/arquitectura/modulos.md",
+        "arquitectura.reglas.json"
+      ],
+      "cerebro": [
+        "tema:olas-de-agentes"
+      ]
+    },
+    {
+      "id": "arq.evolucion.dos-versiones-conviviendo",
+      "titulo": "Probar que la versión nueva y la vieja conviven durante el despliegue",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Durante un despliegue gradual, dos versiones del código hablan con la misma base al mismo tiempo. Si la nueva escribe un campo que la vieja no sabe leer, cinco minutos de despliegue dejan filas rotas para siempre, y el despliegue se reporta como exitoso.",
+      "queHacer": [
+        "Escribir la regla: durante la ventana de despliegue, la versión N-1 tiene que poder leer y escribir todo lo que produce la versión N.",
+        "Los cambios de forma van por expandir-migrar-contraer; nunca en el mismo despliegue que los usa.",
+        "Probar la convivencia arrancando las dos versiones contra la misma base y corriendo el flujo crítico en ambas.",
+        "Cotejar el contrato de la versión nueva contra el de la anterior con un comando, no leyendo el diff."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las dos versiones conviven sobre la misma base",
+          "comando": "npm test -- convivencia-de-versiones",
+          "espera": "exit 0"
+        },
+        {
+          "check": "La versión nueva no produce nada que la anterior no sepa leer",
+          "comando": "node tools/contrato-cotejar.mjs --contra HEAD~1; echo EXIT=$?",
+          "espera": "EXIT=0 y `0 campos incompatibles`"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true
+      },
+      "porCada": null,
+      "posee": [
+        "tools/contrato-cotejar.mjs",
+        "tests/despliegue/convivencia.test.ts"
+      ],
+      "cerebro": [
+        "tema:dominio-migraciones-y-copias"
+      ]
+    },
+    {
+      "id": "arq.evolucion.la-vuelta-atras-esta-probada",
+      "titulo": "Probar la vuelta atrás antes de necesitarla",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Revertir el código es fácil; revertirlo cuando la migración ya cambió la tabla es imposible si nadie lo probó. Y ese es exactamente el momento en que se necesita: con el sistema roto, el dueño llamando y nadie con ganas de experimentar.",
+      "queHacer": [
+        "Escribir `scripts/probar-vuelta-atras.sh`: levanta la versión N con su migración aplicada, revierte el código a N-1 y comprueba que la aplicación responde y el flujo crítico funciona.",
+        "Si la vuelta atrás exige revertir también la migración, escribirla y probarla; si es imposible, declararlo en el ADR y decir cuál es el plan alternativo (restaurar respaldo).",
+        "Anotar cuánto tarda la vuelta atrás medida de verdad: ese número es lo que el dueño necesita saber cuando pregunta «¿y si sale mal?».",
+        "Correrlo antes de cada despliegue que toque el esquema, no una sola vez."
+      ],
+      "aceptacion": [
+        {
+          "check": "La vuelta atrás corre completa",
+          "comando": "bash scripts/probar-vuelta-atras.sh; echo EXIT=$?",
+          "espera": "EXIT=0 e imprime el tiempo total en segundos"
+        },
+        {
+          "check": "La aplicación responde después de volver atrás",
+          "comando": "curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/api/salud",
+          "espera": "200"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "api",
+          "panel-interno"
+        ],
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql",
+          "sqlite"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/probar-vuelta-atras.sh",
+        "docs/arquitectura/decisiones/**"
+      ],
+      "cerebro": [
+        "tema:dominio-migraciones-y-copias",
+        "tema:construir-no-es-arrancar"
+      ]
+    },
+    {
+      "id": "arq.forma.un-solo-despliegue-hasta-que-duela",
+      "titulo": "Arrancar con un solo despliegue y escribir qué obligaría a partirlo",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Partir en servicios desde el día uno multiplica por tres el trabajo de cada cambio y mete fallos de red donde había una llamada a función. El equipo que lo hace casi nunca tiene todavía el problema que eso resuelve, y sí tiene el problema de entregar.",
+      "queHacer": [
+        "Arrancar con un solo despliegue y decirlo en un ADR: qué se gana y qué se pierde.",
+        "En ese mismo ADR, escribir `partir-si:` con condiciones MEDIBLES: un pedazo necesita escalar aparte, un pedazo tiene un ciclo de despliegue distinto, o un equipo distinto lo mantiene.",
+        "Los módulos internos con frontera comprobada son el ensayo: si los módulos no tienen frontera, partir en servicios no la va a crear, solo la va a esconder detrás de HTTP.",
+        "Si el proyecto ya nace con varios despliegues, cada uno lleva su ADR diciendo por qué; ninguno se justifica con «así se hace»."
+      ],
+      "aceptacion": [
+        {
+          "check": "Hay un solo despliegue, o un ADR por cada uno de más",
+          "comando": "find . -maxdepth 2 -name package.json -not -path './node_modules/*' | wc -l",
+          "espera": "1 (o tantos como ADR con `partir-si:` resuelto haya en docs/arquitectura/decisiones/)"
+        },
+        {
+          "check": "Las condiciones para partir están escritas y son medibles",
+          "comando": "grep -rc 'partir-si:' docs/arquitectura/decisiones/ | grep -v ':0'",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "modo": "genesis"
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/decisiones/**"
+      ],
+      "cerebro": [
+        "tema:un-vps-varios-negocios"
+      ]
+    },
+    {
+      "id": "arq.forma.donde-corre-cada-cosa",
+      "titulo": "Escribir qué corre en el servidor, en el navegador y en segundo plano",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Lo que corre en el navegador lo puede cambiar cualquiera con el inspector abierto. Si el descuento o el permiso se calcula ahí, el sistema no tiene reglas: tiene sugerencias. Y moverlo después obliga a reescribir la pantalla entera.",
+      "queHacer": [
+        "Escribir `docs/arquitectura/donde-corre.md`: una fila por pieza con dónde corre, por qué ahí, y qué pasaría si se moviera.",
+        "Regla dura y sin excepciones: nada que decida plata, permisos o descuentos corre en el navegador. El navegador puede MOSTRAR el cálculo; el que vale es el del servidor.",
+        "Lo que no necesita responderle a nadie en el momento (informes, correos, limpiezas) va a segundo plano, con su propio sitio donde correr.",
+        "Marcar qué se ejecuta al construir y qué al atender peticiones: son dos momentos distintos y confundirlos rompe el build."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna regla de plata vive en código de navegador",
+          "comando": "grep -rl \"use client\" app/ components/ | xargs -r grep -nE 'descuento|comision|precio *[*]|total *=' ",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Cada pieza está en la tabla",
+          "comando": "grep -c '^| ' docs/arquitectura/donde-corre.md",
+          "espera": "3+ filas"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "nextjs",
+          "react",
+          "node"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/donde-corre.md"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica",
+        "tema:construir-no-es-arrancar"
+      ]
+    },
+    {
+      "id": "arq.forma.lo-que-no-se-va-a-construir",
+      "titulo": "Escribir la lista de lo que este sistema NO va a hacer",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Sin la lista, cada conversación reabre la misma discusión y el alcance crece por acumulación de «ya que estamos». El día que alguien construye facturación electrónica sin decidirlo, el proyecto cambió de precio, de plazo y de riesgo legal, y nadie firmó ese cambio.",
+      "queHacer": [
+        "Escribir `docs/arquitectura/no-va.md` con una línea por cosa que NO se va a construir, y en la misma línea por qué no.",
+        "Cada renglón es un NO de verdad, no un «más adelante»: lo que se hará después va en el plan, no en esta lista.",
+        "Incluir lo que el dueño pidió y se descartó: es el sitio donde queda constancia de que se habló.",
+        "Sacar algo de esta lista es una decisión con ADR, no una conversación de pasillo."
+      ],
+      "aceptacion": [
+        {
+          "check": "La lista existe y tiene renglones",
+          "comando": "grep -c '^- ' docs/arquitectura/no-va.md",
+          "espera": "5+"
+        },
+        {
+          "check": "Ningún renglón es un aplazamiento disfrazado",
+          "comando": "grep -inE 'quiza|tal vez|por ahora|mas adelante|despues vemos' docs/arquitectura/no-va.md",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "modo": "genesis"
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/no-va.md"
+      ],
+      "cerebro": [
+        "tema:encargos-verificables",
+        "tema:filtros-para-matar-candidatos-de-nicho"
+      ]
+    },
+    {
+      "id": "arq.forma.el-tercero-se-puede-caer",
+      "titulo": "Decidir qué hace el sistema cuando el servicio de terceros no responde",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un `fetch` sin tope de tiempo contra un proveedor caído deja la petición colgada hasta que el proxy la corta, y con veinte de esas el servidor deja de atender a todos. Un proveedor de terceros que puede detener el cobro es una decisión, casi siempre tomada sin querer.",
+      "queHacer": [
+        "Escribir `docs/arquitectura/terceros.md`: proveedor, para qué se usa, tope de espera en milisegundos, y qué hace el sistema si no responde (degradar, encolar o bloquear).",
+        "Regla dura: nada de terceros bloquea el cobro. Si el proveedor es indispensable para cobrar, eso va en un ADR con el veredicto del dueño.",
+        "Todo `fetch` hacia afuera lleva tope de tiempo explícito; sin tope no sale del repositorio.",
+        "Probarlo con el proveedor caído a propósito, no razonándolo: apuntar a un puerto muerto y comprobar que el flujo crítico responde igual."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún fetch sale sin tope de tiempo",
+          "comando": "grep -rn 'fetch(' lib/ app/ --include=*.ts --include=*.tsx | grep -vE 'signal|AbortSignal[.]timeout|timeout'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Con el proveedor caído el flujo crítico sigue",
+          "comando": "npm test -- tercero-caido",
+          "espera": "exit 0"
+        },
+        {
+          "check": "Cada proveedor tiene su fila con su conducta",
+          "comando": "grep -c '^| ' docs/arquitectura/terceros.md",
+          "espera": "1+ filas, una por proveedor usado"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/terceros.md",
+        "lib/proveedores/**"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar"
+      ]
+    },
+    {
+      "id": "arq.forma.el-borde-solo-para-lo-publico",
+      "titulo": "Poner en el borde solo lo público y sin estado",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Mover al borde una ruta que lee la base termina en una consulta cruzando el océano por cada petición: más lento que el servidor de al lado, con la mitad de las APIs de Node ausentes y con errores que solo aparecen en producción.",
+      "queHacer": [
+        "Al borde solo va lo que no necesita la base ni el sistema de archivos: redirecciones, cabeceras, contenido público cacheable, decisiones por país o idioma.",
+        "Todo lo que consulta datos se queda donde están los datos.",
+        "Escribir en `donde-corre.md` qué rutas están en el borde y cuál es su tope de tiempo de respuesta.",
+        "Comprobarlo con un comando: ninguna ruta marcada para el borde puede importar la base ni el sistema de archivos."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna ruta del borde toca datos",
+          "comando": "grep -rln \"runtime = 'edge'\" app/ | xargs -r grep -lniE 'supabase|better-sqlite3|from .pg.|require[(].fs.|from .fs.'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La ruta del borde responde por debajo de su tope",
+          "comando": "curl -s -o /dev/null -w '%{time_total}' http://localhost:3000/",
+          "espera": "un valor por debajo del tope escrito en docs/arquitectura/donde-corre.md"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true,
+        "traficoAnonimo": true,
+        "stack": [
+          "nextjs"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/donde-corre.md",
+        "middleware.ts"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica"
+      ]
+    },
+    {
+      "id": "arq.forma.el-trabajo-de-fondo-tiene-donde-correr",
+      "titulo": "Decidir dónde corre el trabajo periódico y qué pasa si no corre",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un `setInterval` dentro del proceso web se ejecuta dos veces si hay dos procesos, y ninguna si el hospedaje duerme la aplicación. El respaldo que nadie vio fallar es justo el que no existe el día que se necesita.",
+      "queHacer": [
+        "Escribir `docs/arquitectura/trabajos.md`: una fila por trabajo periódico con qué hace, cada cuánto, dónde corre y qué pasa si no corre un día.",
+        "El trabajo periódico no vive dentro del proceso web: es un servicio del sistema, un cron del servidor o un disparador del hospedaje.",
+        "Cada corrida deja registro con hora y resultado; un trabajo sin registro no se puede saber si corrió.",
+        "Dejar un comando que muestre la última corrida de cada trabajo y falle si alguna está más vieja que su período."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay cron escondido en el proceso web",
+          "comando": "grep -rnE 'setInterval[(]|node-cron|cron[.]schedule' app/ lib/ | grep -v 'lib/trabajos/'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Todos los trabajos corrieron dentro de su período",
+          "comando": "node tools/trabajos.mjs --ultima-corrida; echo EXIT=$?",
+          "espera": "EXIT=0 e imprime cada trabajo con la fecha de su última corrida"
+        }
+      ],
+      "aplicaSi": {
+        "stack": [
+          "node",
+          "nextjs"
+        ],
+        "superficies": [
+          "api",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/arquitectura/trabajos.md",
+        "lib/trabajos/**",
+        "tools/trabajos.mjs"
+      ],
+      "cerebro": [
+        "tema:entorno-de-la-maquina",
+        "tema:un-vps-varios-negocios"
+      ]
+    }
+  ]
+}

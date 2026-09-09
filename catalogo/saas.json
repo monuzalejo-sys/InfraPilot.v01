@@ -1,0 +1,2239 @@
+{
+  "categoria": "saas",
+  "nombre": "SaaS",
+  "meta": "Que un producto que se vende solo por internet aguante lo que eso implica: varios clientes en la misma base sin verse nunca, un cobro que se renueva sin que nadie lo empuje, una persona que entra sin que nadie le explique, y una puerta de salida que no haya que pedir por correo.",
+  "arquetipos": [
+    {
+      "id": "saas.tenant.columna-de-tenant-en-toda-tabla",
+      "titulo": "Poner la columna de tenant en toda tabla que guarde datos del cliente",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una sola tabla sin `tenant_id` es la fuga: el día que alguien haga un JOIN contra ella, filas de un cliente aparecen en la pantalla de otro. Y ponerla después obliga a rellenar filas ya guardadas adivinando de quién eran — dato que para entonces ya no existe.",
+      "queHacer": [
+        "Crear `tenants` (id, nombre, slug, plan, estado, creado_en) antes que cualquier otra tabla del dominio.",
+        "Toda tabla de datos del cliente lleva `tenant_id NOT NULL REFERENCES tenants(id)`: sin valor por defecto y sin nullable «por ahora».",
+        "Toda clave única del dominio pasa a ser única POR tenant: `UNIQUE (tenant_id, codigo)`, nunca `UNIQUE (codigo)` — si no, el segundo cliente no puede usar su propio número 001.",
+        "Listar en `docs/tenancy.md`, como tabla, las tablas que a propósito NO llevan tenant (catálogos globales, la propia `tenants`, tablas internas) y por qué.",
+        "Añadir un test que recorra el esquema y falle si aparece una tabla nueva sin `tenant_id` que no esté en esa lista de excepciones."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna tabla de dominio quedó sin tenant_id",
+          "comando": "npm test -- tenant-esquema",
+          "espera": "test verde: 0 tablas fuera de la lista de excepciones sin tenant_id"
+        },
+        {
+          "check": "No quedan claves únicas globales sobre campos del dominio",
+          "comando": "grep -rniE \"unique *\\(\" supabase/migraciones/ | grep -vi \"tenant_id\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La lista de excepciones existe y está justificada",
+          "comando": "test -f docs/tenancy.md && grep -c \"^| \" docs/tenancy.md",
+          "espera": "exit 0 y 1+ filas"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true,
+        "stack": [
+          "postgres",
+          "supabase",
+          "mysql",
+          "sqlite"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "supabase/migraciones/*_tenants.sql",
+        "docs/tenancy.md",
+        "tests/saas/tenant-esquema.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:dominio-migraciones-y-copias"
+      ]
+    },
+    {
+      "id": "saas.tenant.filtro-que-no-se-puede-olvidar",
+      "titulo": "Imponer el filtro por tenant en la base o en un único punto de acceso",
+      "nivel": "N0",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si el `where tenant_id = …` lo escribe cada consulta a mano, basta UNA que se olvide para que un cliente vea la factura de otro; y eso no lo caza el typecheck ni la revisión del diff: se descubre cuando llama el cliente.",
+      "queHacer": [
+        "Elegir y dejar escrito el mecanismo: RLS en Postgres con política por tabla, o un único módulo `lib/tenant/db.ts` por el que pasa TODA lectura y escritura.",
+        "Si es RLS: `ENABLE` y además `FORCE ROW LEVEL SECURITY` en cada tabla con `tenant_id`, con política que compare contra el tenant de la sesión, nunca contra un parámetro que mande el cliente.",
+        "Si es punto único: el cliente crudo de base se exporta solo desde ese módulo y ninguna ruta lo importa directamente.",
+        "La llave que se salta RLS (`service_role`, o el usuario dueño de la base) la usan solo migraciones y el módulo de soporte; jamás una ruta que le responda al cliente.",
+        "Test: abrir conexión con el tenant A puesto y hacer `select count(*)` SIN where sobre tres tablas; el resultado tiene que ser solo lo de A."
+      ],
+      "aceptacion": [
+        {
+          "check": "RLS activo en todas las tablas con tenant_id",
+          "comando": "npm test -- tenant-rls",
+          "espera": "test verde: 0 tablas con tenant_id y rowsecurity=false"
+        },
+        {
+          "check": "Ninguna ruta importa el cliente crudo de base",
+          "comando": "grep -rn \"createClient\\|new Pool\\|drizzle(\" app/ --include=*.ts | grep -v \"lib/tenant/\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La llave que se salta RLS no aparece en rutas del producto",
+          "comando": "grep -rn \"SERVICE_ROLE\" app/ | grep -v \"app/api/soporte/\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true,
+        "stack": [
+          "postgres",
+          "supabase"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/tenant/db.ts",
+        "supabase/migraciones/*_rls.sql",
+        "tests/saas/tenant-rls.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "saas.tenant.el-tenant-sale-de-la-sesion",
+      "titulo": "Sacar el tenant de la sesión del servidor, nunca del cuerpo de la petición",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si el `tenant_id` viaja en el body o en el query, cambiarlo es editar un número en las herramientas del navegador. Es la misma escalada que ya se pagó en Mercaplaza leyendo el rol del body en vez de la fila que devuelve la base.",
+      "queHacer": [
+        "Resolver el tenant UNA vez por petición, en el middleware o en el ayudante de sesión, y colgarlo del contexto del servidor.",
+        "Ninguna ruta acepta `tenant_id` como entrada; si llega, se ignora, y en desarrollo se registra el aviso.",
+        "La pertenencia se comprueba contra la tabla `miembros` en cada petición, no contra una cookie firmada hace un mes.",
+        "Cambiar de tenant, para quien pertenece a varios, es una acción explícita que reemite la sesión; no es un parámetro más.",
+        "Test: petición con la sesión de A llevando el `tenant_id` de B en el cuerpo devuelve datos de A."
+      ],
+      "aceptacion": [
+        {
+          "check": "El tenant no se lee de la entrada de la petición",
+          "comando": "grep -rnE \"(body|query|params|searchParams)[^\\n]{0,20}tenant\" app/ lib/ --include=*.ts",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Poner otro tenant en el cuerpo no cambia la respuesta",
+          "comando": "npm test -- tenant-desde-sesion",
+          "espera": "test verde: la respuesta trae solo filas del tenant de la sesión"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true,
+        "superficies": [
+          "panel-interno",
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/tenant/sesion.ts",
+        "middleware.ts",
+        "tests/saas/tenant-desde-sesion.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "saas.tenant.prueba-de-fuga-entre-dos-clientes",
+      "titulo": "Probar con dos clientes reales que ninguno ve una fila del otro",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El aislamiento que nadie intentó romper no está probado. Aquí el fallo no es teórico: es el cliente A abriendo la URL del pedido de B y viendo el precio al que le vende su competencia.",
+      "queHacer": [
+        "Semilla de prueba con DOS tenants completos (A y B), cada uno con al menos una fila en cada tabla del dominio.",
+        "Recorrer todas las rutas de la API con la sesión de A pidiendo un id de B: la respuesta esperada es 404, no 403 — un 403 ya confirma que ese id existe.",
+        "Para cada ruta de listado, comprobar que el conteo con sesión de A es exactamente el número de filas de A, no el total.",
+        "Probar también escritura: `PATCH` y `DELETE` sobre un id de B con sesión de A no cambian nada, verificado releyendo la fila con la sesión de B.",
+        "El test descubre las rutas recorriendo el árbol de archivos, no una lista escrita a mano: así una ruta nueva sin cubrir hace fallar el test."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna ruta deja pasar un id ajeno",
+          "comando": "npm test -- fuga-entre-tenants",
+          "espera": "test verde: 0 rutas responden 2xx a un id del otro tenant"
+        },
+        {
+          "check": "El test descubre las rutas del disco, no de una lista",
+          "comando": "grep -n \"readdirSync\\|glob\" tests/saas/fuga-entre-tenants.test.ts",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true
+      },
+      "porCada": null,
+      "posee": [
+        "tests/saas/fuga-entre-tenants.test.ts",
+        "tests/saas/dos-tenants.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:que-es-estar-verificado"
+      ]
+    },
+    {
+      "id": "saas.tenant.semilla-con-dos-clientes-siempre",
+      "titulo": "Sembrar desarrollo siempre con dos clientes, nunca con uno",
+      "nivel": "N1",
+      "dificultad": "trivial",
+      "ceremonia": "inline",
+      "porQue": "Con un solo cliente en la semilla, una consulta a la que se le olvidó el filtro devuelve exactamente lo mismo que la correcta: el fallo es invisible hasta producción, que es justo donde hay dos.",
+      "queHacer": [
+        "La semilla crea al menos dos tenants con nombres reconocibles y datos distintos en cada tabla.",
+        "Los ids del segundo tenant se exportan con nombre para que cualquier test los use al probar acceso cruzado.",
+        "El usuario con el que se navega en desarrollo pertenece solo al primero.",
+        "Correr la semilla dos veces deja el mismo estado, no el doble de filas."
+      ],
+      "aceptacion": [
+        {
+          "check": "La semilla es idempotente y deja exactamente dos tenants",
+          "comando": "npm run semilla >/dev/null && npm run semilla >/dev/null && psql \"$DATABASE_URL\" -tAc \"select count(*) from tenants\"",
+          "espera": "2"
+        },
+        {
+          "check": "La semilla crea más de un tenant a propósito",
+          "comando": "grep -c \"crearTenant(\" scripts/semilla.ts",
+          "espera": "2+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/semilla.ts"
+      ],
+      "cerebro": [
+        "tema:que-es-estar-verificado"
+      ]
+    },
+    {
+      "id": "saas.tenant.identificador-en-subdominio-o-ruta",
+      "titulo": "Fijar dónde se lee el tenant: subdominio o primer tramo de la ruta",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin una regla única, media aplicación lo lee del subdominio y la otra media de la ruta; el día que alguien escribe la URL a mano acaba con la sesión de un tenant y la pantalla de otro. Y el subdominio arrastra DNS y certificado comodín, que se deciden antes, no después.",
+      "queHacer": [
+        "Decidir y escribir en `docs/tenancy-dominios.md`: `cliente.dominio.com` o `dominio.com/cliente`. Una sola forma para todo el producto.",
+        "Si es subdominio: comodín en DNS y en el certificado, y comprobar que el proxy le pasa el `Host` original a la aplicación — un proxy que lo reescribe deshace el reparto.",
+        "El `slug` del tenant es único, inmutable y con lista de reservados: `www`, `api`, `app`, `admin`, `soporte`, `cdn`, `mail`.",
+        "Resolver slug → tenant en un solo sitio con caché corta; un slug inexistente responde 404, nunca la pantalla del tenant por defecto.",
+        "Renombrar el negocio no cambia el slug: se le añade un alias que redirige con 301."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los slugs reservados se rechazan al crear un tenant",
+          "comando": "npm test -- slug-tenant",
+          "espera": "test verde: crear un tenant con slug 'admin' falla con 400"
+        },
+        {
+          "check": "Un tenant inexistente no cae en la pantalla por defecto",
+          "comando": "curl -s -o /dev/null -w \"%{http_code}\" -H \"Host: inexistente.midominio.com\" http://localhost:3000/",
+          "espera": "404"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true,
+        "superficies": [
+          "panel-interno",
+          "publico"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/tenant/slug.ts",
+        "docs/tenancy-dominios.md",
+        "tests/saas/slug-tenant.test.ts"
+      ],
+      "cerebro": [
+        "tema:un-vps-varios-negocios",
+        "tema:dominio-migraciones-y-copias"
+      ]
+    },
+    {
+      "id": "saas.tenant.indice-que-empieza-por-tenant",
+      "titulo": "Hacer que todo índice de una tabla con tenant empiece por tenant_id",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un índice sobre `(creado_en)` en una tabla compartida por 200 clientes obliga a recorrer filas de todos para devolver las de uno: a 50.000 filas la pantalla del mes tarda segundos y el cliente pequeño paga la lentitud del grande.",
+      "queHacer": [
+        "Revisar cada índice de las tablas con `tenant_id`: la primera columna tiene que ser `tenant_id`.",
+        "Las claves foráneas del dominio también se indexan con el tenant delante.",
+        "Medir con `EXPLAIN ANALYZE` la consulta de listado más usada, con datos de 20 tenants, y comprobar que usa el índice y no un `Seq Scan`.",
+        "Dejar la medición (filas, plan elegido, ms) con fecha en `docs/rendimiento-tenant.md`, para poder comparar el día que se ponga lento."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún índice de tabla con tenant empieza por otra columna",
+          "comando": "npm test -- indices-tenant",
+          "espera": "test verde: 0 índices sin tenant_id como primera columna"
+        },
+        {
+          "check": "La consulta de listado usa el índice",
+          "comando": "psql \"$DATABASE_URL\" -c \"explain analyze select * from documentos where tenant_id=$1 order by creado_en desc limit 50\"",
+          "espera": "el plan contiene Index Scan y no Seq Scan"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true,
+        "stack": [
+          "postgres",
+          "supabase"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "supabase/migraciones/*_indices_tenant.sql",
+        "docs/rendimiento-tenant.md",
+        "tests/saas/indices-tenant.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "saas.tenant.borrar-un-tenant-completo",
+      "titulo": "Borrar un tenant llevándose todo lo suyo y nada de lo ajeno",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un borrado a medias deja filas huérfanas que reaparecen en un reporte global meses después; uno con un `where` de más se lleva las filas del vecino. Las dos cosas se descubren tarde y ninguna tiene vuelta atrás.",
+      "queHacer": [
+        "Inventariar en un solo sitio toda tabla con `tenant_id` —generado del esquema, no escrito a mano— y el orden de borrado.",
+        "Preferir `ON DELETE CASCADE` desde `tenants`; lo que no pueda cascadear (archivos, colas, caché, índices de búsqueda) se borra explícito y queda listado.",
+        "El borrado es en dos tiempos: marcar `estado='cerrado'` con fecha, y borrar de verdad al cumplirse el plazo de retención decidido.",
+        "Antes de borrar de verdad, generar el paquete de exportación del cliente y guardar su recibo (fecha, tamaño, hash).",
+        "Test con dos tenants: borrar A deja el conteo de B exactamente igual, tabla por tabla."
+      ],
+      "aceptacion": [
+        {
+          "check": "Borrar un tenant no toca al vecino",
+          "comando": "npm test -- borrar-tenant",
+          "espera": "test verde: conteo de B idéntico antes y después, en todas las tablas"
+        },
+        {
+          "check": "No quedan filas huérfanas",
+          "comando": "npm test -- huerfanas-tenant",
+          "espera": "test verde: 0 filas con tenant_id inexistente"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/tenant/borrar.ts",
+        "tests/saas/borrar-tenant.test.ts",
+        "tests/saas/huerfanas-tenant.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:dominio-migraciones-y-copias"
+      ]
+    },
+    {
+      "id": "saas.tenant.consulta-de-soporte-auditada",
+      "titulo": "Dejar UNA sola vía para consultar entre tenants, y que quede auditada",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Soporte necesita mirar la cuenta del cliente que llamó; si eso se resuelve dándole la llave que se salta RLS a una ruta normal, el día que esa ruta tenga un bug la fuga es de toda la base — y sin registro de quién miró qué.",
+      "queHacer": [
+        "Un solo módulo `lib/soporte/consulta.ts` puede usar la conexión que atraviesa tenants; nadie más lo importa.",
+        "Toda llamada exige tres cosas: quién (usuario interno), para qué (número de caso o motivo escrito) y sobre qué tenant.",
+        "Cada llamada escribe la fila de `auditoria_soporte` ANTES de devolver el dato: si la auditoría falla, la consulta falla.",
+        "Es de solo lectura. Escribir en la base de un cliente desde soporte pasa por otra ruta, con aprobación aparte.",
+        "Panel interno con el historial de consultas de los últimos 90 días, buscable por cliente y por persona."
+      ],
+      "aceptacion": [
+        {
+          "check": "Solo un módulo puede atravesar tenants",
+          "comando": "grep -rln \"SERVICE_ROLE\\|bypassRLS\" lib/ app/ | grep -v \"lib/soporte/consulta.ts\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Sin motivo escrito, la consulta no corre",
+          "comando": "npm test -- consulta-soporte",
+          "espera": "test verde: llamar sin motivo lanza y devuelve 0 filas"
+        },
+        {
+          "check": "Cada consulta deja su fila de auditoría",
+          "comando": "npm test -- auditoria-soporte",
+          "espera": "test verde: 3 consultas → 3 filas en auditoria_soporte"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true,
+        "superficies": [
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/soporte/consulta.ts",
+        "supabase/migraciones/*_auditoria_soporte.sql",
+        "tests/saas/consulta-soporte.test.ts",
+        "tests/saas/auditoria-soporte.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "saas.plan.catalogo-de-planes-en-la-base",
+      "titulo": "Guardar los planes y sus topes en la base, no repartidos por el código",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Con los límites escritos en `if (plan === 'pro')` por seis archivos, subir el tope del plan Pro es una cacería y siempre queda uno sin cambiar: el cliente paga por 10 usuarios y el formulario le deja crear 5.",
+      "queHacer": [
+        "Tabla `planes` (clave, nombre, precio_centavos, moneda, periodo, activo) y `plan_limites` (plan, recurso, tope): un renglón por recurso limitado.",
+        "Precios en enteros de la moneda menor, nunca en decimales.",
+        "El código lee el tope de la base por el nombre del recurso; ningún componente nombra un plan a mano.",
+        "Los planes viejos no se borran ni se editan: se marcan `activo=false` y quien esté en ellos conserva sus condiciones.",
+        "La pantalla de precios se genera del catálogo, para que no pueda contradecir lo que el sistema cobra."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ningún plan se compara a mano fuera del módulo de planes",
+          "comando": "grep -rnE \"plan *[=]{2,3} *['\\\"]\" app/ components/ lib/ | grep -v \"lib/planes/\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Los precios no llevan decimales",
+          "comando": "grep -rnE \"precio[_a-zA-Z]* *[:=] *[0-9]+\\.[0-9]\" lib/ app/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El catálogo tiene planes con sus topes",
+          "comando": "psql \"$DATABASE_URL\" -tAc \"select count(*) from plan_limites\"",
+          "espera": "1+"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true
+      },
+      "porCada": null,
+      "posee": [
+        "supabase/migraciones/*_planes.sql",
+        "lib/planes/catalogo.ts"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "saas.plan.limite-comprobado-en-el-servidor",
+      "titulo": "Comprobar el tope del plan en el servidor, no escondiendo el botón",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Esconder el botón «añadir usuario» no impide nada: la misma petición se repite desde la consola del navegador y el cliente del plan de 3 usuarios termina con 40. La pantalla es cortesía; el 402 es la puerta.",
+      "queHacer": [
+        "Una función `puedeConsumir(tenant, recurso, cantidad)` que lee el tope del plan y el consumo actual, y es lo único que decide.",
+        "Toda ruta que cree algo limitado la llama ANTES de escribir y dentro de la misma transacción, para que dos peticiones simultáneas no pasen el tope las dos.",
+        "Al superar el tope responder 402 con recurso, tope y consumo actual — datos con los que la pantalla explica, no un «error».",
+        "La pantalla usa esa misma función para deshabilitar el botón: una sola verdad, dos usos.",
+        "Test de carrera: 10 peticiones simultáneas contra un tope de 3 dejan exactamente 3 filas."
+      ],
+      "aceptacion": [
+        {
+          "check": "El tope aguanta peticiones simultáneas",
+          "comando": "npm test -- tope-carrera",
+          "espera": "test verde: 10 peticiones simultáneas con tope 3 → 3 filas creadas y 7 respuestas 402"
+        },
+        {
+          "check": "Las rutas de creación preguntan antes de escribir",
+          "comando": "grep -rn \"puedeConsumir\" app/api/",
+          "espera": "1+ líneas por cada recurso limitado"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "superficies": [
+          "api",
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/planes/limites.ts",
+        "tests/saas/tope-carrera.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "saas.plan.decidir-que-pasa-al-llegar-al-tope",
+      "titulo": "Decidir y escribir qué pasa exactamente al llegar al tope del plan",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "«Bloquear», «degradar» y «cobrar el exceso» son tres productos distintos y tres facturas distintas. Sin la decisión escrita cada ruta hace una cosa —una bloquea, otra deja pasar— y el cliente descubre la regla cuando le llega el cobro.",
+      "queHacer": [
+        "Por cada recurso limitado elegir UNA salida: bloquear la creación, degradar el servicio, o cobrar el exceso con precio unitario escrito.",
+        "Escribirlo en `docs/planes.md` como tabla: recurso · tope por plan · qué pasa al llegar · qué ve el cliente.",
+        "«Bloquear» nunca borra lo ya creado: quien se pasó por una bajada de plan queda en solo lectura sobre el exceso.",
+        "Si hay cobro por exceso, el precio unitario vive en el catálogo de planes y sale en la factura como renglón aparte.",
+        "Los textos que ve el cliente al toparse dicen el número: «12 de 10 usuarios», no «has alcanzado el límite»."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cada recurso con tope tiene su fila en la tabla escrita",
+          "comando": "npm test -- planes-documentados",
+          "espera": "test verde: cada recurso de plan_limites tiene fila en docs/planes.md"
+        },
+        {
+          "check": "No hay mensajes de tope sin cifra",
+          "comando": "grep -rniE \"alcanzaste el l[ií]mite|l[ií]mite alcanzado\" app/ components/ | grep -v \"{\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/planes.md",
+        "tests/saas/planes-documentados.test.ts"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes",
+        "tema:encargos-verificables"
+      ]
+    },
+    {
+      "id": "saas.plan.avisar-antes-del-tope",
+      "titulo": "Avisar al 80% del tope, no cuando ya no se puede trabajar",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Enterarse del tope justo al ir a crear la factura 101 convierte un límite comercial en una caída de servicio a media jornada: el cliente no culpa a su plan, culpa al sistema.",
+      "queHacer": [
+        "Al cruzar el 80% del tope de un recurso, mostrar aviso en el panel con el número exacto y el enlace para subir de plan.",
+        "Enviar UN correo al dueño de la cuenta por recurso y por periodo, no uno cada vez que se cruza el umbral.",
+        "Guardar `aviso_enviado_en` por (tenant, recurso, periodo) para que el trabajo sea idempotente si se repite.",
+        "El aviso desaparece solo cuando el consumo baja o el plan sube; no se puede «cerrar para siempre»."
+      ],
+      "aceptacion": [
+        {
+          "check": "El aviso se manda una sola vez por periodo",
+          "comando": "npm test -- aviso-tope",
+          "espera": "test verde: 5 cruces del 80% → 1 correo"
+        },
+        {
+          "check": "El correo lleva las cifras, no un texto genérico",
+          "comando": "grep -rnE \"\\{ *(consumo|tope) *\\}\" lib/correos/aviso-tope.tsx",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "correoSaliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/planes/aviso-tope.ts",
+        "lib/correos/aviso-tope.tsx",
+        "tests/saas/aviso-tope.test.ts"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes"
+      ]
+    },
+    {
+      "id": "saas.plan.bajar-de-plan-sin-perder-datos",
+      "titulo": "Dejar en solo lectura lo que sobra al bajar de plan, nunca borrarlo",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si bajar de plan borra los 7 usuarios que sobran, el cliente pierde trabajo por una decisión comercial y la pérdida no tiene vuelta atrás. Y si no hace nada, el que bajó sigue con las ventajas del plan caro.",
+      "queHacer": [
+        "Al bajar de plan, calcular el exceso por recurso y marcarlo; no tocar ni una fila.",
+        "Lo que excede queda en solo lectura —o el cliente elige cuáles conserva activos— y se puede exportar igual.",
+        "Mientras haya exceso no se puede crear nada nuevo de ese recurso.",
+        "Al volver a subir de plan, todo lo marcado se reactiva sin intervención de nadie.",
+        "Test: plan de 10 a plan de 3 con 8 filas deja 8 filas, 3 activas y 0 borradas."
+      ],
+      "aceptacion": [
+        {
+          "check": "Bajar de plan no borra filas",
+          "comando": "npm test -- bajar-de-plan",
+          "espera": "test verde: 8 filas antes, 8 después, 5 marcadas como exceso"
+        },
+        {
+          "check": "No hay borrado en el camino de bajada",
+          "comando": "grep -rniE \"delete|destroy|drop\" lib/planes/cambio.ts",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/planes/cambio.ts",
+        "tests/saas/bajar-de-plan.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "saas.cobro.estado-de-la-suscripcion-en-nuestra-base",
+      "titulo": "Guardar el estado de la suscripción en nuestra base, no en la pasarela",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Preguntarle a la pasarela en cada carga si el cliente pagó ata el acceso a que un tercero responda: si tarda o falla, no entra nadie. La pasarela es el espejo del cobro, nunca el interruptor del producto.",
+      "queHacer": [
+        "Tabla `suscripciones` por tenant: plan, estado (`prueba`, `activa`, `en_mora`, `cerrada`, `cancelada`), `periodo_fin`, `id_en_pasarela`.",
+        "Todo el producto decide con esa tabla; ninguna pantalla ni ruta llama a la pasarela para saber si se puede entrar.",
+        "Los cambios de estado los escriben SOLO el manejador de webhooks y el trabajo de vencimiento, desde un único módulo.",
+        "Dibujar estados y transiciones permitidas en `docs/suscripcion.md`; una transición no listada lanza en vez de aplicarse.",
+        "Con la pasarela caída, el producto sigue funcionando con el estado ya guardado."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna ruta del producto llama a la pasarela",
+          "comando": "grep -rn \"stripe\\.\\|mercadopago\\.\\|wompi\" app/ --include=*.ts | grep -v \"app/api/webhooks/\\|app/api/cobro/\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Con la pasarela caída se entra igual",
+          "comando": "npm test -- pasarela-caida",
+          "espera": "test verde: con la pasarela devolviendo 500, GET /panel responde 200"
+        },
+        {
+          "check": "Una transición no permitida lanza",
+          "comando": "npm test -- estados-suscripcion",
+          "espera": "test verde: cancelada → activa lanza"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "supabase/migraciones/*_suscripciones.sql",
+        "lib/cobro/estado.ts",
+        "docs/suscripcion.md",
+        "tests/saas/estados-suscripcion.test.ts",
+        "tests/saas/pasarela-caida.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:la-caja-no-puede-parar"
+      ]
+    },
+    {
+      "id": "saas.cobro.webhook-que-tolera-repeticion-y-desorden",
+      "titulo": "Aplicar los eventos de la pasarela aunque lleguen repetidos o al revés",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Las pasarelas reintentan y no garantizan el orden: `suscripcion.cancelada` puede llegar después de `suscripcion.renovada` y dejar cerrada la cuenta de quien acaba de pagar. La firma ya la cubre `sec.terceros.webhook-firmado`; lo que falta aquí es el orden y la repetición.",
+      "queHacer": [
+        "Tabla `eventos_pasarela` con el id del evento como clave única: insertar primero, y si choca responder 200 sin volver a aplicar.",
+        "Guardar el cuerpo crudo tal como llegó antes de interpretarlo: si la interpretación estaba mal, se puede reprocesar.",
+        "Aplicar solo si la marca de tiempo del evento es posterior a la del último aplicado a ESA suscripción; los viejos se guardan y se ignoran.",
+        "Responder 200 rápido y aplicar aparte: un manejador lento hace que la pasarela reintente y multiplique el problema.",
+        "Test: el mismo evento tres veces, y un evento viejo después de uno nuevo; el estado final es el mismo en los dos casos."
+      ],
+      "aceptacion": [
+        {
+          "check": "El mismo evento tres veces deja un solo cambio",
+          "comando": "npm test -- webhook-idempotente",
+          "espera": "test verde: 3 envíos → 1 fila en eventos_pasarela y 1 cambio de estado"
+        },
+        {
+          "check": "Un evento viejo no pisa a uno nuevo",
+          "comando": "npm test -- webhook-desorden",
+          "espera": "test verde: el estado final queda en 'activa'"
+        },
+        {
+          "check": "El cuerpo crudo se guarda",
+          "comando": "grep -rniE \"crudo|raw|payload\" supabase/migraciones/*_eventos_pasarela.sql",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/webhooks/pasarela/route.ts",
+        "supabase/migraciones/*_eventos_pasarela.sql",
+        "tests/saas/webhook-idempotente.test.ts",
+        "tests/saas/webhook-desorden.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "saas.cobro.no-guardar-nunca-la-tarjeta",
+      "titulo": "No dejar que el número de la tarjeta pase por nuestro servidor",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un número de tarjeta en un log, en un campo de formulario propio o en un respaldo convierte cualquier lectura de la base en fraude, y el responsable es quien lo guardó. Con el formulario alojado de la pasarela ese dato nunca llega a ser nuestro.",
+      "queHacer": [
+        "Usar el formulario alojado o el elemento embebido de la pasarela: nuestro servidor recibe un token, nunca el número, el CVV ni la fecha.",
+        "Guardar solo lo que la pantalla necesita: últimos cuatro dígitos, marca y vencimiento, como texto.",
+        "Ningún campo de formulario propio llamado `tarjeta`, `numero_tarjeta`, `cvv` o `cvc`.",
+        "El módulo de cobro no imprime cuerpos de petición en los registros, ni en desarrollo."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay campos de tarjeta propios",
+          "comando": "grep -rniE \"name=[\\\"'](card|tarjeta|cvv|cvc|numero_tarjeta)\" app/ components/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Nada guarda un número de tarjeta",
+          "comando": "grep -rniE \"(card_number|numero_tarjeta|cvv) *[:=]\" lib/ app/ supabase/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El cobro no imprime cuerpos",
+          "comando": "grep -rn \"console.log\" lib/cobro/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "components/cobro/formulario-pago.tsx",
+        "lib/cobro/metodo-de-pago.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "saas.cobro.pago-fallido-con-reintentos-y-plazos",
+      "titulo": "Fijar los reintentos y el plazo del pago que falla, y avisarlos",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin plazo escrito, un pago rechazado por una tarjeta vencida termina o en un corte inmediato a un cliente de dos años, o en meses de servicio gratis. Las dos salidas son decisiones y ninguna se debe tomar sola a las 3 de la mañana.",
+      "queHacer": [
+        "Al llegar el evento de pago fallido, pasar la suscripción a `en_mora` con `mora_desde`.",
+        "Fijar el calendario en un solo sitio —reintentos a los días 1, 3, 7 y 14, o lo que decida el dueño— y qué pasa el día siguiente al último.",
+        "Un correo por intento, con el motivo que dio la pasarela dicho en palabras y el enlace directo a cambiar el medio de pago.",
+        "Banner en el panel desde el primer fallo, con la fecha exacta en que se degrada la cuenta.",
+        "Un pago exitoso en cualquier momento limpia la mora y cancela el calendario."
+      ],
+      "aceptacion": [
+        {
+          "check": "El calendario está en el código, en un solo sitio",
+          "comando": "grep -rnE \"\\[ *1 *, *3 *, *7 *, *14\" lib/cobro/mora.ts",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "Pagar durante la mora la limpia",
+          "comando": "npm test -- mora",
+          "espera": "test verde: estado vuelve a 'activa' y mora_desde queda nulo"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "dineroReal": true,
+        "correoSaliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/cobro/mora.ts",
+        "lib/correos/pago-fallido.tsx",
+        "tests/saas/mora.test.ts"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "saas.cobro.degradar-en-vez-de-borrar",
+      "titulo": "Degradar a solo lectura al que dejó de pagar, en vez de borrarle todo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Borrar la cuenta del que no pagó destruye la única razón por la que podría volver, y convierte una gestión de cobranza en una pérdida de datos irreversible del lado del cliente.",
+      "queHacer": [
+        "Al agotarse el plazo de mora la cuenta pasa a `cerrada`: se entra, se lee y se exporta; no se crea ni se modifica.",
+        "Lo que ya existe no se toca; el borrado real solo ocurre por el calendario de retención escrito, y avisado antes.",
+        "La pantalla dice qué se puede hacer, qué falta para volver y el importe exacto.",
+        "Reactivar es pagar: un pago exitoso devuelve la cuenta a `activa` sin que intervenga nadie de la casa."
+      ],
+      "aceptacion": [
+        {
+          "check": "Una cuenta cerrada lee y exporta pero no escribe",
+          "comando": "npm test -- cuenta-cerrada",
+          "espera": "test verde: GET 200, GET /api/exportar 200, POST 402"
+        },
+        {
+          "check": "Cerrar no borra nada",
+          "comando": "grep -rniE \"delete from|\\.delete\\(\" lib/cobro/cierre.ts",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/cobro/cierre.ts",
+        "tests/saas/cuenta-cerrada.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "saas.cobro.cambio-de-plan-a-mitad-de-mes",
+      "titulo": "Prorratear el cambio de plan a mitad de periodo con un solo redondeo",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Cambiar de plan el día 12 y cobrar el mes entero —o no cobrar nada— es plata perdida o un cliente indignado; y calcular el prorrateo con flotantes deja diferencias de un peso que no cuadran con la pasarela y que nadie sabe explicar.",
+      "queHacer": [
+        "Decidir y escribir quién calcula: la pasarela con su prorrateo, o nosotros. Una sola fuente, nunca las dos.",
+        "Si lo calculamos: en enteros de la moneda menor, `dias_restantes / dias_del_periodo`, con UN redondeo al final de todo.",
+        "Subir de plan tiene efecto inmediato y cobra la diferencia; bajar tiene efecto al final del periodo pagado, salvo decisión distinta escrita.",
+        "Cada cambio deja fila en `movimientos_suscripcion`: plan anterior, plan nuevo, fecha, importe y quién lo hizo.",
+        "Test de mesa con seis casos de fecha e importe calculados a mano y congelados en el test."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los seis casos dan el importe exacto",
+          "comando": "npm test -- prorrateo",
+          "espera": "test verde: 6/6 casos con el importe entero esperado"
+        },
+        {
+          "check": "No hay aritmética con decimales en el cálculo",
+          "comando": "grep -rnE \"[0-9]\\.[0-9]|parseFloat|toFixed\" lib/cobro/prorrateo.ts",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/cobro/prorrateo.ts",
+        "supabase/migraciones/*_movimientos_suscripcion.sql",
+        "tests/saas/prorrateo.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:invertir-formulas-redondeadas"
+      ]
+    },
+    {
+      "id": "saas.cobro.factura-que-el-cliente-descarga-solo",
+      "titulo": "Dejar que el cliente descargue sus facturas sin pedírselas a nadie",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si la factura hay que pedirla por WhatsApp, alguien de la casa pierde media hora al mes por cliente y el cliente descubre en diciembre que le faltan tres. Peor: un documento de plata que se regenera cambia — si el precio subió en julio, la factura de marzo no puede cambiar con él.",
+      "queHacer": [
+        "Cada cobro exitoso crea una fila en `facturas` con los importes CONGELADOS: concepto, cantidad, precio unitario, impuesto y total.",
+        "El documento se genera de esa fila, nunca del catálogo de planes vivo.",
+        "Pantalla de facturación con el historial y descarga por factura; el identificador del archivo no se puede adivinar para llegar al de otro tenant.",
+        "La numeración es por emisor y sin huecos; una factura no se borra, se anula con nota de crédito.",
+        "Los datos fiscales del cliente (razón social, NIT) se copian a la factura al emitirla, no se leen del perfil al descargarla."
+      ],
+      "aceptacion": [
+        {
+          "check": "La factura no cambia si cambia el precio del plan",
+          "comando": "npm test -- factura-congelada",
+          "espera": "test verde: subir el precio del plan no altera el total de una factura ya emitida"
+        },
+        {
+          "check": "No se puede descargar la factura de otro tenant",
+          "comando": "npm test -- factura-ajena",
+          "espera": "test verde: GET de una factura de otro tenant responde 404"
+        },
+        {
+          "check": "No hay borrado de facturas",
+          "comando": "grep -rniE \"delete .*facturas\" lib/ app/ supabase/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/(panel)/facturacion/**",
+        "lib/cobro/facturas.ts",
+        "supabase/migraciones/*_facturas.sql",
+        "tests/saas/factura-congelada.test.ts",
+        "tests/saas/factura-ajena.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "saas.cobro.moneda-e-impuesto-decididos-antes-del-primer-cobro",
+      "titulo": "Fijar moneda, impuesto y datos fiscales antes de emitir el primer cobro",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Cobrar en dólares a un cliente colombiano y facturar sin IVA se corrige para adelante, pero las facturas ya emitidas no: se anulan una por una, y con la DIAN de por medio eso deja de ser un problema del código y pasa a ser del dueño.",
+      "queHacer": [
+        "Escribir en `docs/cobro-fiscal.md`: moneda de cobro, si el precio publicado incluye impuesto o no, tarifa aplicada y a quién se le aplica.",
+        "Guardar en cada factura la tarifa usada, no solo el importe: el día que cambie, las viejas siguen explicándose solas.",
+        "Un solo módulo calcula base, impuesto y total, en enteros.",
+        "Si hay retención o régimen especial, es un campo del tenant, no una excepción escondida en el cálculo.",
+        "Lo que dependa de una decisión del dueño —facturación electrónica DIAN, resolución, consecutivo autorizado— se deja como HUECO por escrito; no se inventa un formato verosímil."
+      ],
+      "aceptacion": [
+        {
+          "check": "La tarifa queda guardada en cada factura",
+          "comando": "grep -rn \"tarifa_impuesto\" supabase/migraciones/",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "El impuesto se calcula en un solo sitio",
+          "comando": "grep -rniE \"0\\.19|iva|impuesto\" lib/ app/ --include=*.ts | grep -v \"lib/cobro/impuestos.ts\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Lo indecidido está marcado como hueco, no rellenado",
+          "comando": "grep -c \"HUECO\" docs/cobro-fiscal.md",
+          "espera": "1+ (o 0 solo si el dueño ya decidió todo por escrito en ese mismo archivo)"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/cobro/impuestos.ts",
+        "docs/cobro-fiscal.md"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:cero-datos-inventados"
+      ]
+    },
+    {
+      "id": "saas.cobro.cuadrar-lo-cobrado-con-la-pasarela",
+      "titulo": "Cuadrar cada mes lo cobrado en la pasarela con lo que dice nuestra base",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un webhook perdido deja a un cliente pagando y sin acceso, o con acceso y sin pagar; ninguno de los dos reclama. Sin cuadre mensual la diferencia se descubre auditando a mano un año después, cuando ya no se puede cobrar.",
+      "queHacer": [
+        "Trabajo mensual que baja de la pasarela los cobros del periodo y los compara uno a uno contra `facturas` y `suscripciones`.",
+        "Tres listas de salida: cobros sin factura nuestra, facturas sin cobro, e importes distintos.",
+        "El reporte se guarda con fecha, también cuando da cero diferencias: así se puede decir desde cuándo cuadra.",
+        "El criterio de cruce es el id de la pasarela, nunca importe y fecha, que colisionan entre clientes del mismo plan.",
+        "Diferencia distinta de cero avisa en el panel interno; no se arregla sola ni se ignora."
+      ],
+      "aceptacion": [
+        {
+          "check": "El cuadre corre y deja reporte con fecha",
+          "comando": "npx tsx scripts/cuadre-cobros.ts --periodo 2026-08",
+          "espera": "imprime los 3 conteos y escribe reportes/cuadre-2026-08.json"
+        },
+        {
+          "check": "Una factura sin cobro se detecta",
+          "comando": "npm test -- cuadre",
+          "espera": "test verde: con 1 factura sin cobro, el reporte la lista"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/cuadre-cobros.ts",
+        "reportes/cuadre-*.json",
+        "tests/saas/cuadre.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "saas.prueba.trial-con-fecha-en-la-base",
+      "titulo": "Poner el inicio y el fin de la prueba en la base, no en el cliente",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una prueba que se calcula en el navegador o vive en una cookie se extiende borrando los datos del sitio; y sin fecha de fin guardada nadie puede contestar cuántas cuentas vencen esta semana, que es la única pregunta útil.",
+      "queHacer": [
+        "`prueba_inicia_en` y `prueba_termina_en` en la suscripción, con hora y zona, puestos por el servidor al crear la cuenta.",
+        "El estado `prueba` se decide comparando contra la hora del servidor en cada petición; el cliente no calcula nada.",
+        "Un solo sitio puede extender la prueba, con motivo y con quién la extendió, y queda auditado.",
+        "Consulta que lista las pruebas que vencen en los próximos 7 días, para el panel interno."
+      ],
+      "aceptacion": [
+        {
+          "check": "El fin de la prueba no se calcula en el navegador",
+          "comando": "grep -rniE \"prueba_termina|trial\" components/ | grep -E \"Date.now|new Date\\(\\)\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Con la fecha vencida el acceso de escritura cae",
+          "comando": "npm test -- prueba-vencida",
+          "espera": "test verde: un día después del fin, POST responde 402"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "autoservicio": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/cobro/prueba.ts",
+        "tests/saas/prueba-vencida.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "saas.prueba.que-se-puede-hacer-sin-tarjeta",
+      "titulo": "Decidir qué se puede hacer sin poner tarjeta, y que el código lo respete",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Pedir tarjeta en el primer clic espanta a la mayoría; no pedirla nunca llena la base de cuentas que no van a pagar y de soporte que no vale nada. Sin la decisión escrita, cada pantalla la toma por su cuenta y el producto dice dos cosas.",
+      "queHacer": [
+        "Escribir en `docs/prueba.md` la lista exacta: qué recursos, con qué topes y qué acciones están abiertos sin tarjeta.",
+        "Las acciones que salen al mundo —enviarle correo al cliente final, publicar una página, llamar a una API que se paga— casi siempre exigen tarjeta: decidirlo explícito, no por descuido.",
+        "Los topes de la prueba viven en el catálogo de planes como un plan más, no como un `if (esPrueba)` repartido por el código.",
+        "La pantalla dice qué falta y por qué, con el número, no con un aviso genérico."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay condicionales de prueba sueltos",
+          "comando": "grep -rn \"esPrueba\\|isTrial\" app/ components/ lib/ | grep -v \"lib/cobro/prueba.ts\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La prueba existe como plan con sus topes",
+          "comando": "psql \"$DATABASE_URL\" -tAc \"select count(*) from plan_limites where plan='prueba'\"",
+          "espera": "1+"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "autoservicio": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/prueba.md",
+        "supabase/migraciones/*_plan_prueba.sql"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes"
+      ]
+    },
+    {
+      "id": "saas.prueba.el-dia-que-se-acaba-la-prueba",
+      "titulo": "Escribir qué pasa el día que se acaba la prueba, y avisarlo antes",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El vencimiento es el único momento en que el producto pierde a alguien que ya lo estaba usando. Si ese día la pantalla solo dice «tu prueba terminó» y corta, se pierde el cliente y sus datos quedan de rehén.",
+      "queHacer": [
+        "Avisar en el panel a los 3 días y a 1 día del fin, y por correo al dueño de la cuenta.",
+        "Al vencer, la cuenta pasa a solo lectura, no a bloqueo total: se entra, se mira y se exporta.",
+        "La pantalla de vencimiento dice qué se pierde, qué se conserva y el importe exacto para seguir.",
+        "Convertir a pago restaura todo tal cual, sin volver a configurar nada.",
+        "El estado se comprueba también al pedir, no solo en el trabajo diario: si un día ese trabajo no corre, no pueden quedar cuentas vencidas trabajando gratis."
+      ],
+      "aceptacion": [
+        {
+          "check": "Vencida la prueba se lee pero no se escribe",
+          "comando": "npm test -- fin-de-prueba",
+          "espera": "test verde: GET 200 y POST 402 con la prueba vencida"
+        },
+        {
+          "check": "El vencimiento no depende solo del trabajo diario",
+          "comando": "npm test -- fin-de-prueba-sin-cron",
+          "espera": "test verde: sin correr el trabajo, la petición ya responde 402"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "autoservicio": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/cobro/vencimiento.ts",
+        "app/(panel)/prueba-terminada/**",
+        "tests/saas/fin-de-prueba.test.ts",
+        "tests/saas/fin-de-prueba-sin-cron.test.ts"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes"
+      ]
+    },
+    {
+      "id": "saas.prueba.no-perder-los-datos-del-que-no-convirtio",
+      "titulo": "Conservar los datos del que no convirtió durante un plazo escrito",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Borrar la cuenta al día siguiente del vencimiento cierra la puerta a quien vuelve en tres semanas con el presupuesto aprobado; no borrarla nunca llena la base de cuentas muertas que se pagan en respaldos, en lentitud y en riesgo de datos personales.",
+      "queHacer": [
+        "Fijar el plazo —90 días desde el vencimiento, por ejemplo— y escribirlo donde el cliente lo pueda leer antes de registrarse.",
+        "Un solo trabajo borra lo vencido pasado el plazo, en lotes, dejando registro de cuántas cuentas y cuántas filas borró.",
+        "Antes de borrar, correo de aviso con enlace para reactivar o para exportar.",
+        "Reactivar dentro del plazo devuelve la cuenta completa, incluidos los miembros del equipo y sus roles."
+      ],
+      "aceptacion": [
+        {
+          "check": "El plazo se respeta por los dos lados",
+          "comando": "npm test -- retencion-prueba",
+          "espera": "test verde: con 89 días no borra; con 91 borra 1 cuenta"
+        },
+        {
+          "check": "El borrado deja registro de lo que borró",
+          "comando": "grep -rn \"registrarPurga\\|auditoria\" scripts/purga-cuentas.ts",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "autoservicio": true,
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/purga-cuentas.ts",
+        "tests/saas/retencion-prueba.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "saas.entrada.un-solo-objetivo-en-el-primer-minuto",
+      "titulo": "Elegir la única acción del primer minuto y medir cuántos la completan",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un panel que abre con seis tarjetas vacías y un menú de doce entradas no enseña nada: la persona cierra la pestaña y no vuelve. Y sin medir cuántos llegan a la primera acción útil, cualquier cambio en el arranque es una opinión sin árbitro.",
+      "queHacer": [
+        "Nombrar la acción de activación —una sola y concreta: «crear el primer presupuesto», «cargar la primera lista de precios»— y escribirla en `docs/onboarding.md`.",
+        "La primera pantalla tras crear la cuenta lleva a esa acción y a nada más; el resto del menú puede esperar al segundo minuto.",
+        "Guardar `activado_en` en el tenant la primera vez que ocurre, no un contador de pasos de un tour.",
+        "Consulta de activación: de las cuentas creadas esta semana, cuántas tienen `activado_en` dentro de sus primeras 24 horas.",
+        "Nada de tour de siete pasos: se enseña haciendo la acción real, con datos del cliente."
+      ],
+      "aceptacion": [
+        {
+          "check": "El tenant guarda cuándo se activó",
+          "comando": "grep -rn \"activado_en\" supabase/migraciones/",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "La cifra de activación se calcula de la base",
+          "comando": "npx tsx lib/metricas/activacion.ts --dias 7",
+          "espera": "imprime cuentas creadas, activadas y el porcentaje"
+        }
+      ],
+      "aplicaSi": {
+        "autoservicio": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/(panel)/bienvenida/**",
+        "docs/onboarding.md",
+        "lib/metricas/activacion.ts"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas",
+        "tema:cero-datos-inventados"
+      ]
+    },
+    {
+      "id": "saas.entrada.estado-vacio-que-ensena",
+      "titulo": "Poner en {{entidad}} un estado vacío que enseñe, no una tabla en blanco",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una tabla vacía con sus encabezados no dice si el sistema está roto, si falta un permiso o si simplemente no hay nada todavía. El primer día TODAS las pantallas están así: esa es la primera impresión completa del producto.",
+      "queHacer": [
+        "Distinguir dos vacíos que no son el mismo: «todavía no hay ningún {{entidad}}» y «no hay resultados para este filtro». Ni el mismo texto ni el mismo botón.",
+        "El vacío de primera vez explica en una frase para qué sirve {{entidad}}, ofrece la acción de crear el primero y, si aplica, cómo importar de un archivo.",
+        "El vacío de filtro ofrece quitar el filtro y dice cuántos hay en total.",
+        "Nada de ilustración grande que empuje la acción por debajo del pliegue en un teléfono."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los dos vacíos existen y son distintos",
+          "comando": "npm test -- vacio-{{entidad}}",
+          "espera": "test verde: sin filas y con filtro sin resultados renderizan textos distintos"
+        },
+        {
+          "check": "El componente de vacío está en la pantalla de {{entidad}}",
+          "comando": "grep -rn \"EstadoVacio\" \"app/(panel)/{{entidad}}/\"",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "autoservicio": true,
+        "superficies": [
+          "panel-interno"
+        ],
+        "entidades": [
+          "*"
+        ]
+      },
+      "porCada": "entidad",
+      "posee": [
+        "components/{{entidad}}/estado-vacio.tsx",
+        "tests/saas/vacio-{{entidad}}.test.tsx"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas"
+      ]
+    },
+    {
+      "id": "saas.entrada.datos-de-ejemplo-que-se-borran-de-un-golpe",
+      "titulo": "Marcar los datos de ejemplo y borrarlos todos con un solo botón",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Los datos de ejemplo sin marcar acaban mezclados con los reales: el cliente le factura al «Cliente de prueba» y el total del mes incluye tres ventas que nunca existieron. Y borrarlos uno por uno a mano no lo hace nadie.",
+      "queHacer": [
+        "Columna `es_ejemplo` en toda tabla que reciba datos de muestra, con índice.",
+        "Los ejemplos NO cuentan en totales, reportes ni consumo facturable: la consulta los excluye por defecto y no al revés.",
+        "Un botón «Borrar los datos de ejemplo» que los quita todos en una transacción y deja el sistema en vacío real.",
+        "El botón desaparece cuando ya no queda ninguno.",
+        "Un ejemplo nunca se convierte en real: si el cliente quiere quedárselo, lo copia; en pantalla se ve cuál es cuál."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un ejemplo no entra en los totales",
+          "comando": "npm test -- datos-ejemplo",
+          "espera": "test verde: 3 ejemplos + 2 reales → el total del mes cuenta 2"
+        },
+        {
+          "check": "El borrado deja cero ejemplos y no toca lo real",
+          "comando": "npm test -- borrar-ejemplos",
+          "espera": "test verde: 0 filas con es_ejemplo y las 2 reales siguen"
+        }
+      ],
+      "aplicaSi": {
+        "autoservicio": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/onboarding/ejemplos.ts",
+        "tests/saas/datos-ejemplo.test.ts",
+        "tests/saas/borrar-ejemplos.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "saas.entrada.cuenta-creada-sin-que-nadie-la-apruebe",
+      "titulo": "Crear cuenta, tenant y dueño en una sola transacción y sin aprobación",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si el alta crea el usuario y luego el tenant en dos pasos, un error entre medias deja un usuario sin cuenta que ni entra ni se puede volver a registrar con ese correo. Y si alguien de la casa tiene que aprobar cada alta, el producto no se vende solo: se vende cuando esa persona está despierta.",
+      "queHacer": [
+        "Un solo endpoint crea dentro de UNA transacción: `tenants`, el usuario, la fila de `miembros` con rol dueño y la suscripción en prueba.",
+        "Si cualquier paso falla no queda nada: ni tenant huérfano ni usuario sin cuenta.",
+        "Un correo ya registrado responde igual hacia afuera que uno nuevo —no revelar quién tiene cuenta— y recibe un correo de «ya tienes cuenta, entra aquí».",
+        "Sin aprobación manual en el camino feliz; si hay lista de espera es una decisión aparte, explícita y con su propia pantalla.",
+        "Este alta NO sustituye el doble acceso de los sistemas de mostrador —primero el puesto, después la persona—: aquí no hay puesto que vincular, y por eso este arquetipo solo entra en productos de autoservicio."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un fallo a mitad del alta no deja nada",
+          "comando": "npm test -- alta-transaccional",
+          "espera": "test verde: forzando error en el paso 3, 0 tenants y 0 usuarios nuevos"
+        },
+        {
+          "check": "El alta no revela si el correo ya existe",
+          "comando": "npm test -- alta-correo-existente",
+          "espera": "test verde: misma respuesta y mismo código para correo nuevo y correo ya registrado"
+        }
+      ],
+      "aplicaSi": {
+        "autoservicio": true,
+        "multiTenant": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/registro/route.ts",
+        "lib/onboarding/alta.ts",
+        "tests/saas/alta-transaccional.test.ts",
+        "tests/saas/alta-correo-existente.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "saas.entrada.verificar-el-correo-sin-cerrar-la-puerta",
+      "titulo": "Dejar entrar antes de verificar el correo, y limitar solo lo que sale",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Obligar a verificar antes de ver nada pierde a quien se registró desde el celular y no tiene el correo a mano; no verificar nunca convierte el producto en un relé de spam con nuestro dominio y nuestra reputación de envío.",
+      "queHacer": [
+        "Tras el alta se entra directo y se puede trabajar; hay banner con «reenviar correo».",
+        "Sin verificar no se puede: invitar a nadie, enviar nada hacia afuera, ni cambiar el correo de la cuenta.",
+        "El enlace de verificación caduca a las 24 horas, es de un solo uso y no inicia sesión por sí mismo.",
+        "Limitar los reenvíos —tres por hora y por cuenta— para no quemar la reputación del dominio."
+      ],
+      "aceptacion": [
+        {
+          "check": "Sin verificar no se puede invitar",
+          "comando": "npm test -- correo-sin-verificar",
+          "espera": "test verde: POST /api/invitaciones responde 403"
+        },
+        {
+          "check": "El enlace no sirve dos veces",
+          "comando": "npm test -- verificacion-un-solo-uso",
+          "espera": "test verde: el segundo uso responde 410"
+        }
+      ],
+      "aplicaSi": {
+        "autoservicio": true,
+        "correoSaliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/verificar-correo/**",
+        "lib/onboarding/verificacion.ts",
+        "tests/saas/correo-sin-verificar.test.ts",
+        "tests/saas/verificacion-un-solo-uso.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "saas.equipo.invitar-por-correo-con-token-que-caduca",
+      "titulo": "Invitar por correo con un token de un solo uso que caduca",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un enlace de invitación que no caduca y se puede reusar es una puerta abierta para siempre: reenviado en el grupo de WhatsApp de la empresa, cualquiera entra a la cuenta del cliente con el rol que traía el enlace.",
+      "queHacer": [
+        "Tabla `invitaciones`: tenant, correo, rol, hash del token (nunca el token en claro), `expira_en`, `usada_en` y quién invitó.",
+        "Token aleatorio de 32 bytes: se guarda el hash y el valor solo viaja en el correo.",
+        "Caduca a los 7 días y se marca `usada_en` al aceptarse; cualquier uso posterior responde 410.",
+        "Aceptar exige que el correo de quien acepta sea el invitado; si ya tiene usuario se une, y si no, se crea el usuario y se une, todo en una transacción.",
+        "Se puede revocar una invitación pendiente, y eso invalida el enlace en el acto."
+      ],
+      "aceptacion": [
+        {
+          "check": "El token no se guarda en claro",
+          "comando": "grep -rniE \"token +(text|varchar)\" supabase/migraciones/*_invitaciones.sql | grep -vi hash",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Usada, caducada o revocada, la invitación no sirve",
+          "comando": "npm test -- invitacion",
+          "espera": "test verde: los tres casos responden 410"
+        }
+      ],
+      "aplicaSi": {
+        "equipoCliente": true,
+        "correoSaliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "supabase/migraciones/*_invitaciones.sql",
+        "lib/equipo/invitaciones.ts",
+        "tests/saas/invitacion.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "saas.equipo.el-rol-se-asigna-al-invitar",
+      "titulo": "Asignar el rol en la invitación, no después de que la persona entre",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el rol se pone después, entre que la persona acepta y alguien se acuerda de ajustarlo hay un rato con el rol por defecto; si ese defecto es alto, ese rato es acceso de más — y nadie va a volver a revisarlo.",
+      "queHacer": [
+        "El rol es obligatorio en el formulario de invitación: no hay valor por defecto implícito.",
+        "La lista de roles ofrecidos sale de la tabla de roles del producto, no de un desplegable escrito a mano en el componente.",
+        "Al aceptar, la fila de `miembros` nace ya con ese rol; no existe un estado intermedio sin rol.",
+        "El correo de invitación dice en una frase qué va a poder hacer esa persona."
+      ],
+      "aceptacion": [
+        {
+          "check": "No se puede invitar sin rol",
+          "comando": "npm test -- invitar-sin-rol",
+          "espera": "test verde: POST sin rol responde 400 y no crea invitación"
+        },
+        {
+          "check": "El desplegable no tiene roles escritos a mano",
+          "comando": "grep -rniE \"<option value=[\\\"'](dueno|admin|editor|lector)\" components/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "equipoCliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "components/equipo/invitar.tsx",
+        "tests/saas/invitar-sin-rol.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "saas.equipo.no-invitar-por-encima-del-propio-rol",
+      "titulo": "Impedir que alguien invite a otro con más poder del que él tiene",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Es la escalada de privilegios por la puerta de atrás: el administrador que no puede subirse el rol a sí mismo invita como dueño a otro correo suyo, y en dos minutos está dentro con todo. La comprobación de «no subirse a sí mismo» no cubre este camino.",
+      "queHacer": [
+        "Comprobar en el servidor que el rol invitado es igual o menor que el de quien invita, contra la tabla de jerarquía de roles.",
+        "Solo el dueño puede invitar a otro dueño.",
+        "La misma comprobación aplica al cambiar el rol de un miembro que ya está dentro.",
+        "Todo intento rechazado se registra: quién, a quién y qué rol pedía.",
+        "Test que recorra la matriz completa de pares (rol de quien invita × rol invitado), no tres casos elegidos a dedo."
+      ],
+      "aceptacion": [
+        {
+          "check": "La matriz de quién puede invitar a quién se cumple entera",
+          "comando": "npm test -- jerarquia-invitaciones",
+          "espera": "test verde: los N×N pares dan el resultado esperado"
+        },
+        {
+          "check": "La ruta de invitación pasa por la comprobación",
+          "comando": "grep -c \"puedeInvitarCon\" app/api/invitaciones/route.ts",
+          "espera": "1+"
+        }
+      ],
+      "aplicaSi": {
+        "equipoCliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/invitaciones/route.ts",
+        "lib/equipo/jerarquia.ts",
+        "tests/saas/jerarquia-invitaciones.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "saas.equipo.quitar-a-alguien-sin-borrar-su-rastro",
+      "titulo": "Quitar a un miembro cerrándole la sesión y sin borrar lo que hizo",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si quitar a alguien borra su fila, los documentos que firmó se quedan sin autor y el historial miente. Y si solo se le quita el rol pero su sesión sigue viva, el que salió de la empresa esta mañana sigue trabajando hasta que caduque la cookie.",
+      "queHacer": [
+        "Quitar es marcar `miembros.estado='retirado'` con fecha, no borrar la fila.",
+        "Invalidar sus sesiones de ese tenant en el acto —versión de sesión por miembro, o borrado de sesiones— y revocar sus invitaciones pendientes.",
+        "Lo que creó conserva su nombre; la pantalla lo muestra como «(ya no está en el equipo)».",
+        "El puesto liberado se refleja de inmediato en el conteo del plan y en lo que se factura, sin esperar al cierre.",
+        "Volver a invitar a la misma persona reactiva su fila; no crea una segunda."
+      ],
+      "aceptacion": [
+        {
+          "check": "La sesión del retirado deja de servir de inmediato",
+          "comando": "npm test -- retirar-miembro",
+          "espera": "test verde: tras retirar, su petición responde 401 sin esperar caducidad"
+        },
+        {
+          "check": "No se borra la fila del miembro",
+          "comando": "grep -rniE \"delete from miembros|\\.delete\\(\" lib/equipo/miembros.ts",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El consumo facturable baja al retirar",
+          "comando": "npm test -- puestos-facturables",
+          "espera": "test verde: 5 miembros, retirar 1 → consumo facturable 4"
+        }
+      ],
+      "aplicaSi": {
+        "equipoCliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/equipo/miembros.ts",
+        "tests/saas/retirar-miembro.test.ts",
+        "tests/saas/puestos-facturables.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "saas.equipo.transferir-la-propiedad-de-la-cuenta",
+      "titulo": "Poder transferir la propiedad de la cuenta a otro miembro del equipo",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "El dueño de la cuenta es quien paga y quien puede cerrarla. Cuando esa persona se va de la empresa del cliente y no hay forma de traspasarla, la salida es escribirnos y que alguien de la casa lo cambie a mano en la base: sin rastro, sin permiso de nadie y con la puerta abierta al fraude.",
+      "queHacer": [
+        "El dueño actual inicia el traspaso eligiendo a un miembro activo, y el elegido tiene que aceptar.",
+        "Al aceptar, en una transacción: el nuevo pasa a dueño y el anterior a administrador; nunca quedan cero dueños, ni dos si el producto solo admite uno.",
+        "Se notifica por correo a los dos y queda auditado con fecha, quién y desde qué IP.",
+        "Los datos de cobro y la facturación siguen a la cuenta, no a la persona que se fue.",
+        "El traspaso caduca si no se acepta en 72 horas."
+      ],
+      "aceptacion": [
+        {
+          "check": "Nunca quedan cero dueños durante el traspaso",
+          "comando": "npm test -- traspaso-propiedad",
+          "espera": "test verde: en todos los pasos, count(rol='dueno' y activo)>=1"
+        },
+        {
+          "check": "El traspaso queda auditado",
+          "comando": "npm test -- traspaso-propiedad",
+          "espera": "test verde: 1 fila de auditoría con accion='traspaso'"
+        }
+      ],
+      "aplicaSi": {
+        "equipoCliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/equipo/traspaso.ts",
+        "tests/saas/traspaso-propiedad.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "saas.equipo.el-ultimo-dueno-no-se-puede-ir",
+      "titulo": "Impedir en la base que la cuenta se quede sin ningún dueño",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una cuenta sin dueño no puede cambiar de plan, ni cancelar, ni invitar: queda viva, cobrando, y solo se arregla metiendo mano en la base. Basta con que el único dueño se quite a sí mismo una vez, por error.",
+      "queHacer": [
+        "Comprobar en el servidor antes de retirar o de bajar de rol: si es el último dueño activo, responder 409 diciendo el motivo.",
+        "La misma regla en la base, con disparador o índice parcial: la comprobación de la aplicación no sobrevive a un script de mantenimiento.",
+        "La pantalla deshabilita la opción y dice la salida: traspasar primero la propiedad.",
+        "Test que intente todos los caminos: retirarse, bajarse el rol, desactivar el usuario y cancelar la cuenta."
+      ],
+      "aceptacion": [
+        {
+          "check": "La base rechaza quedarse sin dueño",
+          "comando": "psql \"$DATABASE_URL\" -c \"update miembros set rol='editor' where rol='dueno'\"",
+          "espera": "ERROR (la transacción se aborta y no cambia ninguna fila)"
+        },
+        {
+          "check": "Todos los caminos están cerrados",
+          "comando": "npm test -- ultimo-dueno",
+          "espera": "test verde: los 4 caminos responden 409"
+        }
+      ],
+      "aplicaSi": {
+        "equipoCliente": true
+      },
+      "porCada": null,
+      "posee": [
+        "supabase/migraciones/*_ultimo_dueno.sql",
+        "tests/saas/ultimo-dueno.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "saas.uso.contar-lo-que-se-cobra-desde-los-hechos",
+      "titulo": "Contar lo que se cobra sumando eventos, no llevando un contador",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un contador guardado se desvía: un reintento lo sube dos veces, un fallo a mitad lo deja corto, y el número que se le factura al cliente deja de poder explicarse a partir de nada. Se guardan hechos y se deriva el saldo.",
+      "queHacer": [
+        "Tabla `eventos_uso`: tenant, recurso, cantidad, `ocurrido_en` y clave de idempotencia única.",
+        "El consumo del periodo es una agregación sobre esos eventos, nunca una columna que alguien incrementa.",
+        "Si la agregación se pone cara, se cachea con vista materializada que se refresca; el evento original no se pierde ni se resume destruyendo el detalle.",
+        "Cada evento se puede rastrear hasta la acción que lo produjo: id del documento o de la petición."
+      ],
+      "aceptacion": [
+        {
+          "check": "No existe contador persistido de consumo",
+          "comando": "grep -rniE \"consumo_actual|contador_uso|uso_total\" supabase/migraciones/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "El mismo evento dos veces cuenta una",
+          "comando": "npm test -- eventos-uso",
+          "espera": "test verde: 2 envíos con la misma clave → 1 fila y consumo 1"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true
+      },
+      "porCada": null,
+      "posee": [
+        "supabase/migraciones/*_eventos_uso.sql",
+        "lib/uso/registrar.ts",
+        "tests/saas/eventos-uso.test.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "saas.uso.el-evento-no-se-pierde-si-el-proceso-muere",
+      "titulo": "Escribir el evento de uso en la misma transacción que la acción",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Contar el uso después de responder, o mandarlo en línea a un servicio externo, pierde eventos cada vez que algo se cae — y siempre se pierden a favor del cliente: se factura de menos y nadie lo nota nunca.",
+      "queHacer": [
+        "El evento de uso se inserta en la MISMA transacción que la acción que lo genera.",
+        "Si hay que reportar el consumo a un tercero, no se llama en línea: se encola y un trabajo aparte lo sube, con reintentos — el mismo patrón de outbox que usa la caja para subir a la nube.",
+        "La cola se vacía antes de cerrar el periodo: con cola pendiente, el cierre no corre.",
+        "Medir y registrar cuántos eventos quedan pendientes de subir; si el número crece, avisa antes de que sea un mes entero."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay registro de uso fuera de transacción",
+          "comando": "grep -rn \"registrarUso(\" app/ lib/ | grep -v \"tx\\|trx\\|transaction\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Un fallo tras responder no descuadra el conteo",
+          "comando": "npm test -- uso-transaccional",
+          "espera": "test verde: acciones creadas = eventos de uso, incluso con fallo forzado después de responder"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/uso/cola.ts",
+        "tests/saas/uso-transaccional.test.ts"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "saas.uso.panel-de-consumo-del-cliente",
+      "titulo": "Mostrarle al cliente el mismo número de consumo que se le factura",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si el panel dice 8.400 y la factura cobra 9.100, la discusión se resuelve por teléfono y el cliente deja de creerse las dos cifras. Una sorpresa de consumo a fin de mes es de las razones más comunes de una baja.",
+      "queHacer": [
+        "Pantalla de consumo por recurso: usado, tope, periodo y fecha de corte, alimentada por la MISMA consulta que factura.",
+        "Detalle descargable con los eventos que componen la cifra, con fecha y referencia a la acción.",
+        "Mostrar el periodo actual y el anterior, para que se pueda comparar sin pedir nada.",
+        "Test que compare la cifra de pantalla con la del cálculo de facturación para el mismo periodo: idénticas o falla."
+      ],
+      "aceptacion": [
+        {
+          "check": "Pantalla y factura dan el mismo número",
+          "comando": "npm test -- consumo-cuadra",
+          "espera": "test verde: consumo mostrado = cantidad facturada, en 3 periodos"
+        },
+        {
+          "check": "La pantalla no rehace la suma por su cuenta",
+          "comando": "grep -rn \"reduce(\\|\\.sum(\" \"app/(panel)/consumo/\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "superficies": [
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/(panel)/consumo/**",
+        "tests/saas/consumo-cuadra.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "saas.uso.cerrar-el-periodo-y-congelar-lo-contado",
+      "titulo": "Congelar la cantidad contada al cerrar el periodo de facturación",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un evento que llega tarde y entra en un periodo ya facturado cambia una cifra que el cliente ya pagó: la factura y la base dejan de coincidir para siempre y el cuadre del mes siguiente arrastra la diferencia.",
+      "queHacer": [
+        "Al cerrar el periodo, guardar el total contado por recurso en `periodos_uso`, con la fecha de cierre.",
+        "Después del cierre, los eventos con fecha anterior se aceptan pero se marcan `fuera_de_periodo` y se cuentan en el siguiente.",
+        "El cierre es idempotente: correrlo dos veces no duplica ni cambia la cifra guardada.",
+        "Reporte de eventos tardíos por periodo: si son muchos, el problema está en la cola de subida, no en el cierre."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cerrar dos veces no cambia la cifra",
+          "comando": "npm test -- cierre-periodo",
+          "espera": "test verde: dos cierres → misma cantidad y 1 sola fila en periodos_uso"
+        },
+        {
+          "check": "Un evento tardío no altera el periodo cerrado",
+          "comando": "npm test -- evento-tardio",
+          "espera": "test verde: la cantidad del periodo cerrado no cambia y el evento queda marcado"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/uso/cierre.ts",
+        "supabase/migraciones/*_periodos_uso.sql",
+        "tests/saas/cierre-periodo.test.ts",
+        "tests/saas/evento-tardio.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:caja-y-turnos"
+      ]
+    },
+    {
+      "id": "saas.bandera.encender-por-tenant",
+      "titulo": "Poder encender una función para un solo cliente, no para todos",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin banderas por cliente, probar algo nuevo con un cliente dispuesto obliga a soltarlo a los 200; si sale mal, la reversión es un despliegue de urgencia con el producto roto para todo el mundo.",
+      "queHacer": [
+        "Tabla `banderas` (clave, descripcion, valor por defecto) y `banderas_tenant` (bandera, tenant, valor).",
+        "Una sola función `bandera(clave, tenant)` decide, con caché corta y con valor por defecto seguro si la base no responde.",
+        "Panel interno para encender y apagar por tenant, con quién lo hizo y cuándo.",
+        "Ninguna clave se resuelve por variable de entorno para un cliente concreto: eso obliga a desplegar para apagarla."
+      ],
+      "aceptacion": [
+        {
+          "check": "Nadie lee banderas fuera del módulo",
+          "comando": "grep -rn \"banderas_tenant\\|feature_flag\" app/ components/ | grep -v \"lib/banderas/\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Con la base caída la bandera cae al valor seguro",
+          "comando": "npm test -- banderas-sin-base",
+          "espera": "test verde: sin base, bandera() devuelve el valor por defecto y no lanza"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/banderas/index.ts",
+        "supabase/migraciones/*_banderas.sql",
+        "tests/saas/banderas-sin-base.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "saas.bandera.desplegar-apagado-y-encender-aparte",
+      "titulo": "Desplegar la función apagada y encenderla en otro momento",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando desplegar y estrenar son el mismo acto, cualquier fallo obliga a revertir código con el producto caído y los clientes mirando. Separados, apagar la bandera tarda segundos y no toca el despliegue.",
+      "queHacer": [
+        "Toda función nueva de tamaño entra detrás de una bandera cuyo valor por defecto es apagado.",
+        "El camino viejo sigue vivo hasta que la bandera se retira: encender y apagar tiene que ser simétrico, no un viaje de ida.",
+        "Escribir en `docs/banderas.md` cómo se comprueba que la función nueva sirvió, y quién decide retirarla.",
+        "Las funciones marcadas como críticas corren la suite con la bandera en los dos valores, no solo en el nuevo."
+      ],
+      "aceptacion": [
+        {
+          "check": "La suite pasa con la bandera encendida y apagada",
+          "comando": "BANDERAS_FORZADAS=funcion-nueva=1 npm test && BANDERAS_FORZADAS=funcion-nueva=0 npm test",
+          "espera": "las dos corridas en verde"
+        },
+        {
+          "check": "Ninguna bandera nace encendida",
+          "comando": "grep -rnE \"por_defecto *(=|:) *true|default *true\" supabase/migraciones/ lib/banderas/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/banderas.md",
+        "tests/saas/banderas-dos-caminos.test.ts"
+      ],
+      "cerebro": [
+        "tema:construir-no-es-arrancar"
+      ]
+    },
+    {
+      "id": "saas.bandera.bandera-con-fecha-de-muerte",
+      "titulo": "Ponerle dueño y fecha de retiro a cada bandera, y hacerla fallar",
+      "nivel": "N3",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Las banderas que nadie retira se acumulan hasta que el código tiene ocho caminos posibles y nadie sabe cuál corre en producción; a partir de ahí cada cambio es una apuesta y el sistema deja de ser explicable.",
+      "queHacer": [
+        "Cada bandera lleva dueño y `retirar_antes_de`, obligatorios al crearla.",
+        "Un test falla cuando una bandera pasó su fecha: el aviso llega al equipo, no a un panel que nadie mira.",
+        "Retirar una bandera es borrar el camino perdedor del código y su fila, en el mismo cambio.",
+        "Listado de banderas vivas con su antigüedad, visible en el panel interno."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna bandera está vencida",
+          "comando": "npm test -- banderas-vencidas",
+          "espera": "test verde: 0 banderas con retirar_antes_de en el pasado"
+        },
+        {
+          "check": "No se puede crear una bandera sin fecha de retiro",
+          "comando": "psql \"$DATABASE_URL\" -c \"insert into banderas (clave) values ('x')\"",
+          "espera": "ERROR: null value in column \"retirar_antes_de\""
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/banderas/registro.ts",
+        "tests/saas/banderas-vencidas.test.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "saas.bandera.el-valor-se-decide-en-el-servidor",
+      "titulo": "Decidir en el servidor si la función está encendida, no en el navegador",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una bandera que viaja al navegador se cambia en las herramientas de desarrollo: la función que solo tiene el plan caro se enciende gratis, y la que está a medio hacer queda abierta para quien la busque.",
+      "queHacer": [
+        "Las banderas que gobiernan funciones de pago o a medio hacer se resuelven en el servidor; el cliente recibe el resultado ya aplicado.",
+        "No mandar nunca el mapa completo de banderas al cliente, ni incrustarlo en el HTML inicial.",
+        "Si una bandera afecta a la pantalla, la comprobación de verdad sigue estando en la ruta que hace el trabajo.",
+        "Test que pegue directo al endpoint con la bandera apagada, saltándose la pantalla."
+      ],
+      "aceptacion": [
+        {
+          "check": "El mapa de banderas no llega al navegador",
+          "comando": "curl -s http://localhost:3000/panel | grep -c \"banderas_tenant\\|__BANDERAS__\"",
+          "espera": "0"
+        },
+        {
+          "check": "Con la bandera apagada el endpoint también dice que no",
+          "comando": "npm test -- bandera-en-el-servidor",
+          "espera": "test verde: el POST directo responde 403"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true,
+        "superficies": [
+          "panel-interno",
+          "api"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "lib/banderas/servidor.ts",
+        "tests/saas/bandera-en-el-servidor.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "saas.salida.exportar-todo-lo-suyo",
+      "titulo": "Dejar que el cliente exporte todo lo suyo en un formato que se abra",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un producto del que no se pueden sacar los datos es una trampa, y en la reunión de compra alguien siempre pregunta «¿y si nos queremos ir?». Además el export es lo que permite borrar una cuenta sin miedo: sin él, nadie se atreve a purgar nada.",
+      "queHacer": [
+        "Un botón que genera el paquete completo del tenant: un CSV por tabla, los archivos adjuntos, y un `manifiesto.json` con tablas, conteos y fecha.",
+        "El export recorre el MISMO inventario de tablas que usa el borrado, para que los dos no se desincronicen cuando aparezca una tabla nueva.",
+        "Se genera aparte y se avisa por correo con un enlace que caduca; nada de bloquear la petición durante minutos.",
+        "Solo el dueño de la cuenta puede pedirlo, y queda auditado con fecha y quién.",
+        "Test: exportar el tenant A y comprobar que 0 filas del paquete pertenecen a otro tenant."
+      ],
+      "aceptacion": [
+        {
+          "check": "El export cubre todas las tablas del tenant",
+          "comando": "npm test -- exportar-tenant",
+          "espera": "test verde: tablas del manifiesto = tablas con tenant_id"
+        },
+        {
+          "check": "El paquete no trae ni una fila ajena",
+          "comando": "npm test -- exportar-tenant",
+          "espera": "test verde: 0 filas con tenant_id distinto de A"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true,
+        "autoservicio": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/salida/exportar.ts",
+        "app/api/exportar/route.ts",
+        "tests/saas/exportar-tenant.test.ts"
+      ],
+      "cerebro": [
+        "tema:dominio-migraciones-y-copias",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "saas.salida.cancelar-sin-escribirle-a-nadie",
+      "titulo": "Dejar cancelar desde la pantalla, sin escribirle a nadie",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Obligar a mandar un correo para cancelar retiene por fricción, no por valor: produce reclamos, contracargos con la pasarela y reseñas que cuestan bastante más que la mensualidad que se salvó.",
+      "queHacer": [
+        "Botón de cancelar en la pantalla de facturación, a un clic y sin tener que buscarlo.",
+        "Confirmación que dice la fecha exacta hasta la que sigue el servicio y qué pasa después de esa fecha.",
+        "Se puede deshacer mientras no llegue esa fecha, sin volver a pagar nada.",
+        "Preguntar el motivo es opcional y no puede bloquear la cancelación ni añadir un paso obligatorio.",
+        "Cancelar avisa a la pasarela y actualiza nuestra base; si la pasarela falla, la orden queda encolada y la cancelación surte efecto igual."
+      ],
+      "aceptacion": [
+        {
+          "check": "La ruta de cancelación existe y responde",
+          "comando": "curl -s -o /dev/null -w \"%{http_code}\" -X POST http://localhost:3000/api/suscripcion/cancelar -H \"Cookie: $SESION\"",
+          "espera": "200"
+        },
+        {
+          "check": "No hay texto que mande a escribirle a alguien para cancelar",
+          "comando": "grep -rniE \"escr[ií]benos|cont[áa]ctanos|soporte@\" components/cobro/",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "autoservicio": true
+      },
+      "porCada": null,
+      "posee": [
+        "app/api/suscripcion/cancelar/route.ts",
+        "components/cobro/cancelar.tsx",
+        "tests/saas/cancelar.test.ts"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes"
+      ]
+    },
+    {
+      "id": "saas.salida.la-cancelacion-corre-hasta-el-fin-del-periodo",
+      "titulo": "Mantener el servicio hasta el fin del periodo pagado tras cancelar",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cortar el acceso el mismo día en que alguien cancela le quita servicio que ya pagó: es un cobro sin contraprestación y termina en devolución o en contracargo, que sale más caro que el mes entero.",
+      "queHacer": [
+        "Cancelar pone `cancela_al_final_de_periodo=true` y deja `periodo_fin`; el estado sigue `activa` hasta esa fecha.",
+        "No se renueva: el trabajo de vencimiento la pasa a `cerrada` ese día y ni un minuto antes.",
+        "La pantalla muestra siempre la fecha exacta en que termina el servicio.",
+        "Si el producto ofrece devolución inmediata, es otra acción, explícita y con su regla escrita: no se mezcla con cancelar."
+      ],
+      "aceptacion": [
+        {
+          "check": "Cancelar hoy no corta hoy",
+          "comando": "npm test -- cancelar-fin-de-periodo",
+          "espera": "test verde: tras cancelar, POST sigue en 200 hasta periodo_fin y responde 402 al día siguiente"
+        },
+        {
+          "check": "No hay corte inmediato en el camino de cancelación",
+          "comando": "grep -rniE \"estado *= *'cerrada'\" lib/cobro/cancelar.ts",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/cobro/cancelar.ts",
+        "tests/saas/cancelar-fin-de-periodo.test.ts"
+      ],
+      "cerebro": [
+        "tema:cobro-a-clientes",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "saas.salida.que-se-borra-y-cuando-tras-cancelar",
+      "titulo": "Escribir qué se borra y cuándo tras cancelar, y que un trabajo lo haga",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "«Después lo borramos» significa que los datos personales de los clientes de un negocio que se fue hace dos años siguen en la base y en cada respaldo. Y borrarlos sin plazo escrito deja sin nada, y sin aviso, al que iba a volver.",
+      "queHacer": [
+        "Tabla en `docs/retencion.md`: qué se conserva, cuánto tiempo y por qué (obligación fiscal, reactivación, o nada).",
+        "Las facturas y los movimientos de plata se conservan el plazo legal aunque el resto se borre.",
+        "Un trabajo aplica el calendario y deja registro de qué borró; correrlo en seco con `--simular` tiene que ser posible antes de la primera vez.",
+        "Avisar por correo antes del borrado definitivo, con la fecha y el enlace para exportar.",
+        "Comprobar que el borrado alcanza también a las copias derivadas: caché, índice de búsqueda, archivos y correos programados."
+      ],
+      "aceptacion": [
+        {
+          "check": "El calendario se puede correr en seco",
+          "comando": "npx tsx scripts/retencion.ts --simular",
+          "espera": "imprime cuántas cuentas y filas borraría, y no borra ninguna"
+        },
+        {
+          "check": "Lo fiscal sobrevive al borrado",
+          "comando": "npm test -- retencion",
+          "espera": "test verde: tras la purga quedan 0 filas de dominio y las facturas siguen"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/retencion.md",
+        "scripts/retencion.ts",
+        "tests/saas/retencion.test.ts"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:dominio-migraciones-y-copias"
+      ]
+    },
+    {
+      "id": "saas.admin.ficha-de-cuenta-sin-entrar-como-el-cliente",
+      "titulo": "Ver el estado de una cuenta sin tener que entrar como el cliente",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si la única forma de contestar «¿por qué no puede facturar?» es suplantar al cliente, cada consulta de soporte se convierte en un acceso a datos personales que se habría resuelto mirando cinco campos.",
+      "queHacer": [
+        "Ficha por tenant con: plan, estado de la suscripción, fecha de corte, últimos pagos, consumo por recurso, miembros con sus roles y banderas encendidas.",
+        "Los últimos 20 eventos relevantes con hora: altas, cambios de plan, pagos fallidos, errores.",
+        "Sin datos del negocio del cliente: la ficha explica el estado de la CUENTA, no muestra sus facturas ni sus clientes.",
+        "Buscar por correo, por nombre del negocio o por id de la pasarela."
+      ],
+      "aceptacion": [
+        {
+          "check": "La ficha no consulta tablas del dominio del cliente",
+          "comando": "grep -rnE \"from +\\\"?(documentos|clientes|ventas)\" \"app/(interno)/cuentas/\"",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "La ficha trae los campos que evitan suplantar",
+          "comando": "npm test -- ficha-cuenta",
+          "espera": "test verde: la respuesta trae plan, estado, corte, miembros y consumo"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true,
+        "superficies": [
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/(interno)/cuentas/**",
+        "lib/interno/ficha.ts",
+        "tests/saas/ficha-cuenta.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    },
+    {
+      "id": "saas.admin.suplantar-dejando-rastro",
+      "titulo": "Suplantar a un usuario solo con motivo, con tiempo y dejando rastro",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una suplantación sin registro es un acceso a la cuenta de un cliente que nadie puede auditar después; y una sin banner es alguien de la casa que cree estar en su sesión y escribe en la del cliente.",
+      "queHacer": [
+        "Solo un rol interno puede iniciarla, exige motivo escrito y caduca sola a los 30 minutos.",
+        "Banner permanente y de color distinto mientras dure, con el nombre del cliente y el botón de salir siempre visible.",
+        "Por defecto es de solo lectura; escribir suplantando exige una segunda aprobación y se registra aparte.",
+        "Nunca permite cambiar la clave, ver el medio de pago completo ni exportar los datos del cliente.",
+        "Cada inicio y cada fin escriben en auditoría: quién, a quién, motivo, hora de inicio, hora de fin y qué rutas tocó."
+      ],
+      "aceptacion": [
+        {
+          "check": "Sin motivo escrito no arranca",
+          "comando": "npm test -- suplantar",
+          "espera": "test verde: iniciar sin motivo responde 400 y no crea sesión"
+        },
+        {
+          "check": "Suplantando no se escribe sin segunda aprobación",
+          "comando": "npm test -- suplantar",
+          "espera": "test verde: el POST suplantando responde 403"
+        },
+        {
+          "check": "La sesión de suplantación caduca sola",
+          "comando": "npm test -- suplantar-caduca",
+          "espera": "test verde: a los 31 minutos la petición responde 401"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true,
+        "superficies": [
+          "panel-interno"
+        ],
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/interno/suplantar.ts",
+        "components/interno/banner-suplantacion.tsx",
+        "tests/saas/suplantar.test.ts",
+        "tests/saas/suplantar-caduca.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos",
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "saas.admin.metricas-de-negocio-calculadas-de-la-base",
+      "titulo": "Calcular altas, bajas e ingreso recurrente con una consulta, no a mano",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un ingreso recurrente contado a mano en una hoja se desvía desde el primer mes, y las decisiones de precio se toman entonces sobre una cifra que nadie puede reproducir. Peor: cada quien define «baja» distinto y dos personas dan dos números.",
+      "queHacer": [
+        "Escribir las definiciones en `docs/metricas.md`: qué cuenta como alta, qué como baja, y qué entra en el ingreso recurrente (¿la prueba? ¿el anual prorrateado? ¿los impuestos?).",
+        "Una consulta por métrica, en un solo archivo, que corre contra la base en solo lectura.",
+        "Cada cifra se puede abrir: al pinchar se ve la lista de cuentas que la componen.",
+        "Guardar la foto mensual para poder comparar; recalcular un mes pasado tiene que dar exactamente lo mismo.",
+        "Nada de cifras escritas a mano en una pantalla: si no sale de la consulta, no se muestra."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las métricas salen de una consulta reproducible",
+          "comando": "npx tsx scripts/metricas-negocio.ts --mes 2026-08",
+          "espera": "imprime altas, bajas, activas e ingreso recurrente en enteros"
+        },
+        {
+          "check": "Recalcular un mes pasado da lo mismo",
+          "comando": "npm test -- metricas-estables",
+          "espera": "test verde: dos cálculos del mismo mes dan cifras idénticas"
+        },
+        {
+          "check": "Las definiciones están escritas",
+          "comando": "grep -c \"^| \" docs/metricas.md",
+          "espera": "4+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "suscripcion": true,
+        "superficies": [
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/metricas-negocio.ts",
+        "docs/metricas.md",
+        "tests/saas/metricas-estables.test.ts"
+      ],
+      "cerebro": [
+        "tema:cero-datos-inventados",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "saas.admin.el-panel-interno-no-es-un-rol-mas",
+      "titulo": "Separar el panel de nosotros del producto, no marcarlo con un campo",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un `es_admin=true` en la misma tabla de usuarios del cliente convierte cualquier fallo de escritura sobre esa tabla —o una invitación mal comprobada— en acceso a todas las cuentas. La puerta de nosotros no puede estar dentro de la casa del cliente.",
+      "queHacer": [
+        "Los usuarios internos viven en su propia tabla y su propia sesión; no son miembros de ningún tenant.",
+        "El panel interno cuelga de su propio segmento de rutas con su propio guardián, y en producción exige segundo factor.",
+        "Ninguna ruta del producto pregunta si el usuario es interno, y ninguna ruta interna acepta una sesión de cliente.",
+        "Todo acceso al panel interno se registra, incluidos los de solo lectura."
+      ],
+      "aceptacion": [
+        {
+          "check": "No hay bandera de admin en la tabla de usuarios del cliente",
+          "comando": "grep -rniE \"es_admin|is_admin|superuser\" supabase/migraciones/",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Una sesión de cliente no entra al panel interno",
+          "comando": "npm test -- panel-interno",
+          "espera": "test verde: con sesión de cliente, GET /interno responde 404"
+        },
+        {
+          "check": "El guardián vive en el segmento interno",
+          "comando": "grep -rn \"exigirInterno\" \"app/(interno)/layout.tsx\"",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true,
+        "superficies": [
+          "panel-interno"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "app/(interno)/layout.tsx",
+        "lib/interno/sesion.ts",
+        "tests/saas/panel-interno.test.ts"
+      ],
+      "cerebro": [
+        "tema:acceso-roles-y-puestos"
+      ]
+    }
+  ]
+}

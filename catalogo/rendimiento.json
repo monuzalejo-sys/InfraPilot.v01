@@ -2055,6 +2055,720 @@
         "scripts/perf/chequear-presupuestos.mjs"
       ],
       "cerebro": []
+    },
+    {
+      "id": "perf.cache.lista-blanca-de-lo-cacheable",
+      "titulo": "Escribir la lista de qué se cachea y qué nunca se cachea",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Sin una lista escrita, cada desarrollador decide a ojo qué cachear, y tarde o temprano alguien pone en caché una respuesta que depende de quién pregunta o que cambia el cobro: el cliente A ve el precio o los datos del cliente B.",
+      "queHacer": [
+        "Listar en docs/rendimiento/cache-politica.md cada endpoint o consulta candidata a caché con una columna SI/NO.",
+        "Marcar NO de forma no negociable: cualquier respuesta que varíe por usuario, rol o tenant sin estar en la clave; cualquier respuesta que incluya precio, saldo, disponibilidad de cobro o inventario en tiempo de venta.",
+        "Para cada SI, anotar el TTL o la condición de invalidación y quién es el dueño de esa caché.",
+        "Revisar el código actual y confirmar que ninguna ruta marcada NO tiene un Cache-Control o caché de aplicación puesto por accidente."
+      ],
+      "aceptacion": [
+        {
+          "check": "El documento de política existe con columnas SI/NO por ruta",
+          "comando": "grep -cE '\\| ?(SI|NO) ?\\|' docs/rendimiento/cache-politica.md",
+          "espera": "5+ líneas"
+        },
+        {
+          "check": "Ninguna ruta marcada NO tiene Cache-Control distinto de no-store en el código",
+          "comando": "bash -c \"grep -oP '(?<=NO\\\\|).*' docs/rendimiento/cache-politica.md | grep -oE '/[a-z0-9/_-]+' | xargs -I{} grep -rn 'Cache-Control' app{} 2>/dev/null | grep -v 'no-store'\"",
+          "espera": "0 líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/cache-politica.md"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar",
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "perf.cache.clave-completa-con-tenant-y-rol",
+      "titulo": "Meter tenant, rol y todo lo que cambia la respuesta en la clave de caché",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una clave de caché que solo lleva la ruta y le falta el tenant o el rol no es un bug de velocidad: es una fuga de datos. El primer usuario que pide /reportes le deja su respuesta guardada bajo esa clave, y el siguiente tenant que pida lo mismo recibe los datos ajenos servidos desde caché.",
+      "queHacer": [
+        "Para cada caché listada como SI en cache-politica.md, escribir explícitamente qué campos componen la clave: tenant, rol, usuario si aplica, parámetros de filtro y versión del esquema de respuesta.",
+        "Construir la clave concatenando esos campos con un separador fijo, nunca confiando en el orden de un objeto serializado.",
+        "Escribir una prueba que pida la misma ruta con dos tenants distintos y confirme que la clave generada difiere.",
+        "Escribir una prueba que pida la misma ruta con dos roles distintos sobre el mismo tenant y confirme que la clave también difiere."
+      ],
+      "aceptacion": [
+        {
+          "check": "La clave de caché cambia entre tenants para la misma ruta",
+          "comando": "npm test -- clave-cache-tenant",
+          "espera": "test verde; clave(tenantA, rutaX) !== clave(tenantB, rutaX)"
+        },
+        {
+          "check": "La clave de caché cambia entre roles para el mismo tenant",
+          "comando": "npm test -- clave-cache-rol",
+          "espera": "test verde; clave(tenant, rolAdmin) !== clave(tenant, rolLector)"
+        }
+      ],
+      "aplicaSi": {
+        "multiTenant": true
+      },
+      "porCada": null,
+      "posee": [
+        "lib/servidor/cache/clave.ts"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar"
+      ]
+    },
+    {
+      "id": "perf.cache.invalidar-en-el-momento-no-por-tiempo",
+      "titulo": "Invalidar la caché de {{entidad}} en el momento en que cambia, no esperar el TTL",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un TTL de 5 minutos significa que, durante esos 5 minutos, todo el mundo puede seguir viendo el dato viejo después de un cambio real: el precio que el dueño acaba de corregir, el pedido que ya se marcó como entregado. El usuario reporta \"lo cambié y sigue igual\" y nadie sabe por qué.",
+      "queHacer": [
+        "Identificar cada operación de escritura sobre {{entidad}} que tiene una lectura cacheada correspondiente.",
+        "En esa misma transacción o inmediatamente después de que el commit se confirma, invalidar o actualizar explícitamente las claves de caché afectadas por id de {{entidad}}.",
+        "No depender de un TTL corto como único mecanismo: el TTL es la red de seguridad, la invalidación explícita es el mecanismo principal.",
+        "Escribir una prueba que escriba {{entidad}}, lea inmediatamente después y confirme que el valor leído es el nuevo, no el cacheado."
+      ],
+      "aceptacion": [
+        {
+          "check": "Escribir y releer inmediatamente devuelve el valor nuevo, no el viejo",
+          "comando": "npm test -- invalidacion-inmediata-{{entidad}}",
+          "espera": "test verde; lectura posterior a la escritura == valor recién escrito"
+        },
+        {
+          "check": "Toda escritura sobre la entidad invalida su clave asociada",
+          "comando": "grep -rn 'guardar{{entidad}}\\|actualizar{{entidad}}' lib/servidor/ -A5 | grep -c 'invalidar\\|cache.delete\\|cache.del'",
+          "espera": "1+ líneas por cada punto de escritura"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": "entidad",
+      "posee": [
+        "lib/servidor/{{entidad}}/cache.ts"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "perf.cache.servir-viejo-mientras-se-revalida",
+      "titulo": "Servir el dato viejo mientras se revalida, con tope de antigüedad",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Sin stale-while-revalidate, cada expiración de caché hace que la siguiente petición pague el costo completo de recalcular, y si dos peticiones llegan a la vez ambas recalculan el mismo dato. Sin un tope explícito de antigüedad tolerada, alguien decide de memoria si 10 segundos viejo está bien o no, y esa decisión no se revisa nunca.",
+      "queHacer": [
+        "Para las cachés de lectura de alto tráfico marcadas SI en cache-politica.md, implementar stale-while-revalidate: servir el valor cacheado aunque esté vencido y disparar la recarga en segundo plano.",
+        "Declarar por escrito, por cada una, el máximo de antigüedad tolerada (ej. 30 s) más allá del cual ya no se sirve viejo sino que se espera la recarga.",
+        "Asegurar que solo una recarga en segundo plano corre a la vez por clave (candado o promesa compartida), no una por cada petición concurrente.",
+        "Medir cuántas peticiones simultáneas disparan recarga antes y después del candado."
+      ],
+      "aceptacion": [
+        {
+          "check": "10 peticiones concurrentes a una clave vencida disparan una sola recarga real",
+          "comando": "node scripts/perf/concurrencia-revalidacion.mjs --claves 1 --peticiones 10",
+          "espera": "1 recarga real registrada, 10 respuestas servidas"
+        },
+        {
+          "check": "El tope de antigüedad tolerada está declarado por caché",
+          "comando": "grep -c 'maxAntiguedadMs\\|staleWhileRevalidate' lib/servidor/cache/*.ts",
+          "espera": "1+ por archivo de caché"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "lib/servidor/cache/swr.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.cache.vaciar-con-un-comando",
+      "titulo": "Poder vaciar cualquier caché con un solo comando en producción",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cuando la caché sirve algo corrupto o viejo y el TTL falló, el operador necesita apagar el incendio ya, no esperar un despliegue completo ni reiniciar el proceso a mano. Sin un comando de vaciado, la respuesta al incidente es reiniciar el servidor entero y perder toda la caché de golpe, incluida la que sí estaba sana.",
+      "queHacer": [
+        "Escribir un comando (script o ruta administrativa protegida) que vacíe una caché por nombre o por patrón de clave, sin reiniciar el proceso.",
+        "Registrar en el log de auditoría quién vació qué caché y cuándo.",
+        "Documentar el comando en docs/rendimiento/cache-politica.md junto a cada caché declarada.",
+        "Probar que después de vaciar, la siguiente lectura recalcula desde el origen y no desde un remanente."
+      ],
+      "aceptacion": [
+        {
+          "check": "El comando de vaciado existe y corre",
+          "comando": "node scripts/cache/vaciar.mjs --patron 'reportes:*'",
+          "espera": "imprime cuántas claves vació (numero >= 0) y sale con código 0"
+        },
+        {
+          "check": "Después de vaciar, la siguiente lectura no viene de caché",
+          "comando": "npm test -- vaciado-fuerza-recalculo",
+          "espera": "test verde; hit=false en la lectura posterior al vaciado"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "scripts/cache/vaciar.mjs"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.cache.medir-porcentaje-de-aciertos",
+      "titulo": "Medir el porcentaje real de aciertos de caché, no suponerlo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una caché con 8% de aciertos hace casi todo el trabajo de calcular y además paga el costo extra de leer y escribir la caché: es más lenta que no tener caché. Sin medir el porcentaje de aciertos, nadie se entera de que la caché está de adorno hasta que alguien la revisa por curiosidad.",
+      "queHacer": [
+        "Contar en cada caché los hits y los misses en un contador accesible (endpoint interno o log estructurado).",
+        "Calcular el porcentaje de aciertos = hits / (hits + misses) por caché, en una ventana móvil (última hora o último día).",
+        "Escribir el porcentaje actual, con fecha, en docs/rendimiento/cache-aciertos.md.",
+        "Si una caché mide por debajo de un umbral razonable (definir el número, ej. 40%), documentar la decisión: ajustar la clave, subir el TTL, o quitar la caché."
+      ],
+      "aceptacion": [
+        {
+          "check": "El porcentaje de aciertos se puede consultar en vivo",
+          "comando": "curl -s localhost:3000/interno/cache-metricas | grep -oE '\"aciertos\":[0-9.]+'",
+          "espera": "un número entre 0 y 1"
+        },
+        {
+          "check": "El documento de aciertos tiene al menos una medición con fecha",
+          "comando": "grep -cE '[0-9]{4}-[0-9]{2}-[0-9]{2}.*%' docs/rendimiento/cache-aciertos.md",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/cache-aciertos.md",
+        "lib/servidor/cache/metricas.ts"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "perf.cache.caida-de-cache-no-tumba-el-sistema",
+      "titulo": "Confirmar que el sistema sigue respondiendo cuando la caché se cae",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Si el código trata la caché como si nunca pudiera fallar, un Redis caído convierte una capa de optimización en un punto único de falla: la app entera deja de responder por algo que nunca debió ser requisito para funcionar.",
+      "queHacer": [
+        "Envolver cada lectura y escritura de caché en un manejo de error que, si la caché no responde, siga el camino de calcular desde el origen.",
+        "Poner un tiempo máximo de espera corto a las operaciones de caché para que un Redis lento no bloquee la petición.",
+        "Simular la caída de la caché (apagar el contenedor o apuntar a un host inválido) y confirmar que las rutas dependientes siguen respondiendo, aunque más lento.",
+        "Registrar en el log cada vez que se recurre al origen por falla de caché, para poder ver si el incidente fue frecuente o aislado."
+      ],
+      "aceptacion": [
+        {
+          "check": "Con la caché apagada, la ruta principal sigue devolviendo 200",
+          "comando": "docker stop redis-local && curl -s -o /dev/null -w '%{http_code}' localhost:3000/reportes && docker start redis-local",
+          "espera": "200"
+        },
+        {
+          "check": "Cada fallo de caché queda registrado",
+          "comando": "grep -c 'cache-fallback\\|cache_miss_por_error' logs/app.log",
+          "espera": "1+ líneas tras la prueba anterior"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "lib/servidor/cache/envoltorio-seguro.ts"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar"
+      ]
+    },
+    {
+      "id": "perf.cache.dato-personal-fuera-de-cache-compartida",
+      "titulo": "Sacar el dato personal de cualquier caché compartida entre usuarios",
+      "nivel": "N1",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una caché compartida (CDN, Redis global, caché de aplicación en memoria del proceso) que guarda un nombre, un correo, un teléfono o una dirección bajo una clave que no distingue usuario, la sirve al siguiente que pida esa misma ruta: es exponer datos personales de una persona a otra, no un detalle técnico.",
+      "queHacer": [
+        "Recorrer las cachés compartidas existentes (CDN, Redis, memoria de proceso) y listar cuáles guardan campos con datosPersonales.",
+        "Para cada una, mover el dato personal fuera de la caché compartida: no cachear esa respuesta, o cachearla solo en una caché por-usuario (sesión o clave con el id del usuario incluido).",
+        "Confirmar con una prueba automatizada que ninguna respuesta cacheada compartida contiene campos marcados como personales.",
+        "Añadir la regla a cache-politica.md para que no se repita en cachés futuras."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna clave de caché compartida guarda campos personales",
+          "comando": "node scripts/perf/auditar-cache-datos-personales.mjs",
+          "espera": "0 claves compartidas con campos personales"
+        },
+        {
+          "check": "La regla está escrita en la política",
+          "comando": "grep -ci 'dato personal\\|datosPersonales' docs/rendimiento/cache-politica.md",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "datosPersonales": true
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/perf/auditar-cache-datos-personales.mjs"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "perf.cache.techo-de-antiguedad-en-datos-de-cobro",
+      "titulo": "Prohibir la caché de cualquier dato que participe en el cobro",
+      "nivel": "N0",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Cachear el precio, el inventario disponible o el saldo del cliente ahorra milisegundos hoy y cobra de más o de menos mañana: el cliente paga un precio que ya cambió, o la venta se completa sobre un inventario que ya no existe.",
+      "queHacer": [
+        "Listar cada campo que entra en el cálculo del cobro: precio, impuesto, descuento, inventario disponible, saldo a favor.",
+        "Confirmar que ninguna ruta que participa en el flujo de cobro lee esos campos desde una caché: siempre desde el origen en el momento del cobro.",
+        "Si alguna de esas rutas hoy tiene Cache-Control o caché de aplicación, quitarlo y dejar constancia del cambio en cache-politica.md.",
+        "Escribir una prueba que cambie el precio de cada entidad y confirme que el siguiente cobro usa el precio nuevo, sin ventana de tolerancia."
+      ],
+      "aceptacion": [
+        {
+          "check": "Ninguna ruta de cobro tiene Cache-Control distinto de no-store",
+          "comando": "grep -rln 'cobro\\|checkout\\|pagar' app/api/ | xargs grep -l 'Cache-Control' | xargs grep -L 'no-store'",
+          "espera": "0 líneas"
+        },
+        {
+          "check": "Cambiar el precio se refleja en el cobro inmediato, sin ventana",
+          "comando": "npm test -- precio-sin-cache-en-cobro",
+          "espera": "test verde; cobro usa precio actualizado en la siguiente petición"
+        }
+      ],
+      "aplicaSi": {
+        "dineroReal": true
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/cache-politica.md"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar",
+        "tema:invariantes-contables"
+      ]
+    },
+    {
+      "id": "perf.borde.estatico-con-huella-y-cache-de-un-ano",
+      "titulo": "Servir cada archivo estático con huella en el nombre y caché de un año",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un archivo estático sin huella en el nombre (hash del contenido) obliga a usar un TTL corto para poder actualizarlo algún día, y entonces cada visitante lo vuelve a descargar cada pocas horas aunque no haya cambiado nunca. Con huella en el nombre, el archivo es inmutable: puede cachearse un año completo sin riesgo.",
+      "queHacer": [
+        "Confirmar que el proceso de build agrega un hash del contenido al nombre de cada archivo estático (CSS, JS, imágenes procesadas por el bundler).",
+        "Poner Cache-Control: public, max-age=31536000, immutable a toda respuesta cuyo nombre incluya la huella.",
+        "Confirmar que el HTML que referencia esos archivos NUNCA se cachea con el mismo TTL largo, porque es el HTML el que apunta al nombre nuevo tras cada despliegue.",
+        "Medir con curl -I el header real después del despliegue, no solo revisar la configuración."
+      ],
+      "aceptacion": [
+        {
+          "check": "Los archivos con hash en el nombre traen caché de un año",
+          "comando": "curl -sI https://$DOMINIO/_next/static/chunks/$(ls .next/static/chunks | head -1) | grep -i 'cache-control'",
+          "espera": "max-age=31536000 e immutable presentes"
+        },
+        {
+          "check": "El bundler genera nombres con hash de contenido",
+          "comando": "ls .next/static/chunks/ | grep -cE '\\.[a-f0-9]{8,}\\.(js|css)$'",
+          "espera": "1+ archivos"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true,
+        "superficies": [
+          "publico",
+          "landing",
+          "vitrina"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "next.config.js",
+        "docs/rendimiento/borde.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.borde.html-no-se-cachea-como-el-estatico",
+      "titulo": "No cachear el HTML igual que el estático con huella",
+      "nivel": "N1",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Copiar la política de caché del JS/CSS al HTML deja a los visitantes viendo una versión vieja de la página durante horas o días, incluyendo referencias a archivos estáticos que ya no existen tras el siguiente despliegue: la página se rompe visiblemente para quien tenía el HTML viejo en caché.",
+      "queHacer": [
+        "Poner al HTML servido un Cache-Control corto o de revalidación (ej. max-age=0, must-revalidate, o s-maxage bajo con revalidación en el borde), nunca immutable ni max-age de un año.",
+        "Confirmar que el header del HTML es distinto, medido, del header de los archivos con huella.",
+        "Si se usa ISR o similar, documentar el tiempo de revalidación elegido y por qué ese número.",
+        "Probar que tras publicar un cambio de contenido, el HTML nuevo aparece dentro del tiempo de revalidación declarado, sin purgar nada a mano."
+      ],
+      "aceptacion": [
+        {
+          "check": "El Cache-Control del HTML es distinto y más corto que el de los estáticos con huella",
+          "comando": "curl -sI https://$DOMINIO/ | grep -i 'cache-control'",
+          "espera": "max-age ausente o menor a 300, sin immutable"
+        },
+        {
+          "check": "Un cambio de contenido se refleja dentro del tiempo declarado",
+          "comando": "node scripts/perf/verificar-revalidacion-html.mjs --url https://$DOMINIO/ --minutos 5",
+          "espera": "contenido nuevo visible antes de 5 min"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true,
+        "superficies": [
+          "publico",
+          "landing",
+          "vitrina"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/borde.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.borde.purgar-al-publicar-y-comprobarlo",
+      "titulo": "Purgar el borde al publicar y comprobar que de verdad purgó",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Un despliegue que no purga el borde deja al CDN sirviendo la versión anterior desde sus nodos hasta que el TTL expire por su cuenta: el equipo cree que ya publicó, y una parte de los visitantes sigue viendo lo viejo durante minutos u horas sin que nadie se entere hasta que alguien reclama.",
+      "queHacer": [
+        "Agregar al script de despliegue una llamada a la API de purga del CDN para las rutas que cambiaron (o purga completa si el proveedor no permite selectiva).",
+        "Después de purgar, pedir la misma URL con un parámetro que evite la caché del navegador y confirmar en la respuesta que el header de edad (Age o X-Cache) volvió a cero o marca MISS.",
+        "Si la purga falla, hacer que el despliegue lo reporte como error visible, no como advertencia silenciosa.",
+        "Dejar registrado el ID o la hora de la purga en el log de despliegue."
+      ],
+      "aceptacion": [
+        {
+          "check": "Tras purgar, la siguiente petición marca MISS o Age bajo en el borde",
+          "comando": "curl -sI https://$DOMINIO/ | grep -iE 'x-cache|age'",
+          "espera": "MISS, o Age menor a 5"
+        },
+        {
+          "check": "El script de despliegue incluye el paso de purga",
+          "comando": "grep -c 'purge\\|purga' scripts/deploy.sh",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true,
+        "superficies": [
+          "publico",
+          "landing",
+          "vitrina"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "scripts/deploy.sh"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.borde.imagen-en-el-tamano-que-la-pantalla-pide",
+      "titulo": "Servir cada imagen en el tamaño que la pantalla que la pide necesita",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Mandar la imagen de 2400 px a un teléfono que la va a mostrar en 375 px de ancho gasta datos del visitante y tiempo de descarga por algo que después el navegador reduce igual: el usuario paga el costo completo por un resultado que nunca ve a esa resolución.",
+      "queHacer": [
+        "Confirmar que las imágenes públicas pasan por un servicio o componente de imagen que genera variantes por ancho (srcset o equivalente del framework).",
+        "Fijar los anchos generados según los breakpoints reales del sitio, no un solo tamaño genérico.",
+        "Medir con la pestaña de red, emulando 390 px de ancho, qué variante de imagen se descarga realmente.",
+        "Confirmar que ninguna imagen descargada en móvil pesa más de lo que el layout necesita a ese ancho (con un margen razonable, ej. 1.5x para pantallas retina)."
+      ],
+      "aceptacion": [
+        {
+          "check": "A 390 px de ancho se descarga la variante pequeña, no la original",
+          "comando": "node ORION/tools/edge-cdp.mjs --url https://$DOMINIO/ --width 390 --height 844 --mobile --eval \"[...document.images].map(i=>i.currentSrc)\"",
+          "espera": "las URLs muestran un ancho <= 800 en el parámetro de tamaño"
+        },
+        {
+          "check": "El componente de imagen genera variantes por ancho",
+          "comando": "grep -rc 'srcset\\|sizes=' app/ --include='*.tsx' | grep -v ':0'",
+          "espera": "1+ archivos"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "publico",
+          "landing",
+          "vitrina"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/borde.md"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.borde.bundle-no-se-vuelve-a-bajar-entero",
+      "titulo": "Confirmar que cambiar una línea no obliga a bajar el bundle entero de nuevo",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Si todo el JavaScript sale en un solo archivo, cambiar una línea en cualquier parte invalida ese archivo completo para todos los visitantes: el que ya lo tenía cacheado lo vuelve a bajar entero por un cambio mínimo, y el ahorro de la caché con huella se pierde en la práctica.",
+      "queHacer": [
+        "Confirmar que el bundler separa el código en chunks: vendor (librerías, cambia poco), común (compartido entre rutas) y por-ruta (cambia con cada feature).",
+        "Después de un cambio pequeño en una sola ruta, comparar los nombres de archivo generados antes y después del cambio.",
+        "Confirmar que solo el chunk de esa ruta (y el que la referencia) cambió de nombre; vendor y común deben conservar su hash.",
+        "Si el build actual genera un solo bundle grande, dividirlo y volver a medir."
+      ],
+      "aceptacion": [
+        {
+          "check": "Un cambio en una ruta no cambia el hash del chunk de vendor",
+          "comando": "node scripts/perf/diff-chunks.mjs --antes .next-antes/static/chunks --despues .next/static/chunks",
+          "espera": "vendor-*.js con el mismo hash en ambas carpetas"
+        },
+        {
+          "check": "El KB total re-descargado tras el cambio es menor al del bundle completo",
+          "comando": "node scripts/perf/diff-chunks.mjs --antes .next-antes/static/chunks --despues .next/static/chunks --kb",
+          "espera": "KB cambiados < KB totales del bundle"
+        }
+      ],
+      "aplicaSi": {
+        "superficies": [
+          "publico",
+          "landing",
+          "vitrina"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "next.config.js"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.borde.medir-desde-donde-esta-el-usuario",
+      "titulo": "Medir la carga desde la región del usuario, no desde la máquina del builder",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Medir desde la laptop del desarrollador, a menudo en la misma ciudad o hasta la misma red que el servidor, esconde la latencia real que sufre un usuario en otra región: el sitio \"funciona rápido\" en las pruebas y llega lento a quien de verdad lo usa.",
+      "queHacer": [
+        "Elegir la región donde de verdad está la mayoría de los usuarios (según el mercado piloto o los logs de tráfico real).",
+        "Medir el tiempo de carga con una herramienta que corra desde esa región o con throttling de red que simule esa distancia, no desde la red local de quien construye.",
+        "Registrar la comparación: medido en la máquina del builder vs. medido desde la región real, con fecha y comando.",
+        "Repetir esta medición después de cada cambio de infraestructura de borde (nuevo proveedor, nueva región de CDN)."
+      ],
+      "aceptacion": [
+        {
+          "check": "Existe una medición etiquetada con la región real del usuario",
+          "comando": "grep -c 'region:' docs/rendimiento/borde.md",
+          "espera": "1+ líneas"
+        },
+        {
+          "check": "La medición desde región real y desde la máquina local están ambas documentadas y difieren",
+          "comando": "grep -E 'local:|region:' docs/rendimiento/borde.md",
+          "espera": "2+ líneas con números de ms distintos entre sí"
+        }
+      ],
+      "aplicaSi": {
+        "nube": true,
+        "superficies": [
+          "publico",
+          "landing",
+          "vitrina"
+        ]
+      },
+      "porCada": null,
+      "posee": [
+        "docs/rendimiento/borde.md"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "perf.escala.ensayo-a-10x-antes-de-prometer",
+      "titulo": "Correr {{entidad}} con 10 veces los datos actuales antes de prometer que aguanta",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Decir \"esto escala\" sin haberlo corrido con más volumen es una promesa sin respaldo: la consulta que hoy tarda 40 ms sobre 5.000 filas puede tardar 4 s sobre 50.000 porque no tiene índice, y nadie lo sabe hasta que el cliente grande llega y el sistema se cae en producción.",
+      "queHacer": [
+        "Generar o clonar un conjunto de datos con 10 veces el volumen actual de {{entidad}} en un entorno de prueba, no en producción.",
+        "Correr las operaciones más usadas sobre {{entidad}} (listar, filtrar, exportar, reportar) contra ese volumen y medir el tiempo.",
+        "Comparar contra la línea base al volumen actual: si el crecimiento del tiempo es peor que proporcional al volumen, documentar el hallazgo como riesgo antes de prometer nada al cliente.",
+        "Repetir el ensayo cada vez que el volumen real se acerque al 10x usado en la última prueba."
+      ],
+      "aceptacion": [
+        {
+          "check": "El ensayo con 10x corrió y dejó números escritos",
+          "comando": "node scripts/perf/ensayo-10x.mjs --entidad {{entidad}}",
+          "espera": "imprime tiempo a 1x y tiempo a 10x, ambos en ms"
+        },
+        {
+          "check": "El resultado está documentado con fecha",
+          "comando": "grep -cE '10x.*{{entidad}}.*[0-9]{4}-[0-9]{2}-[0-9]{2}' docs/rendimiento/volumen.md",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": "entidad",
+      "posee": [
+        "docs/rendimiento/volumen.md",
+        "scripts/perf/ensayo-10x.mjs"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "perf.escala.techo-a-operacion-que-crece-con-filas",
+      "titulo": "Poner techo a la operación cuyo costo crece con las filas de {{entidad}}",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Una operación sin techo (exportar todo, recalcular todo, recorrer todo) que hoy tarda 2 segundos porque hay pocas filas, tarda lo que tarde cuando las filas se multipliquen, y ese \"lo que tarde\" puede ser minutos que bloquean al resto del sistema sin que nadie haya decidido que eso era aceptable.",
+      "queHacer": [
+        "Identificar la operación sobre {{entidad}} cuyo tiempo depende directamente del número de filas (exportar, recalcular, recorrer completo).",
+        "Medir el tiempo actual y proyectar, con la medición de 10x, cuánto tardaría al doble y al triple del volumen de esa prueba.",
+        "Poner un techo explícito: un límite de filas por operación, paginación obligatoria, o mover la operación a un trabajo en segundo plano si supera el techo.",
+        "Escribir una prueba que confirme que superar el techo dispara el camino alterno (rechazo, paginación o cola), no un intento de procesar todo igual."
+      ],
+      "aceptacion": [
+        {
+          "check": "Superar el techo de filas dispara el camino alterno declarado",
+          "comando": "npm test -- techo-filas-{{entidad}}",
+          "espera": "test verde; sobre el techo, la respuesta es paginada o encolada, no un procesamiento completo síncrono"
+        },
+        {
+          "check": "El techo está documentado con el número exacto",
+          "comando": "grep -cE 'TECHO_FILAS.*{{entidad}}' lib/servidor/{{entidad}}/*.ts",
+          "espera": "1+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": "entidad",
+      "posee": [
+        "lib/servidor/{{entidad}}/techo.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.escala.trabajo-pesado-sale-de-la-peticion",
+      "titulo": "Sacar el trabajo pesado de {{ruta}} de la petición y mandarlo a una cola",
+      "nivel": "N2",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Un trabajo pesado (generar un reporte grande, procesar un archivo subido, enviar un lote de correos) corrido dentro de la misma petición HTTP mantiene la conexión abierta hasta que termina: si tarda más que el timeout del servidor o del navegador, el usuario ve un error aunque el trabajo sí se estuviera haciendo, y dos peticiones así en paralelo pueden agotar los workers disponibles para el resto del tráfico.",
+      "queHacer": [
+        "Identificar en {{ruta}} el paso que tarda más de un par de segundos con datos reales.",
+        "Sacar ese paso a un trabajo encolado (cola en base de datos, Redis, o el mecanismo que ya use el proyecto) que corre fuera del ciclo de petición-respuesta.",
+        "Responder de inmediato con un identificador de trabajo y un estado consultable (pendiente, en progreso, listo, error).",
+        "Medir el tiempo de respuesta de {{ruta}} antes (bloqueante) y después (encolado) y dejarlo escrito en docs/rendimiento/volumen.md."
+      ],
+      "aceptacion": [
+        {
+          "check": "La ruta responde antes de que el trabajo pesado termine",
+          "comando": "curl -s -o /dev/null -w '%{time_total}\\n' -X POST localhost:3000{{ruta}}",
+          "espera": "tiempo < 1.0 s, con el trabajo real corriendo aparte y consultable después"
+        },
+        {
+          "check": "El estado del trabajo se puede consultar por su id",
+          "comando": "curl -s localhost:3000/trabajos/$ID | grep -oE '\"estado\":\"[a-z]+\"'",
+          "espera": "un estado válido (pendiente|en-progreso|listo|error)"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": "ruta",
+      "posee": [
+        "lib/servidor/colas/{{ruta}}.ts"
+      ],
+      "cerebro": []
+    },
+    {
+      "id": "perf.escala.medir-con-concurrencia-real",
+      "titulo": "Medir {{ruta}} con varias peticiones a la vez, no una sola en serie",
+      "nivel": "N2",
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "porQue": "Una sola petición a la vez nunca muestra el problema de recursos compartidos: conexiones de base de datos agotadas, un candado que serializa lo que debería ser paralelo, o un caché que se pisa a sí mismo. El sistema que responde perfecto a una petición puede caerse a la tercera petición simultánea, y una prueba en serie nunca lo va a mostrar.",
+      "queHacer": [
+        "Elegir el número de usuarios concurrentes esperado en el pico real (no un número arbitrario) para {{ruta}}.",
+        "Correr una herramienta de carga (ej. autocannon, k6) contra {{ruta}} con esa concurrencia sostenida por al menos 30 segundos.",
+        "Medir p50, p95 y la tasa de errores bajo esa concurrencia, no solo el tiempo de una petición sola.",
+        "Comparar contra la medición en serie de la misma ruta y dejar ambos números escritos, uno junto al otro."
+      ],
+      "aceptacion": [
+        {
+          "check": "La prueba de carga concurrente corrió y midió p95 y tasa de error",
+          "comando": "npx autocannon -c 20 -d 30 http://localhost:3000{{ruta}}",
+          "espera": "reporte con p95 en ms y una tasa de error (2xx/total) >= 99%"
+        },
+        {
+          "check": "El documento tiene la medición en serie y la concurrente, una junto a la otra",
+          "comando": "grep -cE 'serie:|concurrente:' docs/rendimiento/volumen.md",
+          "espera": "2+ líneas"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": "ruta",
+      "posee": [
+        "docs/rendimiento/volumen.md"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
+    },
+    {
+      "id": "perf.escala.recurso-que-se-agota-primero",
+      "titulo": "Identificar con una medición cuál recurso se agota primero al escalar",
+      "nivel": "N3",
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "porQue": "Sin saber cuál recurso se agota primero (conexiones de base de datos, memoria del proceso, espacio en disco), el equipo escala a ciegas: agrega más servidores cuando el límite real era el pool de conexiones de la base de datos, y el problema sigue exactamente igual con el doble de costo.",
+      "queHacer": [
+        "Correr la prueba de concurrencia real (perf.escala.medir-con-concurrencia-real) mientras se observan en paralelo: conexiones activas a la base de datos, uso de memoria del proceso y espacio libre en disco.",
+        "Subir la concurrencia por pasos hasta que algo falle o se degrade notablemente, y anotar en qué paso y cuál recurso llegó primero a su límite.",
+        "Documentar el número exacto del límite encontrado (ej. \"a 45 conexiones concurrentes el pool de Postgres se agota\") en docs/rendimiento/volumen.md.",
+        "Proponer el techo operativo (cuántos usuarios concurrentes soporta hoy el sistema) basado en ese número medido, no en una sensación."
+      ],
+      "aceptacion": [
+        {
+          "check": "Existe una medición que nombra el recurso agotado y el punto exacto",
+          "comando": "grep -E 'recurso agotado:|limite medido:' docs/rendimiento/volumen.md",
+          "espera": "1+ líneas con un número (conexiones, MB o GB) y el nombre del recurso"
+        },
+        {
+          "check": "El script de ensayo de recursos corre y reporta el punto de quiebre",
+          "comando": "node scripts/perf/ensayo-recursos.mjs",
+          "espera": "imprime el recurso y el valor de concurrencia donde se degradó"
+        }
+      ],
+      "aplicaSi": {},
+      "porCada": null,
+      "posee": [
+        "scripts/perf/ensayo-recursos.mjs",
+        "docs/rendimiento/volumen.md"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia"
+      ]
     }
   ]
 }
