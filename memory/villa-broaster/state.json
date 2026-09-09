@@ -1,6 +1,6 @@
 {
   "projectId": "villa-broaster",
-  "snapshotDate": "2026-09-09T02:02:13.973Z",
+  "snapshotDate": "2026-09-09T02:11:05.324Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -912,6 +912,22 @@
       ],
       "fact": "EL SISTEMA ESTA PUBLICADO Y VIVO EN INTERNET (2026-09-08). https://villabroaster.prommter.online (vitrina, HTTP 200) y https://caja.villabroaster.prommter.online/admin (panel, HTTP 200, titulo Sistema contable Villa Broaster), ambos con certificado propio de Lets Encrypt emitido ese dia. LA API PUBLICA 14 PRODUCTOS: la carta real, con la pechuga a 12000 en el local 1 y 12500 en el local 2 — el precio por sede funciona de punta a punta. VPS Hostinger KVM 1, IP 2.25.89.240, Ubuntu 24.04.4. Node 24.20.0, Caddy como proxy con HTTPS automatico, systemd con un servicio por app (broaster-app :3200, villa-app :3201), usuario villabroaster sin privilegios, repos clonados con una deploy key de SOLO LECTURA por repositorio. La ADMIN_CLAVE se genero con openssl en el servidor, escrita a /etc/villa-broaster/broaster-app.env con permisos 600 y SIN mostrarse en pantalla: no paso por la conversacion ni por el contexto de nadie.",
       "context": "Los dos arreglos del mismo dia fueron los que hicieron posible esto: sin KN-036 el npm run build habria muerto en el servidor pidiendo ADMIN_CLAVE para compilar, y sin KN-037 las apps habrian escuchado en un puerto que el proxy no busca. Tres trampas mas se pagaron durante el despliegue y quedaron en docs/DESPLIEGUE.md: (1) GitHub rechaza la misma deploy key en dos repos; (2) sudo -u NO cambia HOME, asi que el ~/.ssh/config del usuario no se lee y el error miente hablando de resolucion de nombres; (3) un servidor nuevo no conoce a github.com y SSH se para a preguntar la huella, bloqueando el comando y tragandose como respuestas todo lo que se pegue despues. PENDIENTE: la prueba de humo de punta a punta (un pedido real desde la vitrina que aparezca en el panel) no se hizo para no meter un dato de prueba en la contabilidad del cliente sin permiso."
+    },
+    {
+      "id": "KN-039",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-09-09T02:11:05.324Z",
+      "updated": "2026-09-09T02:11:05.324Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "KN-038"
+      ],
+      "fact": "LA VITRINA ERA UNA PUERTA AL PANEL Y SE CERRO (2026-09-08, commit 9f6c566). El rewrite de villa-app era /api/:path* a secas, asi que desde el dominio PUBLICO se alcanzaba /api/admin/ordenes, /gastos y /usuarios: respondian 401, no habia agujero, pero el login del panel vivia en la direccion que se reparte por WhatsApp. Convertido en LISTA BLANCA de lo unico que la vitrina usa —/api/productos, /api/ordenes y /api/ordenes/:path*—; el grep confirmo que no usa ninguna otra. Verificado en produccion: /api/admin/* pasa de 401 a 404 desde la vitrina, /api/productos sigue 200, /api/ordenes 405 en GET (es POST) y el panel por caja.villabroaster.prommter.online/admin sigue 200.",
+      "context": "Salio de una pregunta del dueno —si le parecia buena la forma de un dominio con dos subdominios— que se contesto midiendo en vez de opinando. La separacion vitrina/caja en dos nombres es correcta y se mantiene: quien compra no ve la puerta del panel, la caja se puede proteger aparte, y un origen distinto evita que un fallo en la parte publica alcance la cookie de sesion del panel. Lo que estaba mal no era el esquema sino que la separacion era nominal: el proxy la deshacia. Regla que queda: separar por subdominio no sirve de nada si el reenvio del publico abarca todo el privado."
     }
   ],
   "archives": [
@@ -990,5 +1006,5 @@
     }
   ],
   "lastAmmRun": "2026-09-03T00:00:00.000Z",
-  "version": 40
+  "version": 41
 }
