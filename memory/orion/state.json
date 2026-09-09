@@ -1,8 +1,8 @@
 {
   "projectId": "orion",
-  "snapshotDate": "2026-09-02T03:25:37.000Z",
-  "version": 10,
-  "lastAmmRun": "2026-08-26T06:30:00.000Z",
+  "snapshotDate": "2026-09-09T00:00:00.000Z",
+  "version": 13,
+  "lastAmmRun": "2026-09-09T00:00:00.000Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -50,23 +50,6 @@
       "title": "runtime/ es la unica fuente de verdad del runtime; tools/runtime.mjs es la unica puerta",
       "description": "El runtime vivia en tres sitios (runtime/ en el repo, ~/.claude, y el payload embebido de instalar-orion.mjs) sin nadie que los cuadrara. tools/runtime.mjs anade: `estado` (deriva a tres bandas con fechas), `instalar` (runtime -> ~/.claude, con .bak), `recoger` (rescate ~/.claude -> runtime, que era el paso que faltaba) y `empaquetar` (regenera el payload del instalador desde runtime/). El inventario se descubre leyendo runtime/, no de una lista escrita a mano.",
       "reason": "Ver KN-001: 5 de 15 archivos habian derivado en ambas direcciones y correr el instalador habria revertido en silencio las mejoras que solo vivian en ~/.claude."
-    },
-    {
-      "id": "DEC-004",
-      "type": "Decision",
-      "tier": "Project",
-      "created": "2026-08-26T06:30:00.000Z",
-      "updated": "2026-08-26T06:30:00.000Z",
-      "lifetime": "Project",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Accepted",
-      "dependencies": [
-        "DEC-003"
-      ],
-      "title": "Todo el runtime bajo el prefijo orion-",
-      "description": "Instruccion literal del dueno 2026-08-26: 'todos los agentes que creemos quiero que sea barra Orion algo'. Renombrados: landing-prompter -> orion-landing, estudio-diseno -> orion-diseno. Se actualizaron las 17 superficies vivas que los citaban (runtime, READMEs, temas del cerebro, prompts-landing). NO se tocaron los respaldos (kit-portabilidad) ni las cosechas congeladas (_cosecha), que son historia. Las citas archivo:linea de los temas siguen siendo validas porque el contenido no cambio, solo el nombre del archivo.",
-      "reason": "Un prefijo unico hace que el dueno sepa que /orion-<algo> es siempre suyo, y que un agente nuevo sepa donde encaja."
     },
     {
       "id": "DEC-005",
@@ -133,21 +116,6 @@
       "source": "sesion 2026-08-26, RFC-0008 N8-R11 + medias medidas de KN-002"
     },
     {
-      "id": "KN-004",
-      "type": "Knowledge",
-      "tier": "Project",
-      "created": "2026-08-26T06:30:00.000Z",
-      "updated": "2026-08-26T06:30:00.000Z",
-      "lifetime": "Project",
-      "impact": "Medium",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "`cerebro.mjs ruta \"<pregunta>\"` devuelve COORDENADAS en vez de texto: archivo, linea y el `sed -n 'a,bp'` acotado para abrir solo ese trozo. Un tema del cerebro son ~900 lineas; la regla que hacia falta son 6. Ademas barre la boveda de Obsidian buscando notas ESCRITAS A MANO -- lo que el dueno escribio en Obsidian y no esta en ningun state.json, que ninguna otra herramienta encuentra. Excluye Cerebro/, Proyectos/ y Sistema/ porque esas tres carpetas las genera export-vault y devolverlas seria duplicar.",
-      "context": "Aplica en TODAS las fases y varias veces por turno, asi que su efecto compuesto es mayor que su numero individual.",
-      "source": "sesion 2026-08-26, tools/cerebro.mjs comando ruta"
-    },
-    {
       "id": "KN-005",
       "type": "Knowledge",
       "tier": "Project",
@@ -199,21 +167,6 @@
       "source": "sesion 2026-08-26, tools/plan.mjs comandos ola y validar"
     },
     {
-      "id": "KN-008",
-      "type": "Knowledge",
-      "tier": "Project",
-      "created": "2026-08-26T06:30:00.000Z",
-      "updated": "2026-08-26T06:30:00.000Z",
-      "lifetime": "Project",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "Un mensaje dictado por voz trae correcciones a mitad ('el MAUI... el baul no, el baul'), ejemplos que suenan a requisitos ('por ejemplo, un proyecto inmobiliario'), enfasis en forma de numero ('mil tareas'), condicionales que el mismo resuelve mas adelante, y la peticion central enterrada entre tres secundarias. Un agente que lo lea en crudo se lleva el ejemplo por requisito y pierde la correccion. El agente orion-traductor existe para eso: produce un ENCARGO con secciones separadas para correcciones detectadas, ejemplos que NO son requisitos, enfasis traducido, y huecos con su asuncion por defecto.",
-      "context": "La regla operativa es contar: items pedidos vs items escritos. El hueco que deje el encargo, el ejecutor lo rellena inventando -- ya paso con un prompt que mandaba dibujar 23 productos citando solo 10.",
-      "source": "sesion 2026-08-26, diseno de orion-traductor sobre el mensaje real del dueno"
-    },
-    {
       "id": "CON-001",
       "type": "Constraint",
       "tier": "Project",
@@ -261,59 +214,11 @@
       "reason": "build:page y build:lib son los dos sitios donde opus cuesta el doble que sonnet teniendo sonnet el doble de muestra limpia. Es el ahorro mas grande disponible sin tocar calidad."
     },
     {
-      "id": "PEND-003",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-08-26T06:30:00.000Z",
-      "updated": "2026-08-26T06:30:00.000Z",
-      "lifetime": "Sprint",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Ready",
-      "dependencies": [
-        "KN-005"
-      ],
-      "task": "Cerrar los huecos de medicion: anotar SIEMPRE los subagent_tokens (tambien en spawns que fallan), marcar infraDeath: true en las muertes de sesion, y usar solo los cinco subtipos canonicos de build en el campo phase.",
-      "reason": "Un presupuesto calibrado sobre datos con 16 % de huecos arrastra ese error para siempre, y un subtipo con un solo dato no calibra nada."
-    },
-    {
-      "id": "RSK-001",
-      "type": "Risk",
-      "tier": "Project",
-      "created": "2026-08-26T06:30:00.000Z",
-      "updated": "2026-08-26T06:30:00.000Z",
-      "lifetime": "Project",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Open",
-      "dependencies": [
-        "PEND-002"
-      ],
-      "risk": "Bajar de tier leyendo mal la estadistica: que opus pase 102 de 107 veces NO significa que sobre, significa que la rubrica le esta dando lo dificil. Bajarlo todo de golpe convierte un ahorro en una tanda de ciclos de correccion, que cuestan mas que el ahorro.",
-      "probability": "Medium",
-      "mitigation": "Bajar por TIPO DE TRABAJO con historial limpio y muestra suficiente, uno cada vez, y dejar que un FAIL real lo suba solo. Y nunca poner hechos de negocio ni copy publico en el tier barato aunque salga ok: verdict ok mide que el spawn aterrizo, no que acerto (_permanent/KN-016)."
-    },
-    {
-      "id": "KN-009",
-      "type": "Knowledge",
-      "tier": "Permanent",
-      "created": "2026-08-26T07:15:00.000Z",
-      "updated": "2026-08-26T07:15:00.000Z",
-      "lifetime": "Permanent",
-      "impact": "Medium",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [],
-      "fact": "SEGUNDA FORMA DE MORIR DE UN BUILDER, distinta del limite de sesion: el TOPE DE SALIDA. Medido 2026-08-26 construyendo el catalogo: cinco builders escribian un JSON grande cada uno; cuatro entregaron (122, 142, 147 y 85 KB) y uno murio con 'Claude's response exceeded the 64000 output token maximum' dejando el disco VACIO. La diferencia no fue el modelo ni el tamano final -el que murio iba a ser el mas pequeno- sino que los que sobrevivieron escribieron POR TANDAS (20 y 31 llamadas de herramienta) y el que murio intento un solo volcado. Se reconoce al instante porque no deja NADA: no es un archivo a medias, es un archivo que no existe.",
-      "context": "Remedio: en todo encargo que produzca un archivo generado grande, pedir explicitamente escritura por tandas con comprobacion entre una y otra (para JSON, que siga parseando). Como cualquier muerte de infraestructura, NO es fallo de capacidad y no debe subir el tier del modelo. El relanzamiento fue seguro precisamente porque el disco estaba vacio: se audito antes, segun la doctrina.",
-      "source": "sesion 2026-08-26, builder de catalogo/datos.json"
-    },
-    {
       "id": "KN-010",
       "type": "Knowledge",
       "tier": "Project",
       "created": "2026-08-26T08:00:00.000Z",
-      "updated": "2026-08-26T08:00:00.000Z",
+      "updated": "2026-09-03T00:00:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
@@ -321,44 +226,12 @@
       "dependencies": [
         "DEC-002"
       ],
-      "fact": "PRIMER PLAN DE EJECUCION REAL (villa-broaster, 2026-08-26): 176 tareas — 18 de auditar el repo mas 158 del catalogo para N0 y N1, los niveles hoy abiertos. VALIDO. Lo mas valioso no fueron las tareas del catalogo sino que el arquitecto CORRIGIO el brief que se le dio: la memoria del proyecto llevaba tres dias desactualizada (daba PEND-006 y PEND-007 por abiertos cuando estaban hechos, 68 tests cuando eran 176, 5 pestanas cuando eran 7). Y encontro dos defectos que nadie habia visto: cuadrarTurnos/resumirConTurnos/resumenPorLocalConTurnos con tests verdes y CERO consumidores -el dueno no puede ver su propio cuadre-, y la ruta publica de una orden devolviendo telefono y direccion del cliente protegida solo por un uuid, con ese enlace reenviandose por WhatsApp.",
+      "fact": "PRIMER PLAN DE EJECUCION REAL (villa-broaster, 2026-08-26): 176 tareas — 18 de auditar el repo mas 158 del catalogo para N0 y N1, los niveles hoy abiertos. VALIDO. Lo mas valioso no fueron las tareas del catalogo sino que el arquitecto CORRIGIO el brief que se le dio: la memoria del proyecto llevaba tres dias desactualizada (daba PEND-006 y PEND-007 por abiertos cuando estaban hechos, 68 tests cuando eran 176, 5 pestanas cuando eran 7). Y encontro dos defectos que nadie habia visto: cuadrarTurnos/resumirConTurnos/resumenPorLocalConTurnos con tests verdes y CERO consumidores -el dueno no puede ver su propio cuadre-, y la ruta publica de una orden devolviendo telefono y direccion del cliente protegida solo por un uuid, con ese enlace reenviandose por WhatsApp.\n\nCOMPLEMENTO (de KN-011): Un plan completo NO es un documento legible: 176 tareas son 823 lineas de PLAN.md, y 432 tareas son 1.820. Por eso `plan.mjs tanda` escribe otra cosa: el resumen del proyecto arriba y solo las N tareas siguientes detalladas abajo, cada una con su porque, sus pasos, sus archivos, sus comprobaciones y como lanzarla. Ese es el formato que se lee de verdad; PLAN.md es el archivo.",
       "context": "La leccion de proceso: un agente que OBSERVA el repo vale mas que el brief que se le da, y por eso su contrato le exige citar rutas reales en vez de fiarse de lo que le cuenten. El corolario incomodo: la memoria de un proyecto activo caduca en dias, no en meses.",
-      "source": "sesion 2026-08-26, orion-arquitecto sobre villa-broaster"
-    },
-    {
-      "id": "KN-011",
-      "type": "Knowledge",
-      "tier": "Project",
-      "created": "2026-08-26T08:00:00.000Z",
-      "updated": "2026-08-26T08:00:00.000Z",
-      "lifetime": "Project",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "dependencies": [
-        "DEC-002"
-      ],
-      "fact": "Un plan completo NO es un documento legible: 176 tareas son 823 lineas de PLAN.md, y 432 tareas son 1.820. Por eso `plan.mjs tanda` escribe otra cosa: el resumen del proyecto arriba y solo las N tareas siguientes detalladas abajo, cada una con su porque, sus pasos, sus archivos, sus comprobaciones y como lanzarla. Ese es el formato que se lee de verdad; PLAN.md es el archivo.",
-      "context": "Peticion literal del dueno 2026-08-26: 'un plan de que vamos a hacer resumidamente y el numero de tareas abajo detalladamente'. El registro sirve a la maquina, la tanda a la persona, y ambos salen del mismo plan.json.",
-      "source": "sesion 2026-08-26, tools/plan.mjs comando tanda"
-    },
-    {
-      "id": "KN-012",
-      "type": "Knowledge",
-      "tier": "Project",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [
-        "KN-004",
-        "DEC-005"
-      ],
-      "fact": "LA TRAMPA DEL ESPEJO: consultar una vista generada no ahorra ninguna lectura, porque devuelve disfrazado de hallazgo lo que el indice ya cubria. Detectado 2026-08-26 y arreglado: el barrido de notas a mano de `cerebro.mjs ruta` excluia Cerebro/, Proyectos/ y Sistema/, pero no las carpetas que escribe baul.mjs -Planes/, Sesiones/, Encargos/-, asi que devolvia el plan de villa-broaster como si fuera una nota escrita por una persona. Comprobado en los dos sentidos tras el arreglo: ya no devuelve la vista, y sigue encontrando una nota a mano puesta en la raiz del baul.",
-      "context": "Lo encontro orion-traductor leyendo el mensaje del dueno, en su bloque de TENSIONES: 'pedir que el bibliotecario primero consulte en Obsidian solo ahorra si el baul deja de ser espejo'. Es la prueba de que la seccion de tensiones del traductor no es adorno: senalo un defecto real del sistema antes de que nadie lo tocara. Regla general: cada carpeta que una herramienta GENERE tiene que entrar a la lista de exclusion del barrido, o el barrido deja de valer.",
-      "source": "sesion 2026-08-26, orion-traductor sobre el mensaje dictado; arreglo en tools/cerebro.mjs",
-      "created": "2026-08-26T08:40:00.000Z",
-      "updated": "2026-08-26T08:40:00.000Z"
+      "source": "sesion 2026-08-26, orion-arquitecto sobre villa-broaster",
+      "supersedes": [
+        "KN-011"
+      ]
     },
     {
       "id": "KN-013",
@@ -369,11 +242,14 @@
       "priority": "Medium",
       "status": "Current",
       "dependencies": [],
-      "fact": "El ENCARGO que produce orion-traductor sobre un mensaje dictado real llego a las mismas 8 entregas y a las mismas 7 asunciones por defecto que habia tomado el orquestador leyendo el mismo mensaje -sin verlas-, y ademas separo tres ejemplos que sonaban a requisito: 'orama' (proyecto inmobiliario), 'diez mejoras' y 'mil tareas para seguridad, mil para backend, mil para frontend'. Su recuento fue explicito: 30 items en el inventario de primera pasada, 8 entregables, ninguno inventado y ninguno perdido.",
+      "fact": "ORION-TRADUCTOR: Diseño y validacion. Un mensaje dictado por voz trae correcciones a mitad ('el MAUI... el baul no, el baul'), ejemplos que suenan a requisitos ('por ejemplo, un proyecto inmobiliario'), enfasis en forma de numero ('mil tareas'), condicionales que el mismo resuelve mas adelante, y la peticion central enterrada entre tres secundarias. Un agente que lo lea en crudo se lleva el ejemplo por requisito y pierde la correccion. El agente orion-traductor existe para eso: produce un ENCARGO con secciones separadas para correcciones detectadas, ejemplos que NO son requisitos, enfasis traducido, y huecos con su asuncion por defecto.\n\nEl ENCARGO que produce orion-traductor sobre un mensaje dictado real llego a las mismas 8 entregas y a las mismas 7 asunciones por defecto que habia tomado el orquestador leyendo el mismo mensaje -sin verlas-, y ademas separo tres ejemplos que sonaban a requisito: 'orama' (proyecto inmobiliario), 'diez mejoras' y 'mil tareas para seguridad, mil para backend, mil para frontend'. Su recuento fue explicito: 30 items en el inventario de primera pasada, 8 entregables, ninguno inventado y ninguno perdido.",
       "context": "Es la validacion del agente: dos lecturas independientes del mismo dictado convergen. Y el valor unico que aporta es lo que un lector apurado pierde -las correcciones a mitad de frase y los ejemplos-, que es exactamente el modo de fallo que motivo escribirlo.",
       "source": "sesion 2026-08-26, memory/orion/encargos/2026-08-26-orion-v4.md",
       "created": "2026-08-26T08:40:00.000Z",
-      "updated": "2026-08-26T08:40:00.000Z"
+      "updated": "2026-09-03T00:00:00.000Z",
+      "supersedes": [
+        "KN-008"
+      ]
     },
     {
       "id": "KN-014",
@@ -394,28 +270,11 @@
       "source": "sesion 2026-08-26, orion-estratega sobre villa-broaster"
     },
     {
-      "id": "RSK-002",
-      "type": "Risk",
-      "tier": "Project",
-      "created": "2026-08-26T09:10:00.000Z",
-      "updated": "2026-08-26T09:10:00.000Z",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "High",
-      "status": "Open",
-      "dependencies": [
-        "KN-014"
-      ],
-      "risk": "El precio propuesto para villa-broaster (400.000 COP/mes x 12 = 4,8M) apenas cubre el computo de terminar los niveles N0+N1 (~865k COP) mas el hosting del ano (~420k) mas el soporte. Si el dueno espera que la mensualidad financie ademas el backlog rapido, el numero queda corto y la cuenta se vuelve trabajo a perdida.",
-      "probability": "Medium",
-      "mitigation": "La decision es del dueno y el estratega no la tomo por el: o se sube la mensualidad, o se estira el calendario de N0+N1, o se recorta explicitamente que entra en la cuota. Lo que NO se puede es dejarlo implicito, que es como se llega a los tres meses trabajando gratis. Piso escrito: 250.000 COP/mes."
-    },
-    {
       "id": "KN-015",
       "type": "Knowledge",
       "tier": "Project",
       "created": "2026-08-26T09:40:00.000Z",
-      "updated": "2026-08-26T09:40:00.000Z",
+      "updated": "2026-09-09T00:00:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
@@ -424,26 +283,9 @@
         "DEC-002",
         "KN-006"
       ],
-      "fact": "CATALOGO COMPLETO 2026-08-26: 535 arquetipos en 9 categorias — seguridad 70, frontend 80, backend 72, datos 62, producto 57, operacion 55, rendimiento 54, calidad 48, accesibilidad 37. De ellos 43 se instancian por entidad/ruta/rol, asi que un proyecto con 12 entidades y 15 rutas saca del orden de 1.051 tareas CONCRETAS sin inventar ninguna. Eso resuelve la peticion literal del dueno ('mil tareas para seguridad, mil para backend, mil para frontend') de la unica forma en que es util: el numero sale de multiplicar arquetipos defendibles por entidades observadas, no de escribir mil lineas de relleno.",
-      "context": "Calidad medida en los 9 archivos: cero `porQue` corto, 3,9-4,9 pasos de media, 2,0-2,8 criterios de aceptacion por arquetipo, y greps que deben dar 0 lineas como forma mas barata de verificar (50 en seguridad, 39 en backend, 37 en frontend). Ocho builders distintos y la vara se sostuvo.",
-      "source": "sesion 2026-08-26, node tools/plan.mjs catalogo --validar"
-    },
-    {
-      "id": "KN-016",
-      "type": "Knowledge",
-      "tier": "Project",
-      "created": "2026-08-26T09:40:00.000Z",
-      "updated": "2026-08-26T09:40:00.000Z",
-      "lifetime": "Project",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "dependencies": [
-        "KN-015"
-      ],
-      "fact": "Cuando varios builders escriben catalogos hermanos EN PARALELO, el remedio contra la duplicacion no es coordinarlos por adelantado sino pedirle a cada uno que LEA a los demas antes de escribir. Medido: el builder de `datos` descubrio a mitad de su trabajo que `calidad` y `rendimiento` habian aparecido mientras el escribia, y recorto su propio alcance —de 9 ideas a 3 en `dat.consulta.*`, mas 4 arquetipos eliminados de `semilla` y `migracion`— para no solapar. El de accesibilidad hizo lo mismo contra frontend y lo reporto arquetipo por arquetipo.",
-      "context": "Es lo contrario de la propiedad disjunta de ARCHIVOS, que sigue siendo obligatoria: aqui el solapamiento es de CONTENIDO, y un archivo propio no lo evita. La instruccion que funciona es 'lee a los hermanos y di que recortaste', porque ademas deja la decision auditada en el reporte.",
-      "source": "sesion 2026-08-26, reportes de los builders de datos y accesibilidad"
+      "fact": "CATALOGO COMPLETO 2026-08-26: 535 arquetipos en 9 categorias — seguridad 70, frontend 80, backend 72, datos 62, producto 57, operacion 55, rendimiento 54, calidad 48, accesibilidad 37. De ellos 43 se instancian por entidad/ruta/rol, asi que un proyecto con 12 entidades y 15 rutas saca del orden de 1.051 tareas CONCRETAS sin inventar ninguna. Eso resuelve la peticion literal del dueno ('mil tareas para seguridad, mil para backend, mil para frontend') de la unica forma en que es util: el numero sale de multiplicar arquetipos defendibles por entidades observadas, no de escribir mil lineas de relleno.\n\nACTUALIZACION 2026-09-09 (enfoque 'vibe coding saas real', 15 ejes dictados por el dueno): el catalogo paso de 535 arquetipos/9 categorias a 725/11. Dos categorias NUEVAS -arquitectura (52) y saas (54)- mas refuerzos a operacion (+25: ci/git/nube), backend (+21: correo/tiempo-real/api/eventos), rendimiento (+20: cache/borde/escala) y seguridad (+18: abuso/llaves/sesion). `catalogo/_COBERTURA-WEB.md` mapea los 15 ejes dictados contra donde quedo cada uno, y marca aparte lo anadido por iniciativa propia bajo 'y mas cosas' para que el dueno lo pueda tachar. `plan.mjs catalogo --validar` = CATALOGO VALIDO.",
+      "context": "Calidad medida en los 9 archivos originales: cero `porQue` corto, 3,9-4,9 pasos de media, 2,0-2,8 criterios de aceptacion por arquetipo, y greps que deben dar 0 lineas como forma mas barata de verificar (50 en seguridad, 39 en backend, 37 en frontend). Ocho builders distintos y la vara se sostuvo. En la ampliacion de 2026-09-09, auditoria de los 142 checks de aceptacion de los refuerzos: 100% con comando ejecutable, 0% con adjetivo como criterio.",
+      "source": "sesion 2026-08-26, node tools/plan.mjs catalogo --validar; ampliado sesion 2026-09-09"
     },
     {
       "id": "KN-017",
@@ -460,23 +302,6 @@
       "fact": "UN ARQUETIPO QUE 'APLICA SIEMPRE' CASI NUNCA EXISTE, y el catalogo lo estaba incumpliendo: 49 de los 134 arquetipos de backend+datos no declaraban condicion de superficie ni de stack. Lo destapo un plan real: placita-tienda es una pagina publica SIN servidor y SIN base de datos -consume por HTTP la API de otro proyecto- y el catalogo le metio 17 tareas absurdas ('poner la hora en el servidor', 'dar a articulo-carrito su tabla, su clave primaria y su indice'). Arreglado: 37 arquetipos con su condicion, mas 3 que se colaban porque su stack ['node','json-en-disco'] matcheaba el 'node' de cualquier Next.js. Quedan 15 sin condicion A PROPOSITO: reglas de dominio puras que si aplican a una app cliente.",
       "context": "Lo que hace creible el recorte no es que baje el numero hacia adelante (de 20 a 3 arquetipos aplicables a una app sin servidor) sino la REGRESION EN SENTIDO CONTRARIO contra los respaldos: perfil de caja con json-en-disco 67->67, perfil api+postgres 125->125, perfil de panel interno 69->69. Ni un arquetipo perdido. Comprobar que no se recorto de mas es la mitad del trabajo, y es la que casi nunca se hace.",
       "source": "sesion 2026-08-27, /orion-plan sobre placita y placita-tienda",
-      "created": "2026-08-27T02:10:00.000Z",
-      "updated": "2026-08-27T02:10:00.000Z"
-    },
-    {
-      "id": "KN-018",
-      "type": "Knowledge",
-      "tier": "Project",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "High",
-      "status": "Current",
-      "dependencies": [
-        "DEC-002"
-      ],
-      "fact": "EL REGISTRO AGUANTA USO CONCURRENTE, medido sin querer: mientras esta sesion planeaba placita, OTRA sesion ejecuto T-008 del plan de villa-broaster y escribio de vuelta `estado: hecho` con evidencia comprobable en disco ('SISTEMA_URL aparece 2 veces en villa-app/next.config.ts, .env.example existe y lo nombra, verificar:completo sale con codigo 0'). Se verifico la evidencia contra el disco y era cierta. El lazo de control de RFC-0008 N8-R10 funciona entre sesiones, no solo dentro de una.",
-      "context": "Regla de convivencia que se deduce: el plan de otra sesion NO se commitea desde aqui, aunque este sucio en el arbol. Se reporta y se deja. Dos sesiones escribiendo el mismo plan.json a la vez si serian un problema; escribir tareas distintas del mismo plan, no lo fue.",
-      "source": "sesion 2026-08-27, villa-broaster/plan.json T-008",
       "created": "2026-08-27T02:10:00.000Z",
       "updated": "2026-08-27T02:10:00.000Z"
     },
@@ -498,52 +323,19 @@
       "updated": "2026-08-27T02:10:00.000Z"
     },
     {
-      "id": "KN-020",
-      "type": "Knowledge",
-      "tier": "Project",
-      "lifetime": "Project",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "dependencies": [
-        "DEC-002"
-      ],
-      "fact": "`plan.mjs agregar` aceptaba EN SILENCIO tareas con el campo de criterio mal nombrado. Una sesion escribio cuatro criterios con `que` en vez de `check` -que es como se dice en espanol, 'que se comprueba'- y la herramienta los trago sin avisar, dejando el plan invalido con `check: undefined` y cuatro criterios invisibles para el validador. Ni una palabra del texto se habia perdido: estaba entero bajo la otra clave.",
-      "context": "Arreglado aceptando el sinonimo y AVISANDO al normalizar, en vez de rechazar: quien escribe la tarjeta piensa en espanol y el rechazo le costaria una iteracion entera. La regla general: una herramienta que ingiere datos de otro agente normaliza lo que puede deducir sin ambiguedad y grita lo que no; tragar callado es lo unico que no puede hacer.",
-      "source": "sesion 2026-08-27, villa-broaster/plan.json T-261",
-      "created": "2026-08-27T02:10:00.000Z",
-      "updated": "2026-08-27T02:10:00.000Z"
-    },
-    {
-      "id": "PEND-004",
-      "type": "Pending",
-      "tier": "Project",
-      "lifetime": "Sprint",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Ready",
-      "dependencies": [
-        "KN-019"
-      ],
-      "task": "Revisar los 8 avisos de propiedad implicita que quedan en los tres planes (placita 3, villa-broaster 5) y meter el glob en `posee` donde corresponda, para que `ola` deje de darlos por paralelizables.",
-      "reason": "Cada uno de esos 8 es una colision potencial entre builders, que es el fallo #1 medido del ecosistema. El aviso ya senala cual es; falta la edicion.",
-      "created": "2026-08-27T02:10:00.000Z",
-      "updated": "2026-08-27T02:10:00.000Z"
-    },
-    {
       "id": "DEC-006",
       "type": "Decision",
       "tier": "Project",
       "created": "2026-09-02T03:25:37.000Z",
-      "updated": "2026-09-02T03:25:37.000Z",
+      "updated": "2026-09-03T00:00:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
       "status": "Accepted",
       "dependencies": [],
       "title": "El runtime se escribe con $ORION_HOME, nunca con rutas literales (2026-09-01)",
-      "reason": "El dueno pregunto si ORION ya podia trabajar a la par del PC. La respuesta era no, y no por las herramientas: los 21 archivos de agentes y skills traian 53 rutas C:\\Users\\Kalel\\ORION. Un agente arranca en blanco, lee su definicion, copia el comando y falla — o sea que el primer paso obligatorio del runtime (consultar el cerebro) estaba roto en esta maquina sin que nada lo avisara.",
-      "description": "Todo comando dentro de runtime/agents y runtime/skills usa $ORION_HOME/... con barras normales. La variable se declara UNA vez por maquina en ~/.claude/settings.json (env.ORION_HOME) — en la Mac /Users/g/orion, en el PC C:\\Users\\Kalel\\ORION — y entra en caliente, sin reiniciar la sesion. La boveda es $ORION_HOME/../ORION-Vault. Las herramientas .mjs ya resolvian process.env.ORION_HOME con autodeteccion como respaldo, asi que el arreglo fue solo en la documentacion ejecutable. || CADENA DE PROPAGACION, en este orden y sin saltarse pasos: se edita runtime/ (unica fuente de verdad), se regenera el instalador con `node tools/generar-instalador.mjs`, y se instala con `node tools/instalar-orion.mjs`. Comprobar con --check: debe decir 'sin cambios: 21'. || Se quito tambien PowerShell de las herramientas de orion-verifier (no existe en macOS) y se reescribio la regla del push en orion y orion-close, que seguian ordenando no publicar."
+      "reason": "El dueno pregunto si ORION ya podia trabajar a la par del PC. La respuesta era no, y no por las herramientas: los 21 archivos de agentes y skills traian rutas literales del PC, migrando a $ORION_HOME. Un agente arranca en blanco, lee su definicion, copia el comando y falla — o sea que el primer paso obligatorio del runtime (consultar el cerebro) estaba roto en esta maquina sin que nada lo avisara.",
+      "description": "Todo comando dentro de runtime/agents y runtime/skills usa $ORION_HOME/... con barras normales. La variable se declara UNA vez por maquina en ~/.claude/settings.json (env.ORION_HOME) — en cada máquina (ej: /Users/g/orion en Mac) — y entra en caliente, sin reiniciar la sesion. La boveda es $ORION_HOME/../ORION-Vault. Las herramientas .mjs ya resolvian process.env.ORION_HOME con autodeteccion como respaldo, asi que el arreglo fue solo en la documentacion ejecutable. || CADENA DE PROPAGACION, en este orden y sin saltarse pasos: se edita runtime/ (unica fuente de verdad), se regenera el instalador con `node tools/generar-instalador.mjs`, y se instala con `node tools/instalar-orion.mjs`. Comprobar con --check: debe decir 'sin cambios: 21'. || Se quito tambien PowerShell de las herramientas de orion-verifier (no existe en macOS) y se reescribio la regla del push en orion y orion-close, que seguian ordenando no publicar."
     },
     {
       "id": "KN-021",
@@ -560,7 +352,183 @@
       ],
       "fact": "MIGRAR EL REPO NO MIGRA EL RUNTIME, Y UN HECHO DE MAQUINA SIN LA MAQUINA ESCRITA AL LADO CADUCA EN SILENCIO. Dos hallazgos de la misma sesion, y el segundo es el caro. (1) La casa se mudo a la Mac el 2026-08-31 y se dio por migrada, pero el runtime NI SIQUIERA ESTABA INSTALADO: ~/.claude tenia solo lo que trae el plugin (7 agentes de fase, 5 skills) mientras el repo define 13 y 8. Faltaban arquitecto, bibliotecario, estratega, harvester, landing, traductor, y las skills orion-baul, orion-cerebro y orion-plan. Nadie lo noto porque /orion seguia respondiendo — con menos runtime. COMPROBACION BARATA en cualquier maquina nueva: `node tools/instalar-orion.mjs --check`; si dice que TODO 'se crearia', no hay nada instalado. (2) Lo caro: _permanent/KN-001 afirmaba en presente que el push por terminal no funciona, sin decir de que computador hablaba. Era del PC. La creencia viajo con la mudanza y NINGUNA sesion intento un push durante cinco semanas — dos repos de villa-broaster quedaron vacios en GitHub con su codigo suelto en ~/Downloads. El mismo veneno estaba en cerebro/temas/entorno-de-la-maquina.md, que es peor porque un TEMA se lee como restriccion del run: decia que no hay Python, que el push falla y que Bash se trunca a 8 KB, todo falso aqui. REGLA: un hecho de entorno se escribe SIEMPRE con la maquina y la fecha ('en el PC, medido el X'), o por maquina en una tabla. Sin eso no caduca: miente.",
       "context": "Sesion 2026-09-01, pregunta del dueno: 'ya estas listo para trabajar a la par del PC?'. La respuesta honesta exigio medir, no recordar."
+    },
+    {
+      "id": "DEC-007",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-09-09T00:00:00.000Z",
+      "updated": "2026-09-09T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-002"
+      ],
+      "title": "Los interruptores de perfil son opt-in: un aplicaSi booleano solo dispara si el perfil lo declara a proposito",
+      "description": "Se anaden trece interruptores booleanos al perfil de proyecto: nube, multiTenant, suscripcion, autoservicio, equipoCliente, correoSaliente, apiPublica, traficoAnonimo, tiempoReal, mas los cuatro que ya existian (publico, dineroReal, datosPersonales, multiUsuario). Un valor `true` en `aplicaSi` de un arquetipo solo aplica si el perfil declara ese campo en `true`; ausente o `false` no dispara nada. Esto convierte el tema 'la-caja-no-puede-parar' de advertencia en prosa en un mecanismo verificable: nada de nube, CDN, tenant ni suscripcion puede aterrizar en el plan de una caja registradora salvo que el perfil lo pida.",
+      "reason": "Verificado midiendo, no asumiendo: el SaaS de prueba pasa de 558 a 763 tareas y recibe 57 de saas.*; villa-broaster (428->565) y placita (1279) reciben CERO de saas.*. Un filtro por superficie o stack es mas debil que un booleano dedicado y ya habia fallado por sinonimos (ver KN-022)."
+    },
+    {
+      "id": "KN-022",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-09-09T00:00:00.000Z",
+      "updated": "2026-09-09T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "DEC-002",
+        "KN-017"
+      ],
+      "fact": "UN VOCABULARIO CERRADO DECLARADO EN DOS SITIOS NUNCA COINCIDIO, Y NADIE LO NOTO HASTA MEDIR: orion-arquitecto dictaba como vocabulario cerrado de superficies web-publica/panel-interno/caja/api/movil, pero los 535 arquetipos del catalogo filtraban por publico/panel-interno/caja/api/vitrina/landing. Cinco arquetipos -entre ellos sec.permisos.la-landing-no-es-puerta-de-administracion- fueron INALCANZABLES para todo proyecto con web publica, incluido villa-broaster, que si tiene una. El propio archivo del agente advertia que 'un sinonimo hace que el plan salga corto sin que nadie se entere', y era su propia lista la que lo causaba.",
+      "context": "Corregido en los tres sitios donde vivia el vocabulario: tools/plan.mjs normaliza el alias (mapa ALIAS + funcion normalizar dentro de aplica()), catalogo/_ESQUEMA.md documenta el vocabulario cerrado unico, y el agente (runtime/agents y su espejo ~/.claude/agents) ya no repite la lista vieja. Leccion generalizable: un vocabulario cerrado que vive en el archivo que lo DECLARA y por separado en el que lo CONSUME hay que compararlo por valor exacto, no confiar en que alguien lo revise a ojo; el fallo no lanza error, solo produce menos tareas de las que deberia, mismo patron silencioso que KN-017.",
+      "source": "sesion 2026-09-09, enfoque-web-real: auditoria de catalogo/_ESQUEMA.md contra runtime/agents/orion-arquitecto.md"
+    },
+    {
+      "id": "KN-024",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-09-09T00:00:00.000Z",
+      "updated": "2026-09-09T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "KN-002",
+        "RSK-001",
+        "PEND-002"
+      ],
+      "fact": "SENAL DE CALIBRACION build:lib, medida en el refuerzo de catalogo del 2026-09-09: sonnet produjo los cuatro refuerzos (operacion, backend, seguridad, rendimiento; 18-25 arquetipos cada uno) sin un solo FAIL y sin problemas de validacion. Opus produjo las dos categorias nuevas (arquitectura 52, saas 54), tambien limpias, pero costo del orden de 1,7x por unidad de trabajo frente a los refuerzos de sonnet.",
+      "context": "Para escribir arquetipos de catalogo con esquema fijo y ejemplos a la vista (refuerzo de una categoria ya existente), sonnet parece suficiente; opus se justifico donde habia que inventar la taxonomia desde cero (categoria nueva, sin ejemplos que copiar). Es evidencia a favor de PEND-002 acotada a este tipo de trabajo -'refuerzo con ejemplos' vs 'taxonomia nueva'-, no una generalizacion a build:lib completo: la mitigacion de RSK-001 sigue aplicando.",
+      "source": "sesion 2026-09-09, enfoque-web-real: modelOutcomes de 6 spawns build:lib"
+    },
+    {
+      "id": "KN-025",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-09-09T00:00:00.000Z",
+      "updated": "2026-09-09T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "DEC-002",
+        "DEC-005"
+      ],
+      "fact": "ERRORES REPETIDOS DE BUILDERS AL ESCRIBIR ARQUETIPOS DE CATALOGO, detectados y corregidos por el orquestador (2026-09-09, sobre los lotes de arquitectura/saas/refuerzos): (1) placeholders {{entidad}} en el texto sin declarar porCada -2 casos-, que dejarian el literal sin sustituir en el plan; (2) aplicaSi.etapa como string suelto donde el patron ya establecido usa array, ej. ['N3','N4'] -3 casos-; (3) arquetipos de git/CI sin aplicaSi que contradecian una politica de la casa ya decidida -2 casos: ops.git.nadie-empuja-directo-a-main chocaba con DEC-005, que dice que ORION publica directo-, resueltos con equipo: 'orion+humanos' en vez de borrarlos, porque ahi si aplican.",
+      "context": "Los tres son mecanicos y baratos de revisar antes de aceptar el lote de un builder: grep de {{ sin porCada en el mismo objeto, grep de etapa: \" (string) en vez de etapa: [, y cruzar cualquier arquetipo nuevo contra las Decisiones ya Aceptadas del proyecto antes de darlo por bueno.",
+      "source": "sesion 2026-09-09, enfoque-web-real: revision del orquestador sobre 6 lotes de build:lib"
+    },
+    {
+      "id": "RSK-001",
+      "type": "Risk",
+      "tier": "Project",
+      "created": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-08-26T06:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Open",
+      "dependencies": [
+        "PEND-002"
+      ],
+      "risk": "Bajar de tier leyendo mal la estadistica: que opus pase 102 de 107 veces NO significa que sobre, significa que la rubrica le esta dando lo dificil. Bajarlo todo de golpe convierte un ahorro en una tanda de ciclos de correccion, que cuestan mas que el ahorro.",
+      "probability": "Medium",
+      "mitigation": "Bajar por TIPO DE TRABAJO con historial limpio y muestra suficiente, uno cada vez, y dejar que un FAIL real lo suba solo. Y nunca poner hechos de negocio ni copy publico en el tier barato aunque salga ok: verdict ok mide que el spawn aterrizo, no que acerto (_permanent/KN-016)."
     }
   ],
-  "archives": []
+  "archives": [
+    {
+      "id": "ARC-1",
+      "archivedId": "KN-004",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-09-03T00:00:00.000Z",
+      "reason": "LowValue"
+    },
+    {
+      "id": "ARC-2",
+      "archivedId": "KN-009",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-09-03T00:00:00.000Z",
+      "reason": "LowValue"
+    },
+    {
+      "id": "ARC-3",
+      "archivedId": "KN-012",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-09-03T00:00:00.000Z",
+      "reason": "LowValue"
+    },
+    {
+      "id": "ARC-4",
+      "archivedId": "KN-016",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-09-03T00:00:00.000Z",
+      "reason": "LowValue"
+    },
+    {
+      "id": "ARC-5",
+      "archivedId": "KN-018",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-09-03T00:00:00.000Z",
+      "reason": "LowValue"
+    },
+    {
+      "id": "ARC-6",
+      "archivedId": "KN-020",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-09-03T00:00:00.000Z",
+      "reason": "LowValue"
+    },
+    {
+      "id": "ARC-7",
+      "archivedId": "RSK-002",
+      "archivedType": "Risk",
+      "archivedAt": "2026-09-03T00:00:00.000Z",
+      "reason": "LowValue"
+    },
+    {
+      "id": "ARC-8",
+      "archivedId": "DEC-004",
+      "archivedType": "Decision",
+      "archivedAt": "2026-09-03T00:00:00.000Z",
+      "reason": "LowValue"
+    },
+    {
+      "id": "ARC-9",
+      "archivedId": "KN-011",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-09-03T00:00:00.000Z",
+      "reason": "Merged",
+      "supersededBy": null
+    },
+    {
+      "id": "ARC-10",
+      "archivedId": "KN-008",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-09-03T00:00:00.000Z",
+      "reason": "Merged",
+      "supersededBy": null
+    },
+    {
+      "id": "ARC-11",
+      "archivedId": "PEND-003",
+      "archivedType": "Pending",
+      "archivedAt": "2026-09-09T00:00:00.000Z",
+      "reason": "Expired"
+    },
+    {
+      "id": "ARC-12",
+      "archivedId": "PEND-004",
+      "archivedType": "Pending",
+      "archivedAt": "2026-09-09T00:00:00.000Z",
+      "reason": "Expired"
+    }
+  ]
 }

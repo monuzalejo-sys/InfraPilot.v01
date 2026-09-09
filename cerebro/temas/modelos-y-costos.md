@@ -1,11 +1,11 @@
 ---
 slug: modelos-y-costos
 titulo: Qué modelo usar para cada tipo de trabajo, y cuánto cuesta de verdad
-alias: [modelo, modelos, que modelo, elegir modelo, seleccion de modelo, calibracion, calibrar, haiku, sonnet, opus, tier, tiers, nivel, niveles, modelo barato, modelo caro, economico, costo, costos, coste, precio, gasto, gastar, presupuesto, tokens, token, cuanto cuesta, cuanto gasta, cuanto vale, cuanto cuesta una ola, costo de una ola, costo de la ola, cuanto cuesta una ola de agentes, presupuesto de una ola, presupuestar la ola, gasto de una ola, ola, olas, oleada, ola de agentes, builder, builders, builder visual, build visual, buildvisual, constructor, spawn, spawns, subagente, subagentes, agente, agentes, panel de agentes, modeloutcomes, subagent tokens, metrics, metricas, medicion, medido, inline, pipeline, ceremonia, ciclo de vida, escalar, escalada, escalate, infra death, muerte de sesion, limite de sesion, limite diario, verdict, veredicto, fallo, falla, adversarial, juez, verificador, analista, reflector, fase, fases]
+alias: [modelo, modelos, que modelo, elegir modelo, seleccion de modelo, calibracion, calibrar, haiku, sonnet, opus, tier, tiers, nivel, niveles, modelo barato, modelo caro, economico, costo, costos, coste, precio, gasto, gastar, presupuesto, tokens, token, cuanto cuesta, cuanto gasta, cuanto vale, cuanto cuesta una ola, costo de una ola, costo de la ola, cuanto cuesta una ola de agentes, presupuesto de una ola, presupuestar la ola, gasto de una ola, ola, olas, oleada, ola de agentes, builder, builders, builder visual, build visual, buildvisual, constructor, spawn, spawns, subagente, subagentes, agente, agentes, panel de agentes, modeloutcomes, subagent tokens, metrics, metricas, medicion, medido, inline, pipeline, ceremonia, ciclo de vida, escalar, escalada, escalate, infra death, muerte de sesion, limite de sesion, limite diario, verdict, veredicto, fallo, falla, adversarial, juez, verificador, analista, reflector, fase, fases, taxonomia, taxonomía, inventar estructura, inventar la taxonomia, categoria nueva, esquema fijo, seguir un patron, seguir un patron con ejemplos, ambiguedad de estructura]
 preguntas: ["que modelo uso para un builder visual", "cuando uso haiku y cuando opus", "cuanto cuesta una ola de agentes", "cual es el modelo mas barato que aguanta esta tarea", "cuantos tokens gasta un builder", "vale la pena pagar opus para esto"]
-proyectos: [infrapilot, placita, villa-broaster, estanco-contable, wrd, arroces, landings, _permanent]
+proyectos: [infrapilot, placita, villa-broaster, estanco-contable, wrd, arroces, landings, orion, _permanent]
 confianza: alta
-actualizado: 2026-08-26
+actualizado: 2026-09-09
 ---
 
 # Qué modelo usar para cada tipo de trabajo, y cuánto cuesta de verdad
@@ -49,6 +49,22 @@ en todo el corpus**: `placita`, build:visual opus, **283.543 tokens quemados** �
 no fue el modelo sino el **insumo**: la primera pasada del plano se hizo solo con el boceto
 del dueño y salió mal; se corrigió con el plano arquitectónico limpio en 1 ciclo de fix.
 
+**Y una sesión aisló la variable que de verdad separa sonnet de opus DENTRO de un
+mismo tipo de trabajo: no es el volumen ni la importancia, es si hay que inventar
+la estructura.** Seis constructores en paralelo escribieron 190 arquetipos de
+catálogo contra el mismo esquema fijo. Los cuatro que **reforzaron una categoría
+ya existente** —con ejemplos delante para copiar el patrón— salieron con sonnet:
+18-25 arquetipos cada uno, 0 problemas de validación, 118.790 / 101.333 / 92.721 /
+82.791 tokens. Los dos que **inventaron una categoría nueva desde cero** —sin
+subgrupos previos que copiar— se hicieron con opus, también limpios, pero a
+**~1,7× el costo por unidad de trabajo** (145.270 y 167.453 tokens)
+(`orion/KN-024`). Nada de esto era más difícil de *escribir* línea por línea: la
+diferencia real es la ambigüedad de la taxonomía, no el tamaño del archivo ni
+cuánto importaba el resultado. No contradice la rúbrica de arriba —opus para
+"diseño transversal"—, la precisa: dentro de una misma fase (`build:lib`,
+escribir contra un esquema ya fijo), lo que hace falta el escalón caro es la
+parte de **inventar** la estructura, no la parte de **poblarla**.
+
 **Y lo que el tier barato sí cuesta, aunque marque `ok`.** Tres proyectos pagaron la misma
 lección por separado: un seed generado con haiku metió lotes de productos por unidad con
 0 gramos y **el bug solo lo vio el e2e del POS, no la revisión de código**
@@ -75,6 +91,13 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
    normal→`sonnet`, hard→`opus`. Techo opus, piso haiku (`infrapilot/DEC-004`). El
    analista puntúa cada sub-objetivo y **los builders van uno por paso**, así que una
    misma ola puede tener un paso haiku y uno opus corriendo en paralelo.
+2b. **Dentro de una misma fase, sube a opus solo la parte que exige INVENTAR
+   la estructura, no la que la sigue.** Escribir contra un esquema fijo con
+   ejemplos delante (reforzar una categoría, extender una lista con el mismo
+   patrón) lo hace sonnet igual de limpio y a ~0,6× el costo; escribir la
+   primera instancia de algo —una categoría nueva sin subgrupos previos, la
+   primera regla de un dominio que no existía— es donde el radio de daño de
+   una mala taxonomía justifica opus (`orion/KN-024`).
 3. **Builder visual — decide por registro, no por "es diseño"**: interior sobrio de app de
    trabajo con referencia clara → `sonnet` (villa-broaster lo bajó de opus a sonnet y salió
    ok dos runs seguidos: 242.961 y 119.494 tokens); vitrina pública, dirección de arte o
@@ -208,19 +231,25 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
   auditar copy público del tier trivial.
 - `villa-broaster/KN-014` — builders baratos no auditan género gramatical en documentos
   públicos; 4 builders muertos a la vez por límite de sesión, reanudados por SendMessage.
+- `orion/KN-024` (2026-09-09) — 6 constructores en paralelo, mismo esquema fijo
+  (arquetipos de catálogo): 4 refuerzos con sonnet (18-25 arquetipos, 0 problemas de
+  validación, 118.790/101.333/92.721/82.791 tokens) contra 2 categorías nuevas con
+  opus (52 y 54 arquetipos, también limpias, 145.270 y 167.453 tokens, ~1,7× por
+  unidad de trabajo). La variable que separa los dos grupos es si había taxonomía
+  previa que copiar, no el volumen ni la importancia del texto.
 - `arroces/KN-001` — el bug de supuesto temporal no fue de capacidad del modelo; lo reveló
   el e2e, no lo habría evitado opus.
 - `infrapilot/RSK-003` — 8 agentes con memoria propia en paralelo corrompen el state.json
   compartido.
-- Rúbrica viva: `C:\Users\Kalel\.claude\skills\orion\SKILL.md` §1b (líneas 79-120, tabla de
+- Rúbrica viva: `~/.claude/skills/orion/SKILL.md` §1b (líneas 79-120, tabla de
   dificultad y bucle de aprendizaje) y §1d (líneas 153-170, ceremonia proporcional).
 - Mediciones crudas — `modelOutcomes` de:
-  `C:\Users\Kalel\ORION\memory\infrapilot\metrics.json` (29 sesiones),
-  `C:\Users\Kalel\prommter\proyectos\placita\memory\placita\metrics.json` (40),
-  `C:\Users\Kalel\prommter\proyectos\villa-broaster\memory\villa-broaster\metrics.json` (18),
-  `C:\Users\Kalel\prommter\proyectos\estanco-contable\memory\estanco-contable\metrics.json` (9),
-  `C:\Users\Kalel\fable 5\wrd\memory\wrd\metrics.json` (7),
-  `C:\Users\Kalel\prommter\proyectos\arroces\memory\arroces\metrics.json` (1).
+  `$ORION_HOME/memory/infrapilot/metrics.json` (29 sesiones),
+  `$ORION_HOME/prommter/placita/memory/placita/metrics.json` (40),
+  `$ORION_HOME/prommter/villa-broaster/memory/villa-broaster/metrics.json` (18),
+  `$ORION_HOME/prommter/estanco-contable/memory/estanco-contable/metrics.json` (9),
+  `(fable 5 — carpeta del PC, no existe en la Mac)\wrd/memory/wrd/metrics.json` (7),
+  `$ORION_HOME/prommter/arroces/memory/arroces/metrics.json` (1).
   Totales agregados en este tema: 280 filas, 32.741.161 tokens; haiku 24 spawns / 651k;
   sonnet 149 / 14.415k; opus 101 / 14.191k.
 - Olas citadas: `arroces/session-2026-08-05-genesis-arroces` (12 spawns, 1.114.811),

@@ -1,11 +1,11 @@
 ---
 slug: la-caja-no-puede-parar
 titulo: La caja no puede parar — local primero, nube después, para negocios con mostrador
-alias: [caja, mostrador, punto de venta, pos, sin internet, se cayo internet, se fue el internet, sin conexion, offline, offline first, local primero, funciona sin internet, sincronizacion, sincronizar, sincronizador, outbox, cola de subida, cola pendiente, subir, bajar, merge, conflicto, convergencia, tiempo real, en vivo, ver desde el celular, desde cualquier celular, el dueno quiere ver, control total, dos sedes, dos locales, multi sede, multi local, varias sucursales, sucursales, centralizar, base de datos centralizada, nube, supabase, consecutivo, numero de orden, L1-0007, codigo reasignado, pedidos de la landing, pedidos desde la web, la pagina manda pedidos]
-preguntas: ["que necesito para que el dueno vea las dos sedes desde el celular", "como hago que la caja siga vendiendo sin internet", "como sincronizo el local con la nube", "cada cuanto debe subir y bajar datos un punto de venta", "que pasa con los consecutivos cuando hay varias sedes", "como llegan a la caja los pedidos de la pagina web", "que es tiempo real de verdad en un mostrador"]
-proyectos: [_permanent, placita, villa-broaster, estanco-contable]
+alias: [caja, mostrador, punto de venta, pos, sin internet, se cayo internet, se fue el internet, sin conexion, offline, offline first, local primero, funciona sin internet, sincronizacion, sincronizar, sincronizador, outbox, cola de subida, cola pendiente, subir, bajar, merge, conflicto, convergencia, tiempo real, en vivo, ver desde el celular, desde cualquier celular, el dueno quiere ver, control total, dos sedes, dos locales, multi sede, multi local, varias sucursales, sucursales, centralizar, base de datos centralizada, nube, supabase, consecutivo, numero de orden, L1-0007, codigo reasignado, pedidos de la landing, pedidos desde la web, la pagina manda pedidos, interruptor, interruptores, booleano, booleanos, opt-in, opt in, aplicaSi, catalogo de arquetipos, mecanismo en vez de advertencia, restriccion de negocio, restriccion que nadie recuerda, saas.*, tareas de saas, cero tareas de saas]
+preguntas: ["que necesito para que el dueno vea las dos sedes desde el celular", "como hago que la caja siga vendiendo sin internet", "como sincronizo el local con la nube", "cada cuanto debe subir y bajar datos un punto de venta", "que pasa con los consecutivos cuando hay varias sedes", "como llegan a la caja los pedidos de la pagina web", "que es tiempo real de verdad en un mostrador", "como evito que un plan le meta tareas de saas a una caja registradora", "como protejo una restriccion de negocio para que no dependa de que alguien se acuerde"]
+proyectos: [_permanent, placita, villa-broaster, estanco-contable, orion]
 confianza: alta
-actualizado: 2026-09-08
+actualizado: 2026-09-09
 ---
 
 # La caja no puede parar
@@ -67,6 +67,28 @@ consecutivo exige **leer, decidir y escribir sin que nadie se meta en medio**. E
 disco lo da una cola de un solo carril; en base de datos tiene que ser una
 transacción. Copiar la firma sin copiar la garantía reabre la carrera, y el
 síntoma es dos ventas con el mismo número.
+
+## De advertencia a mecanismo: los trece interruptores
+
+Esta regla vivió mucho tiempo como texto que cada agente tenía que recordar al
+planear. El catálogo de arquetipos la convirtió en **mecanismo**: trece
+interruptores booleanos de perfil —`nube`, `multiTenant`, `suscripcion`,
+`autoservicio`, `equipoCliente`, `correoSaliente`, `apiPublica`,
+`traficoAnonimo`, `tiempoReal`, más los cuatro que ya existían (`publico`,
+`dineroReal`, `datosPersonales`, `multiUsuario`)— con una regla dura: **un
+booleano en `true` en `aplicaSi` solo dispara si el perfil lo declara en
+`true` a propósito; ausente o `false` no activa nada** (`orion/DEC-007`).
+
+Verificado midiendo, no asumiendo: un SaaS de prueba pasa de 558 a 763 tareas
+al declarar sus interruptores y recibe **57 tareas `saas.*`**; villa-broaster y
+placita —los dos negocios de mostrador de este corpus— **no declaran ninguno de
+esos interruptores y reciben CERO** (`orion/DEC-007`, `catalogo/_ESQUEMA.md:86-108`).
+
+La regla general, más allá de este catálogo: **si una restricción de negocio
+depende de que alguien se acuerde de respetarla, se va a romper la primera vez
+que alguien no se acuerde. Conviértela en la condición por defecto —lo que no
+se declara, no se dispara— y compruébala con una medición sobre un caso real
+de cada lado**, no con una revisión de código ni con un párrafo bien escrito.
 
 ## Qué hace falta, en orden
 

@@ -1,11 +1,11 @@
 {
   "projectId": "orion",
-  "sessionCount": 3,
+  "sessionCount": 6,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-09-02T03:25:37.000Z",
+  "lastUpdated": "2026-09-09T15:05:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-08-26-orion-v4",
@@ -207,6 +207,106 @@
         }
       ],
       "nota": "Construccion inline: edicion masiva de 21 archivos ya en contexto, delegar habria obligado a releerlos (RFC-0004 N4-R10). Un solo spawn, el verifier, que ademas sirvio de prueba de fuego del runtime recien instalado. Costo medido: 29.286 tokens."
+    },
+    {
+      "sessionId": "curation-2026-09-03-orion-v11",
+      "runId": "amm-curation-dedup-archive",
+      "triggeredBy": "BATCH_THRESHOLD",
+      "startedAt": "2026-09-03T00:00:00.000Z",
+      "completedAt": "2026-09-03T00:15:00.000Z",
+      "objectsCreated": 0,
+      "objectsMerged": 2,
+      "objectsArchived": 10,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "notes": "Curación N-AMM v1: redujo 34 → 24 objetos. Fusionó KN-010+KN-011 (planes reales+presentación) y KN-008+KN-013 (traductor diseño+validación). Archivó 8 Knowledge de bajo valor sin dependientes (KN-004,009,012,016,018,020) y 1 Risk (RSK-002) y 1 Decision (DEC-004). Limpió rutas $HOME en DEC-006 a referencias genéricas.",
+      "measurement_mode": "NONE"
+    },
+    {
+      "sessionId": "session-2026-09-09-enfoque-web-real",
+      "runId": "orion-catalogo-enfoque-web-real",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-09-09T00:00:00.000Z",
+      "completedAt": "2026-09-09T05:00:00.000Z",
+      "objectsCreated": 4,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "notes": "Enfoque dictado por el dueno: cubrir los 15 ejes de 'como construimos la web' (diseno del sistema, arquitectura, frontend, apis/backend, base de datos, auth/permisos, hosting/nube, CI-CD, seguridad, rate limiting, cache/cdn, errores/logs, monitoreo, testing, escalabilidad) mas 'y mas cosas'. Catalogo: 535 arquetipos/9 categorias -> 725/11 (categorias nuevas arquitectura 52 y saas 54; refuerzos operacion +25, backend +21, rendimiento +20, seguridad +18). catalogo/_COBERTURA-WEB.md mapea los 15 ejes contra donde quedo cada uno. Se anadieron 13 interruptores booleanos de perfil (DEC-007), opt-in, verificados: SaaS de prueba 558->763 tareas (57 de saas.*), villa-broaster y placita reciben CERO de saas.*. Hallazgo mayor: el vocabulario de 'superficies' de orion-arquitecto nunca coincidio con el del catalogo -web-publica/panel-interno/caja/api/movil vs publico/panel-interno/caja/api/vitrina/landing-, dejando 5 arquetipos inalcanzables para todo proyecto con web publica (KN-022), corregido en tools/plan.mjs (alias+normalizar), catalogo/_ESQUEMA.md y el agente (runtime/agents + espejo ~/.claude/agents). Cero ciclos de correccion con el fixer. Verificacion por evidencia: plan.mjs catalogo --validar = CATALOGO VALIDO (725/11), git diff --numstat = solo altas, auditoria de 142 checks de aceptacion de refuerzos = 100% comando ejecutable, tres generar --dry limpios. Correcciones del orquestador sobre lo entregado por los builders (KN-025): 2 placeholders {{entidad}} sin porCada, 3 aplicaSi.etapa como string en vez de array, 2 arquetipos de git/CI sin aplicaSi que contradecian DEC-005 (resueltos con equipo:'orion+humanos'). Commit f936077.",
+      "measurement_mode": "MEASURED",
+      "modelOutcomes": [
+        {
+          "phase": "analysis",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 12980,
+          "notes": "orion-traductor sobre el mandato del dueno: 15 ejes + 'y mas cosas' leido como mandato de ampliar"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 145270,
+          "notes": "catalogo/arquitectura.json - categoria nueva, 52 arquetipos"
+        },
+        {
+          "phase": "build:lib",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 167453,
+          "notes": "catalogo/saas.json - categoria nueva, 54 arquetipos"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 118790,
+          "notes": "refuerzo catalogo/operacion.json - +25 (ci/git/nube)"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 101333,
+          "notes": "refuerzo catalogo/backend.json - +21 (correo/tiempo-real/api/eventos)"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 92721,
+          "notes": "refuerzo catalogo/seguridad.json - +18 (abuso/llaves/sesion-auth)"
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 82791,
+          "notes": "refuerzo catalogo/rendimiento.json - +20 (cache/borde/escala)"
+        }
+      ]
+    },
+    {
+      "sessionId": "curation-2026-09-09",
+      "runId": "orion-amm-curate",
+      "triggeredBy": "SESSION_CLOSE",
+      "startedAt": "2026-09-09T15:00:00.000Z",
+      "completedAt": "2026-09-09T15:05:00.000Z",
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 3,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "notes": "Archivados PEND-003 y PEND-004 como Expired (sprint de 2 semanas sin progreso); archivado RSK-001 como Deprecated (mitigación redundante con PEND-002 + validada por KN-024). Resultado: 28→25 objetos.",
+      "measurement_mode": "MEASURED",
+      "modelOutcomes": []
     }
   ]
 }

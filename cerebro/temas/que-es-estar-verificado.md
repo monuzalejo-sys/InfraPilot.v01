@@ -1,11 +1,11 @@
 ---
 slug: que-es-estar-verificado
 titulo: Qué significa que algo "ya quedó": la definición de hecho
-alias: [ya quedo, ya quedó, quedo listo, quedo bien, ya esta, ya está, esta listo, listo, terminado, terminada, terminar, estar terminado, esta terminado, cuando esta terminado, que es estar terminado, cuando doy por terminada una tarea, terminado de verdad, acabado, hecho, done, definicion de hecho, definicion de terminado, criterio de aceptacion, criterios de aceptacion, cuando digo que esta listo, dar por bueno, dar por buena, dar por hecho, declarar listo, decir que funciona, compila, compilo, compilar, compilar no es funcionar, basta con compilar, no basta con compilar, corre pero no sirve, funciona pero no hace nada, arranca pero, typecheck, type check, tsc, tsc --noEmit, strict, tsconfig, tsconfig ad-hoc, build, build verde, pasa el build, todo verde, en verde, tests en verde, pasan los tests, self-tests, self tests, selftests, unitarios, tests unitarios, smoke, smokes, camino feliz, e2e, E2E, prueba e2e, punta a punta, de punta a punta, prueba de punta a punta, ejercitar, probar de verdad, qa, QA, qa de agente, reviso, revisar, revision, revisar el trabajo de un agente, reviso el trabajo de un agente, como reviso el trabajo de un agente, revisar el trabajo del agente, revisar lo que hizo el agente, revisar lo que entrego el agente, recibir el trabajo de un agente, auditar el trabajo de un agente, calificar el trabajo de un agente, aprobar el trabajo de un agente, revisar entrega de agente, revisar builder, revisar al builder, revisar subagente, agente, agentes, subagente, builder, builders, el agente dice que quedo, el agente dice que ya quedo, confiar en el agente, confiar en lo que dice el agente, le creo al agente, verifier, verificador, verificacion, verificado, no verificado, QAReport, PASS, FAIL, adversarial, refutador, refutadores, romper el gating, seguridad, auth, admin, RLS, seed, seed limpio, con seed, sin seed, empresa nueva, cuenta nueva, base vacia, catalogo vacio, estado sucio, e2e sucio, datos viejos, datos de la version anterior, version anterior, VERSION_DATOS, migracion, middleware, proxy, PUBLIC_PATHS, curl, sw.js, manifest, webhook, 307, porcentaje, porcentaje de avance, avance, cuanto llevamos, quien califica, quien pone el porcentaje, juez, juez externo, autorreportado, se califica solo, falso positivo, falsos positivos, verde mentiroso, agregador, agregadores, sintetizador, agregado, agregar metricas, herramienta de medicion, herramienta de agregacion, script de metricas, dashboard, panel de costos, numero mentiroso, verificar un agregador, como verifico un script que suma numeros, el script corrio pero el numero esta mal, cruzar contra el numero real, caso con respuesta conocida, spot check, numero de tests subio, subieron los tests, tests duplicados, tests que corren dos veces, suite corre dos veces, doble conteo, contar dos veces, restar antes de celebrar, cifra que sube, el numero subio, cobertura falsa, glob de tests, test glob, importar tests dentro de otro test, archivo de tests que importa tests, muestra de control, recorte de alcance, recortar de mas, recorte de mas, no te pases recortando, acotar un filtro, restringir un filtro, estrechar un criterio, estrechar el alcance, condicion de aplicacion, aplicasi, grupo de control, caso de control, perfil de control, perfiles de respaldo, conteo de respaldo, verificar hacia atras, verificar en los dos sentidos, los dos sentidos de una verificacion, dano colateral, efecto colateral de un cambio, comprobar que no rompi otros casos, regresion en sentido contrario, un arquetipo que aplica siempre casi nunca existe]
+alias: [ya quedo, ya quedó, quedo listo, quedo bien, ya esta, ya está, esta listo, listo, terminado, terminada, terminar, estar terminado, esta terminado, cuando esta terminado, que es estar terminado, cuando doy por terminada una tarea, terminado de verdad, acabado, hecho, done, definicion de hecho, definicion de terminado, criterio de aceptacion, criterios de aceptacion, cuando digo que esta listo, dar por bueno, dar por buena, dar por hecho, declarar listo, decir que funciona, compila, compilo, compilar, compilar no es funcionar, basta con compilar, no basta con compilar, corre pero no sirve, funciona pero no hace nada, arranca pero, typecheck, type check, tsc, tsc --noEmit, strict, tsconfig, tsconfig ad-hoc, build, build verde, pasa el build, todo verde, en verde, tests en verde, pasan los tests, self-tests, self tests, selftests, unitarios, tests unitarios, smoke, smokes, camino feliz, e2e, E2E, prueba e2e, punta a punta, de punta a punta, prueba de punta a punta, ejercitar, probar de verdad, qa, QA, qa de agente, reviso, revisar, revision, revisar el trabajo de un agente, reviso el trabajo de un agente, como reviso el trabajo de un agente, revisar el trabajo del agente, revisar lo que hizo el agente, revisar lo que entrego el agente, recibir el trabajo de un agente, auditar el trabajo de un agente, calificar el trabajo de un agente, aprobar el trabajo de un agente, revisar entrega de agente, revisar builder, revisar al builder, revisar subagente, agente, agentes, subagente, builder, builders, el agente dice que quedo, el agente dice que ya quedo, confiar en el agente, confiar en lo que dice el agente, le creo al agente, verifier, verificador, verificacion, verificado, no verificado, QAReport, PASS, FAIL, adversarial, refutador, refutadores, romper el gating, seguridad, auth, admin, RLS, seed, seed limpio, con seed, sin seed, empresa nueva, cuenta nueva, base vacia, catalogo vacio, estado sucio, e2e sucio, datos viejos, datos de la version anterior, version anterior, VERSION_DATOS, migracion, middleware, proxy, PUBLIC_PATHS, curl, sw.js, manifest, webhook, 307, porcentaje, porcentaje de avance, avance, cuanto llevamos, quien califica, quien pone el porcentaje, juez, juez externo, autorreportado, se califica solo, falso positivo, falsos positivos, verde mentiroso, agregador, agregadores, sintetizador, agregado, agregar metricas, herramienta de medicion, herramienta de agregacion, script de metricas, dashboard, panel de costos, numero mentiroso, verificar un agregador, como verifico un script que suma numeros, el script corrio pero el numero esta mal, cruzar contra el numero real, caso con respuesta conocida, spot check, numero de tests subio, subieron los tests, tests duplicados, tests que corren dos veces, suite corre dos veces, doble conteo, contar dos veces, restar antes de celebrar, cifra que sube, el numero subio, cobertura falsa, glob de tests, test glob, importar tests dentro de otro test, archivo de tests que importa tests, muestra de control, recorte de alcance, recortar de mas, recorte de mas, no te pases recortando, acotar un filtro, restringir un filtro, estrechar un criterio, estrechar el alcance, condicion de aplicacion, aplicasi, grupo de control, caso de control, perfil de control, perfiles de respaldo, conteo de respaldo, verificar hacia atras, verificar en los dos sentidos, los dos sentidos de una verificacion, dano colateral, efecto colateral de un cambio, comprobar que no rompi otros casos, regresion en sentido contrario, un arquetipo que aplica siempre casi nunca existe, auditoria transversal, auditoria cruzada, validador local, cada validador local, seis validadores en verde, defectos que ningun validador vio, placeholder sin instanciar, placeholder sin porCada, etapa como string, tipo de dato inconsistente entre archivos hermanos]
 preguntas: ["como se si algo quedo bien", "que es estar terminado", "basta con que compile", "como reviso el trabajo de un agente", "el build paso verde, ya puedo decir que funciona?", "que pruebo antes de decirle al dueño que quedo listo?", "los tests pasan pero el bug salio en produccion, que me falto probar?", "quien pone el porcentaje de avance?", "mi typecheck da errores y el del proyecto no, a cual le creo?", "hice login y panel de admin, con el verifier normal basta?", "escribi un script que suma metricas de varios proyectos, ya quedo?", "como se si mi agregador de costos esta calculando bien?", "el numero de tests subio de golpe, es buena senal?", "subieron los tests sin escribir tests nuevos, que paso?", "le puse una condicion a una regla para que aplicara menos, como se que no me pase recortando?", "restringi un filtro y el numero bajo como esperaba, eso ya prueba que quedo bien?", "como verifico que un recorte de alcance no daño casos que no debian cambiar?"]
 proyectos: [estanco-contable, arroces, placita, infrapilot, wrd, villa-broaster, orion, _permanent]
 confianza: alta
-actualizado: 2026-08-27
+actualizado: 2026-09-09
 ---
 
 # Qué significa que algo "ya quedó": la definición de hecho
@@ -116,6 +116,22 @@ almacenamiento en disco 67→67, perfil de API con Postgres 125→125, perfil de
 69→69 — ni un arquetipo perdido (commit `3bbbba2`). *"Comprobar que no se recorto de mas es
 la mitad del trabajo, y es la que casi nunca se hace"* (`orion/KN-017`, campo `context`).
 
+**Y lo pagó, en miniatura, que un validador que revisa su propio archivo no ve lo
+que pasa en el archivo del vecino.** Seis constructores en paralelo escribieron
+190 arquetipos del catálogo de ORION contra el mismo esquema, cada uno con su
+propia comprobación local, y los seis dieron verde. El orquestador, auditando el
+conjunto **después** de recibirlo, encontró 7 defectos que ningún validador
+individual vio: 2 placeholders `{{entidad}}` sin declarar `porCada` (habrían
+quedado sin sustituir en el plan real), 3 claves `aplicaSi.etapa` escritas como
+cadena suelta donde el patrón ya establecido en el resto del catálogo usa
+arreglo, y 2 arquetipos de git/CI sin condición que contradecían una Decisión ya
+Aceptada del proyecto (`DEC-005`, "ORION publica directo a main") — se
+resolvieron acotándolos a `equipo: "orion+humanos"` en vez de borrarlos, porque
+ahí sí aplican (`orion/KN-025`). Ninguno es un fallo de capacidad del modelo: es
+que la comprobación de cada builder es local a SU archivo, y una contradicción
+con una política que vive en OTRO archivo, o un patrón de forma que solo se ve
+comparando varios archivos entre sí, ningún autochequeo aislado la puede cazar.
+
 ## Cómo se aplica
 
 **La escalera de "ya quedó".** Cada peldaño responde una pregunta distinta, y ninguno
@@ -155,7 +171,7 @@ responde la del siguiente. Di en voz alta en cuál estás.
 5. **Todo lo que pida un tercero sin sesión, pruébalo con una petición real contra el
    servidor corriendo y mira el código de estado**: assets de PWA, webhooks, `.well-known`,
    callbacks de OAuth o de pasarela, sitemap, robots. El arreglo vive en
-   `C:\Users\Kalel\ORION\infrapilot-app\proxy.ts:8` (`PUBLIC_PATHS`) y la comprobación en
+   `$ORION_HOME/infrapilot-app/proxy.ts:8` (`PUBLIC_PATHS`) y la comprobación en
    `:40` (`isPublic`) — `infrapilot/KN-028`.
 6. **Ante una discrepancia de typecheck, gana el `tsc` del proyecto.** Si chequeas con una
    config propia fuera del proyecto, **hereda o replica `strict: true`**: sin strict se
@@ -173,7 +189,7 @@ responde la del siguiente. Di en voz alta en cuál estás.
    (`wrd/KN-004`).
 8. **El porcentaje lo pone el juez, con criterio escrito ANTES.** Cada entrega lleva su
    criterio verificable y sus escalones (`villa-broaster/DEC-011`; ejemplo real en
-   `C:\Users\Kalel\prommter\proyectos\villa-broaster\docs\semanal\avance.json`, entrega
+   `$ORION_HOME/prommter/villa-broaster/docs/semanal/avance.json`, entrega
    E3: *"Diseño aprobado = 12; T-02 = 40; T-03 = 70; T-04 = 100"*). Dos consecuencias que
    duelen y son el punto: **una entrega sin evidencia se queda en 0** aunque haya trabajo
    detrás (E1 y E4 están en 0 por definiciones que nadie escribió), y **lo que
@@ -199,6 +215,16 @@ responde la del siguiente. Di en voz alta en cuál estás.
     de catálogos: un filtro, un permiso, un `.gitignore`, una regla de RLS, una migración
     que borra, un grep de limpieza — todo lo que estrecha un criterio necesita esta segunda
     mitad de la prueba.
+
+12. **Después de una ola que produce varios archivos contra el MISMO esquema,
+    corre una auditoría transversal barata antes de aceptar el lote completo.**
+    No repitas el trabajo de cada builder: cruza específicamente lo que un
+    validador local no puede ver —placeholders de sustitución sin su campo
+    habilitador al lado, un tipo de dato que se escribió distinto al patrón ya
+    establecido en los archivos hermanos, y cualquier elemento nuevo contra las
+    Decisiones ya Aceptadas del proyecto. Es mecánico y barato de correr, y es
+    exactamente el hueco que dejó pasar 7 defectos con los seis validadores en
+    verde (`orion/KN-025`).
 
 ## Cuándo NO aplica
 
@@ -266,7 +292,7 @@ responde la del siguiente. Di en voz alta en cuál estás.
 **Verde con el bug adentro**
 - `arroces/KN-001` (Permanent) — *"solo lo reveló la verificación E2E en navegador, no el
   tsc ni los self-tests unitarios"*.
-- `C:\Users\Kalel\prommter\proyectos\arroces\memory\arroces\brief.md:8-12` — 38/38
+- `$ORION_HOME/prommter/arroces/memory/arroces/brief.md:8-12` — 38/38
   self-tests: carta 6/6, pagos 8/8, cierre 6/6, pedido 18/18.
 - `arroces/memory/arroces/metrics.json` — `fixCycles: 1`; `verify/sonnet ok 74 803 tok`,
   `fix/opus ok 114 381 tok`; nota de sesión: *"el bug de cierre NO fue de capacidad del
@@ -283,13 +309,13 @@ responde la del siguiente. Di en voz alta en cuál estás.
 **Lo que el build no ve**
 - `infrapilot/KN-028` — `/sw.js` y `/manifest.webmanifest` con 307 a `/login`; *"the
   failure only surfaced running curl against the dev server"*.
-- `C:\Users\Kalel\ORION\infrapilot-app\proxy.ts:4-8` (el comentario explica el porqué y
+- `$ORION_HOME/infrapilot-app/proxy.ts:4-8` (el comentario explica el porqué y
   define `PUBLIC_PATHS`) y `:40` (`isPublic`).
 
 **El verifier no busca romper**
 - `wrd/KN-004` — 16 hallazgos de 2 adversarios opus tras un verifier que ya dio FAIL;
   PIN de admin filtrado en un comentario doctest.
-- `C:\Users\Kalel\fable 5\wrd\memory\wrd\metrics.json:123-125` — `verification/sonnet
+- `(fable 5 — carpeta del PC, no existe en la Mac)\wrd/memory/wrd/metrics.json:123-125` — `verification/sonnet
   fail 51161` → `adversarial/opus 94008` → `adversarial/opus 125667`.
 
 **"Corre" también miente en agregadores**
@@ -298,7 +324,7 @@ responde la del siguiente. Di en voz alta en cuál estás.
   en estanco-contable salía "4 fallidas de 10" cuando son 6 juzgables y 0 fallidas.
   Encontrado cruzando el agregado contra `estanco-contable/memory/estanco-contable/metrics.json`
   a mano, no por el autor del agregador.
-- `C:\Users\Kalel\ORION\tools\cerebro.mjs` (función que arma `docs` de clase `metrica`,
+- `$ORION_HOME/tools/cerebro.mjs` (función que arma `docs` de clase `metrica`,
   ~línea 204-218) — el fix reconoce campo `infraDeath: true` y sufijo `:infra-death` y
   aparta las muertes en su propio conteo en vez de sumarlas a `fail`.
 
@@ -314,6 +340,13 @@ responde la del siguiente. Di en voz alta en cuál estás.
   en `lib/dominio/devolucion.ts`; 2 errores que el tsc del proyecto no ve.
 - `estanco-contable/package.json:10` — `"typecheck": "tsc --noEmit"` es el chequeo canónico.
 
+**El validador local no ve la contradicción transversal**
+- `orion/KN-025` (2026-09-09) — 6 constructores en paralelo, 190 arquetipos de
+  catálogo, los 6 validadores individuales en verde; auditoría transversal del
+  orquestador encontró 7 defectos: 2 placeholders `{{entidad}}` sin `porCada`,
+  3 `aplicaSi.etapa` como cadena suelta en vez de arreglo, 2 arquetipos que
+  contradecían `DEC-005` ya Aceptada.
+
 **Recortar sin verificar el respaldo**
 - `orion/KN-017` — 49 de 134 arquetipos de backend+datos sin condición de superficie ni de
   stack; 37 corregidos; verificación hacia adelante (aplicables a `placita-tienda`: 20→3) y
@@ -322,7 +355,7 @@ responde la del siguiente. Di en voz alta en cuál estás.
 - Commit `3bbbba2` en el repo de ORION (*"catalogo: un arquetipo que «aplica siempre» casi
   nunca existe — 37 con su condicion"*): *"VERIFICADO EN LOS DOS SENTIDOS, que es lo que hace
   creible el recorte"*; catálogo intacto tras el cambio: 535 arquetipos en 9 categorías.
-- `C:\Users\Kalel\ORION\catalogo\_ESQUEMA.md:76-78` — la regla que ya advertía esto antes de
+- `$ORION_HOME/catalogo/_ESQUEMA.md:76-78` — la regla que ya advertía esto antes de
   que se incumpliera: *"Un arquetipo que aplica siempre casi nunca existe: los que se marcan
   «siempre» sin serlo llenan los planes de ruido y entrenan al dueño a ignorarlos."*
 
@@ -331,7 +364,7 @@ responde la del siguiente. Di en voz alta en cuál estás.
   criterios **verificados** (tests, navegador, archivos, PRs), **nunca autorreportados**;
   semana 1 (2026-08-22): E1 0, E2 50, E3 12, E4 0, E5 40, E6 0, E7 0, E8 15; PDF de 11
   páginas, commit `76af678`.
-- `C:\Users\Kalel\prommter\proyectos\villa-broaster\docs\semanal\avance.json` — criterio
+- `$ORION_HOME/prommter/villa-broaster/docs/semanal/avance.json` — criterio
   de E2: *"Base construida y verificada (…107 tests) = 50; integrada en main con QA
   independiente = 80; T-11 completa = 100"*, sobre trabajo **construido y verificado por
   el propio ORION** (campo `resumen`). El techo de la autoverificación es un número, y es 50.
