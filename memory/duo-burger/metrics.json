@@ -1,0 +1,53 @@
+{
+  "projectId": "duo-burger",
+  "sessionCount": 2,
+  "totalContextSaved": 0,
+  "avgCompressionRatio": 1,
+  "avgKnowledgeDensity": 7,
+  "trendCompressionRatio": "stable",
+  "lastUpdated": "2026-09-10T00:00:00.000Z",
+  "sessions": [
+    {
+      "completedAt": "2026-09-09T00:00:00.000Z",
+      "objectsCreated": 15,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "note": "Fundacion del proyecto y entrega del cortometraje de 18 s en Remotion, en los tres formatos. CINCO spawns de subagente murieron por INFRAESTRUCTURA y ninguno por incapacidad: tres a la vez por caida de DNS con la maquina a carga 46 sobre 4 hilos (brew compilando ffmpeg mientras tres agentes renderizaban), y dos por limite de sesion. Esas cinco muertes NO se registran como veredictos de modelo a proposito: anotarlas como fallo envenenaria la calibracion y subiria un escalon de tier que nadie ha ganado. El unico veredicto real es el del sonnet que si alcanzo a escribir sus cinco archivos de fondos y efectos, todos correctos y compilando. El personaje, los dos actos, el logotipo y la firma acabaron construidos por el orquestador a mano.",
+      "modelOutcomes": [
+        {
+          "phase": "build:visual",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": null
+        }
+      ]
+    },
+    {
+      "completedAt": "2026-09-10T00:00:00.000Z",
+      "objectsCreated": 9,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "note": "Segunda version del corto tras el rechazo del dueno: cortometraje de 45 s sobre once ilustraciones suyas a 1376x768, con kit comun, ocho escenas construidas y verificadas por olas (Workflow) en tres vueltas, firma sorpresa. Tokens de subagente MEDIDOS: ola 1 = 1.843.859 (26 agentes, 8 muertos por limite de sesion), reanudacion = 749.863 (26, 0 muertos), tercera vuelta = 436.805 (4). Total 3,03 M. Modelo opus en construccion y verificacion visual, a proposito: es la cara del cliente.",
+      "modelOutcomes": [
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 1843859
+        },
+        {
+          "phase": "verification",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 749863
+        },
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 436805
+        }
+      ]
+    }
+  ]
+}
