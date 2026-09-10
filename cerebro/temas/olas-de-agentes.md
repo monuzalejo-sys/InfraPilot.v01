@@ -1,11 +1,11 @@
 ---
 slug: olas-de-agentes
 titulo: Repartir trabajo entre agentes en paralelo sin colisiones ni pérdidas
-alias: [ola, olas, ola de agentes, tope de salida, limite de salida, output token maximum, 64000, 64k, respuesta demasiado larga, escribir por tandas, escribir por partes, archivo grande, json grande, no dejo nada, no escribio nada, murio sin dejar rastro, olas de agentes, agentes en paralelo, varios agentes, repartir trabajo, dividir el trabajo, dividir la tarea, partir la tarea, parto la tarea, en cuantos pedazos, pedazos, trozos, trocear, partir en pedazos, granularidad, un builder por paso, por pasos, tamano del encargo, equipo de agentes, paralelo, paralelizar, paralelismo, builder, builders, subagente, subagentes, spawn, spawns, wave, wave.json, manifiesto de ola, colision, colisiones, conflicto de archivos, pisarse, se pisan, muerte de agente, agente muerto, se murio, se murieron, se cayo, se cayeron, limite de sesion, infra-death, infra death, reanudar, reanudacion, recuperar ola, recuperacion de ola, respawn, relanzar, orquestador, orquestrador, contratos, ownership, propiedad de archivos, SendMessage, trabajo perdido, se me murio un agente, se me murio un builder, se me murio el agente, murio a mitad, checklist de rescate, rescate de ola, protocolo de muerte, que hago si se muere un agente, audita el disco, auditar el disco, antes de relanzar, mirar el disco, stub de 0 bytes, 0 bytes, archivo vacio, archivo en cero, tamano en disco, reporte vacio, reporte truncado, no es fallo del modelo, no lo cuentes como fallo, senal de capacidad, infraDeath, INFRA_DEATH, sufijo de fase, arqueologia, trabajo huerfano, delta, respawn estrecho, siembra en disco, sembrar datos, fixture sembrado, qa reanudable, resumeFromRunId, HEAD, mover HEAD, checkout a mitad de sesion, cambio de rama, cambia de rama, rama se movio, rama distinta a mitad, builder en rama vieja, construyendo sobre rama vieja, git checkout, git switch, reflog, conteo de tests no cuadra, numero de tests no coincide, cifra medida que no cuadra, metrica no coincide, discrepancia de tests, señal no ruido, no es ruido, criterios de aceptacion, criterio de aceptacion, leer los criterios, propiedad declarada, propiedad real, lista posee, posee, owns, ninguna ruta, todo componente, cada modulo, glob, criterio transversal, dos tareas chocaron, chocaron, se pisaron sin compartir archivos, colision sin solape, archivos disjuntos y aun asi, verificador en paralelo, dos verificadores, dos medidores, medidor, medir en paralelo, verificador es escritor, quien mide escribe, puerto compartido, mismo puerto, puerto 3200, carpeta data, data compartido, limpieza cruzada, borrar lo que otro usa, turnos.json en cero, aislar el verificador, verificar aislado, verificar:aislado, worktree, copia del arbol, servidor de prueba, levantar servidor para verificar, rojo transitorio, rojo a mitad de la ola, tsc en rojo, tsc rojo de otro carril, falso rojo, rojo falso, error de tipos de otro agente, el arbol quedo verde al final, cuando juzgo el arbol, cuando corro tsc en una ola, builder muerto, builders muertos, relanzar un builder muerto, relanzar builder muerto, que reviso antes de relanzar un builder muerto, reviso antes de relanzar, que reviso antes de relanzar, reviso, revisar antes de relanzar, muerto, muertos]
+alias: [ola, olas, ola de agentes, tope de salida, limite de salida, output token maximum, 64000, 64k, respuesta demasiado larga, escribir por tandas, escribir por partes, archivo grande, json grande, no dejo nada, no escribio nada, murio sin dejar rastro, olas de agentes, agentes en paralelo, varios agentes, repartir trabajo, dividir el trabajo, dividir la tarea, partir la tarea, parto la tarea, en cuantos pedazos, pedazos, trozos, trocear, partir en pedazos, granularidad, un builder por paso, por pasos, tamano del encargo, equipo de agentes, paralelo, paralelizar, paralelismo, builder, builders, subagente, subagentes, spawn, spawns, wave, wave.json, manifiesto de ola, colision, colisiones, conflicto de archivos, pisarse, se pisan, muerte de agente, agente muerto, se murio, se murieron, se cayo, se cayeron, limite de sesion, infra-death, infra death, reanudar, reanudacion, recuperar ola, recuperacion de ola, respawn, relanzar, orquestador, orquestrador, contratos, ownership, propiedad de archivos, SendMessage, trabajo perdido, se me murio un agente, se me murio un builder, se me murio el agente, murio a mitad, checklist de rescate, rescate de ola, protocolo de muerte, que hago si se muere un agente, audita el disco, auditar el disco, antes de relanzar, mirar el disco, stub de 0 bytes, 0 bytes, archivo vacio, archivo en cero, tamano en disco, reporte vacio, reporte truncado, no es fallo del modelo, no lo cuentes como fallo, senal de capacidad, infraDeath, INFRA_DEATH, sufijo de fase, arqueologia, trabajo huerfano, delta, respawn estrecho, siembra en disco, sembrar datos, fixture sembrado, qa reanudable, resumeFromRunId, HEAD, mover HEAD, checkout a mitad de sesion, cambio de rama, cambia de rama, rama se movio, rama distinta a mitad, builder en rama vieja, construyendo sobre rama vieja, git checkout, git switch, reflog, conteo de tests no cuadra, numero de tests no coincide, cifra medida que no cuadra, metrica no coincide, discrepancia de tests, señal no ruido, no es ruido, criterios de aceptacion, criterio de aceptacion, leer los criterios, propiedad declarada, propiedad real, lista posee, posee, owns, ninguna ruta, todo componente, cada modulo, glob, criterio transversal, dos tareas chocaron, chocaron, se pisaron sin compartir archivos, colision sin solape, archivos disjuntos y aun asi, verificador en paralelo, dos verificadores, dos medidores, medidor, medir en paralelo, verificador es escritor, quien mide escribe, puerto compartido, mismo puerto, puerto 3200, carpeta data, data compartido, limpieza cruzada, borrar lo que otro usa, turnos.json en cero, aislar el verificador, verificar aislado, verificar:aislado, worktree, copia del arbol, servidor de prueba, levantar servidor para verificar, rojo transitorio, rojo a mitad de la ola, tsc en rojo, tsc rojo de otro carril, falso rojo, rojo falso, error de tipos de otro agente, el arbol quedo verde al final, cuando juzgo el arbol, cuando corro tsc en una ola, builder muerto, builders muertos, relanzar un builder muerto, relanzar builder muerto, que reviso antes de relanzar un builder muerto, reviso antes de relanzar, que reviso antes de relanzar, reviso, revisar antes de relanzar, muerto, muertos, ENOTFOUND, se cayo el dns, dns caido, murieron por hardware, murio por carga, compilando mientras renderiza, ola de video, verificar animacion, verificar video, ola grande, 26 agentes, reanudacion de ola grande, cache del run anterior]
 preguntas: ["¿por qué se me murieron los agentes a mitad de la ola?", "¿cómo reparto el trabajo entre varios agentes?", "¿cómo lanzo varios builders sin que se pisen los archivos?", "¿qué hago si un builder se cayó a mitad del trabajo?", "¿cómo recupero una ola que murió?", "¿cuántos agentes puedo lanzar a la vez?", "se me murió un agente, ¿qué hago?", "¿qué reviso antes de relanzar un builder muerto?", "el agente dijo que arrancó pero no veo nada en disco, ¿entregó o no?", "¿cómo anoto una muerte por límite de sesión sin que cuente como fallo del modelo?", "el conteo de tests no coincide con lo esperado, ¿lo ignoro?", "¿puede un subagente cambiar la rama del repo?", "¿por qué dos builders en paralelo construyeron sobre código viejo?", "las dos tareas tenían archivos distintos, ¿por qué se pisaron?", "¿cómo sé de verdad qué archivos va a tocar una tarea?", "¿puedo lanzar dos verificadores a la vez?", "¿por qué el archivo que estaba midiendo cambió a mitad de la medición?", "un agente reportó tsc en rojo durante la ola, ¿lo arreglo?"]
-proyectos: [infrapilot, estanco-contable, villa-broaster, wrd, placita, orama, landings]
+proyectos: [infrapilot, estanco-contable, villa-broaster, wrd, placita, orama, landings, duo-burger]
 confianza: alta
-actualizado: 2026-08-27
+actualizado: 2026-09-10
 ---
 
 # Repartir trabajo entre agentes en paralelo sin colisiones ni pérdidas
@@ -41,11 +41,26 @@ pico:
   `build:visual`, `build:lib`): cuatro procesos en paralelo alcanzaron el timeout
   **simultáneamente** porque comparten la misma cuota de sesión (`villa-broaster/KN-014`).
 - En WRD los cortes se llevaron **~592k tokens** en infra-deaths (`wrd/KN-005`).
+- 2026-09-09: **tres builders a la vez** murieron con `ENOTFOUND` en la MISMA Mac de
+  siempre — no fue límite de sesión, fue el **hardware**: `brew` compilaba ffmpeg desde
+  fuente mientras esos tres renderizaban video, la carga llegó a **46 sobre 4 hilos** y
+  la resolución de DNS se cayó. Otros dos murieron después, esos sí por límite de
+  sesión. Cinco muertes, dos causas distintas, la misma tanda (`duo-burger/KN-008`;
+  ver [[TEMA-entorno-de-la-maquina]] para el remedio con `uptime` y `kill -STOP`).
+- 2026-09-10, la ola más grande medida hasta ahora: **8 de 26 spawns** murieron por
+  límite de sesión a mitad de una tanda de escenas de video. La reanudación —**26
+  agentes de nuevo, 0 muertes**— recuperó todo del cache del run anterior y solo
+  ejecutó lo que faltaba (749.863 tokens contra 1.843.859 de la ola original): la
+  reanudación no es solo para builders individuales, escala a la ola entera
+  (`duo-burger/metrics.json`, sesión 2026-09-10).
 
-Ahí está la respuesta a *"¿por qué se me murieron a mitad de la ola?"*: **no fallaron
-los modelos, se acabó la sesión**, y se acabó para todos al mismo tiempo porque el
-paralelismo consume la cuota compartida en paralelo. Por eso un infra-death jamás se
-anota como señal de capacidad del modelo (`wrd/KN-005`, `infrapilot/KN-018`).
+Ahí está la respuesta a *"¿por qué se me murieron a mitad de la ola?"*: la causa más
+común es que **no fallaron los modelos, se acabó la sesión**, y se acabó para todos al
+mismo tiempo porque el paralelismo consume la cuota compartida en paralelo — pero no es
+la única: si varios agentes rinden a la vez que algo pesado compila de forma nativa en
+la misma máquina, el sistema entero (hasta el DNS) puede ceder antes que la cuota de
+sesión. Por eso un infra-death jamás se anota como señal de capacidad del modelo
+(`wrd/KN-005`, `infrapilot/KN-018`, `duo-burger/KN-008`).
 
 **Lo caro no es la muerte: es la arqueología después.** Tres proyectos pagaron la
 misma lección por separado y coinciden: el builder muerto **casi siempre ya escribió
@@ -245,15 +260,15 @@ el esquema y el momento de escribirlo están en
 `ORION/runtime/skills/orion.SKILL.md:198-206`, y ya está ignorado por git en
 `ORION/.gitignore:7` (`memory/*/wave.json`). **Verificado con código, no de
 memoria:** el mecanismo está vivo ahora mismo —
-`C:\Users\Kalel\ORION\memory\permanent\wave.json` existe con 3 pasos en estados
+`$ORION_HOME/memory/permanent/wave.json` existe con 3 pasos en estados
 `done` / `en curso` / `pendiente`.
 
 **1 · No relances. Lee el manifiesto y saca la lista de lo que ese agente decía
 poseer.**
 
 ```bash
-cat "C:/Users/Kalel/ORION/memory/<proj>/wave.json"     # Bash
-type C:\Users\Kalel\ORION\memory\<proj>\wave.json      # PowerShell
+cat "$ORION_HOME/memory/<proj>/wave.json"     # Bash
+type $ORION_HOME/memory\<proj>\wave.json      # PowerShell
 ```
 
 Si aparece un `wave.json` al arrancar una sesión, **la sesión anterior murió a
@@ -286,7 +301,7 @@ Git no ve al builder que no commitea, así que el paso 2 no basta. **Un archivo 
 0 bytes significa que el builder reportó que empezó y no persistió nada:
 trátalo como NO hecho** (`wrd/KN-005`). Si no lo miras, planificas la ola
 siguiente sobre archivos que no existen. **Verificado con código hoy:** en
-`C:\Users\Kalel\fable 5\wrd\sistema\` siguen en **0 bytes** `js/datos.js`,
+`(fable 5 — carpeta del PC, no existe en la Mac)\wrd/sistema\` siguen en **0 bytes** `js/datos.js`,
 `js/vista-pedidos.js`, `js/vista-catalogo.js`, `js/vista-contable.js`,
 `js/vista-socios.js`, `js/vista-datos.js` y `css/sistema.css` —siete— mientras
 `js/app.js` (16.518 b) y `js/acceso.js` (6.189 b) sí aterrizaron; sigue abierto
@@ -312,7 +327,7 @@ entregan" deja un hueco invisible.
 autoverificación, no la entrega.**
 
 ```bash
-node C:\Users\Kalel\ORION\tools\edge-cdp.mjs --url <url> --mobile --eval "<comprobación>"
+node $ORION_HOME/tools/edge-cdp.mjs --url <url> --mobile --eval "<comprobación>"
 ```
 
 En estanco lo que se cae es la fase de auto-verificación en navegador, no el
@@ -466,7 +481,7 @@ opcionales ni intercambiables.
   y árbol: archivo de 758→840 líneas a mitad de medición, 3 turnos y 3 órdenes que nadie
   creó, `data/turnos.json` en **0 bytes** por limpieza cruzada. Es la extensión explícita
   de este tema de builders a medidores.
-- `C:\Users\Kalel\prommter\proyectos\villa-broaster\docs\DESPLIEGUE.md` §6 — la regla ya
+- `$ORION_HOME/prommter/villa-broaster/docs/DESPLIEGUE.md` §6 — la regla ya
   escrita para el equipo (verificador = escritor, prohibida la limpieza cruzada,
   comprobación de salida) y el comando `npm run verificar:aislado`
   (`broaster-app/package.json:20`, `broaster-app/scripts/aislado.mjs`).

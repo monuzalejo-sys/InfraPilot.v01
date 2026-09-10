@@ -1,11 +1,11 @@
 ---
 slug: entorno-de-la-maquina
 titulo: Lo que cada máquina puede y no puede hacer (son DOS)
-alias: [push, git push, subir el codigo, subir a github, publicar el repo, credential, credential manager, github desktop, desktop, commit, rama, remoto, terminal, consola, maquina, entorno, esta maquina, mi pc, computador, dos computadores, dos maquinas, mac, macos, darwin, windows, en cual maquina estoy, instalado, no esta instalado, falta instalar, python, python3, pip, docker, brew, homebrew, node, npm, powershell, ps 5.1, bash, heredoc, comando largo, se corta, truncado, utf8, tildes, acentos, mojibake, encoding, json corrupto, puerto, puertos, localhost, launch.json, servidor local, dev server, arrancar el servidor, wifi, wifi del local, firewall, red local, red publica, lan, celular, telefono, escala de windows, permisos del agente, sandbox, scratchpad, limite de sesion, edge, chrome, chrome headless, pdf, orion_home]
+alias: [push, git push, subir el codigo, subir a github, publicar el repo, credential, credential manager, github desktop, desktop, commit, rama, remoto, terminal, consola, maquina, entorno, esta maquina, mi pc, computador, dos computadores, dos maquinas, mac, macos, darwin, windows, en cual maquina estoy, instalado, no esta instalado, falta instalar, python, python3, pip, docker, brew, homebrew, node, npm, powershell, ps 5.1, bash, heredoc, comando largo, se corta, truncado, utf8, tildes, acentos, mojibake, encoding, json corrupto, puerto, puertos, localhost, launch.json, servidor local, dev server, arrancar el servidor, wifi, wifi del local, firewall, red local, red publica, lan, celular, telefono, escala de windows, permisos del agente, sandbox, scratchpad, limite de sesion, edge, chrome, chrome headless, pdf, orion_home, uptime, carga, carga del sistema, load average, hilos, nucleos, cuantos nucleos tiene esta mac, cuantos hilos, i5, cpu al limite, se cayo el dns, dns caido, ENOTFOUND, resolucion de dns, compilando en segundo plano, compilar mientras corren agentes, brew compilando, kill -STOP, kill -CONT, suspender un proceso, pausar una compilacion, cuantos agentes en paralelo aguanta esta maquina]
 preguntas: ["en que maquina estoy trabajando", "puedo hacer push desde la terminal", "que hay instalado en esta maquina y que no", "por que el comando largo se corta a la mitad", "como genero un pdf aqui", "en que puerto arranca cada proyecto"]
-proyectos: [_permanent, infrapilot, prommter, wrd, villa-broaster, placita, estanco-contable, pollo-landing, landings]
+proyectos: [_permanent, infrapilot, prommter, wrd, villa-broaster, placita, estanco-contable, pollo-landing, landings, duo-burger]
 confianza: alta
-actualizado: 2026-09-01
+actualizado: 2026-09-10
 ---
 
 # Lo que cada máquina puede y no puede hacer (son DOS)
@@ -62,9 +62,10 @@ Medido el 2026-09-01 en la Mac y el 2026-08-24 en el PC:
 | `pdftoppm` / poppler | NO (pero hay `brew`) | NO |
 | Docker | NO | NO |
 | Node / npm / git | v24.18.0 · 11.16.0 · 2.39.2 | v24.16.0 · 11.13.0 · 2.55.0 |
+| CPU | i5, **4 hilos** — no aguanta una ola de agentes mientras algo compila nativo | no medido |
 
 `ORION_HOME` vale `/Users/g/orion` en la Mac (declarado en `~/.claude/settings.json`) y
-`C:\Users\Kalel\ORION` en el PC. **Todo comando del runtime se escribe con la variable,
+`$ORION_HOME` en el PC. **Todo comando del runtime se escribe con la variable,
 nunca con la ruta literal** — es lo que hace que los mismos 21 archivos de agentes y
 skills sirvan en las dos.
 
@@ -103,7 +104,20 @@ skills sirvan en las dos.
 9. **Lo que solo puede hacer el dueño se escribe como Pending, no se intenta**:
    `npm install` desde URL, escrituras a bases compartidas, ajustes de seguridad del
    sistema, e invitaciones y protección de ramas en GitHub (`infrapilot/KN-019`).
-10. **Puertos, de un archivo, no de memoria** — `$ORION_HOME/.claude/launch.json`. En la
+10. **Antes de lanzar una ola en esta Mac, mira `uptime`.** Es un i5 de 4 hilos: con
+    carga por encima de ~8 la ola se suicida, y por encima de eso puede tumbar hasta la
+    resolución de DNS. Medido el 2026-09-09: con `brew` compilando ffmpeg desde fuente
+    (más de cuatro horas) **mientras tres agentes renderizaban video en paralelo**, la
+    carga llegó a **46 sobre 4 hilos** y **cinco spawns murieron seguidos** — tres a la
+    vez con `ENOTFOUND` porque el DNS se cayó, dos más después por límite de sesión.
+    Ninguna de las cinco fue falta de capacidad del modelo: no subas ningún escalón de
+    tier por esto (`duo-burger/KN-008`). Remedios que sí funcionaron: **`kill -STOP`**
+    sobre el proceso que compila (se reanuda después con `-CONT` sin perder el trabajo
+    de compilación, en vez de matarlo y repetirlo), bajar los bancos de prueba a media
+    resolución mientras algo pesado corre en segundo plano, y avisar en el brief de no
+    lanzar renders en paralelo. Ver [[TEMA-olas-de-agentes]] para el resto del
+    protocolo de muerte por infraestructura.
+11. **Puertos, de un archivo, no de memoria** — `$ORION_HOME/.claude/launch.json`. En la
     Mac hoy: `placita` 3300, `placita-pos` 4173. En el PC el archivo era compartido entre
     sesiones y otra podía pisarlo, así que verifica tu entrada antes de arrancar
     (`wrd/KN-001`).
@@ -149,6 +163,8 @@ push real: villa-app-repo 09859a5..de20b97 · Equipo-villa-broaster 4f91358..f3b
 - `infrapilot/DEC-005` — la política vieja de autocommit, ya alineada con DEC-001.
 - `prommter/KN-002` — PowerShell 5.1 corrompe JSON UTF-8 (solo PC).
 - `estanco-contable/KN-008` — se puede probar SQL real: `embedded-postgres` en el scratchpad, 37/37.
+- `duo-burger/KN-008` — i5 de 4 hilos; carga 46 tumbó el DNS con `brew` compilando y tres
+  agentes renderizando a la vez; `kill -STOP`/`-CONT` como remedio que no pierde trabajo.
 
 ### Huecos explícitos (el corpus NO lo respalda)
 
