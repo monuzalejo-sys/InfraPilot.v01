@@ -3,21 +3,6 @@
   "snapshotDate": "2026-09-10T00:00:00.000Z",
   "objects": [
     {
-      "id": "KN-001",
-      "type": "Knowledge",
-      "tier": "Project",
-      "created": "2026-09-09T00:00:00.000Z",
-      "updated": "2026-09-09T00:00:00.000Z",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "Critical",
-      "status": "Deprecated",
-      "dependencies": [],
-      "fact": "PUNTO CERO VERIFICADO (2026-09-09): de Duo Burger no existe NADA. Cero codigo en la maquina (find en todo el home), cero repos en GitHub en las dos cuentas (gh repo list kalelfelpem-glitch y monuzalejo-sys), cero objetos en el cerebro (cerebro.mjs ruta, dos formulaciones). El unico rastro escrito en todo el ecosistema es una frase del dueno del 2026-09-09 02:22 y los puertos que el tema un-vps-varios-negocios ya le reservo. Cualquier afirmacion sobre su carta, sus sedes, su marca o su estado comercial es HOY un supuesto, no un dato.",
-      "context": "Se busco antes de proponer nada, precisamente para no fundar el proyecto sobre un invento. Comprobable: gh repo list en ambas cuentas no devuelve ningun repo con 'duo' ni 'burger'. SUPERADO el mismo dia: el proyecto existe, tiene repo publicado y un cortometraje de 18 s entregado. Lo que sigue sin saberse es el NEGOCIO (ver PEND-001), no el proyecto.",
-      "source": "gh repo list + find ~ + cerebro.mjs ruta, 2026-09-09"
-    },
-    {
       "id": "KN-002",
       "type": "Knowledge",
       "tier": "Project",
@@ -75,9 +60,7 @@
       "impact": "High",
       "priority": "Critical",
       "status": "Blocked",
-      "dependencies": [
-        "KN-001"
-      ],
+      "dependencies": [],
       "task": "Que el dueno diga que ES Duo Burger: (1) cuantas sedes, (2) si ya es cliente firmado o todavia es prospecto, (3) que necesita — el sistema de caja, la vitrina publica, o las dos cosas.",
       "reason": "Bloquea TODO lo demas y solo lo sabe el. Sin las tres respuestas, planear el proyecto seria inventarlo: Villa Broaster tiene 262 tareas porque son dos sedes con caja, insumos y roles; si Duo Burger es un local con una carta, su plan son diez tareas, no 262. Elegir mal aqui cuesta el trabajo entero."
     },
@@ -125,8 +108,7 @@
       "priority": "High",
       "status": "Current",
       "fact": "REMOTION NO CODIFICA EN ESTA MAC, PERO SI DIBUJA. Remotion 4.0.523 trae su propio codificador (@remotion/compositor-darwin-x64) compilado para macOS 15; esta Mac corre macOS 13.7.8 Ventura. Al terminar de dibujar los fotogramas el codificador muere con SIGABRT: dyld no encuentra _AVCaptureDeviceTypeContinuityCamera en libavdevice.dylib. Los FOTOGRAMAS salen perfectos: lo unico roto es juntarlos. SOLUCION comprobada: remotion render <comp> <dir> --sequence y despues ffmpeg del sistema. Queda escrito en scripts/render.sh del proyecto del video.",
-      "context": "Se descubrio probando el render de video ANTES de construir nada, para no llegar al final con 540 fotogramas y sin salida. Vale para cualquier proyecto Remotion en un Mac anterior a Sequoia.",
-      "source": "npx remotion render, 2026-09-09"
+      "context": "Se descubrio probando el render de video ANTES de construir nada, para no llegar al final con 540 fotogramas y sin salida. Vale para cualquier proyecto Remotion en un Mac anterior a Sequoia."
     },
     {
       "tier": "Project",
@@ -187,51 +169,6 @@
       "risk": "Remotion es software de licencia restringida, no libre: es gratis para individuos y para empresas de hasta 3 personas, y a partir de ahi exige licencia de empresa pagada. Prommter es una agencia con clientes, y este video se produce PARA un cliente.",
       "probability": "Medium",
       "mitigation": "Verificar el numero de personas de la empresa contra los terminos vigentes de remotion.dev antes de facturar trabajo hecho con Remotion. Si la licencia no encaja, la alternativa ya esta instalada en el mismo proyecto y es Apache-2.0: hyperframes. El corto tendria que reescribirse como HTML, pero la escaleta, la paleta y el diseno de los planos se conservan enteros."
-    },
-    {
-      "tier": "Project",
-      "created": "2026-09-09T00:00:00.000Z",
-      "updated": "2026-09-09T00:00:00.000Z",
-      "lifetime": "Project",
-      "dependencies": [],
-      "id": "DEC-003",
-      "type": "Decision",
-      "impact": "High",
-      "priority": "High",
-      "status": "Superseded",
-      "title": "El teaser se cuenta como una bobina vieja que se quema, y el logo es el mecanismo",
-      "description": "Cortometraje de 18 s. Una bobina de dibujos de los anos 30 hace su cuenta atras y aparece un cartel de FIN; detras estan los dos personajes quietos en sepia; UNO PARPADEA a los 2,6 s; la pelicula se quema y por el agujero entra un mundo ochentero CALIDO; vuelven, caminan y CHOCAN LOS PUNOS, y ese choque detona el logotipo; corte seco a papel calido y silencio para la firma de Prommter.",
-      "reason": "Tres decisiones de direccion, cada una con su porque. (1) El cartel de FIN CIERRA la puerta, y solo se puede reabrir una puerta que el espectador vio cerrarse: sin el, el parpadeo no sorprende. (2) El gancho tiene que caer antes del segundo tres, que es lo que dan las redes. (3) El choque de punos ES el logo del cliente, asi que en vez de estamparlo al final como pegatina se convierte en el mecanismo que hace nacer el titulo — el espectador ve nacer la marca en lugar de que se la ensenen. Y los personajes NO se van con el titulo: bajan, encogen y se quedan sujetando su puno debajo del nombre, porque ellos son la marca. SUPERADA el 2026-09-09: el dueno rechazo la primera version por infantil y dicto su propia estructura de ocho tiempos con arte generado por el."
-    },
-    {
-      "tier": "Project",
-      "created": "2026-09-09T00:00:00.000Z",
-      "updated": "2026-09-09T00:00:00.000Z",
-      "lifetime": "Project",
-      "dependencies": [],
-      "id": "DEC-004",
-      "type": "Decision",
-      "impact": "Medium",
-      "priority": "High",
-      "status": "Superseded",
-      "title": "Ochentero CALIDO, no synthwave; y la firma de la agencia en el registro contrario",
-      "description": "El mundo del acto 2 es un atardecer de aerografo con formas Memphis: naranjas, rosas y amarillos. Prohibido en este proyecto el topico synthwave — rejilla en perspectiva, sol de rayas morado y cian, palmeras. La tarjeta final de Prommter va en el manifiesto del estudio del ingeniero moderno: papel #F8F6F2, tinta #111111, Inter 500, muchisimo aire, sin grano.",
-      "reason": "Dos razones. La de color: los del propio logo (pan, queso, tomate) YA son calidos, y el naranja y el rosa los encienden mientras el morado los apaga; ademas el dueno pidio explicitamente algo poco comun y el synthwave es el tópico agotado del genero. La de registro: 16 segundos de ruido y color seguidos de un corte seco a silencio y papel es lo que hace que la firma se recuerde. La agencia no grita despues del cliente. Eso ademas resuelve la tension con el manifiesto, que prohibe neones: el neon es del CLIENTE, la calma es de PROMMTER. SUPERADA el 2026-09-09: el dueno rechazo la primera version por infantil y dicto su propia estructura de ocho tiempos con arte generado por el."
-    },
-    {
-      "tier": "Project",
-      "created": "2026-09-09T00:00:00.000Z",
-      "updated": "2026-09-09T00:00:00.000Z",
-      "lifetime": "Project",
-      "dependencies": [],
-      "id": "KN-006",
-      "type": "Knowledge",
-      "impact": "High",
-      "priority": "High",
-      "status": "Current",
-      "fact": "SEIS LECCIONES DE ANIMACION PAGADAS MIRANDO FOTOGRAMAS, no razonando. (1) El aplaste que conserva volumen es una TRAMPA de encuadre: achatar a 0,4 multiplica el ancho por 2,5 y con dos personajes en pantalla se salen por los lados; el suelo util es 0,7. (2) Un fogonazo de impacto tiene que durar UN fotograma fuerte y dos de rescoldo: al 75 % sostenido tres fotogramas no golpea, lava el plano justo cuando hay que ver a los personajes. (3) La separacion entre dos personajes que se tocan hay que DERIVARLA de la escala (separacion = alcance_del_puno * escala), porque si son numeros sueltos los punos chocan al aire en cuanto cambia el formato. (4) Un acercamiento de camara multiplica tambien la distancia de las manos al centro: con un 10 % los brazos se salian del cuadro. (5) Una curva unica de anticipacion hace que el puno cruce el centro antes de tiempo; hay que separar el gesto en dos tiempos explicitos, recoger y disparar. (6) Los guantes tienen radio: para que dos punos se TOQUEN sus centros deben estar a dos radios, no encima uno del otro, o se leen como una sola mancha blanca.",
-      "context": "Ninguna de las seis se puede ver leyendo el codigo: las seis salieron de renderizar un fotograma y MIRARLO. Es la leccion de fondo — en animacion, el typecheck no dice nada sobre si algo se ve.",
-      "source": "stills de out/rev, proyecto duo-burguer-video, 2026-09-09"
     },
     {
       "tier": "Project",
@@ -440,7 +377,42 @@
       "reason": "Son los dos unicos limites del arte que el codigo no puede tapar. Decision del dueno."
     }
   ],
-  "archives": [],
-  "lastAmmRun": "2026-09-09T00:00:00.000Z",
-  "version": 6
+  "archives": [
+    {
+      "id": "ARC-001",
+      "archivedId": "KN-001",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-09-10T00:00:00.000Z",
+      "reason": "Deprecated",
+      "note": "Punto cero verificado (2026-09-09): el proyecto ya existe, tiene repo publicado y cortometraje entregado. El zero-state ha sido supersedido por la realidad del proyecto."
+    },
+    {
+      "id": "ARC-002",
+      "archivedId": "DEC-003",
+      "archivedType": "Decision",
+      "archivedAt": "2026-09-10T00:00:00.000Z",
+      "reason": "Superseded",
+      "supersededBy": "DEC-005",
+      "note": "Primera propuesta de estructura narrativa (bobina vieja que se quema, parpadeo sorpresa). Rechazada por el dueno el 2026-09-09 por infantil; reemplazada por DEC-005 (cortometraje sobre ilustracion con ocho tiempos del dueno)."
+    },
+    {
+      "id": "ARC-003",
+      "archivedId": "DEC-004",
+      "archivedType": "Decision",
+      "archivedAt": "2026-09-10T00:00:00.000Z",
+      "reason": "Superseded",
+      "supersededBy": "DEC-005",
+      "note": "Paleta ochentero calido vs synthwave (ambos eran propuestas para el acto 2 de DEC-003, rechazada). DEC-005 reemplaza la estructura narrativa completa."
+    },
+    {
+      "id": "ARC-004",
+      "archivedId": "KN-006",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-09-10T00:00:00.000Z",
+      "reason": "Expired",
+      "note": "Seis lecciones de animacion pagadas mirando fotogramas del muneco vectorial articulado. El muneco ya no existe (DEC-005 cambio a cortometraje sobre ilustracion). La leccion de fondo (en animacion, el typecheck no dice si algo se ve) ya vive en KN-013 (verificacion por medicion de pixeles)."
+    }
+  ],
+  "lastAmmRun": "2026-09-10T00:00:00.000Z",
+  "version": 7
 }

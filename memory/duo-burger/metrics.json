@@ -1,6 +1,6 @@
 {
   "projectId": "duo-burger",
-  "sessionCount": 2,
+  "sessionCount": 3,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 7,
@@ -48,6 +48,15 @@
           "tokens": 436805
         }
       ]
+    },
+    {
+      "completedAt": "2026-09-10T00:00:00.000Z",
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 4,
+      "triggeredBy": "SESSION_CLOSE",
+      "note": "Curation: arquivadas 4 objetos terminales. DEC-003 y DEC-004 (superseded por DEC-005), KN-001 (zero-state deprecated), KN-006 (vector character retired, su leccion tipografica vive en KN-013). Objetos activos reducidos de 29 a 25, dentro del limite. Memoria recompactada.",
+      "modelOutcomes": []
     }
   ]
 }
