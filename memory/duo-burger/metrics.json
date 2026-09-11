@@ -1,11 +1,11 @@
 {
   "projectId": "duo-burger",
-  "sessionCount": 3,
+  "sessionCount": 4,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 7,
   "trendCompressionRatio": "stable",
-  "lastUpdated": "2026-09-10T00:00:00.000Z",
+  "lastUpdated": "2026-09-11T00:00:00.000Z",
   "sessions": [
     {
       "completedAt": "2026-09-09T00:00:00.000Z",
@@ -57,6 +57,33 @@
       "triggeredBy": "SESSION_CLOSE",
       "note": "Curation: arquivadas 4 objetos terminales. DEC-003 y DEC-004 (superseded por DEC-005), KN-001 (zero-state deprecated), KN-006 (vector character retired, su leccion tipografica vive en KN-013). Objetos activos reducidos de 29 a 25, dentro del limite. Memoria recompactada.",
       "modelOutcomes": []
+    },
+    {
+      "completedAt": "2026-09-11T00:00:00.000Z",
+      "objectsCreated": 4,
+      "objectsMerged": 3,
+      "objectsArchived": 0,
+      "note": "Plan de contenido 01 y activos de redes (vertical enmarcado, cinco cortes, once laminas). Investigacion en cuatro frentes: la ola inicial (Workflow, ultracode) completo Instagram y TikTok y murio por limite de sesion en Facebook, reaperturas, sintesis y critica (344.895 tokens); con ultracode apagado, Facebook y reaperturas se cubrieron con dos agentes sueltos (110.677 + 119.842) y la sintesis la hizo el orquestador. Total medido de subagente: 575.414.",
+      "modelOutcomes": [
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 344895
+        },
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 110677
+        },
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 119842
+        }
+      ]
     }
   ]
 }

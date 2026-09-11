@@ -1,6 +1,6 @@
 {
   "projectId": "duo-burger",
-  "snapshotDate": "2026-09-10T00:00:00.000Z",
+  "snapshotDate": "2026-09-11T00:00:00.000Z",
   "objects": [
     {
       "id": "KN-002",
@@ -55,14 +55,14 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-09-09T00:00:00.000Z",
-      "updated": "2026-09-09T00:00:00.000Z",
+      "updated": "2026-09-11T00:00:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "Critical",
       "status": "Blocked",
       "dependencies": [],
       "task": "Que el dueno diga que ES Duo Burger: (1) cuantas sedes, (2) si ya es cliente firmado o todavia es prospecto, (3) que necesita — el sistema de caja, la vitrina publica, o las dos cosas.",
-      "reason": "Bloquea TODO lo demas y solo lo sabe el. Sin las tres respuestas, planear el proyecto seria inventarlo: Villa Broaster tiene 262 tareas porque son dos sedes con caja, insumos y roles; si Duo Burger es un local con una carta, su plan son diez tareas, no 262. Elegir mal aqui cuesta el trabajo entero."
+      "reason": "Bloquea TODO lo demas y solo lo sabe el. Sin las tres respuestas, planear el proyecto seria inventarlo: Villa Broaster tiene 262 tareas porque son dos sedes con caja, insumos y roles; si Duo Burger es un local con una carta, su plan son diez tareas, no 262. Elegir mal aqui cuesta el trabajo entero. (Consolidado en PEND-007, la hoja para el cliente del plan de contenido.)"
     },
     {
       "id": "PEND-002",
@@ -85,7 +85,7 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-09-09T00:00:00.000Z",
-      "updated": "2026-09-09T00:00:00.000Z",
+      "updated": "2026-09-11T00:00:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
@@ -94,7 +94,7 @@
         "PEND-001"
       ],
       "task": "Conseguir del cliente la carta real con precios, y la ortografia OFICIAL de la marca: 'Duo Burger', 'Duo Burguer', 'DUO BURGER'... y si lleva tilde.",
-      "reason": "Sin carta real no hay catalogo, y un catalogo de mentira en una vitrina publica es una vitrina que no se puede mostrar. La ortografia no es un detalle: entra en el dominio, en el logo y en cada titulo de la landing, y el dueno la ha escrito de dos formas distintas ('duo burger' el 09-09, 'duo burguer' hoy). La leccion KN-001 de la memoria landings ya cobra este error: hay que verificar si el nombre es la marca definitiva o un provisional antes de cablearlo."
+      "reason": "Sin carta real no hay catalogo, y un catalogo de mentira en una vitrina publica es una vitrina que no se puede mostrar. La ortografia no es un detalle: entra en el dominio, en el logo y en cada titulo de la landing, y el dueno la ha escrito de dos formas distintas ('duo burger' el 09-09, 'duo burguer' hoy). La leccion KN-001 de la memoria landings ya cobra este error: hay que verificar si el nombre es la marca definitiva o un provisional antes de cablearlo. (Consolidado en PEND-007, la hoja para el cliente del plan de contenido.)"
     },
     {
       "tier": "Project",
@@ -202,7 +202,7 @@
     {
       "tier": "Project",
       "created": "2026-09-09T00:00:00.000Z",
-      "updated": "2026-09-09T00:00:00.000Z",
+      "updated": "2026-09-11T00:00:00.000Z",
       "lifetime": "Project",
       "dependencies": [],
       "id": "PEND-005",
@@ -211,7 +211,7 @@
       "priority": "High",
       "status": "Blocked",
       "task": "La fecha de la reapertura, y el archivo original del logo en PNG transparente o en vectores.",
-      "reason": "Hoy el corto cierra con PROXIMAMENTE, y una fecha concreta convierte un anuncio bonito en una razon para volver a mirar. El logo original hace falta solo para el plano del logotipo: los personajes estan reconstruidos como muneco articulado a partir de la imagen que mando el dueno, porque para animarlos hacen falta piezas sueltas y un PNG plano solo se puede mover de sitio."
+      "reason": "Hoy el corto cierra con PROXIMAMENTE, y una fecha concreta convierte un anuncio bonito en una razon para volver a mirar. El logo original hace falta solo para el plano del logotipo: los personajes estan reconstruidos como muneco articulado a partir de la imagen que mando el dueno, porque para animarlos hacen falta piezas sueltas y un PNG plano solo se puede mover de sitio. (Consolidado en PEND-007, la hoja para el cliente del plan de contenido.)"
     },
     {
       "tier": "Project",
@@ -375,6 +375,65 @@
       "status": "Ready",
       "task": "Regenerar la escena 01 (fachada de noche) con el logotipo oficial apagado si el dueno no acepta que el letrero viejo diga \"Duo Burger\" en caligrafica. Y, si se quiere mas nitidez en los cortes cerrados del recuerdo, pedir esa pintura a mas resolucion.",
       "reason": "Son los dos unicos limites del arte que el codigo no puede tapar. Decision del dueno."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-11T00:00:00.000Z",
+      "updated": "2026-09-11T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [],
+      "id": "DEC-007",
+      "type": "Decision",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "title": "Plan de contenido 01: organico, en tres redes, con el corto enmarcado en vertical y la mecanica del duo",
+      "description": "Documento docs/plan-de-contenido-01.md (457 lineas, 50 fuentes numeradas con confianza) y pagina publicada como artefacto «Vuelve Duo Burguer». Estructura: huecos al frente (H1-H12), ruta de 7 dias, cuentas dia 0 (Instagram empresa, TikTok empresa con biblioteca comercial, pagina de Facebook), voz de las mascotas, calendario con textos listos, palanca de colaboracion con la cuenta del dueno, metricas, hoja para el cliente. Activos producidos: corto enmarcado Historia 1080x1920 y Feed 1080x1350 (StageOverride), cinco cortes T1-T5 recortados para abrir con imagen, once laminas 4:5.",
+      "reason": "El dueno pidio el primer plan con Instagram de 80 seguidores y sin TikTok ni Facebook: «full creacion y calentar». Se escribio para UN lector (Kalel) siguiendo el tema documentos-para-personas, y con cero datos inventados: lo que falta esta numerado y visible. La investigacion fue por cuatro frentes con fuentes reales; tres hallazgos cambiaron decisiones y estan en KN-015."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-11T00:00:00.000Z",
+      "updated": "2026-09-11T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [],
+      "id": "KN-015",
+      "type": "Knowledge",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "fact": "TRES HECHOS QUE CAMBIAN COMO SE LANZA UN NEGOCIO LOCAL EN REDES EN COLOMBIA (2026): (1) Los reels se publican NATIVOS en Facebook, no compartidos desde Instagram: el compartido cae en el muro y no en la seccion de reels, puede silenciar musica con licencia, y una prueba sobre tres paginas midio 72 % mas alcance nativo (metricool 2025, agorapulse 2025). (2) En Colombia un sorteo en redes con ganador al AZAR necesita permiso previo de Coljuegos o de la loteria departamental; multas hasta ~90 M COP (coljuegos.gov.co boletin 24). Una votacion de preferencia o una promocion para todos NO lo necesitan. Ademas Meta exige el texto «no patrocinado por Instagram/Facebook» y desde 2025 ninguna accion puede ser la unica condicion de participacion. (3) En TikTok el 88 % del tiempo de visualizacion es CON sonido (TikTok Marketing Science): un video mudo no se publica ahi; y desde 2025-09-01 el contenido promocional lleva el interruptor de contenido comercial o queda fuera de Para ti. Datos de audiencia: TikTok 37,7 M adultos en Colombia (93 %), supera a Facebook 36,4-36,8 M e Instagram 21,6 M (DataReportal, oct 2025); WhatsApp es el canal de pedido (71 % de restaurantes, 73 % de consumidores).",
+      "context": "Investigado el 2026-09-11 en cuatro frentes con URL y confianza por hecho; la lista completa esta en docs/plan-de-contenido-01.md, seccion Fuentes. Vale para cualquier cliente local de Prommter.",
+      "source": "docs/plan-de-contenido-01.md, fuentes 22-27, 42-45"
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-11T00:00:00.000Z",
+      "updated": "2026-09-11T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [],
+      "id": "KN-016",
+      "type": "Knowledge",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "fact": "UN CORTO APAISADO SE LLEVA A VERTICAL ENMARCANDOLO, NO RECORTANDOLO: la pelicula entera a todo el ancho en el centro y la casa de la marca arriba y abajo (logotipo, eslogan, damero). Tecnicamente, en Remotion la pelicula se incrusta dentro de otra composicion y sigue creyendo que mide su tamano original gracias a un contexto (StageOverride) que fuerza el escenario; se escala entera por CSS y ningun plano se recompone. Y las PIEZAS CORTAS para reels se recortan para que el primer fotograma tenga imagen y movimiento: T4 empieza en el BOOM (frame 736) y no en el medio segundo de negro que en la pelicula es un silencio y en un reel suelto es medio segundo perdido.",
+      "context": "src/film/Vertical.tsx, src/film/stage.ts, scripts/encoder.swift con rango de fotogramas. Los cortes se sacan de la secuencia ya renderizada sin volver a renderizar.",
+      "source": "prommter/duo-burguer-video, 2026-09-11"
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-11T00:00:00.000Z",
+      "updated": "2026-09-11T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [],
+      "id": "PEND-007",
+      "type": "Pending",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Blocked",
+      "task": "Que el cliente responda la hoja de la seccion 8 del plan: fecha de reapertura, direccion y horario, carta con precios, WhatsApp de pedidos, quien responde, acceso al Instagram, fotos y videos reales, promocion aprobada, nombres de las mascotas (o dejar que voten). Son los huecos H1-H12 del plan; sin H1 el calendario sigue en dias relativos.",
+      "reason": "El plan esta escrito para no pararse por ellos, pero cada uno cambia algo concreto y ninguno lo puede inventar el codigo. Reune PEND-001, PEND-003 y PEND-005 en una sola hoja que se manda tal cual."
     }
   ],
   "archives": [
@@ -414,5 +473,5 @@
     }
   ],
   "lastAmmRun": "2026-09-10T00:00:00.000Z",
-  "version": 7
+  "version": 8
 }
