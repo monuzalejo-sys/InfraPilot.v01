@@ -2,7 +2,7 @@
 
 ## Qué es (hoy)
 
-Cortometraje de 45,2 s sobre once ilustraciones del cliente (1376x768 apaisado). Entregado: máster 18 Mbps en `out/duo-burguer-vertical.mp4`; versiones ligera (7 Mbps), cuadrado, ancho. Salidas adicionales: enmarcado vertical para Historia (1080x1920), feed (1080x1350), cinco cortes recortados T1-T5, once láminas 4:5 para redes. Plan de contenido 01 completo en `docs/plan-de-contenido-01.md` (457 líneas, 50 fuentes numeradas): calendario de 7 días, voz de mascotas, palanca de colaboración, métricas, hoja para el cliente. **Primera versión (18 s con vectores planos) rechazada el 2026-09-09: infantil y feo.** La marca se escribe **Duo Burguer**.
+Cortometraje de 45,2 s sobre once ilustraciones del cliente (1376x768 apaisado). Entregado: máster 18 Mbps en `out/duo-burguer-nativo.mp4`, con versiones ligera (7 Mbps), móvil (4,5) y preview (2,2), todas 1376x768; las salidas de la versión rechazada se borraron de `out/`. Salidas adicionales: enmarcado vertical para Historia (1080x1920), feed (1080x1350), cinco cortes recortados T1-T5, once láminas 4:5 para redes. Plan de contenido 01 completo en `docs/plan-de-contenido-01.md` (457 líneas, 50 fuentes numeradas): calendario de 7 días, voz de mascotas, palanca de colaboración, métricas, hoja para el cliente. **Primera versión (18 s con vectores planos) rechazada el 2026-09-09: infantil y feo.** La marca se escribe **Duo Burguer**.
 
 ## Decisiones activas
 
