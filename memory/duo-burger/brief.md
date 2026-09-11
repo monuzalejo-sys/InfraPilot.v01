@@ -1,18 +1,18 @@
-# Duo Burger: Cortometraje de 45 segundos — Estado 2026-09-10
+# Duo Burguer: cortometraje de 45 segundos — Estado 2026-09-11
 
 ## Qué es
 
-Cortometraje de 45 s sobre once ilustraciones (1376x768) generadas por el cliente. Personajes articulados, cámara dinámica, efectos de luz y partículas. Publicado privado en `github.com/kalelfelpem-glitch/duo-burguer-video` (cuatro formatos: vertical 1080x1920, cuadrado, ancho, ligero para redes). Proyecto de la agencia Prommter.
+Cliente de Prommter: hamburguesería que reabre. Cortometraje anunciativo de 45,2 s sobre once ilustraciones (1376x768) generadas por el dueño, con cámara, luz y efectos animados encima (no se redibuja nada). Publicado privado en `github.com/kalelfelpem-glitch/duo-burguer-video`. Salidas en `out/`: máster 18 Mbps (96 MB), ligero 7 Mbps, móvil 4,5 Mbps (25 MB), preview 2,2 Mbps (12 MB), todos a 1376x768 APAISADO. Va mudo. La marca se escribe «Duo Burguer» (así la escribe el dueño y así va en el corto).
 
 ## Estado actual
 
-- **Versión entregada:** 18 segundos de corto + firma de agencia (96 fotogramas)
+- **Versión entregada (2026-09-10):** 45,2 s = 42 s de la estructura del dueño en ocho tiempos + 3,2 s de firma de Prommter (letrero que cae). Verificada por olas de agentes mirando y midiendo fotogramas (3 vueltas) y por el director sobre hoja de contactos. La primera versión (18 s, vectores planos) fue RECHAZADA por el dueño: «infantil y feo».
 - **Código:** Remotion 4.0.523 + React 19 + Hyperframes v0.8.33 (alternativa Apache-2.0)
 - **Repo:** `prommter/duo-burguer-video` (privado)
 
 ## Decisiones vigentes
 
-- **DEC-001:** Dominio provisional `duoburger.prommter.online` (no dominio propio aún)
+- **DEC-001:** Dominio provisional `duoburguer.prommter.online` si algún día hay vitrina web (no dominio propio aún)
 - **DEC-002:** Motor Remotion (desensamble React); Hyperframes como herramienta auxiliar
 - **DEC-005:** Cortometraje sobre ilustración: once pinturas, ocho tiempos del cliente, cámara animada sobre arte
 - **DEC-006:** Firma de Prommter como gag final (letrero de bombillas que cae y se enciende)
@@ -32,7 +32,7 @@ Cortometraje de 45 s sobre once ilustraciones (1376x768) generadas por el client
 
 ## Trampas de la máquina (KN-003/004/008/009/010)
 
-1. **KN-003:** Remotion no codifica en macOS 13.7 (dyld error). Salida: `--sequence` + ffmpeg del sistema
+1. **KN-003:** Remotion no codifica en macOS 13.7 (dyld error). Salida: `--sequence` + `scripts/encoder.swift` (AVAssetWriter); ffmpeg ya está instalado pero no hace falta
 2. **KN-004:** Mac lenta (i5-7360U, 4 hilos). Regla: ruido a 1/3 de resolución, estirar por CSS
 3. **KN-008:** Carga > 8 sobre 4 hilos rompe olas de agentes (DNS). Antes de lanzar: mirar `uptime`
 4. **KN-009:** macOS codifica video solo (AVAssetWriter, 60 líneas Swift). Alternativa cuando ffmpeg no está
