@@ -1,43 +1,41 @@
-# Duo Burguer: cortometraje de 45 segundos — Estado 2026-09-11
+# Duo Burguer: Cortometraje + Plan de Contenido — 2026-09-11
 
-## Qué es
+## Qué es (hoy)
 
-Cliente de Prommter: hamburguesería que reabre. Cortometraje anunciativo de 45,2 s sobre once ilustraciones (1376x768) generadas por el dueño, con cámara, luz y efectos animados encima (no se redibuja nada). Publicado privado en `github.com/kalelfelpem-glitch/duo-burguer-video`. Salidas en `out/`: máster 18 Mbps (96 MB), ligero 7 Mbps, móvil 4,5 Mbps (25 MB), preview 2,2 Mbps (12 MB), todos a 1376x768 APAISADO. Va mudo. La marca se escribe «Duo Burguer» (así la escribe el dueño y así va en el corto).
+Cortometraje de 45,2 s sobre once ilustraciones del cliente (1376x768 apaisado). Entregado: máster 18 Mbps en `out/duo-burguer-vertical.mp4`; versiones ligera (7 Mbps), cuadrado, ancho. Salidas adicionales: enmarcado vertical para Historia (1080x1920), feed (1080x1350), cinco cortes recortados T1-T5, once láminas 4:5 para redes. Plan de contenido 01 completo en `docs/plan-de-contenido-01.md` (457 líneas, 50 fuentes numeradas): calendario de 7 días, voz de mascotas, palanca de colaboración, métricas, hoja para el cliente. **Primera versión (18 s con vectores planos) rechazada el 2026-09-09: infantil y feo.** La marca se escribe **Duo Burguer**.
 
-## Estado actual
+## Decisiones activas
 
-- **Versión entregada (2026-09-10):** 45,2 s = 42 s de la estructura del dueño en ocho tiempos + 3,2 s de firma de Prommter (letrero que cae). Verificada por olas de agentes mirando y midiendo fotogramas (3 vueltas) y por el director sobre hoja de contactos. La primera versión (18 s, vectores planos) fue RECHAZADA por el dueño: «infantil y feo».
-- **Código:** Remotion 4.0.523 + React 19 + Hyperframes v0.8.33 (alternativa Apache-2.0)
-- **Repo:** `prommter/duo-burguer-video` (privado)
+**DEC-001:** Dominio provisional `duoburger.prommter.online` (sin dominio propio aún).  
+**DEC-002:** Motor Remotion 4.0.523 + React 19; Hyperframes v0.8.33 como herramienta auxiliar.  
+**DEC-005:** Cortometraje sobre ilustración: ocho tiempos del cliente, cámara animada, sin redibujo.  
+**DEC-006:** Firma de Prommter como gag final (letrero de bombillas que cae y se enciende, 96 fotogramas).  
+**DEC-007:** Plan de contenido 01 orgánico, tres redes, corto vertical enmarcado + láminas + días aprobados.
 
-## Decisiones vigentes
+## Pendientes (sin PEND-001/003/005 consolidados en PEND-007)
 
-- **DEC-001:** Dominio provisional `duoburguer.prommter.online` si algún día hay vitrina web (no dominio propio aún)
-- **DEC-002:** Motor Remotion (desensamble React); Hyperframes como herramienta auxiliar
-- **DEC-005:** Cortometraje sobre ilustración: once pinturas, ocho tiempos del cliente, cámara animada sobre arte
-- **DEC-006:** Firma de Prommter como gag final (letrero de bombillas que cae y se enciende)
-
-## Pendientes abiertos
-
-- **PEND-001:** Que el cliente defina qué ES Duo Burger (sedes, estado firma, qué necesita: caja/vitrina/ambas)
-- **PEND-003:** Ortografía oficial de la marca + carta real con precios
-- **PEND-004:** Música del teaser (swing ~150 bpm, librería con licencia; hyperframes beats para cuadrar)
-- **PEND-005:** Fecha de reapertura + logo original en vectores o PNG transparente
-- **PEND-006:** Regenerar escena 01 si cliente rechaza letrero viejo; pedir más resolución si quiere nitidez en cerrados
+**PEND-002:** ¿Reusa Villa Broaster o código separado? (modelo de tandas vs por pedido).  
+**PEND-004:** Música: swing ~150 bpm, librería con licencia (hyperframes beats para cuadrar).  
+**PEND-006:** Regenerar escena 01 si cliente rechaza letrero caligrafia; resolución extra si pide.  
+**PEND-007:** Cliente responde hoja (fecha reapertura, dirección, horario, carta, WhatsApp, fotos, promo, mascotas).
 
 ## Riesgos
 
-- **RSK-001 (Remotion):** Licencia pagada si empresa > 3 personas. Solución: reescribir en Hyperframes (Apache-2.0)
-- **RSK-002 (Música):** Lista del cliente son grabaciones famosas (Benny Goodman, etc.). Solución: librería con licencia
+**RSK-001:** Remotion requiere licencia pagada si empresa > 3 personas. Fallback: Hyperframes (Apache-2.0).  
+**RSK-002:** Música: lista del cliente son grabaciones famosas. Fallback: librería de swing con licencia.
 
-## Trampas de la máquina (KN-003/004/008/009/010)
+## Hallazgos KN-015 (tres hechos que cambian lanzamiento en redes, Colombia 2026)
 
-1. **KN-003:** Remotion no codifica en macOS 13.7 (dyld error). Salida: `--sequence` + `scripts/encoder.swift` (AVAssetWriter); ffmpeg ya está instalado pero no hace falta
-2. **KN-004:** Mac lenta (i5-7360U, 4 hilos). Regla: ruido a 1/3 de resolución, estirar por CSS
-3. **KN-008:** Carga > 8 sobre 4 hilos rompe olas de agentes (DNS). Antes de lanzar: mirar `uptime`
-4. **KN-009:** macOS codifica video solo (AVAssetWriter, 60 líneas Swift). Alternativa cuando ffmpeg no está
-5. **KN-010:** Código 0 no es prueba. Siempre: verificar artefactos, no exit codes
+1. Reels se publican NATIVOS en Facebook, no compartidos: +72 % alcance, no silencia música licenciada.
+2. Sorteos al azar necesitan Coljuegos/lotería departamental (multas ~90 M COP); votación NO.
+3. TikTok: 88 % visualización CON sonido; desde 2025-09-01, comercial requiere interruptor; 37,7 M adultos > Instagram 21,6 M.
 
-## Límite de infraestructura
+## Trampas de la máquina (en este Mac)
 
-El VPS compartido (Hostinger, 4 GB, 1 vCPU) cabe ~3-4 negocios. Duo Burger: puertos 3210 (sistema), 3211 (vitrina). Datos NUNCA comparten carpeta con Villa Broaster (3200/3201).
+**KN-003/009 (fusionadas):** Remotion no codifica en macOS 13 (dyld error). Soluciones: `--sequence` + ffmpeg del sistema, O Swift AVAssetWriter (60 líneas, sin instalar).  
+**KN-004:** Mac lenta (i5, 4 hilos). Regla: ruido a 1/3 resolución, estirar por CSS.  
+**KN-008:** Carga > 8 sobre 4 hilos rompe olas (DNS). Antes de lanzar: mirar `uptime`.  
+**KN-010:** Código 0 no es prueba. Siempre: verificar artefactos, no exit codes.
+
+---
+Repo: `prommter/duo-burguer-video` (privado). VPS: puertos 3210 (sistema), 3211 (vitrina).

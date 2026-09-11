@@ -1,6 +1,6 @@
 {
   "projectId": "duo-burger",
-  "sessionCount": 4,
+  "sessionCount": 5,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 7,
@@ -84,6 +84,15 @@
           "tokens": 119842
         }
       ]
+    },
+    {
+      "completedAt": "2026-09-11T00:00:00.000Z",
+      "objectsCreated": 0,
+      "objectsMerged": 1,
+      "objectsArchived": 4,
+      "triggeredBy": "SESSION_CLOSE",
+      "note": "Curation: archivadas 3 pendientes (PEND-001, 003, 005) consolidadas en PEND-007, y fusionada KN-003 en KN-009 (ambas sobre codificación de video). Objetos activos reducidos de 29 a 25, dentro del límite. Memoria recompactada.",
+      "modelOutcomes": []
     }
   ]
 }
