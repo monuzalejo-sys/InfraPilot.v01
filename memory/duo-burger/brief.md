@@ -9,13 +9,13 @@ Cortometraje de **45,2 segundos a 1376×768 píxeles** entregado en Remotion 4.0
 - **DATOS REALES** (KN-017): Calle 56 con Carrera 10, Villa del Viento, Popayán. WhatsApp 300 195 5160, Nequi 312 648 4714, empaque 1.000, horario TBD.
 
 ## División de trabajo
-**Repo compartido `duo-burguer` (canónico, memoria en su `memory/duo-burger`):** el PC escribe `duo-sistema/` (Next 16 + node:sqlite, :3500), `contrato/`, `HUECOS.md` y su memoria. **Esta Mac:** `duo-vitrina/` (:3501) en ramas `mac/*` con PR, más video, marca y redes aquí. PEND-002 resuelto: código aparte, no reusa Villa Broaster. Siguiente: PEND-008.
+**Repo compartido `duo-burguer` (canónico, memoria en su `memory/duo-burger`):** el PC escribe `duo-sistema/` (Next 16 + node:sqlite, :3500), `contrato/`, `HUECOS.md` y su memoria. **Esta Mac:** `duo-vitrina/` (:3501) en ramas `mac/*` con PR, más video, marca y redes aquí. Código aparte, no reusa Villa Broaster. Siguiente: PEND-008 (construir duo-vitrina).
 
 ## Decisiones activas
-DEC-001 (dominio provisional prommter.online), DEC-002 (Remotion motor + hyperframes beats), DEC-005 (cortometraje sobre ilustración, sin redibujo), DEC-006 (firma Prommter gag bombillas), DEC-007 (plan orgánico 3 redes), DEC-009 (sin WhatsApp; vitrina en repo compartido; superó a DEC-008).
+DEC-001 (dominio provisional prommter.online), DEC-002 (Remotion motor + hyperframes beats), DEC-005 (cortometraje sobre ilustración, sin redibujo), DEC-006 (firma Prommter gag bombillas), DEC-007 (plan orgánico 3 redes), DEC-009 (sin WhatsApp; vitrina en repo compartido).
 
 ## Pendientes bloqueantes
-PEND-002 (¿reusa o aparte?), PEND-004 (música licencia swing ~150 bpm), PEND-006 (escena 01 letrero), PEND-007 (cliente: fecha, horario, fotos, músca, promo, mascotas, cinco dudas carta).
+PEND-004 (música licencia swing ~150 bpm), PEND-006 (escena 01 letrero), PEND-007 (cliente: fecha, horario, fotos, música, promo, mascotas, dudas carta), PEND-008 (construir duo-vitrina en rama mac/*).
 
 ## Riesgos
 RSK-001 (Remotion licencia empresa >3 personas; fallback Hyperframes Apache-2.0). RSK-002 (música cliente grabada; fallback librería swing licencia).
@@ -24,10 +24,10 @@ RSK-001 (Remotion licencia empresa >3 personas; fallback Hyperframes Apache-2.0)
 (1) Reels nativos Facebook +72 % alcance vs compartidos desde Instagram. (2) Sorteos azar necesitan Coljuegos (~90 M COP multa); votación permitida. (3) TikTok 88 % con sonido; vídeo mudo no va; 37,7 M adultos > Instagram 21,6 M; WhatsApp 73 % consumidores.
 
 ## Trampas de la máquina
-KN-009: Remotion no codifica en macOS 13 (dyld); usar `--sequence` + encoder.swift 60 líneas (H.264 hardware).  
-KN-004: Filtros SVG sobrecargan; ruido a 1/3 resolución, estirar CSS.  
-KN-008: uptime > ~8 sobre 4 hilos rompe olas (DNS); cinco spawns murieron 2026-09-09.  
+KN-009: Remotion no codifica en macOS 13 (dyld); usar `--sequence` + encoder.swift 60 líneas (H.264 hardware).
+KN-004: Filtros SVG sobrecargan; ruido a 1/3 resolución, estirar CSS.
+KN-008: uptime > ~8 sobre 4 hilos rompe olas (DNS); cinco spawns murieron 2026-09-09.
 KN-010: Código 0 no prueba nada; verificar artefacto (duración, fotograma extraído).
 
 ---
-Repos privados: `kalelfelpem-glitch/duo-burguer-video` (video, marca, carta, vista previa) y `kalelfelpem-glitch/duo-burguer` (sistema + vitrina). Puertos vigentes 3500 (sistema) y 3501 (vitrina) según el repo compartido; los 3210/3211 anteriores quedaron sin efecto. Datos aislados de Villa Broaster (CON-001).
+Repos privados: `kalelfelpem-glitch/duo-burguer-video` (video, marca, carta, vista previa) y `kalelfelpem-glitch/duo-burguer` (sistema + vitrina). Puertos vigentes 3500 (sistema) y 3501 (vitrina) según el repo compartido; datos aislados de Villa Broaster (CON-001).

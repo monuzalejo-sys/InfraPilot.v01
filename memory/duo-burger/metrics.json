@@ -1,6 +1,6 @@
 {
   "projectId": "duo-burger",
-  "sessionCount": 7,
+  "sessionCount": 8,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 7,
@@ -110,6 +110,15 @@
       "objectsArchived": 0,
       "triggeredBy": "TASK_COMPLETE",
       "note": "Sin WhatsApp en la landing; traspaso de la vitrina al repo compartido duo-burguer (PR #1); iconos de hamburguesa por ingredientes. DEC-008 superada por DEC-009. Trabajo inline, sin subagentes medidos.",
+      "modelOutcomes": []
+    },
+    {
+      "completedAt": "2026-09-12T22:45:00.000Z",
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 2,
+      "triggeredBy": "SESSION_CLOSE",
+      "note": "Curation: archivadas DEC-008 (Superseded por DEC-009, landing con WhatsApp descartada) y PEND-002 (Done, reuso vs código aparte resuelto como código aparte). Objetos activos reducidos de 30 a 28. Puertos actualizado en KN-002 (3500/3501). Brief regenerado. Memoria compactada.",
       "modelOutcomes": []
     }
   ]

@@ -13,7 +13,7 @@
       "priority": "High",
       "status": "Current",
       "dependencies": [],
-      "fact": "SITIO YA RESERVADO EN EL SERVIDOR: Duo Burger tiene asignados los puertos 3210 (sistema) y 3211 (vitrina) en el VPS Hostinger 2.25.89.240, donde ya vive Villa Broaster en 3200/3201. Medido y no supuesto: cada app Next en produccion ocupa 108 MB, un negocio completo ~220 MB, y en la KVM 1 de 4 GB caben 3-4 negocios porque el limite es 1 vCPU y no la memoria. La infraestructura cuesta lo mismo con uno que con cuatro: ~12 USD/mes repartidos.",
+      "fact": "SITIO YA RESERVADO EN EL SERVIDOR: Duo Burger tiene asignados los puertos 3500 (duo-sistema) y 3501 (duo-vitrina) en el VPS Hostinger 2.25.89.240, donde ya vive Villa Broaster en 3200/3201. Medido y no supuesto: cada app Next en produccion ocupa 108 MB, un negocio completo ~220 MB, y en la KVM 1 de 4 GB caben 3-4 negocios porque el limite es 1 vCPU y no la memoria. La infraestructura cuesta lo mismo con uno que con cuatro: ~12 USD/mes repartidos.",
       "context": "La receta completa de anadir un negocio al mismo servidor esta curada en el tema un-vps-varios-negocios del cerebro: dos nombres DNS, dos puertos jamas repetidos, dos servicios systemd, carpeta de datos propia y una deploy key de solo lectura POR repositorio.",
       "source": "cerebro/temas/un-vps-varios-negocios.md, 2026-09-08"
     },
@@ -49,22 +49,6 @@
       ],
       "constraint": "Si Duo Burger entra al mismo VPS que Villa Broaster: sus datos NUNCA comparten carpeta ni proceso con los de Villa Broaster, y hay que aceptar de antemano que un solo servidor es un solo punto de caida — si se apaga, se apagan los dos clientes a la vez.",
       "reason": "Es la regla que el tema un-vps-varios-negocios marca como innegociable, y la unica que no cambia por estar acompanados. El punto de caida compartido es asumible mientras cada negocio siga vendiendo sin nube (patron la-caja-no-puede-parar) y deja de serlo cuando uno facture lo suficiente como para no poder esperar; ahi se separa ese, no antes."
-    },
-    {
-      "id": "PEND-002",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-09-09T00:00:00.000Z",
-      "updated": "2026-09-12T00:00:00.000Z",
-      "lifetime": "Project",
-      "impact": "High",
-      "priority": "Critical",
-      "status": "Done",
-      "dependencies": [
-        "PEND-007"
-      ],
-      "task": "Decidir si Duo Burger REUSA el sistema de Villa Broaster (segunda instancia o codigo parametrizado) o se construye aparte.",
-      "reason": "Es la bifurcacion que decide si esto es un despliegue de unas horas o un proyecto de meses. Se esta midiendo con evidencia: auditoria del acoplamiento del broaster-app a un solo cliente (marca cableada vs configuracion vs reglas propias del pollo). El hallazgo que manda es si el modelo asume tandas de asado y piezas de pollo, porque una hamburguesa se arma por pedido y no se asa por tandas — ahi la diferencia deja de ser el catalogo y pasa a ser el modelo. (La auditoria del acoplamiento se cancelo por orden del dueno; el trabajo derivo al cortometraje. Sigue abierta como decision de negocio.) RESUELTO en los hechos (2026-09-12): el PC construye codigo aparte, duo-sistema (Next 16 + node:sqlite, :3500) en el repo kalelfelpem-glitch/duo-burguer, con su propio contrato; no reusa broaster-app. Ver DEC-009 y KN-018."
     },
     {
       "tier": "Project",
@@ -385,26 +369,10 @@
     },
     {
       "tier": "Project",
-      "created": "2026-09-11T00:00:00.000Z",
-      "updated": "2026-09-12T00:00:00.000Z",
-      "lifetime": "Project",
-      "dependencies": [],
-      "id": "DEC-008",
-      "type": "Decision",
-      "impact": "High",
-      "priority": "High",
-      "status": "Superseded",
-      "title": "La landing de ventas es estatica, pide por WhatsApp y comparte los datos con la carta",
-      "description": "landing/plantilla.html + landing/build.mjs generan landing/dist/index.html autocontenido (logotipo, mascotas y poster en data URI; el clip del BOOM aparte en video/). Movil primero a 390 px, UNA accion —pedir por WhatsApp— visible sin desplazarse y fija abajo, boton Pedir por plato con el nombre ya escrito en el mensaje, como pedir en tres pasos con Nequi, donde estamos con enlace al mapa, y el horario como hueco visible. Los precios salen de src/carta/datos.ts: cambiar uno cambia carta y landing. SUPERADA el 2026-09-12 por DEC-009: el dueno quito el pedido por WhatsApp.",
-      "reason": "Division de trabajo dictada por el dueno el 2026-09-11: «el PC estaba trabajando en el sistema, tu trabaja en la landing de ventas». Sin sistema propio todavia en esta Mac, la primera version vende por WhatsApp (el 73 % de los consumidores colombianos lo prefiere, KN-015) y no necesita servidor; cuando el sistema exista, la landing se cablea a el como la vitrina de Villa Broaster (villa-app), que es el fin declarado del dueno para todos sus negocios."
-    },
-    {
-      "tier": "Project",
       "created": "2026-09-12T00:00:00.000Z",
       "updated": "2026-09-12T00:00:00.000Z",
       "lifetime": "Project",
       "dependencies": [
-        "DEC-008",
         "KN-017"
       ],
       "id": "DEC-009",
@@ -547,8 +515,25 @@
       "reason": "Merged",
       "supersededBy": "DEC-002",
       "note": "Detalles tecnicos de hyperframes (paquete npm, herramientas beats/snapshot/inspect) fusionados en DEC-002 para documentar completamente la decision de usar hyperframes como herramienta auxiliar."
+    },
+    {
+      "id": "ARC-010",
+      "archivedId": "DEC-008",
+      "archivedType": "Decision",
+      "archivedAt": "2026-09-12T00:00:00.000Z",
+      "reason": "Superseded",
+      "supersededBy": "DEC-009",
+      "note": "Landing estatica con pedido por WhatsApp. Superada el 2026-09-12 cuando el dueno ordeno quitar WhatsApp y cambiar a vitrina en repo compartido (DEC-009)."
+    },
+    {
+      "id": "ARC-011",
+      "archivedId": "PEND-002",
+      "archivedType": "Pending",
+      "archivedAt": "2026-09-12T00:00:00.000Z",
+      "reason": "Expired",
+      "note": "Decidir si Duo Burger reusa o construye aparte. RESUELTO: el PC construye codigo aparte (duo-sistema) en repo kalelfelpem-glitch/duo-burguer. Ver DEC-009 y KN-018."
     }
   ],
-  "lastAmmRun": "2026-09-12T00:00:00.000Z",
-  "version": 12
+  "lastAmmRun": "2026-09-12T22:45:00.000Z",
+  "version": 13
 }
