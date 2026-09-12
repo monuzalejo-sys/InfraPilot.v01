@@ -377,8 +377,38 @@
       "impact": "High",
       "priority": "Critical",
       "status": "Blocked",
-      "task": "Que el cliente responda la hoja de la seccion 8 del plan: fecha de reapertura, direccion y horario, carta con precios, WhatsApp de pedidos, quien responde, acceso al Instagram, fotos y videos reales, promocion aprobada, nombres de las mascotas (o dejar que voten). Son los huecos H1-H12 del plan; sin H1 el calendario sigue en dias relativos.",
+      "task": "Del cliente faltan: fecha de reapertura (H1), HORARIO (H2, la direccion ya esta), quien responde (H5), acceso al Instagram (H6), fotos y videos reales (H8), musica con licencia (H9), promocion aprobada (H12), nombres de las mascotas (H11), y confirmar las cinco dudas de la carta (DUDAS en src/carta/datos.ts). Resueltos el 2026-09-11 con las cartas que mando: direccion, carta con precios, WhatsApp y Nequi.",
       "reason": "El plan esta escrito para no pararse por ellos, pero cada uno cambia algo concreto y ninguno lo puede inventar el codigo. Reune PEND-001, PEND-003 y PEND-005 en una sola hoja que se manda tal cual."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-11T00:00:00.000Z",
+      "updated": "2026-09-11T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [],
+      "id": "KN-017",
+      "type": "Knowledge",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Current",
+      "fact": "DATOS REALES DEL NEGOCIO (de las cartas que mando el dueno el 2026-09-11): direccion Calle 56 Norte con Carrera 10, esquina, Villa del Viento, Popayan; WhatsApp 300 195 5160; Nequi 312 648 4714; empaque para llevar 1.000. La CARTA NEGRA manda en precios: hamburguesas sencilla 13.000, cheddar 15.000, especial 15.000, pollo 17.000, doble y/o mixta 20.000 (bajaron 3.000 respecto a los borradores); salchipapas 8/10/12/16/16.000; perro 7.000; sandwiches 8.000 y 10.000; adiciones 2.000-6.000; bebidas Coca-Cola 1,5 L 7.500, 400 ml 4.000, 250 ml 3.000, agua 2.000/3.000; combos 21.000, 28.000, 13.000; promociones martes (Coca-Cola 250 gratis con hamburguesa) y jueves (perro + papa + gaseosa 11.000). Todo en src/carta/datos.ts, la unica fuente de verdad de la carta y de la landing. Los borradores de colores decian «La Salchipaperia de Yoli»: el dueno pidio adaptarlos a NUESTRO estilo, asi que la carta lleva el logotipo de Duo Burguer; si el negocio conserva ese nombre, es un cambio de una linea.",
+      "context": "Dos lineas de la carta negra NO se copiaron por parecer duplicadas (cheddar a 14.000 con descripcion de mozzarella; segunda jamon y queso a 12.000) y los combos quedaron con precios fijados cuando la sencilla valia 16.000. Las cinco dudas estan en DUDAS de datos.ts. El HORARIO sigue sin saberse.",
+      "source": "src/carta/datos.ts, cartas enviadas por el dueno, 2026-09-11"
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-11T00:00:00.000Z",
+      "updated": "2026-09-11T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [],
+      "id": "DEC-008",
+      "type": "Decision",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "title": "La landing de ventas es estatica, pide por WhatsApp y comparte los datos con la carta",
+      "description": "landing/plantilla.html + landing/build.mjs generan landing/dist/index.html autocontenido (logotipo, mascotas y poster en data URI; el clip del BOOM aparte en video/). Movil primero a 390 px, UNA accion —pedir por WhatsApp— visible sin desplazarse y fija abajo, boton Pedir por plato con el nombre ya escrito en el mensaje, como pedir en tres pasos con Nequi, donde estamos con enlace al mapa, y el horario como hueco visible. Los precios salen de src/carta/datos.ts: cambiar uno cambia carta y landing.",
+      "reason": "Division de trabajo dictada por el dueno el 2026-09-11: «el PC estaba trabajando en el sistema, tu trabaja en la landing de ventas». Sin sistema propio todavia en esta Mac, la primera version vende por WhatsApp (el 73 % de los consumidores colombianos lo prefiere, KN-015) y no necesita servidor; cuando el sistema exista, la landing se cablea a el como la vitrina de Villa Broaster (villa-app), que es el fin declarado del dueno para todos sus negocios."
     }
   ],
   "archives": [
@@ -454,5 +484,5 @@
     }
   ],
   "lastAmmRun": "2026-09-11T00:00:00.000Z",
-  "version": 9
+  "version": 10
 }
