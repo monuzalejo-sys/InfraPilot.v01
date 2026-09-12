@@ -1,11 +1,11 @@
 {
   "projectId": "duo-burger",
-  "sessionCount": 5,
+  "sessionCount": 6,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 7,
   "trendCompressionRatio": "stable",
-  "lastUpdated": "2026-09-11T00:00:00.000Z",
+  "lastUpdated": "2026-09-12T00:00:00.000Z",
   "sessions": [
     {
       "completedAt": "2026-09-09T00:00:00.000Z",
@@ -92,6 +92,15 @@
       "objectsArchived": 4,
       "triggeredBy": "SESSION_CLOSE",
       "note": "Curation: archivadas 3 pendientes (PEND-001, 003, 005) consolidadas en PEND-007, y fusionada KN-003 en KN-009 (ambas sobre codificación de video). Objetos activos reducidos de 29 a 25, dentro del límite. Memoria recompactada.",
+      "modelOutcomes": []
+    },
+    {
+      "completedAt": "2026-09-12T00:00:00.000Z",
+      "objectsCreated": 0,
+      "objectsMerged": 1,
+      "objectsArchived": 1,
+      "triggeredBy": "SESSION_CLOSE",
+      "note": "Curation: fusionada KN-005 (detalles de hyperframes como paquete npm) en DEC-002 para consolidar la decision de arquitectura. Objetos activos reducidos de 26 a 25. Brief regenerado.",
       "modelOutcomes": []
     }
   ]

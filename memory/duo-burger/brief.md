@@ -1,41 +1,33 @@
-# Duo Burguer: Cortometraje + Plan de Contenido — 2026-09-11
+# Duo Burguer — Brief de Proyecto — 2026-09-12
 
-## Qué es (hoy)
+## Qué es hoy
+Cortometraje de **45,2 segundos a 1376×768 píxeles** entregado en Remotion 4.0.523, construido sobre once ilustraciones del dueño con kit común de efectos (luz, lluvia, confeti, grano, parpadeo, iris). Máster en `out/duo-burguer-nativo.mp4` (18 Mbps); salidas adicionales: vertical enmarcada para Historia (1080×1920) e Feed (1080×1350 StageOverride), cinco cortes T1-T5 para reels, once láminas 4:5 para redes. Plan de contenido 01 íntegro en `docs/plan-de-contenido-01.md` (457 líneas, 50 fuentes). **Primera versión de 18 s rechazada el 2026-09-09: infantil.** La marca se escribe **Duo Burguer**.
 
-Cortometraje de 45,2 s sobre once ilustraciones del cliente (1376x768 apaisado). Entregado: máster 18 Mbps en `out/duo-burguer-nativo.mp4`, con versiones ligera (7 Mbps), móvil (4,5) y preview (2,2), todas 1376x768; las salidas de la versión rechazada se borraron de `out/`. Salidas adicionales: enmarcado vertical para Historia (1080x1920), feed (1080x1350), cinco cortes recortados T1-T5, once láminas 4:5 para redes. Plan de contenido 01 completo en `docs/plan-de-contenido-01.md` (457 líneas, 50 fuentes numeradas): calendario de 7 días, voz de mascotas, palanca de colaboración, métricas, hoja para el cliente. **Primera versión (18 s con vectores planos) rechazada el 2026-09-09: infantil y feo.** La marca se escribe **Duo Burguer**.
+## Producto
+- **CARTA NEGRA:** precios en `src/carta/datos.ts` (sencilla 13 k, cheddar 15 k, especial 15 k, pollo 17 k, doble 20 k, combos, promociones). Dibujada en `out/redes/carta/`.
+- **LANDING:** `landing/dist/index.html` generada con `node landing/build.mjs`. Móvil primero, botón Pedir por WhatsApp visible sin desplazarse, enlace a ubicación, horario como hueco.
+- **DATOS REALES** (KN-017): Calle 56 con Carrera 10, Villa del Viento, Popayán. WhatsApp 300 195 5160, Nequi 312 648 4714, empaque 1.000, horario TBD.
+
+## División de trabajo
+**PC:** sistema (¿reusa Villa Broaster o código aparte? PEND-002). **Esta Mac:** landing + redes (DEC-008).
 
 ## Decisiones activas
+DEC-001 (dominio provisional prommter.online), DEC-002 (Remotion motor + hyperframes beats), DEC-005 (cortometraje sobre ilustración, sin redibujo), DEC-006 (firma Prommter gag bombillas), DEC-007 (plan orgánico 3 redes), DEC-008 (landing + WhatsApp).
 
-**DEC-001:** Dominio provisional `duoburger.prommter.online` (sin dominio propio aún).  
-**DEC-002:** Motor Remotion 4.0.523 + React 19; Hyperframes v0.8.33 como herramienta auxiliar.  
-**DEC-005:** Cortometraje sobre ilustración: ocho tiempos del cliente, cámara animada, sin redibujo.  
-**DEC-006:** Firma de Prommter como gag final (letrero de bombillas que cae y se enciende, 96 fotogramas).  
-**DEC-007:** Plan de contenido 01 orgánico, tres redes, corto vertical enmarcado + láminas + días aprobados.
-
-## Pendientes (sin PEND-001/003/005 consolidados en PEND-007)
-
-**PEND-002:** ¿Reusa Villa Broaster o código separado? (modelo de tandas vs por pedido).  
-**PEND-004:** Música: swing ~150 bpm, librería con licencia (hyperframes beats para cuadrar).  
-**PEND-006:** Regenerar escena 01 si cliente rechaza letrero caligrafia; resolución extra si pide.  
-**PEND-007:** Cliente responde hoja (fecha reapertura, dirección, horario, carta, WhatsApp, fotos, promo, mascotas).
+## Pendientes bloqueantes
+PEND-002 (¿reusa o aparte?), PEND-004 (música licencia swing ~150 bpm), PEND-006 (escena 01 letrero), PEND-007 (cliente: fecha, horario, fotos, músca, promo, mascotas, cinco dudas carta).
 
 ## Riesgos
+RSK-001 (Remotion licencia empresa >3 personas; fallback Hyperframes Apache-2.0). RSK-002 (música cliente grabada; fallback librería swing licencia).
 
-**RSK-001:** Remotion requiere licencia pagada si empresa > 3 personas. Fallback: Hyperframes (Apache-2.0).  
-**RSK-002:** Música: lista del cliente son grabaciones famosas. Fallback: librería de swing con licencia.
+## Hallazgos KN-015 (tres hechos redes Colombia 2026)
+(1) Reels nativos Facebook +72 % alcance vs compartidos desde Instagram. (2) Sorteos azar necesitan Coljuegos (~90 M COP multa); votación permitida. (3) TikTok 88 % con sonido; vídeo mudo no va; 37,7 M adultos > Instagram 21,6 M; WhatsApp 73 % consumidores.
 
-## Hallazgos KN-015 (tres hechos que cambian lanzamiento en redes, Colombia 2026)
-
-1. Reels se publican NATIVOS en Facebook, no compartidos: +72 % alcance, no silencia música licenciada.
-2. Sorteos al azar necesitan Coljuegos/lotería departamental (multas ~90 M COP); votación NO.
-3. TikTok: 88 % visualización CON sonido; desde 2025-09-01, comercial requiere interruptor; 37,7 M adultos > Instagram 21,6 M.
-
-## Trampas de la máquina (en este Mac)
-
-**KN-003/009 (fusionadas):** Remotion no codifica en macOS 13 (dyld error). Soluciones: `--sequence` + ffmpeg del sistema, O Swift AVAssetWriter (60 líneas, sin instalar).  
-**KN-004:** Mac lenta (i5, 4 hilos). Regla: ruido a 1/3 resolución, estirar por CSS.  
-**KN-008:** Carga > 8 sobre 4 hilos rompe olas (DNS). Antes de lanzar: mirar `uptime`.  
-**KN-010:** Código 0 no es prueba. Siempre: verificar artefactos, no exit codes.
+## Trampas de la máquina
+KN-009: Remotion no codifica en macOS 13 (dyld); usar `--sequence` + encoder.swift 60 líneas (H.264 hardware).  
+KN-004: Filtros SVG sobrecargan; ruido a 1/3 resolución, estirar CSS.  
+KN-008: uptime > ~8 sobre 4 hilos rompe olas (DNS); cinco spawns murieron 2026-09-09.  
+KN-010: Código 0 no prueba nada; verificar artefacto (duración, fotograma extraído).
 
 ---
-Repo: `prommter/duo-burguer-video` (privado). VPS: puertos 3210 (sistema), 3211 (vitrina).
+Repo privado: `kalelfelpem-glitch/duo-burguer-video`. VPS: puertos 3210 (sistema), 3211 (vitrina) en Hostinger 2.25.89.240 junto Villa Broaster (3200/3201); datos aislados (CON-001).

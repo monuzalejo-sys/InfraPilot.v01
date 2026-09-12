@@ -84,22 +84,7 @@
     {
       "tier": "Project",
       "created": "2026-09-09T00:00:00.000Z",
-      "updated": "2026-09-09T00:00:00.000Z",
-      "lifetime": "Project",
-      "dependencies": [],
-      "id": "KN-005",
-      "type": "Knowledge",
-      "impact": "Medium",
-      "priority": "Medium",
-      "status": "Current",
-      "fact": "HYPERFRAMES ES REAL Y ES DE HEYGEN: paquete npm hyperframes v0.8.33, Apache-2.0, repo heygen-com/hyperframes, publicado el 2026-09-09. Compone video como HTML plano con atributos de tiempo, en vez de con React como Remotion. Trae herramientas que Remotion no tiene: beats (detecta los compases de una pista y escribe sus tiempos, para cuadrar la animacion contra la musica), snapshot, inspect, grade-compare, check. AVISO: manda telemetria anonima por defecto; se apaga con hyperframes telemetry disable. Para RENDERIZAR necesita ffmpeg del sistema, que Remotion no necesita.",
-      "context": "Instalado como devDependency del proyecto del video. El corto se construyo en Remotion; hyperframes queda como herramienta auxiliar, sobre todo por beats cuando entre la musica.",
-      "source": "npm search + npx hyperframes doctor, 2026-09-09"
-    },
-    {
-      "tier": "Project",
-      "created": "2026-09-09T00:00:00.000Z",
-      "updated": "2026-09-09T00:00:00.000Z",
+      "updated": "2026-09-12T00:00:00.000Z",
       "lifetime": "Project",
       "dependencies": [],
       "id": "DEC-002",
@@ -108,8 +93,11 @@
       "priority": "High",
       "status": "Accepted",
       "title": "El corto se construye en Remotion, con hyperframes al lado como herramienta",
-      "description": "Motor del cortometraje: Remotion 4.0.523 con React 19. Hyperframes queda instalado en el mismo proyecto como devDependency y como caja de herramientas, no como motor.",
-      "reason": "El dueno pidio las dos cosas. Remotion gana como motor porque el corto necesita un personaje ARTICULADO cuyas piezas se deforman por pose, y eso se expresa mucho mejor como componentes React con props que como HTML con atributos de tiempo. Hyperframes es ademas v0.8.33, anterior a su 1.0, publicado el mismo dia. Pero sus herramientas si son mejores que las de Remotion para lo que viene despues: beats cuadra la animacion contra la musica, que es justo el hueco abierto del proyecto."
+      "description": "Motor del cortometraje: Remotion 4.0.523 con React 19. Hyperframes queda instalado en el mismo proyecto como devDependency y como caja de herramientas, no como motor. Hyperframes es paquete npm v0.8.33 (Apache-2.0, repo heygen-com/hyperframes, publicado el 2026-09-09) que compone video como HTML plano con atributos de tiempo. Trae herramientas de Remotion no tiene: beats (detecta compases de pista para cuadrar animacion contra musica), snapshot, inspect, grade-compare, check. Para renderizar necesita ffmpeg del sistema.",
+      "reason": "El dueno pidio las dos cosas. Remotion gana como motor porque el corto necesita un personaje ARTICULADO cuyas piezas se deforman por pose, y eso se expresa mucho mejor como componentes React con props que como HTML con atributos de tiempo. Pero las herramientas de hyperframes SI son mejores que las de Remotion para lo que viene despues: beats cuadra la animacion contra la musica, que es justo el hueco abierto del proyecto.",
+      "supersedes": [
+        "KN-005"
+      ]
     },
     {
       "tier": "Project",
@@ -481,8 +469,18 @@
       "reason": "Merged",
       "supersededBy": "KN-009",
       "note": "Workaround Remotion-específico fusionado en KN-009 (codificación de video con macOS)"
+    },
+    {
+      "id": "ARC-009",
+      "archivedId": "KN-005",
+      "archivedType": "Knowledge",
+      "archivedAt": "2026-09-12T00:00:00.000Z",
+      "reason": "Merged",
+      "supersededBy": "DEC-002",
+      "note": "Detalles tecnicos de hyperframes (paquete npm, herramientas beats/snapshot/inspect) fusionados en DEC-002 para documentar completamente la decision de usar hyperframes como herramienta auxiliar."
     }
   ],
-  "lastAmmRun": "2026-09-11T00:00:00.000Z",
-  "version": 10
+  "snapshotDate": "2026-09-12T00:00:00.000Z",
+  "lastAmmRun": "2026-09-12T00:00:00.000Z",
+  "version": 11
 }
