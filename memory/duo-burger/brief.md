@@ -5,14 +5,14 @@ Cortometraje de **45,2 segundos a 1376×768 píxeles** entregado en Remotion 4.0
 
 ## Producto
 - **CARTA NEGRA:** precios en `src/carta/datos.ts` (sencilla 13 k, cheddar 15 k, especial 15 k, pollo 17 k, doble 20 k, combos, promociones). Dibujada en `out/redes/carta/`.
-- **LANDING:** `landing/dist/index.html` generada con `node landing/build.mjs`. Móvil primero, botón Pedir por WhatsApp visible sin desplazarse, enlace a ubicación, horario como hueco.
+- **LANDING (DEC-009):** sin WhatsApp. `landing/` del video es vista previa: carta real, aviso «Los pedidos en línea abren muy pronto», botón «Ver la carta», carrito dormido. Íconos por ingredientes en cada hamburguesa (KN-019). La que venderá es `duo-vitrina/` en el repo compartido `kalelfelpem-glitch/duo-burguer`, contra su `docs/CONTRATO-API.md` (KN-018). Traspaso: PR #1 y `docs/VITRINA-MAC.md`.
 - **DATOS REALES** (KN-017): Calle 56 con Carrera 10, Villa del Viento, Popayán. WhatsApp 300 195 5160, Nequi 312 648 4714, empaque 1.000, horario TBD.
 
 ## División de trabajo
-**PC:** sistema (¿reusa Villa Broaster o código aparte? PEND-002). **Esta Mac:** landing + redes (DEC-008).
+**Repo compartido `duo-burguer` (canónico, memoria en su `memory/duo-burger`):** el PC escribe `duo-sistema/` (Next 16 + node:sqlite, :3500), `contrato/`, `HUECOS.md` y su memoria. **Esta Mac:** `duo-vitrina/` (:3501) en ramas `mac/*` con PR, más video, marca y redes aquí. PEND-002 resuelto: código aparte, no reusa Villa Broaster. Siguiente: PEND-008.
 
 ## Decisiones activas
-DEC-001 (dominio provisional prommter.online), DEC-002 (Remotion motor + hyperframes beats), DEC-005 (cortometraje sobre ilustración, sin redibujo), DEC-006 (firma Prommter gag bombillas), DEC-007 (plan orgánico 3 redes), DEC-008 (landing + WhatsApp).
+DEC-001 (dominio provisional prommter.online), DEC-002 (Remotion motor + hyperframes beats), DEC-005 (cortometraje sobre ilustración, sin redibujo), DEC-006 (firma Prommter gag bombillas), DEC-007 (plan orgánico 3 redes), DEC-009 (sin WhatsApp; vitrina en repo compartido; superó a DEC-008).
 
 ## Pendientes bloqueantes
 PEND-002 (¿reusa o aparte?), PEND-004 (música licencia swing ~150 bpm), PEND-006 (escena 01 letrero), PEND-007 (cliente: fecha, horario, fotos, músca, promo, mascotas, cinco dudas carta).
@@ -30,4 +30,4 @@ KN-008: uptime > ~8 sobre 4 hilos rompe olas (DNS); cinco spawns murieron 2026-0
 KN-010: Código 0 no prueba nada; verificar artefacto (duración, fotograma extraído).
 
 ---
-Repo privado: `kalelfelpem-glitch/duo-burguer-video`. VPS: puertos 3210 (sistema), 3211 (vitrina) en Hostinger 2.25.89.240 junto Villa Broaster (3200/3201); datos aislados (CON-001).
+Repos privados: `kalelfelpem-glitch/duo-burguer-video` (video, marca, carta, vista previa) y `kalelfelpem-glitch/duo-burguer` (sistema + vitrina). Puertos vigentes 3500 (sistema) y 3501 (vitrina) según el repo compartido; los 3210/3211 anteriores quedaron sin efecto. Datos aislados de Villa Broaster (CON-001).

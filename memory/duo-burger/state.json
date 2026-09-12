@@ -1,6 +1,6 @@
 {
   "projectId": "duo-burger",
-  "snapshotDate": "2026-09-11T00:00:00.000Z",
+  "snapshotDate": "2026-09-12T00:00:00.000Z",
   "objects": [
     {
       "id": "KN-002",
@@ -55,16 +55,16 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-09-09T00:00:00.000Z",
-      "updated": "2026-09-11T00:00:00.000Z",
+      "updated": "2026-09-12T00:00:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "Critical",
-      "status": "Blocked",
+      "status": "Done",
       "dependencies": [
         "PEND-007"
       ],
       "task": "Decidir si Duo Burger REUSA el sistema de Villa Broaster (segunda instancia o codigo parametrizado) o se construye aparte.",
-      "reason": "Es la bifurcacion que decide si esto es un despliegue de unas horas o un proyecto de meses. Se esta midiendo con evidencia: auditoria del acoplamiento del broaster-app a un solo cliente (marca cableada vs configuracion vs reglas propias del pollo). El hallazgo que manda es si el modelo asume tandas de asado y piezas de pollo, porque una hamburguesa se arma por pedido y no se asa por tandas — ahi la diferencia deja de ser el catalogo y pasa a ser el modelo. (La auditoria del acoplamiento se cancelo por orden del dueno; el trabajo derivo al cortometraje. Sigue abierta como decision de negocio.)"
+      "reason": "Es la bifurcacion que decide si esto es un despliegue de unas horas o un proyecto de meses. Se esta midiendo con evidencia: auditoria del acoplamiento del broaster-app a un solo cliente (marca cableada vs configuracion vs reglas propias del pollo). El hallazgo que manda es si el modelo asume tandas de asado y piezas de pollo, porque una hamburguesa se arma por pedido y no se asa por tandas — ahi la diferencia deja de ser el catalogo y pasa a ser el modelo. (La auditoria del acoplamiento se cancelo por orden del dueno; el trabajo derivo al cortometraje. Sigue abierta como decision de negocio.) RESUELTO en los hechos (2026-09-12): el PC construye codigo aparte, duo-sistema (Next 16 + node:sqlite, :3500) en el repo kalelfelpem-glitch/duo-burguer, con su propio contrato; no reusa broaster-app. Ver DEC-009 y KN-018."
     },
     {
       "tier": "Project",
@@ -386,17 +386,86 @@
     {
       "tier": "Project",
       "created": "2026-09-11T00:00:00.000Z",
-      "updated": "2026-09-11T00:00:00.000Z",
+      "updated": "2026-09-12T00:00:00.000Z",
       "lifetime": "Project",
       "dependencies": [],
       "id": "DEC-008",
       "type": "Decision",
       "impact": "High",
       "priority": "High",
-      "status": "Accepted",
+      "status": "Superseded",
       "title": "La landing de ventas es estatica, pide por WhatsApp y comparte los datos con la carta",
-      "description": "landing/plantilla.html + landing/build.mjs generan landing/dist/index.html autocontenido (logotipo, mascotas y poster en data URI; el clip del BOOM aparte en video/). Movil primero a 390 px, UNA accion —pedir por WhatsApp— visible sin desplazarse y fija abajo, boton Pedir por plato con el nombre ya escrito en el mensaje, como pedir en tres pasos con Nequi, donde estamos con enlace al mapa, y el horario como hueco visible. Los precios salen de src/carta/datos.ts: cambiar uno cambia carta y landing.",
+      "description": "landing/plantilla.html + landing/build.mjs generan landing/dist/index.html autocontenido (logotipo, mascotas y poster en data URI; el clip del BOOM aparte en video/). Movil primero a 390 px, UNA accion —pedir por WhatsApp— visible sin desplazarse y fija abajo, boton Pedir por plato con el nombre ya escrito en el mensaje, como pedir en tres pasos con Nequi, donde estamos con enlace al mapa, y el horario como hueco visible. Los precios salen de src/carta/datos.ts: cambiar uno cambia carta y landing. SUPERADA el 2026-09-12 por DEC-009: el dueno quito el pedido por WhatsApp.",
       "reason": "Division de trabajo dictada por el dueno el 2026-09-11: «el PC estaba trabajando en el sistema, tu trabaja en la landing de ventas». Sin sistema propio todavia en esta Mac, la primera version vende por WhatsApp (el 73 % de los consumidores colombianos lo prefiere, KN-015) y no necesita servidor; cuando el sistema exista, la landing se cablea a el como la vitrina de Villa Broaster (villa-app), que es el fin declarado del dueno para todos sus negocios."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-12T00:00:00.000Z",
+      "updated": "2026-09-12T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [
+        "DEC-008",
+        "KN-017"
+      ],
+      "id": "DEC-009",
+      "type": "Decision",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Accepted",
+      "title": "Sin WhatsApp: la landing del video es vista previa y la que vende es duo-vitrina, que escribe la Mac en el repo compartido duo-burguer",
+      "description": "La landing de duo-burguer-video ensena la carta real con precios, el aviso «Los pedidos en linea abren muy pronto» y un solo boton «Ver la carta»; el carrito queda dormido (PEDIDOS_EN_LINEA=false) y no manda nada. Artefacto 606eeb58. Los pedidos en linea entran por duo-vitrina/ (Next :3501) dentro de kalelfelpem-glitch/duo-burguer, contra docs/CONTRATO-API.md de ese repo tal como esta. El PC escribe duo-sistema/, contrato/, docs/HUECOS.md y memory/duo-burger; la Mac escribe duo-vitrina/, docs/VITRINA-MAC.md y docs/marca/iconos/, siempre en ramas mac/* con PR. Traspaso en PR #1 de duo-burguer.",
+      "reason": "Ordenes del dueno el 2026-09-12: «quita el pedir por whatsapp», «quiero que el pc sepa que haces para conectar el sistema y la landing de ventas» y «ya le pedi al pc crear el repo de duo burguer, ahi van a trabajar juntos». El carrito del prototipo se escribio contra el contrato de Villa Broaster y se descarto al ver que el de Duo Burguer es otro."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-12T00:00:00.000Z",
+      "updated": "2026-09-12T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [
+        "DEC-009"
+      ],
+      "id": "KN-018",
+      "type": "Knowledge",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Current",
+      "fact": "CONTRATO PUBLICO DE DUO-SISTEMA (docs/CONTRATO-API.md §3 del repo duo-burguer): GET /api/franja; GET /api/catalogo?franja= -> {esMuestra, productos:[{productoId,nombre,descripcion,precioCop,franjas,tipo simple|armable,gruposOpcion,activo,esMuestra}]}; GET /api/zonas; POST /api/ordenes con cabecera obligatoria Idempotencia-Clave (crypto.randomUUID, 32-64) y cuerpo {canal mesa|recoger|domicilio, origen puntoId|directo, cliente{nombre,telefono}, domicilio{direccion,referencia,zonaId}, notas<=300, lineas[{productoId,cantidad 1-50,selecciones[{grupoId,opcionId}]}]} -> 201 {ordenId,consecutivo,totalCop,estado recibida}, 200 si se repite, 409 con totalVigenteCop si cambio el precio; GET /api/ordenes/[id] -> solo {consecutivo,estado,totalCop}, 20/min. Errores solo {error}, dinero entero Cop, fechas ISO con desfase, sin PUT ni DELETE. La vitrina reescribe /api/:path* a SISTEMA_URL (no conoce el 3500). Cambio menor = clave opcional; las cinco rutas publicas estan congeladas.",
+      "context": "datos.ts ya usa ids que sirven de productoId y exporta la carta en esa forma: node --no-warnings landing/build.mjs --exportar-carta <carpeta> escribe carta-noche.json (31 productos, misma forma que contrato/ejemplos/catalogo.json); categoria y dias van aparte en propuestas. El contrato NO tiene empaque, dias de la semana ni Nequi: la vitrina los ensena como informacion hasta que el PC decida.",
+      "source": "duo-burguer docs/CONTRATO-API.md §1, §3, §6, §7; docs/ARQUITECTURA.md; PR #1"
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-12T00:00:00.000Z",
+      "updated": "2026-09-12T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [
+        "KN-017"
+      ],
+      "id": "KN-019",
+      "type": "Knowledge",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "fact": "Los iconos de hamburguesa se generan, no se dibujan a mano: src/carta/icono.ts arma un SVG 64x64 por capas a partir de la receta capas de cada hamburguesa en datos.ts (Cheddar con queso naranja, Especial y Pollo con tocineta y doble mozzarella, Pollo con filete apanado, Doble con dos carnes y encogida para caber). La landing los pone junto a cada hamburguesa y a los combos sencilla y doble. Copias nombradas por productoId en docs/marca/iconos/ del repo duo-burguer.",
+      "context": "Primera version ilegible: con capas de 3 unidades el contorno se comia el color. Se subieron las capas finas a 4-5 unidades y el trazo a 1,4, y la cebolla se dibujo como montoncito de hebras para no confundirla con la tocineta.",
+      "source": "src/carta/icono.ts, out/redes/iconos/hoja-iconos.png, 2026-09-12"
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-12T00:00:00.000Z",
+      "updated": "2026-09-12T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [
+        "DEC-009",
+        "KN-018"
+      ],
+      "id": "PEND-008",
+      "type": "Pending",
+      "impact": "High",
+      "priority": "High",
+      "status": "Ready",
+      "task": "Construir duo-vitrina en el repo duo-burguer en rama mac/*: T-002 rewrite a SISTEMA_URL, T-012 lib/api.ts unico, T-013/T-014 portada 390 px con la marca real, T-315/T-016 pedido con Idempotencia-Clave y todos los codigos, T-018 domicilio con zonas, T-020 origen del QR, T-032 medicion en pixeles. Antes: leer si el PC publico docs/CONEXION-MAC.md y si respondio el PR #1.",
+      "reason": "Es la parte de la landing de ventas que el dueno asigno a la Mac; sin ella no hay pedidos en linea."
     }
   ],
   "archives": [
@@ -480,7 +549,6 @@
       "note": "Detalles tecnicos de hyperframes (paquete npm, herramientas beats/snapshot/inspect) fusionados en DEC-002 para documentar completamente la decision de usar hyperframes como herramienta auxiliar."
     }
   ],
-  "snapshotDate": "2026-09-12T00:00:00.000Z",
   "lastAmmRun": "2026-09-12T00:00:00.000Z",
-  "version": 11
+  "version": 12
 }

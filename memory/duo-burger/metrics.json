@@ -1,6 +1,6 @@
 {
   "projectId": "duo-burger",
-  "sessionCount": 6,
+  "sessionCount": 7,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 7,
@@ -101,6 +101,15 @@
       "objectsArchived": 1,
       "triggeredBy": "SESSION_CLOSE",
       "note": "Curation: fusionada KN-005 (detalles de hyperframes como paquete npm) en DEC-002 para consolidar la decision de arquitectura. Objetos activos reducidos de 26 a 25. Brief regenerado.",
+      "modelOutcomes": []
+    },
+    {
+      "completedAt": "2026-09-12T00:00:00.000Z",
+      "objectsCreated": 4,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "triggeredBy": "TASK_COMPLETE",
+      "note": "Sin WhatsApp en la landing; traspaso de la vitrina al repo compartido duo-burguer (PR #1); iconos de hamburguesa por ingredientes. DEC-008 superada por DEC-009. Trabajo inline, sin subagentes medidos.",
       "modelOutcomes": []
     }
   ]
