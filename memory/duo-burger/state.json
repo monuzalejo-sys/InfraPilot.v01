@@ -520,6 +520,25 @@
       "status": "Blocked",
       "task": "Pedir al dueno: precio de la arepa; si el arroz del desayuno es opcional; si sudados y gulash son platos separados o mixtos; si el almuerzo lleva sopa, arroz o bebida; si hojaldras, dedos, hawaianos y empanadas se venden todo el dia. Cada respuesta es una linea en datos.ts, luego ./landing/publicar.sh y re-render de la carta de redes. Y confirmar: si arroz y tajadas a 2.000 son solo porciones sueltas o si el desayuno los cobra aparte; si gaseosas y jugos tienen horario.",
       "reason": "Son suposiciones escritas en DUDAS para no inventar; afectan precio y lo que se muestra al publico."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-13T00:00:00.000Z",
+      "updated": "2026-09-13T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [
+        "KN-018",
+        "KN-020",
+        "DEC-010"
+      ],
+      "id": "KN-021",
+      "type": "Knowledge",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Current",
+      "fact": "ESTADO MEDIDO DEL SISTEMA DEL PC (main aa7ebd5, corrido en la Mac el 2026-09-13): npm run verificar pasa (507/507 pruebas, 0 vulnerabilidades, contraste ok, lint 2 avisos); scripts/arrancar-local.mjs siembra sede, franjas 4/12/18, dueno con PIN temporal, caja-1, punto QR y 30 productos. PERO solo existen rutas app/api/acceso/* (login, PIN, sesion, vincular puesto): GET /api/franja, /api/catalogo y /api/zonas dan 404, y siguen pendientes T-009 (servir carta), T-011 (recibir pedido), T-024 (cobrar), T-027 (cocina), T-028 (carta en panel). La carta sembrada es la instantanea de c436659: 30 productos solo noche con ids cortos (ham-sencilla), sin manana/almuerzo ni bebidas nuevas. No esta desplegado en ningun servidor.",
+      "context": "Conclusion para publicar: hoy solo se puede publicar la carta estatica (DEC-010, falta el CNAME). Publicar el sistema seria publicar una pantalla de acceso. Copia de trabajo en prommter/duo-burguer-main (git worktree de origin/main), base de prueba en el scratchpad, config duo-sistema en .claude/launch.json. Medicion dejada al PC en el PR #1.",
+      "source": "npm run verificar, arrancar-local.mjs y curl a localhost:3500 el 2026-09-13; PR #1 comentario 5655150048"
     }
   ],
   "archives": [
@@ -621,5 +640,5 @@
     }
   ],
   "lastAmmRun": "2026-09-12T22:45:00.000Z",
-  "version": 16
+  "version": 17
 }
