@@ -6,7 +6,7 @@ Cortometraje de **45,2 segundos a 1376×768 píxeles** entregado en Remotion 4.0
 ## Producto
 - **CARTA NEGRA:** precios en `src/carta/datos.ts` (sencilla 13 k, cheddar 15 k, especial 15 k, pollo 17 k, doble 20 k, combos, promociones). Dibujada en `out/redes/carta/`.
 - **LANDING (DEC-009):** sin WhatsApp. `landing/` del video es vista previa: carta real, aviso «Los pedidos en línea abren muy pronto», botón «Ver la carta», carrito dormido. Íconos por ingredientes en cada hamburguesa (KN-019). La que venderá es `duo-vitrina/` en el repo compartido `kalelfelpem-glitch/duo-burguer`, contra su `docs/CONTRATO-API.md` (KN-018). Traspaso: PR #1 y `docs/VITRINA-MAC.md`.
-- **DATOS REALES** (KN-017): Calle 56 con Carrera 10, Villa del Viento, Popayán. WhatsApp 300 195 5160, Nequi 312 648 4714, empaque 1.000, horario TBD.
+- **DATOS REALES** (KN-017): Calle 56 con Carrera 10, Villa del Viento, Popayán. Contacto y Nequi 300 326 0448, empaque 1.000, horario todos los días 7 a.m. a 10 p.m..
 
 ## División de trabajo
 **Repo compartido `duo-burguer` (canónico, memoria en su `memory/duo-burger`):** el PC escribe `duo-sistema/` (Next 16 + node:sqlite, :3500), `contrato/`, `HUECOS.md` y su memoria. **Esta Mac:** `duo-vitrina/` (:3501) en ramas `mac/*` con PR, más video, marca y redes aquí. Código aparte, no reusa Villa Broaster. Siguiente: PEND-008 (construir duo-vitrina).
@@ -31,3 +31,4 @@ KN-010: Código 0 no prueba nada; verificar artefacto (duración, fotograma extr
 
 ---
 Repos privados: `kalelfelpem-glitch/duo-burguer-video` (video, marca, carta, vista previa) y `kalelfelpem-glitch/duo-burguer` (sistema + vitrina). Puertos vigentes 3500 (sistema) y 3501 (vitrina) según el repo compartido; datos aislados de Villa Broaster (CON-001).
+- **PUBLICADA (DEC-010):** carta pública para `duoburguer.prommter.com` en GitHub Pages (repo público `duo-burguer-carta`, `landing/publicar.sh`). QR del local y cartel A5 en `out/redes/qr/`, apuntan al dominio. **Falta el CNAME en Hostinger (PEND-009)**. prommter.online es de Villa Broaster: no se usa.

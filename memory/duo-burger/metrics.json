@@ -1,6 +1,6 @@
 {
   "projectId": "duo-burger",
-  "sessionCount": 8,
+  "sessionCount": 9,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 7,
@@ -119,6 +119,15 @@
       "objectsArchived": 2,
       "triggeredBy": "SESSION_CLOSE",
       "note": "Curation: archivadas DEC-008 (Superseded por DEC-009, landing con WhatsApp descartada) y PEND-002 (Done, reuso vs código aparte resuelto como código aparte). Objetos activos reducidos de 30 a 28. Puertos actualizado en KN-002 (3500/3501). Brief regenerado. Memoria compactada.",
+      "modelOutcomes": []
+    },
+    {
+      "completedAt": "2026-09-12T00:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "triggeredBy": "TASK_COMPLETE",
+      "note": "Contacto/Nequi 300 326 0448 y horario 7-22; carta publicada para duoburguer.prommter.com (GitHub Pages, repo publico duo-burguer-carta); QR del local y cartel A5 verificados leyendolos; PR #1 integrado con main del PC (seccion 8 de VITRINA-MAC). Trabajo inline.",
       "modelOutcomes": []
     }
   ]
