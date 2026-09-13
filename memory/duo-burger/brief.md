@@ -32,3 +32,4 @@ KN-010: Código 0 no prueba nada; verificar artefacto (duración, fotograma extr
 ---
 Repos privados: `kalelfelpem-glitch/duo-burguer-video` (video, marca, carta, vista previa) y `kalelfelpem-glitch/duo-burguer` (sistema + vitrina). Puertos vigentes 3500 (sistema) y 3501 (vitrina) según el repo compartido; datos aislados de Villa Broaster (CON-001).
 - **PUBLICADA (DEC-010):** carta pública para `duoburguer.prommter.com` en GitHub Pages (repo público `duo-burguer-carta`, `landing/publicar.sh`). QR del local y cartel A5 en `out/redes/qr/`, apuntan al dominio. **Falta el CNAME en Hostinger (PEND-009)**. prommter.online es de Villa Broaster: no se usa.
+- **CARTA COMPLETA (KN-020, DEC-011):** mañana (desayuno armable 6.000, calentado, acompañantes; arepa sin precio), almuerzo armable 12.000 y noche. La landing arma desayuno, almuerzo y hamburguesa (Sencilla + adiciones a precio de carta, dibujo por capas). Dudas para el dueño en PEND-010.
