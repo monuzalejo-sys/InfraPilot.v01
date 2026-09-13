@@ -483,8 +483,8 @@
       "impact": "High",
       "priority": "Critical",
       "status": "Current",
-      "fact": "CARTA DE LA MANANA Y DEL ALMUERZO (dictada por el dueno el 2026-09-13), en datos.ts con franjas: desayunos (manana) = «Arma tu desayuno» 6.000 armable [huevos revueltos, pericos o rancheros +1.000; cafe o agua de panela; arroz incluido y tajada de maduro o porcion de papas] y calentado 8.000; acompanar (manana) = hojaldra 500, dedo 1.000, hawaiano 2.000, empanada 1.500, arepa SIN PRECIO (porConfirmar: no se publica ni se exporta); almuerzos (almuerzo) = «Arma tu almuerzo» 12.000 armable [principio: frijol, alverja, blanquillo; plato fuerte: sudado de carne, sudado de pollo, carne asada, pollo asado, gulash de carne, gulash de pollo; ensalada de papa o tradicional]. El dueno recalco «el desayuno es a 6000»: en la landing el precio del plato no se mueve y el total va en el resumen.",
-      "context": "Suposiciones escritas en DUDAS: arroz siempre incluido; sudados y gulash leidos como dos platos cada uno; almuerzo sin sopa/arroz/bebida porque no los nombro; acompanantes solo de manana. Export: landing/build.mjs --exportar-carta escribe carta.json (antes carta-noche.json), 38 productos, 2 armables con gruposOpcion de grupoId global; 0 errores con validarInstantanea de duo-sistema/scripts/catalogo-real.mjs. El importar-carta.mjs del PC se detiene con secciones nuevas (por diseno). Carta de redes: 3 paginas de historia y 6 de carrusel.",
+      "fact": "CARTA DE LA MANANA Y DEL ALMUERZO (dictada por el dueno el 2026-09-13), en datos.ts con franjas: desayunos (manana) = «Arma tu desayuno» 6.000 armable [huevos revueltos, pericos o rancheros +1.000; cafe o agua de panela; arroz incluido y tajada de maduro o porcion de papas] y calentado 8.000; acompanar (manana) = hojaldra 500, dedo 1.000, hawaiano 2.000, empanada 1.500, arepa SIN PRECIO (porConfirmar: no se publica ni se exporta); almuerzos (almuerzo) = «Arma tu almuerzo» 12.000 armable [principio: frijol, alverja, blanquillo; plato fuerte: sudado de carne, sudado de pollo, carne asada, pollo asado, gulash de carne, gulash de pollo; ensalada de papa o tradicional]. El dueno recalco «el desayuno es a 6000»: en la landing el precio del plato no se mueve y el total va en el resumen. BEBIDAS Y PORCIONES (dueno, 2026-09-13): cafe 2.000, chocolate 4.000, milo 5.000, jugo de maracuya, lulo y mango en vaso 6.000; porcion de arroz 2.000 y tajadas de maduro (dos) 2.000. Bebidas en las tres franjas; arroz y tajadas en manana y almuerzo con franjas por producto.",
+      "context": "Suposiciones escritas en DUDAS: arroz siempre incluido; sudados y gulash leidos como dos platos cada uno; almuerzo sin sopa/arroz/bebida porque no los nombro; acompanantes solo de manana. Export: landing/build.mjs --exportar-carta escribe carta.json (antes carta-noche.json), 46 productos (antes 38), 2 armables con gruposOpcion de grupoId global; 0 errores con validarInstantanea de duo-sistema/scripts/catalogo-real.mjs. El importar-carta.mjs del PC se detiene con secciones nuevas (por diseno). Carta de redes: 4 paginas de historia (bebidas sola) y 7 de carrusel.",
       "source": "duo-burguer-video f70cd9d; VITRINA-MAC 8.7 en PR #1"
     },
     {
@@ -518,7 +518,7 @@
       "impact": "Medium",
       "priority": "High",
       "status": "Blocked",
-      "task": "Pedir al dueno: precio de la arepa; si el arroz del desayuno es opcional; si sudados y gulash son platos separados o mixtos; si el almuerzo lleva sopa, arroz o bebida; si hojaldras, dedos, hawaianos y empanadas se venden todo el dia. Cada respuesta es una linea en datos.ts, luego ./landing/publicar.sh y re-render de la carta de redes.",
+      "task": "Pedir al dueno: precio de la arepa; si el arroz del desayuno es opcional; si sudados y gulash son platos separados o mixtos; si el almuerzo lleva sopa, arroz o bebida; si hojaldras, dedos, hawaianos y empanadas se venden todo el dia. Cada respuesta es una linea en datos.ts, luego ./landing/publicar.sh y re-render de la carta de redes. Y confirmar: si arroz y tajadas a 2.000 son solo porciones sueltas o si el desayuno los cobra aparte; si gaseosas y jugos tienen horario.",
       "reason": "Son suposiciones escritas en DUDAS para no inventar; afectan precio y lo que se muestra al publico."
     }
   ],
@@ -621,5 +621,5 @@
     }
   ],
   "lastAmmRun": "2026-09-12T22:45:00.000Z",
-  "version": 15
+  "version": 16
 }
