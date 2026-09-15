@@ -421,7 +421,7 @@
     {
       "tier": "Project",
       "created": "2026-09-12T00:00:00.000Z",
-      "updated": "2026-09-12T00:00:00.000Z",
+      "updated": "2026-09-15T00:00:00.000Z",
       "lifetime": "Project",
       "dependencies": [
         "DEC-009",
@@ -431,14 +431,14 @@
       "type": "Pending",
       "impact": "High",
       "priority": "High",
-      "status": "Blocked",
+      "status": "Done",
       "task": "Construir duo-vitrina en el repo duo-burguer en rama mac/*: T-002 rewrite a SISTEMA_URL, T-012 lib/api.ts unico, T-013/T-014 portada 390 px con la marca real, T-315/T-016 pedido con Idempotencia-Clave y todos los codigos, T-018 domicilio con zonas, T-020 origen del QR, T-032 medicion en pixeles. Antes: leer si el PC publico docs/CONEXION-MAC.md y si respondio el PR #1.",
-      "reason": "Es la parte de la landing de ventas que el dueno asigno a la Mac; sin ella no hay pedidos en linea. BLOQUEADA el 2026-09-12: docs/CONEXION-MAC.md §4 del PC pone la vitrina del lado del PC, y el dueno le asigno a la Mac la landing de ventas. Tension declarada en VITRINA-MAC §8.5 (PR #1); la Mac no crea duo-vitrina hasta que el dueno decida."
+      "reason": "Es la parte de la landing de ventas que el dueno asigno a la Mac; sin ella no hay pedidos en linea. BLOQUEADA el 2026-09-12: docs/CONEXION-MAC.md §4 del PC pone la vitrina del lado del PC, y el dueno le asigno a la Mac la landing de ventas. Tension declarada en VITRINA-MAC §8.5 (PR #1); la Mac no crea duo-vitrina hasta que el dueno decida. HECHA 2026-09-15 con otra forma: la vitrina conectada es la landing construida con build.mjs --conectada (no un Next :3501), servida por Caddy con reenvio SOLO de rutas publicas; rama conectada de duo-burguer-carta. Probada de punta a punta contra landing/sistema-de-ensayo.mjs."
     },
     {
       "tier": "Project",
       "created": "2026-09-12T00:00:00.000Z",
-      "updated": "2026-09-12T00:00:00.000Z",
+      "updated": "2026-09-15T00:00:00.000Z",
       "lifetime": "Project",
       "dependencies": [
         "DEC-009",
@@ -449,14 +449,14 @@
       "impact": "High",
       "priority": "Critical",
       "status": "Accepted",
-      "title": "La carta publica vive en duoburguer.prommter.com, servida por GitHub Pages, y el QR del local apunta a ese dominio",
-      "description": "Repo PUBLICO kalelfelpem-glitch/duo-burguer-carta (solo lo construido: index.html, video, CNAME, .nojekyll), GitHub Pages con cname duoburguer.prommter.com. Se publica con duo-burguer-video/landing/publicar.sh (zsh, necesita http.postBuffer alto). El QR (scripts/qr.swift con CoreImage, correccion H, verificado leyendolo de vuelta; cartel A5 en src/carta/QrCartel.tsx, salidas en out/redes/qr/) codifica https://duoburguer.prommter.com sin ?o=. La vitrina futura debe responder en esa raiz o redirigir desde ella.",
+      "title": "La carta publica vive en duoburguer.prommter.shop (GitHub Pages) y el QR del local apunta a ese dominio",
+      "description": "Repo PUBLICO kalelfelpem-glitch/duo-burguer-carta (solo lo construido: index.html, video, CNAME, .nojekyll), GitHub Pages con cname duoburguer.prommter.shop. Se publica con duo-burguer-video/landing/publicar.sh (zsh, necesita http.postBuffer alto). El QR (scripts/qr.swift con CoreImage, correccion H, verificado leyendolo de vuelta; cartel A5 en src/carta/QrCartel.tsx, salidas en out/redes/qr/) codifica https://duoburguer.prommter.shop sin ?o=. La vitrina futura debe responder en esa raiz o redirigir desde ella. CORREGIDO 2026-09-13/15: duoburguer.prommter.com nunca tuvo registro DNS; el dueno escogio prommter.shop y el PC creo el CNAME en Hostinger y forzo HTTPS. QR y cartel regenerados para .shop en la Mac (qr.swift leer OK).",
       "reason": "Ordenes del dueno el 2026-09-12: «publicalo en uno libre de los que tenemos de prommter», «no uses ese dominio, ya esta ocupado, ahi va el pollo» (prommter.online es de Villa Broaster) y «dame un qr para ponerlo en el local». prommter.com estaba estacionado en Hostinger sin subdominios; prommter.org tiene un sitio conectado que responde 503. GitHub Pages porque esta Mac no tiene llave del VPS, ni acceso a Hostinger, ni Vercel con sesion: GitHub es la unica cuenta autenticada. El QR va al dominio y no al alojamiento para que mudar la pagina sea cambiar DNS sin reimprimir."
     },
     {
       "tier": "Project",
       "created": "2026-09-12T00:00:00.000Z",
-      "updated": "2026-09-12T00:00:00.000Z",
+      "updated": "2026-09-15T00:00:00.000Z",
       "lifetime": "Project",
       "dependencies": [
         "DEC-010"
@@ -465,9 +465,9 @@
       "type": "Pending",
       "impact": "High",
       "priority": "Critical",
-      "status": "Blocked",
+      "status": "Cancelled",
       "task": "El dueno crea en Hostinger, zona DNS de prommter.com, un CNAME nombre duoburguer -> kalelfelpem-glitch.github.io. Despues: comprobar dig +short CNAME duoburguer.prommter.com, esperar el certificado y activar HTTPS con gh api -X PUT repos/kalelfelpem-glitch/duo-burguer-carta/pages -F https_enforced=true -f cname=duoburguer.prommter.com -f source[branch]=main -f source[path]=/; abrir https://duoburguer.prommter.com desde fuera y leer el QR impreso con el telefono antes de pegar carteles.",
-      "reason": "Sin ese registro el nombre no resuelve y github.io ya redirige a el (301): hoy la carta publica no abre para nadie. Requiere acceso a Hostinger, que solo tiene el dueno."
+      "reason": "Sin ese registro el nombre no resuelve y github.io ya redirige a el (301): hoy la carta publica no abre para nadie. Requiere acceso a Hostinger, que solo tiene el dueno. CANCELADA: el dominio paso a duoburguer.prommter.shop, ya vivo (HTTPS 200)."
     },
     {
       "tier": "Project",
@@ -524,7 +524,7 @@
     {
       "tier": "Project",
       "created": "2026-09-13T00:00:00.000Z",
-      "updated": "2026-09-13T00:00:00.000Z",
+      "updated": "2026-09-15T00:00:00.000Z",
       "lifetime": "Project",
       "dependencies": [
         "KN-018",
@@ -537,8 +537,61 @@
       "priority": "Critical",
       "status": "Current",
       "fact": "ESTADO MEDIDO DEL SISTEMA DEL PC (main aa7ebd5, corrido en la Mac el 2026-09-13): npm run verificar pasa (507/507 pruebas, 0 vulnerabilidades, contraste ok, lint 2 avisos); scripts/arrancar-local.mjs siembra sede, franjas 4/12/18, dueno con PIN temporal, caja-1, punto QR y 30 productos. PERO solo existen rutas app/api/acceso/* (login, PIN, sesion, vincular puesto): GET /api/franja, /api/catalogo y /api/zonas dan 404, y siguen pendientes T-009 (servir carta), T-011 (recibir pedido), T-024 (cobrar), T-027 (cocina), T-028 (carta en panel). La carta sembrada es la instantanea de c436659: 30 productos solo noche con ids cortos (ham-sencilla), sin manana/almuerzo ni bebidas nuevas. No esta desplegado en ningun servidor.",
-      "context": "Conclusion para publicar: hoy solo se puede publicar la carta estatica (DEC-010, falta el CNAME). Publicar el sistema seria publicar una pantalla de acceso. Copia de trabajo en prommter/duo-burguer-main (git worktree de origin/main), base de prueba en el scratchpad, config duo-sistema en .claude/launch.json. Medicion dejada al PC en el PR #1.",
+      "context": "Conclusion para publicar: hoy solo se puede publicar la carta estatica (DEC-010, falta el CNAME). Publicar el sistema seria publicar una pantalla de acceso. Copia de trabajo en prommter/duo-burguer-main (git worktree de origin/main), base de prueba en el scratchpad, config duo-sistema en .claude/launch.json. Medicion dejada al PC en el PR #1. ACTUALIZACION 2026-09-15: el PC adopto los 46 ids de la carta (deac029), dejo kit de VPS para caja.duoburguer.prommter.shop (007cc05) bloqueado en el registro A; siguen sin rutas publicas y el CI de main sigue rojo por tests/capas.test.ts en ubuntu.",
       "source": "npm run verificar, arrancar-local.mjs y curl a localhost:3500 el 2026-09-13; PR #1 comentario 5655150048"
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-15T00:00:00.000Z",
+      "updated": "2026-09-15T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [
+        "DEC-009",
+        "KN-020"
+      ],
+      "id": "DEC-012",
+      "type": "Decision",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Accepted",
+      "title": "Semana de reapertura: una semana de pedidos que se entregan un mismo dia, con tres hamburguesas (res, pollo, cerdo) para conocer el gusto",
+      "description": "Ids fijos reapertura-res, reapertura-pollo, reapertura-cerdo en EVENTO de datos.ts (eventoId reapertura-2026), sin fechas, ingredientes, costo ni precio hasta que el dueno los cuadre (huecos E1-E8 de ORDEN-PC). En la vitrina: seccion arriba de la carta sin desorganizarla; estados proximamente/abierto/cerrado/terminado derivados del reloj del servidor; voto «cual quieres probar primero» y preguntas de gusto por POST /api/evento/preferencias (anonimo, idempotente); apartar por POST /api/ordenes con eventoId, nunca mezclado con la carta de todos los dias y sin empaque. La estatica solo anuncia (no vota ni pide).",
+      "reason": "Dueno 2026-09-15: «vamos a hacer un evento con una semana para recibir pedidos para sacarlos todos un dia, quiero llevar toda la gente a la pagina y que sea interactiva... 3 hamburguesas... res, pollo, cerdo... el fin es tener mas alcance del gusto de los clientes... no quiero que esto desorganice nada... aun falta que yo cuadre que va a llevar cada una y su valor total, a coste y a venta»."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-15T00:00:00.000Z",
+      "updated": "2026-09-15T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [
+        "DEC-009",
+        "DEC-012"
+      ],
+      "id": "DEC-013",
+      "type": "Decision",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Accepted",
+      "title": "La Mac es la vitrina y el PC el sistema: la vitrina conectada es estatica detras de Caddy y el PC tiene una orden escrita con prioridades",
+      "description": "Vitrina = duo-burguer-video/landing (plantilla + build.mjs). Dos construcciones: estatica -> main de duo-burguer-carta (GitHub Pages, duoburguer.prommter.shop); conectada -> rama conectada (VPS /var/www/duo-vitrina, Caddy reenvia solo /api/franja, /api/catalogo, /api/zonas, /api/ordenes[/id], /api/evento[/preferencias]; nunca /api/admin ni /api/acceso, leccion villa-broaster KN-039). landing/sistema-de-ensayo.mjs imita el contrato para probar; nunca se despliega. Orden del PC: duo-burguer/docs/ORDEN-PC-2026-09-15.md + issue #2 (P0.1 CI verde, P0.2 API publica, P0.3 evento, P0.4 dia de entrega, P0.5 publicar, P1 costeo C1-C8 con insumos, compras, recetas por producto y opcion, gastos prorrateados, margen y precio sugerido). CONEXION-MAC §4 anotado.",
+      "reason": "Dueno 2026-09-15: «el pc es el sistema tu eres la vitrina, organicemos esto... manda un recordatorio al pc y ponlo a trabajar... en el sistema quiero desglosar la mayor cantidad de costes para manejar los margenes con mayor precision». La sesion del PC no es alcanzable desde la Mac (ni list_sessions ni Remote Control), asi que la orden va por GitHub y el dueno la pega en la ventana del PC. Estatica+Caddy en vez de Next :3501: reusa la pagina aprobada y ahorra un proceso en el KVM 1."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-15T00:00:00.000Z",
+      "updated": "2026-09-15T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [
+        "DEC-012",
+        "DEC-013"
+      ],
+      "id": "PEND-011",
+      "type": "Pending",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Blocked",
+      "task": "Cuando el PC publique P0.2/P0.3 y el sistema este en caja.duoburguer.prommter.shop: probar la rama conectada contra el sistema REAL (no el ensayo), con el mismo recorrido (voto, pedido con adiciones+empaque+domicilio, doble envio, 409 de precio, apartado); luego mover el DNS de duoburguer de CNAME GitHub a A del VPS y comprobar el QR impreso. Del dueno: E1 fechas, E2 que lleva cada una, E3 costo y precio, E4 pago, E5 cupo, E6 canales, E7 preguntas de gusto, E8 nombres.",
+      "reason": "Es el camino que falta para que la preventa abra de verdad; todo lo de la Mac ya esta construido y probado contra el ensayo."
     }
   ],
   "archives": [
@@ -640,5 +693,5 @@
     }
   ],
   "lastAmmRun": "2026-09-12T22:45:00.000Z",
-  "version": 17
+  "version": 18
 }
