@@ -609,6 +609,23 @@
       "title": "Un QR por mesa que identifica la mesa desde el cliente, y cada negocio con su propio dominio prommter (Duo Burguer = prommter.shop)",
       "description": "QR general https://duoburguer.prommter.shop y por mesa https://duoburguer.prommter.shop/?o=mesa-1 y ?o=mesa-2 (qr.swift, version 5 H, leidos de vuelta; carteles out/redes/qr/cartel-qr-mesa-N). La vitrina conectada manda canal mesa y origen mesa-N sin pedir nombre ni celular. El PC debe sembrar mesa-1 y mesa-2 en punto_qr y mostrar la mesa en tablero, cocina y comprobante (ORDEN-PC §7). Dominio: el PC habia puesto prommter.shop en revision por la regla «cada uno su dominio»; el dueno aclaro que cada negocio tiene su propio dominio prommter distinto, asi que prommter.shop es de Duo Burguer y el QR se imprime.",
       "reason": "Dueno 2026-09-15: «cada mesa tenga un QR y sea identificable para el sistema... que no tengamos que hacer el diferenciador» y «cada uno va a tener su propio dominio prommter individual». Acepto tambien selector manual; se eligio QR porque nadie puede marcar una mesa desde su casa."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-15T00:00:00.000Z",
+      "updated": "2026-09-15T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [
+        "DEC-013"
+      ],
+      "id": "DEC-015",
+      "type": "Decision",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "title": "Sin registro ni historial del cliente: ve su pedido al volver y lo modifica 5 minutos",
+      "description": "Vitrina: pedido guardado solo en el telefono (localStorage duo-pedidos, borrado a las 24 h; formulario borrado al cerrar el plazo), tarjeta Tu pedido #N, Lo que pediste, Modificar mi pedido con cuenta regresiva y PATCH. Contrato propuesto al PC (ORDEN-PC §8): modificableHasta + tokenEdicion en el 201, PATCH /api/ordenes/[id] con Edicion-Clave, 404 identico con otra clave, 409 pasado el plazo o en preparacion, minutosParaModificar=5 en configuracion, modificaciones como hechos. Probado contra el ensayo.",
+      "reason": "Dueno 2026-09-15: «no quiero lo de registro de pedidos porque seria guardar mucha informacion... despues de que pidan les aparezca lo que pidieron y cinco minutos sea modificable... si se sale y vuelve a entrar tenga ahi su pedido». Primero dijo 3 minutos; vale 5."
     }
   ],
   "archives": [
@@ -710,5 +727,5 @@
     }
   ],
   "lastAmmRun": "2026-09-12T22:45:00.000Z",
-  "version": 19
+  "version": 20
 }
