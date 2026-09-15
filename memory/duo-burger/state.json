@@ -592,6 +592,23 @@
       "status": "Blocked",
       "task": "Cuando el PC publique P0.2/P0.3 y el sistema este en caja.duoburguer.prommter.shop: probar la rama conectada contra el sistema REAL (no el ensayo), con el mismo recorrido (voto, pedido con adiciones+empaque+domicilio, doble envio, 409 de precio, apartado); luego mover el DNS de duoburguer de CNAME GitHub a A del VPS y comprobar el QR impreso. Del dueno: E1 fechas, E2 que lleva cada una, E3 costo y precio, E4 pago, E5 cupo, E6 canales, E7 preguntas de gusto, E8 nombres.",
       "reason": "Es el camino que falta para que la preventa abra de verdad; todo lo de la Mac ya esta construido y probado contra el ensayo."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-15T00:00:00.000Z",
+      "updated": "2026-09-15T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [
+        "DEC-013"
+      ],
+      "id": "DEC-014",
+      "type": "Decision",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "title": "Un QR por mesa que identifica la mesa desde el cliente, y cada negocio con su propio dominio prommter (Duo Burguer = prommter.shop)",
+      "description": "QR general https://duoburguer.prommter.shop y por mesa https://duoburguer.prommter.shop/?o=mesa-1 y ?o=mesa-2 (qr.swift, version 5 H, leidos de vuelta; carteles out/redes/qr/cartel-qr-mesa-N). La vitrina conectada manda canal mesa y origen mesa-N sin pedir nombre ni celular. El PC debe sembrar mesa-1 y mesa-2 en punto_qr y mostrar la mesa en tablero, cocina y comprobante (ORDEN-PC §7). Dominio: el PC habia puesto prommter.shop en revision por la regla «cada uno su dominio»; el dueno aclaro que cada negocio tiene su propio dominio prommter distinto, asi que prommter.shop es de Duo Burguer y el QR se imprime.",
+      "reason": "Dueno 2026-09-15: «cada mesa tenga un QR y sea identificable para el sistema... que no tengamos que hacer el diferenciador» y «cada uno va a tener su propio dominio prommter individual». Acepto tambien selector manual; se eligio QR porque nadie puede marcar una mesa desde su casa."
     }
   ],
   "archives": [
@@ -693,5 +710,5 @@
     }
   ],
   "lastAmmRun": "2026-09-12T22:45:00.000Z",
-  "version": 18
+  "version": 19
 }
