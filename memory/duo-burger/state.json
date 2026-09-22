@@ -1,6 +1,6 @@
 {
   "projectId": "duo-burger",
-  "snapshotDate": "2026-09-13T00:00:00.000Z",
+  "snapshotDate": "2026-09-22T18:00:00.000Z",
   "objects": [
     {
       "id": "KN-002",
@@ -645,6 +645,22 @@
       "fact": "ESTADO 2026-09-22: el PC llevo el plan a 262/330 (74 commits del 15 al 22, CI verde). duo-sistema ya tiene la API publica (franja, catalogo con categoria, zonas, ordenes con autorizacion Ley 1581, PATCH de 5 min con tokenEdicion y lineas versionadas, seguimiento, evento y preferencias), puntos QR mesa-1/mesa-2 sembrados, caja, turnos, cobro, anulacion, reversa, cocina, mostrador, tablero, costeo (insumos, compras, recetas, gastos, margenes, reporte) y panel del evento. Corre en el VPS 2.25.89.240 detras de Caddy (instalar-vps.sh) y esta bloqueado SOLO por el registro A caja.duoburguer que crea el dueno en hPanel (T-221) y por su primer ingreso con cambio de PIN de fabrica (T-226, rearmado el 22, vence en 72 h). Las tareas de vitrina del plan (T-002, T-012..T-020, T-230...) las bloqueo el PC como trabajo de la Mac.",
       "context": "La vitrina conectada se probo contra ese sistema real corriendo en la Mac con landing/sistema-de-ensayo.mjs en modo reenvio (ENSAYO_SISTEMA_URL): voto 201, pedido 9.000 con autorizacion sellada, PATCH mismo consecutivo total 16.000 version 2, mesa-2 sin datos personales, admin/acceso 404. El empaque no aparece en el catalogo del sistema (T-326 pendiente del dueno), asi que la vitrina no lo suma. Push: ninguna maquina necesita al dueno para empujar; lo que lo necesita es hPanel, el PIN y sus decisiones.",
       "source": "duo-burguer origin/main 2b5b004, plan.json v338, issue #2 comentario 5780600196"
+    },
+    {
+      "id": "DEC-016",
+      "type": "Decision",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-09-22T18:00:00.000Z",
+      "updated": "2026-09-22T18:00:00.000Z",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [],
+      "title": "Las dos maquinas publican solas: hooks de sincronizacion en el repo compartido",
+      "description": "duo-burguer/.claude/sincronizar.mjs con dos modos. traer (SessionStart y cada mensaje): fetch y avance rapido si la otra maquina publico, avisando a la sesion que llego. publicar (Stop): empuja lo commiteado, con pull --rebase --autostash si la otra se adelanto, y detiene el cierre UNA vez si quedaron cambios sueltos. Nunca fuerza (push forzado, reset --hard, borrar ramas y filter-branch quedan prohibidos en los ajustes). No trae nada que pise archivos a medio editar: sin esa comprobacion el --autostash metia marcas de conflicto dentro del archivo (medido el 2026-09-22 en repos de prueba). En Windows la red va con -c credential.helper=manager (lo que este PC midio que publica) y con GIT_TERMINAL_PROMPT=0 para fallar rapido en vez de esperar una ventana que nadie ve. Los ajustes viven en el repo (docs/publicacion-automatica/settings.json), asi que viajan solos a la otra maquina; la Mac usa su copia aparte porque su sesion se abre en /Users/g/orion.",
+      "reason": "Dueno 2026-09-22: «quiero que el pc deje todo lo que haga publicado sin yo pushear para asi tener todo en tiempo real en los dos dispositivos». Supera a T-076 y a PENDIENTES-GIT.md, que nacieron el 2026-09-11 cuando el repo no tenia remoto: hoy el PC publica solo (12 publicaciones el 2026-09-22). Probado en vivo: el propio script hizo el rebase contra lo que acababa de subir el PC y publico el commit 643dd66.",
+      "context": "Lo que falta es un paso del dueno: copiar el archivo de ajustes a .claude/settings.json y reabrir la sesion una vez en cada maquina. El clasificador del modo automatico prohibe que el agente escriba archivos de ajustes de Claude Code (Self-Modification)."
     }
   ],
   "archives": [
@@ -746,5 +762,5 @@
     }
   ],
   "lastAmmRun": "2026-09-12T22:45:00.000Z",
-  "version": 21
+  "version": 22
 }

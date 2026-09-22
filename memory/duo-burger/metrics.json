@@ -1,11 +1,11 @@
 {
   "projectId": "duo-burger",
-  "sessionCount": 16,
+  "sessionCount": 17,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 7,
   "trendCompressionRatio": "stable",
-  "lastUpdated": "2026-09-12T00:00:00.000Z",
+  "lastUpdated": "2026-09-22T18:00:00.000Z",
   "sessions": [
     {
       "completedAt": "2026-09-09T00:00:00.000Z",
@@ -191,6 +191,15 @@
       "objectsArchived": 0,
       "triggeredBy": "TASK_COMPLETE",
       "note": "Revision del PC (262/330, sistema en VPS esperando DNS); vitrina alineada (autorizacion) y probada contra el sistema real.",
+      "modelOutcomes": []
+    },
+    {
+      "completedAt": "2026-09-22T18:00:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "triggeredBy": "TASK_COMPLETE",
+      "note": "Publicacion automatica entre Mac y PC: sincronizar.mjs probado en repos de prueba y en vivo; falta que el dueno copie los ajustes.",
       "modelOutcomes": []
     }
   ]
