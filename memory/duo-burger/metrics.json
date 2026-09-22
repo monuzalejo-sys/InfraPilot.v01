@@ -1,6 +1,6 @@
 {
   "projectId": "duo-burger",
-  "sessionCount": 15,
+  "sessionCount": 16,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 7,
@@ -182,6 +182,15 @@
       "objectsArchived": 0,
       "triggeredBy": "TASK_COMPLETE",
       "note": "Pedido modificable 5 minutos sin registro, en vitrina y ensayo; contrato al PC (§8).",
+      "modelOutcomes": []
+    },
+    {
+      "completedAt": "2026-09-22T00:00:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "triggeredBy": "TASK_COMPLETE",
+      "note": "Revision del PC (262/330, sistema en VPS esperando DNS); vitrina alineada (autorizacion) y probada contra el sistema real.",
       "modelOutcomes": []
     }
   ]

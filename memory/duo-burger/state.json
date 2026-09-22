@@ -579,7 +579,7 @@
     {
       "tier": "Project",
       "created": "2026-09-15T00:00:00.000Z",
-      "updated": "2026-09-15T00:00:00.000Z",
+      "updated": "2026-09-22T00:00:00.000Z",
       "lifetime": "Project",
       "dependencies": [
         "DEC-012",
@@ -591,7 +591,7 @@
       "priority": "Critical",
       "status": "Blocked",
       "task": "Cuando el PC publique P0.2/P0.3 y el sistema este en caja.duoburguer.prommter.shop: probar la rama conectada contra el sistema REAL (no el ensayo), con el mismo recorrido (voto, pedido con adiciones+empaque+domicilio, doble envio, 409 de precio, apartado); luego mover el DNS de duoburguer de CNAME GitHub a A del VPS y comprobar el QR impreso. Del dueno: E1 fechas, E2 que lleva cada una, E3 costo y precio, E4 pago, E5 cupo, E6 canales, E7 preguntas de gusto, E8 nombres.",
-      "reason": "Es el camino que falta para que la preventa abra de verdad; todo lo de la Mac ya esta construido y probado contra el ensayo."
+      "reason": "Es el camino que falta para que la preventa abra de verdad; todo lo de la Mac ya esta construido y probado contra el ensayo. AVANCE 2026-09-22: la prueba contra el sistema REAL ya se hizo (2b5b004 local): voto, pedido con autorizacion, PATCH 5 min, mesa-2; todo OK. Falta: el PC instala la vitrina en el VPS (rama conectada + bloque Caddy) y el dueno crea en hPanel A caja.duoburguer y luego cambia duoburguer a A."
     },
     {
       "tier": "Project",
@@ -626,6 +626,25 @@
       "title": "Sin registro ni historial del cliente: ve su pedido al volver y lo modifica 5 minutos",
       "description": "Vitrina: pedido guardado solo en el telefono (localStorage duo-pedidos, borrado a las 24 h; formulario borrado al cerrar el plazo), tarjeta Tu pedido #N, Lo que pediste, Modificar mi pedido con cuenta regresiva y PATCH. Contrato propuesto al PC (ORDEN-PC §8): modificableHasta + tokenEdicion en el 201, PATCH /api/ordenes/[id] con Edicion-Clave, 404 identico con otra clave, 409 pasado el plazo o en preparacion, minutosParaModificar=5 en configuracion, modificaciones como hechos. Probado contra el ensayo.",
       "reason": "Dueno 2026-09-15: «no quiero lo de registro de pedidos porque seria guardar mucha informacion... despues de que pidan les aparezca lo que pidieron y cinco minutos sea modificable... si se sale y vuelve a entrar tenga ahi su pedido». Primero dijo 3 minutos; vale 5."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-09-22T00:00:00.000Z",
+      "updated": "2026-09-22T00:00:00.000Z",
+      "lifetime": "Project",
+      "dependencies": [
+        "DEC-013",
+        "DEC-014",
+        "DEC-015"
+      ],
+      "id": "KN-022",
+      "type": "Knowledge",
+      "impact": "High",
+      "priority": "Critical",
+      "status": "Current",
+      "fact": "ESTADO 2026-09-22: el PC llevo el plan a 262/330 (74 commits del 15 al 22, CI verde). duo-sistema ya tiene la API publica (franja, catalogo con categoria, zonas, ordenes con autorizacion Ley 1581, PATCH de 5 min con tokenEdicion y lineas versionadas, seguimiento, evento y preferencias), puntos QR mesa-1/mesa-2 sembrados, caja, turnos, cobro, anulacion, reversa, cocina, mostrador, tablero, costeo (insumos, compras, recetas, gastos, margenes, reporte) y panel del evento. Corre en el VPS 2.25.89.240 detras de Caddy (instalar-vps.sh) y esta bloqueado SOLO por el registro A caja.duoburguer que crea el dueno en hPanel (T-221) y por su primer ingreso con cambio de PIN de fabrica (T-226, rearmado el 22, vence en 72 h). Las tareas de vitrina del plan (T-002, T-012..T-020, T-230...) las bloqueo el PC como trabajo de la Mac.",
+      "context": "La vitrina conectada se probo contra ese sistema real corriendo en la Mac con landing/sistema-de-ensayo.mjs en modo reenvio (ENSAYO_SISTEMA_URL): voto 201, pedido 9.000 con autorizacion sellada, PATCH mismo consecutivo total 16.000 version 2, mesa-2 sin datos personales, admin/acceso 404. El empaque no aparece en el catalogo del sistema (T-326 pendiente del dueno), asi que la vitrina no lo suma. Push: ninguna maquina necesita al dueno para empujar; lo que lo necesita es hPanel, el PIN y sus decisiones.",
+      "source": "duo-burguer origin/main 2b5b004, plan.json v338, issue #2 comentario 5780600196"
     }
   ],
   "archives": [
@@ -727,5 +746,5 @@
     }
   ],
   "lastAmmRun": "2026-09-12T22:45:00.000Z",
-  "version": 20
+  "version": 21
 }
