@@ -1,6 +1,6 @@
 {
   "projectId": "duo-burger",
-  "snapshotDate": "2026-09-22T18:00:00.000Z",
+  "snapshotDate": "2026-09-23T15:00:00.000Z",
   "objects": [
     {
       "id": "KN-002",
@@ -661,6 +661,24 @@
       "description": "duo-burguer/.claude/sincronizar.mjs con dos modos. traer (SessionStart y cada mensaje): fetch y avance rapido si la otra maquina publico, avisando a la sesion que llego. publicar (Stop): empuja lo commiteado, con pull --rebase --autostash si la otra se adelanto, y detiene el cierre UNA vez si quedaron cambios sueltos. Nunca fuerza (push forzado, reset --hard, borrar ramas y filter-branch quedan prohibidos en los ajustes). No trae nada que pise archivos a medio editar: sin esa comprobacion el --autostash metia marcas de conflicto dentro del archivo (medido el 2026-09-22 en repos de prueba). En Windows la red va con -c credential.helper=manager (lo que este PC midio que publica) y con GIT_TERMINAL_PROMPT=0 para fallar rapido en vez de esperar una ventana que nadie ve. Los ajustes viven en el repo (docs/publicacion-automatica/settings.json), asi que viajan solos a la otra maquina; la Mac usa su copia aparte porque su sesion se abre en /Users/g/orion.",
       "reason": "Dueno 2026-09-22: «quiero que el pc deje todo lo que haga publicado sin yo pushear para asi tener todo en tiempo real en los dos dispositivos». Supera a T-076 y a PENDIENTES-GIT.md, que nacieron el 2026-09-11 cuando el repo no tenia remoto: hoy el PC publica solo (12 publicaciones el 2026-09-22). Probado en vivo: el propio script hizo el rebase contra lo que acababa de subir el PC y publico el commit 643dd66.",
       "context": "Lo que falta es un paso del dueno: copiar el archivo de ajustes a .claude/settings.json y reabrir la sesion una vez en cada maquina. El clasificador del modo automatico prohibe que el agente escriba archivos de ajustes de Claude Code (Self-Modification)."
+    },
+    {
+      "id": "DEC-017",
+      "type": "Decision",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-09-23T15:00:00.000Z",
+      "updated": "2026-09-23T15:00:00.000Z",
+      "impact": "Medium",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-016"
+      ],
+      "title": "Pedido de imprenta del 23-09: tabla de acrilico a marcador, cuatro QR de mesa y piezas a medida",
+      "description": "En duo-burguer/imprenta (motor del PC, HTML a PDF por CDP con comprobaciones): 07-tabla-acrilico 100x100 cara dia/noche SIN precios (casilla clara para marcador en las dos caras; la arepa entra porque el precio lo pone el dueno), 08-qr-mesa-acrilico 4 cuadros 12x12 a dos caras + ficha tecnica, 03-carta/carta-21x27, 10-rompetrafico 90x150, 11-tarjetas 9x5, 12-stickers-metro 85 de 5x5 con troquel. QR mesa 3 y 4 generados con CoreImage (scripts/qr.swift de la Mac) y comprobados. Commit 3c7a606.",
+      "reason": "Dueno 2026-09-23: medidas y piezas dictadas; «que te luzcas»; zip en PDF de la mejor calidad.",
+      "context": "Lecciones medidas: (1) render.mjs --todo en la Mac re-renderiza con Chrome TODOS los PDF del PC (mismo contenido, otros bytes): se restauran con git checkout. (2) Un QR de 46 mm fallaba la prueba de reducirlo a 30 mm (remuestreo) y a 43 mm pasa. (3) La noche va sobre --negro exacto: con otro tono el logo sobre negro muestra su recuadro. Pendiente del PC: sembrar mesa-3 y mesa-4 (docs/ORDEN-PC-2026-09-23.md). Pendiente del dueno: que dice exactamente la frase de salsas."
     }
   ],
   "archives": [
@@ -762,5 +780,5 @@
     }
   ],
   "lastAmmRun": "2026-09-12T22:45:00.000Z",
-  "version": 22
+  "version": 23
 }
