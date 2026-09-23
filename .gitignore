@@ -28,3 +28,6 @@ cerebro/indice.json
 # config local del dispositivo (previews de Claude Code)
 .claude/launch.json
 .claude/settings.local.json
+
+# Agenda y finanzas personales del dueño: repo local propio, nunca al remoto publico de ORION
+agenda/
