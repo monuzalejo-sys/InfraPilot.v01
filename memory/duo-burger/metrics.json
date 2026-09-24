@@ -1,11 +1,11 @@
 {
   "projectId": "duo-burger",
-  "sessionCount": 18,
+  "sessionCount": 19,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 7,
   "trendCompressionRatio": "stable",
-  "lastUpdated": "2026-09-23T15:00:00.000Z",
+  "lastUpdated": "2026-09-24T20:00:00.000Z",
   "sessions": [
     {
       "completedAt": "2026-09-09T00:00:00.000Z",
@@ -227,6 +227,34 @@
           "model": "opus",
           "verdict": "ok",
           "tokens": 162509
+        }
+      ]
+    },
+    {
+      "completedAt": "2026-09-24T20:00:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "triggeredBy": "TASK_COMPLETE",
+      "note": "Pedido de imprenta rehecho: 11 piezas en curvas verificadas (0 fuentes, 0 píxeles), trazar.mjs nuevo, entrega en Descargas.",
+      "modelOutcomes": [
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 303225
+        },
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 225569
+        },
+        {
+          "phase": "build:visual",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 434189
         }
       ]
     }
