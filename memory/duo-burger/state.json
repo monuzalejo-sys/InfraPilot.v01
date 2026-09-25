@@ -1,6 +1,6 @@
 {
   "projectId": "duo-burger",
-  "snapshotDate": "2026-09-24T20:00:00.000Z",
+  "snapshotDate": "2026-09-25T18:00:00.000Z",
   "objects": [
     {
       "id": "KN-002",
@@ -697,6 +697,24 @@
       "description": "El dueño rechazó la primera tanda por vacía y pidió: sin teléfono ni Nequi, mensajes llamativos, distinto al resto, rompetráfico a dos caras (mañana/noche), un solo sticker 5x5, logo arriba a la izquierda en la tarjeta, la tabla 100x100 DINÁMICA (sin platos ni precios impresos: tablero para escribir) y vector porque la imprenta vectoriza. Rehecho con piezas/_calle (rayos, sellos, gritos con sombra dura, damero/rayas vectoriales) y trazar.mjs (Ghostscript WASM: texto en curvas; falla si queda una fuente o un píxel o si no se ve igual). Commit ac4815c; entrega en ~/Downloads/DUO-BURGUER-imprenta-2026-09-24 (+ .zip).",
       "reason": "Dueño 2026-09-24: «muy vacio, no pongas numeros de contacto ni nequi … pon mensajes llamativos, haz algo distinto al resto»; «la imprenta trabaja con vectores y tienen que vectorizar, las cosas pequeñas salen pixeladas»; «para el 100x100 quiero que sea dinamico … util para nosotros para cambios».",
       "context": "Medido: Chrome vuelve píxeles fondos CSS repetidos (el damero y las rayas de todo el kit del PC), <pattern>, sombras borrosas y filtros; la primera tanda traía hasta 116 imágenes. El EPS no se entrega: eps2write vuelve imagen los degradados del logo y con cualquier opacidad aplana la página entera (los íconos tenían un trazo al 50 %: ya va sólido #DF9132). Pendiente del PC/dueño: sembrar mesa-3 y mesa-4; confirmar la frase de salsas."
+    },
+    {
+      "id": "DEC-019",
+      "type": "Decision",
+      "tier": "Project",
+      "lifetime": "Project",
+      "created": "2026-09-25T18:00:00.000Z",
+      "updated": "2026-09-25T18:00:00.000Z",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-018"
+      ],
+      "title": "Carta del 25-09 en todo: menú de la semana, un QR por pieza, material rehecho y vitrina publicada",
+      "description": "Datos en duo-burguer-video/src/carta/datos.ts @9b27b9a (copia en imprenta carta-real.ts): desayuno 7.000 con 4 huevos a escoger y pan/café/arroz/maduro; chocolate, Milo, Chocolisto 5.000 vaso grande (mañana); arepa 700; almuerzo = menú de la semana (almuerzo-lunes…domingo con dias; jue y dom 15.000, resto 12.000; domingo el de la casa); sin precio van informativo (arepas rellenas, Postobón mini/personal, Quatro). Un QR por pieza (?o=carta, tablero, rompetrafico, tarjeta, sticker, mesa-N). Material rehecho por orquestación de 6 frentes con revisor adversarial (todos aprobados) + auditoría cruzada; commit 4682553; vitrina publicada (a58f9a6) con el de hoy destacado. Entrega en ~/Downloads/DUO-BURGUER-imprenta-2026-09-25(.zip).",
+      "reason": "Dueño 2026-09-25: nueva información de mañana, bebidas, adicionales y almuerzo semanal; «solo la carta lleva todo, el resto… el fin es llamar al cliente»; «letra un poco más grande»; «los QR son importantísimos»; «deja al PC informado de todo»; «esa información es útil para el sistema, landing de ventas y demás».",
+      "context": "Pendiente del dueño: precios de arepa de huevo, arepa de pollo y queso, Postobón mini/personal, Quatro; confirmar «Tripazo». Pendiente del PC (docs/ORDEN-PC-2026-09-25.md): importar la carta, rechazar almuerzo fuera de su día, sembrar puntos QR por pieza y mesas 3-4, regenerar o retirar sus piezas viejas (carta-mesa, paredes, caballete, volante). La primera corrida de la orquestación murió por límite de uso; relanzada con revisores en sonnet."
     }
   ],
   "archives": [
@@ -798,5 +816,5 @@
     }
   ],
   "lastAmmRun": "2026-09-12T22:45:00.000Z",
-  "version": 24
+  "version": 25
 }
