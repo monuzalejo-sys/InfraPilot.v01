@@ -1,11 +1,11 @@
 ---
 slug: cortometraje-sobre-ilustracion
 titulo: "Dirigir un cortometraje sobre ilustraciones reales, no redibujarlo en código (Remotion)"
-alias: [corto, cortometraje, video, vídeo, video corto, comercial animado, spot, anuncio animado, animacion, animación, animar, remotion, render de video, renderizar video, camara, cámara, movimiento de camara, empuje de camara, empuje de cámara, paneo, panoramica, panorámica, dolly, travelling, zoom, plano, planos, encuadre, encuadres, foco, foco de camara, centro de la camara, corte, cortes, salto de continuidad, salto de eje, dos planos iguales, mismo encuadre, continuidad visual, ilustracion, ilustración, ilustraciones, pintura, pinturas, arte generado, arte del dueno, arte del dueño, dibujos del dueno, gemini, imagenes generadas, generado con ia, redibujar, redibujar en codigo, redibujar en código, svg, personaje en svg, vectores planos, se ve infantil, se ve feo, muy infantil y feo, rechazo del video, rechazo del corto, fotograma, fotogramas, still, stills, frame, frames, nitidez, varianza laplaciana, laplaciano, se ve borroso, se ve pixelado, se ve estirado, ablandado, borde negro, banda negra, descubre el borde, grano, vineta, viñeta, textura de pelicula, textura comun, mp4, encoder, encoder de video, avassetwriter, swift, swiftc, ffmpeg, remotion render, --sequence, secuencia de imagenes, numeracion de fotogramas, verificar animacion, verificar animación, verificador de fotogramas, ola de verificadores, olas de escenas, director, veredicto del director, cuanto puedo acercar la camara, hasta donde puedo hacer zoom, guia de marca, guía de marca, referencias de arte, resolucion nativa, resolución nativa, macos 13, macos 15, ventura, sequoia, compositor de remotion, sigabrt, continuitycamera]
-preguntas: ["¿cómo hago un corto animado a partir de las ilustraciones del dueño sin que se vea infantil?", "¿hasta dónde puedo acercar la cámara a una pintura sin que se vea borrosa?", "dos escenas me quedaron con el mismo encuadre, ¿cómo las diferencio?", "¿por qué me sale una banda negra cuando empujo la cámara hacia el borde de la pintura?", "¿cómo verifico que una animación quedó bien sin solo leer el código?", "el dueño rechazó el video por infantil, ¿qué hago distinto la próxima vez?", "¿cómo saco el mp4 si Remotion no codifica en esta máquina?", "¿le pido al generador de imágenes que anime, o construyo la animación yo encima de su arte?", "¿por qué el render terminó en verde y no hay ningún archivo de video?"]
+alias: [corto, cortometraje, video, vídeo, video corto, comercial animado, spot, anuncio animado, animacion, animación, animar, remotion, render de video, renderizar video, camara, cámara, movimiento de camara, empuje de camara, empuje de cámara, paneo, panoramica, panorámica, dolly, travelling, zoom, plano, planos, encuadre, encuadres, foco, foco de camara, centro de la camara, corte, cortes, salto de continuidad, salto de eje, dos planos iguales, mismo encuadre, continuidad visual, ilustracion, ilustración, ilustraciones, pintura, pinturas, arte generado, arte del dueno, arte del dueño, dibujos del dueno, gemini, imagenes generadas, generado con ia, redibujar, redibujar en codigo, redibujar en código, svg, personaje en svg, vectores planos, se ve infantil, se ve feo, muy infantil y feo, rechazo del video, rechazo del corto, fotograma, fotogramas, still, stills, frame, frames, nitidez, varianza laplaciana, laplaciano, se ve borroso, se ve pixelado, se ve estirado, ablandado, borde negro, banda negra, descubre el borde, grano, vineta, viñeta, textura de pelicula, textura comun, mp4, encoder, encoder de video, avassetwriter, swift, swiftc, ffmpeg, remotion render, --sequence, secuencia de imagenes, numeracion de fotogramas, verificar animacion, verificar animación, verificador de fotogramas, ola de verificadores, olas de escenas, director, veredicto del director, cuanto puedo acercar la camara, hasta donde puedo hacer zoom, guia de marca, guía de marca, referencias de arte, resolucion nativa, resolución nativa, macos 13, macos 15, ventura, sequoia, compositor de remotion, sigabrt, continuitycamera, titere, títere, titere svg, rig, rig de personaje, muneco articulado, muñeco articulado, mascota animada, mascotas animadas, animar personaje en codigo, animar personaje en código, vectores fieles a la guia, vectores fieles a la guía, estilo inventado, vuelve duo burguer, juntos otra vez, choque de puños, blanco y negro a color, byn, bn a color, telon de pan, telón de pan, ajonjoli, ajonjolí, mono a estereo, mono a estéreo, audio medido, medir audio, dbfs, curva cuadratica, curva cuadrática, manguera svg, guante de cuatro dedos, guante de 4 dedos]
+preguntas: ["¿cómo hago un corto animado a partir de las ilustraciones del dueño sin que se vea infantil?", "¿hasta dónde puedo acercar la cámara a una pintura sin que se vea borrosa?", "dos escenas me quedaron con el mismo encuadre, ¿cómo las diferencio?", "¿por qué me sale una banda negra cuando empujo la cámara hacia el borde de la pintura?", "¿cómo verifico que una animación quedó bien sin solo leer el código?", "el dueño rechazó el video por infantil, ¿qué hago distinto la próxima vez?", "¿cómo saco el mp4 si Remotion no codifica en esta máquina?", "¿le pido al generador de imágenes que anime, o construyo la animación yo encima de su arte?", "¿por qué el render terminó en verde y no hay ningún archivo de video?", "¿puedo animar un personaje en código (SVG) o eso también se ve infantil?", "el dueño rechazó un video en vectores pero le gustó otro también en vectores, ¿cuál es la diferencia real?", "¿cómo verifico que un personaje animado en código es fiel a la guía de marca?", "¿cómo verifico un efecto de sonido que cambia de mono a estéreo en un fotograma exacto?"]
 proyectos: [duo-burger]
 confianza: alta
-actualizado: 2026-09-10
+actualizado: 2026-10-01
 ---
 
 # Dirigir un cortometraje sobre ilustraciones reales, no redibujarlo en código
@@ -24,6 +24,13 @@ columnas de borde) — nunca leyendo el código — y que el director revise cad
 veredicto, no solo lo cuente. Si el compositor de video no arranca en tu
 máquina, renderiza `--sequence` y codifica aparte; un render que termina en
 verde sin producir el archivo no es una entrega.
+
+**Matiz (2026-10-01):** esto no es "nunca código" — es "nunca estilo
+inventado". Si en vez de fotografiar arte ya pintado vas a CONSTRUIR el
+personaje en código (un títere vectorial), reemplaza "arte ya terminado" por
+"guía de marca verificable": compara el render directamente contra un
+recorte de la guía en cada entrega, no contra tu criterio. Ver "Cuándo NO
+aplica".
 
 ## Por qué (qué lo pagó)
 
@@ -74,6 +81,33 @@ ffmpeg` tardó más de cuatro horas compilando desde fuente. La salida que
 funcionó: `remotion render --sequence` + un programa de sesenta líneas en
 Swift con `AVAssetWriter` que usa el H.264 por hardware del propio macOS, sin
 instalar ni descargar nada (`duo-burger/KN-009`, `scripts/encoder.swift`).
+
+**Lo pagó, tres semanas después, una aprobación que obliga a matizar todo lo
+anterior.** El 2026-10-01 el dueño vio un corto de 32 s hecho TODO en
+vectores con código —artefacto «Vuelve Duo Burguer»—, con las mascotas
+dibujadas fieles a la guía de marca, y dijo *"ese me gustó"*, pidiendo uno
+"mucho mejor" y "algo que lo diferencie de cualquier marca" (`feedback_video_no_infantil.md`,
+matiz del 2026-10-01; `project_duo_burguer_corto_juntos.md`). El eje real del
+rechazo de septiembre nunca fue "código sí/no" ni "vector sí/no": fue el
+ESTILO INVENTADO (paleta synthwave y personajes que no eran los de la guía).
+El segundo corto, "Juntos otra vez" (62,4 s), construyó un títere articulado
+en código como un conjunto CERRADO de estados con nombre —seis `Ojos`, nueve
+`Boca`, un guante de cuatro dedos con seis poses (`Mano`), brazos y piernas
+como curva cuadrática (`manguera()`)— y lo verificó comparando el render
+DIRECTAMENTE contra un recorte de la guía de marca, fotograma por fotograma:
+la primera versión tenía la lechuga y el tomate aplastados y sin argollas,
+invisible hasta ponerla al lado de la guía (`duo-burger/KN-028`;
+`src/corto/rig/Burger.tsx:24-25,213,299,413-424`, `src/corto/rig/Guante.tsx:11,50-91`
+en `prommter/duo-burguer-video`).
+
+**Y midió también el sonido, no solo la imagen.** El choque de puños en el
+fotograma 840 tenía que sonar como el salto de un disco viejo mono a alta
+fidelidad estéreo. Medido con `scripts/banda/medir.mjs` contra el audio real
+(`public/corto/banda.wav`, corrida del 2026-10-01): la proporción
+RMS(L−R)/RMS(L+R) pasa de 0,0000 antes del fotograma 840 a 0,3227 después, y
+el nivel salta de −37,3 dBFS (20 ms antes del golpe) a −11,3 dBFS (en el
+golpe) — la misma disciplina de "ábrelo y mídelo" del fotograma, aplicada
+también al audio (`duo-burger/KN-029`).
 
 ## Cómo se aplica
 
@@ -129,9 +163,33 @@ instalar ni descargar nada (`duo-burger/KN-009`, `scripts/encoder.swift`).
     (no del render) para confirmar que el contenido es el esperado — ver
     [[TEMA-que-es-estar-verificado]], que documenta la misma trampa en software
     de otro dominio.
+13. **Si construyes un personaje en código en vez de dirigir cámara sobre
+    arte ya pintado, el títere es un conjunto CERRADO de estados con nombre,
+    no una reinterpretación por fotograma**: enumera los estados posibles de
+    cada parte (ojos, boca, manos) como un tipo (`Ojos`, `Boca`, `Mano`) y
+    compón las poses combinando esos estados, nunca inventando geometría
+    nueva escena por escena. Verifica contra la guía de marca con una
+    comparación de imagen lado a lado, igual que verificas un fotograma: sin
+    eso, "fiel a la guía" es una afirmación sin evidencia.
+14. **Cuando un momento de dirección depende de un corte sincronizado de
+    imagen Y sonido** (un choque, un flash, un corte seco), mide los dos por
+    separado alrededor del mismo fotograma exacto: la proporción de energía
+    entre canales para un salto mono→estéreo, el nivel en dBFS para un golpe.
+    "Se ve bien" y "se escucha bien" son afirmaciones sin evidencia hasta que
+    midas ambos.
 
 ## Cuándo NO aplica
 
+- **"No redibujes con código" no significa "nunca uses código para
+  dibujar": significa no INVENTES el estilo.** El rechazo de septiembre de
+  2026 fue al estilo (paleta synthwave, personajes que no eran los del
+  dueño), no a la técnica: un títere vectorial construido en código SÍ se
+  aprobó en octubre cuando cada trazo (proporciones, colores, expresiones)
+  salió de la guía de marca y el render se comparó directamente contra ella,
+  fotograma a fotograma. Si vas a construir en vez de fotografiar, la
+  condición que reemplaza "arte ya terminado" es "comparación directa contra
+  la guía de marca en cada entrega", no "nunca código"
+  (`feedback_video_no_infantil.md`; `duo-burger/KN-028`).
 - **Si el arte fuente es vectorial hecho a mano (SVG), no pintura rasterizada**,
   el límite de nitidez por ampliación (laplaciano) no aplica igual —un vector
   no pierde definición al escalar—, pero el límite geométrico del encuadre
@@ -179,8 +237,33 @@ instalar ni descargar nada (`duo-burger/KN-009`, `scripts/encoder.swift`).
   el desglose de las tres vueltas de verificación.
 - `src/film/kit/Pintura.tsx:51-61` (`prommter/duo-burguer-video`) — el recorte
   anti-borde implementado: `const lim = 1 / (2 * z)`.
-- `feedback_video_no_infantil.md` (memoria permanente del dueño) — la cita
-  textual del rechazo y lo que pidió a cambio.
+- `feedback_video_no_infantil.md` (memoria permanente del dueño, con matiz
+  del 2026-10-01) — la cita textual del rechazo de septiembre, lo que pidió a
+  cambio, y la cita textual de la aprobación de octubre («ese me gustó») que
+  distingue estilo inventado de técnica.
+- `duo-burger/KN-028` — el títere de las mascotas (`src/corto/rig/Burger.tsx`)
+  verificado fotograma por fotograma contra `docs/marca/guia-de-marca.png`:
+  cero desviación de paleta. Es la verificación de "fiel a la guía", no una
+  afirmación.
+- `duo-burger/KN-029` + medición directa (`node scripts/banda/medir.mjs
+  public/corto/banda.wav`, 2026-10-01) — el audio también se mide, no se
+  escucha: RMS(L−R)/RMS(L+R) pasa de 0,0000 (antes del fotograma 840) a 0,3227
+  (después); el nivel salta de −37,3 dBFS a −11,3 dBFS en el golpe.
+- `duo-burger/DEC-019` — la decisión de dirección del segundo corto: B/N
+  hasta el puño, color que estalla en círculo (`clipPath: circle()`,
+  `src/corto/Corto.tsx:85`), "telón de pan" de apertura/cierre, firma del
+  ajonjolí que rueda.
+- `project_duo_burguer_corto_juntos.md` (memoria permanente) — "Juntos otra
+  vez" (62,4 s): dónde vive el código, la idea que diferencia, y la
+  advertencia de que la música está medida pero nadie la ha oído.
+- `src/corto/rig/Burger.tsx:24-25,213,299,413-424` y
+  `src/corto/rig/Guante.tsx:11,50-91` (`prommter/duo-burguer-video`) — el
+  títere como estados con nombre: seis `Ojos`, nueve `Boca`, guante de cuatro
+  dedos con seis `Mano`, brazos y piernas como curva cuadrática (`manguera()`).
+- `src/corto/kit/Logo.tsx:1-7` y `src/corto/kit/Titulo.tsx:11,21`
+  (`prommter/duo-burguer-video`) — dos trampas de Remotion: el logo va de SVG
+  incrustado (no `<image>`) para no depender de una carga, y el ancho de cada
+  letra se mide con canvas sin memo a propósito.
 
 ## Enlaces
 

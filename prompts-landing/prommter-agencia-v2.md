@@ -8,6 +8,9 @@ una vez y mensualidad"; hoy manda prommter/KN-003 — ver §1.C).
 ESTE ARCHIVO SIGUE VIGENTE. Si la landing YA está construida, la iteración de
 acabado va en `ORION/prompts-landing/prommter-agencia-v3-mejora.md` (2026-08-29),
 que opera ENCIMA del entregable y no sustituye nada de aquí.
+Y desde el 2026-09-24, `prommter-agencia-v4-cotizacion.md` DESCONGELA el precio
+(H-6 cerrado: se publica la cifra del contrato), los tres niveles (S7 pasa a ser
+la oferta integral) y «cómo empezamos» (S9). Antes de tocar S6-S9, léelo.
 Léelo entero antes de escribir una línea.
 ═══════════════════════════════════════════════════════════════════════════════
 

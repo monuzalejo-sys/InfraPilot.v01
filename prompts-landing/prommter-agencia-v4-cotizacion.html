@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prommter · Cuánto cuesta</title>
+<meta name="description" content="Sistema, vitrina y marketing para su negocio por $1.000.000 al mes. El primer mes es gratis. Cotice en un minuto.">
+<!-- Tipografía: literal del §5.C de prommter-agencia-v2.md -->
+<script>document.documentElement.classList.add('js')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+/* Tokens: copia exacta del §5.B de prommter-agencia-v2.md. Si un color no está aquí, no existe. */
+:root{
+  --noche:#12100E; --noche-2:#1C1916;
+  --papel:#F8F6F2; --tarjeta:#FCFBF8; --borde:#E7E4DE; --hover:#F2EFE9;
+  --tinta:#111111; --gris:#666666;
+  --claro:#F8F6F2; --claro-2:#C9C2B8; --claro-3:#8A8177;
+  --verde:#2F5D50; --verde-cl:#5E9E85;
+  --ambar:#E8A83A; --teja:#C2452D; --teja-cl:#E5623E;
+  --wa:#25D366;
+  --r-card:14px; --r-pill:999px;
+  --sombra:0 18px 40px rgba(18,16,14,.18);
+  --sombra-dura:6px 6px 0 rgba(18,16,14,.14);
+  --serif:Fraunces, Georgia, serif;
+  --sans:Manrope, "Segoe UI", system-ui, sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--papel);color:var(--tinta);font:400 16px/1.5 var(--sans);overflow-x:hidden}
+img,svg{display:block}
+a{color:inherit}
+.num{font-variant-numeric:tabular-nums}
+.oculto{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.marco{max-width:1120px;margin:0 auto}
+section[id],#resultado{scroll-margin-top:72px}
+
+h2,h3,.cifra,.marca{font-family:var(--serif);font-weight:700;letter-spacing:-.02em;line-height:.95;margin:0}
+h2{font-size:clamp(26px,6.4vw,44px);max-width:18ch}
+h3{font-size:22px;line-height:1.1}
+.cifra{font-size:clamp(44px,13vw,96px)}
+
+.ceja{margin:0 0 14px;font-weight:800;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--claro-2)}
+.ceja--papel{color:var(--gris)}
+.entrada{margin:18px 0 0;max-width:46ch;font-size:18px;color:var(--claro-2)}
+.entrada--papel{color:var(--gris)}
+.nota{margin:12px 0 0;color:var(--gris)}
+
+/* Bandas alternadas oscuro/claro (§5.A) */
+.banda{padding:clamp(56px,9vw,112px) 16px}
+.banda--noche{background:var(--noche);color:var(--claro)}
+.banda--papel{background:var(--papel);color:var(--tinta)}
+
+/* Aviso de vista previa: se quita al montarlo en la landing */
+.solo-vista-previa{background:var(--ambar);color:var(--tinta);font-weight:700;padding:10px 16px;text-align:center}
+
+/* Barra superior */
+.barra{position:sticky;top:0;z-index:20;background:rgba(18,16,14,.94);backdrop-filter:blur(8px);color:var(--claro);border-bottom:1px solid rgba(248,246,242,.08)}
+.barra__in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:56px;padding:0 16px}
+.marca{font-size:24px;text-decoration:none}
+.barra__nav{display:flex;gap:18px;flex-wrap:wrap}
+.barra__nav a{text-decoration:none;color:var(--claro-2);font-weight:700;min-height:44px;display:inline-flex;align-items:center}
+.barra__nav a:hover{color:var(--claro)}
+
+/* S-A · el precio */
+.precio{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:32px}
+.precio .cifra{color:var(--ambar)}
+.precio__al{margin:0;font-size:22px;font-weight:700;color:var(--claro-2)}
+.hechos{list-style:none;margin:36px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hecho{background:var(--noche-2);border:1px solid rgba(248,246,242,.08);border-radius:var(--r-card);padding:20px;display:flex;flex-direction:column;gap:4px}
+.hecho__t{color:var(--claro-3);font-weight:700}
+.hecho b{font-family:var(--serif);font-size:32px;line-height:1.05;letter-spacing:-.02em;color:var(--claro)}
+.hecho span:last-child{color:var(--claro-2)}
+
+/* S-B · lo que recibe */
+.tres{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:36px}
+.tarjeta{background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--r-card);padding:24px;box-shadow:var(--sombra-dura)}
+.tarjeta svg{width:32px;height:32px;color:var(--verde);margin-bottom:14px}
+.tarjeta p{margin:10px 0 0;color:var(--gris)}
+.lista{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:10px}
+.lista li{position:relative;padding-left:26px}
+.lista li::before{content:"";position:absolute;left:0;top:.62em;width:12px;height:2px;background:var(--verde)}
+.sub{margin-top:56px;font-size:clamp(22px,4.6vw,30px)}
+.cuatro{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.cuatro li{border-top:2px solid var(--tinta);padding-top:14px}
+.cuatro svg{width:26px;height:26px;color:var(--verde);margin-bottom:10px}
+.cuatro b{display:block}
+.cuatro span{color:var(--gris)}
+
+/* S-C · el cotizador */
+.cotizador{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:28px;align-items:start;margin-top:36px}
+.preguntas{display:grid;gap:14px;margin:0}
+.paso{margin:0;border:1px solid rgba(248,246,242,.1);border-radius:var(--r-card);background:var(--noche-2);padding:20px}
+.paso legend{float:left;width:100%;display:flex;gap:12px;align-items:flex-start;margin:0 0 14px;padding:0;font-weight:700;font-size:18px;color:var(--claro)}
+.paso legend + *{clear:both}
+.paso__n{flex:none;width:28px;height:28px;border-radius:var(--r-pill);display:grid;place-items:center;background:var(--ambar);color:var(--tinta);font-weight:800;font-size:16px}
+.opciones{display:flex;flex-wrap:wrap;gap:10px}
+.opcion{position:relative}
+.opcion input{position:absolute;opacity:0;width:1px;height:1px}
+.opcion span{display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:var(--r-pill);border:1.5px solid rgba(248,246,242,.28);color:var(--claro);font-weight:700;cursor:pointer;transition:background-color .18s,color .18s,border-color .18s}
+.opcion span:hover{border-color:var(--claro-2)}
+.opcion input:checked + span{background:var(--claro);border-color:var(--claro);color:var(--tinta)}
+.opcion input:focus-visible + span{outline:3px solid var(--ambar);outline-offset:2px}
+.contador{display:inline-flex;align-items:center;gap:6px;border:1.5px solid rgba(248,246,242,.28);border-radius:var(--r-pill);padding:4px}
+.contador button{width:44px;height:44px;border-radius:var(--r-pill);border:0;background:var(--noche);color:var(--claro);font:700 22px/1 var(--sans);cursor:pointer}
+.contador button:hover{background:rgba(248,246,242,.1)}
+.contador button:disabled{opacity:.35;cursor:default}
+.contador button:focus-visible{outline:3px solid var(--ambar);outline-offset:2px}
+.contador output{min-width:48px;text-align:center;font-family:var(--serif);font-weight:700;font-size:26px}
+.apps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.apps[hidden]{display:none}
+.campo{display:grid;gap:6px;color:var(--claro-2);font-weight:700}
+.campo input{width:100%;min-height:48px;border-radius:12px;border:1.5px solid rgba(248,246,242,.28);background:var(--noche);color:var(--claro);font:700 20px/1 var(--sans);padding:0 14px;font-variant-numeric:tabular-nums}
+.campo input:focus{outline:3px solid var(--ambar);outline-offset:1px;border-color:transparent}
+.rango{grid-column:1 / -1;width:100%;accent-color:var(--ambar);min-height:32px}
+.apps .nota{grid-column:1 / -1;margin:0;color:var(--claro-3)}
+
+/* La cotización: un recibo, objeto físico sobre la noche */
+.resultado{position:sticky;top:76px;background:var(--tarjeta);color:var(--tinta);border-radius:var(--r-card);padding:24px;box-shadow:var(--sombra),var(--sombra-dura)}
+.resultado .ceja{margin-bottom:10px}
+.resultado__cabeza{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.resultado__cabeza > span{font-weight:700}
+.resultado__cabeza strong{font-family:var(--serif);font-size:34px;letter-spacing:-.02em;line-height:1}
+.resultado__cabeza small{font-family:var(--sans);font-size:16px;color:var(--gris);font-weight:700}
+.resultado__que{margin:6px 0 0;color:var(--gris)}
+.desglose{margin:18px 0 0;border-top:1px dashed var(--borde);padding-top:10px}
+.desglose div{display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px dashed var(--borde)}
+.desglose dt{color:var(--gris)}
+.desglose dd{margin:0;text-align:right;font-weight:700;max-width:60%}
+.resultado__total{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-top:14px}
+.resultado__total span{font-weight:700}
+.resultado__total strong{font-family:var(--serif);font-size:28px;letter-spacing:-.02em}
+.resultado__nota{margin:6px 0 0;color:var(--gris)}
+.fuga{margin-top:18px;border-radius:12px;background:var(--papel);border:1px solid var(--borde);padding:16px}
+.fuga[hidden]{display:none}
+.fuga__t{margin:0;font-weight:700}
+.fuga__cifra{margin:4px 0 0;font-family:var(--serif);font-weight:700;font-size:clamp(26px,7vw,34px);letter-spacing:-.02em;line-height:1.05;color:var(--teja)}
+.fuga__al{margin:4px 0 0;color:var(--gris)}
+.fuga__nota{margin:10px 0 0;color:var(--gris)}
+.pronto{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.pronto:empty{display:none}
+.pronto li{display:flex;flex-direction:column;gap:8px;align-items:flex-start;border:1px solid var(--borde);border-radius:12px;padding:12px}
+.pronto b{display:block}
+.pronto span{color:var(--gris)}
+.pildora{flex:none;display:inline-block;border-radius:var(--r-pill);padding:4px 12px;font-weight:800;font-size:16px;white-space:nowrap}
+.pildora--pronto{background:var(--ambar);color:var(--tinta)}
+.pildora--abierto{background:var(--verde);color:var(--claro)}
+.cta-wa{margin-top:18px;display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;border-radius:var(--r-pill);background:var(--wa);color:var(--tinta);font-weight:800;text-decoration:none;box-shadow:var(--sombra-dura)}
+.cta-wa svg{width:22px;height:22px}
+.cta-wa:focus-visible{outline:3px solid var(--tinta);outline-offset:3px}
+.cta-wa[hidden]{display:none}
+.cta-pronto{margin:18px 0 0;border-radius:12px;background:var(--noche);color:var(--claro);padding:14px 16px;font-weight:700}
+.cta-pronto[hidden]{display:none}
+.mensaje{margin-top:12px}
+.mensaje summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+.mensaje pre{margin:4px 0 0;white-space:pre-wrap;word-break:break-word;font:500 16px/1.5 var(--sans);background:var(--papel);border:1px solid var(--borde);border-radius:12px;padding:14px}
+
+/* S-D · lo que es suyo y lo que no entra */
+.dos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px}
+.marcas{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:12px}
+.marcas li{display:flex;gap:12px;align-items:flex-start}
+.marcas svg{flex:none;width:22px;height:22px;margin-top:2px}
+.marcas--si svg{color:var(--verde)}
+.marcas--no svg{color:var(--teja)}
+
+/* S-E · cómo empezamos */
+.pasos{list-style:none;margin:36px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;counter-reset:paso}
+.pasos li{counter-increment:paso;border-top:2px solid rgba(248,246,242,.2);padding-top:16px;color:var(--claro-2)}
+.pasos li::before{content:counter(paso);display:block;font-family:var(--serif);font-weight:700;font-size:44px;line-height:1;color:var(--ambar);margin-bottom:10px}
+.pasos b{display:block;color:var(--claro);margin-bottom:6px}
+.pasos .nota{color:var(--claro-3)}
+
+/* S-F · los sectores */
+.sector{background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--r-card);padding:24px;box-shadow:var(--sombra-dura);display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.sector p{margin:0;color:var(--gris)}
+
+.pie{background:var(--noche);color:var(--claro-2);padding:40px 16px}
+.pie .marca{color:var(--claro);font-size:28px}
+.pie p{margin:8px 0 0}
+
+/* Barra de resumen en móvil: aparece mientras se responde el cotizador */
+.resumen-movil{display:none}
+
+/* Aparición al entrar en pantalla (I6 del v2): 12 px + opacidad.
+   Solo con JS activo: sin JS, nada se queda escondido. */
+.js [data-aparece]{opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .5s ease}
+.js [data-aparece].visto{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.js [data-aparece]{opacity:1;transform:none;transition:none}}
+
+@media (max-width:960px){
+  .cotizador{grid-template-columns:minmax(0,1fr)}
+  .resultado{position:static}
+  .tres{grid-template-columns:minmax(0,1fr)}
+  .cuatro{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pasos{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dos{grid-template-columns:minmax(0,1fr)}
+  .resumen-movil{position:fixed;left:12px;right:12px;bottom:12px;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--claro);color:var(--tinta);border-radius:var(--r-pill);padding:8px 8px 8px 20px;box-shadow:var(--sombra);transform:translateY(140%);transition:transform .25s ease}
+  .resumen-movil.activo{transform:none}
+  .resumen-movil b{font-family:var(--serif);font-size:22px}
+  .resumen-movil a{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:var(--r-pill);background:var(--noche);color:var(--claro);font-weight:800;text-decoration:none;white-space:nowrap}
+}
+@media (max-width:560px){
+  .hechos{grid-template-columns:minmax(0,1fr)}
+  .cuatro{grid-template-columns:minmax(0,1fr)}
+  .pasos{grid-template-columns:minmax(0,1fr)}
+  .apps{grid-template-columns:minmax(0,1fr)}
+  .barra__nav{gap:14px}
+  .resultado{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<p class="solo-vista-previa" role="note">Vista previa: bloque de precio y cotización para montar en la landing de prommter.com. Lo que dice «se confirma» lo completa el dueño.</p>
+
+<header class="barra">
+  <div class="marco barra__in">
+    <a class="marca" href="#precio">Prommter</a>
+    <nav class="barra__nav" aria-label="Secciones">
+      <a href="#precio">Precio</a>
+      <a href="#cotice">Cotice</a>
+      <a href="#sectores">Sectores</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<h1 class="oculto">Prommter: cuánto cuesta y cotización</h1>
+
+<!-- S-A · EL PRECIO — contrato-servicio-integral-v1.md:46-51 y :95 -->
+<section class="banda banda--noche" id="precio" aria-labelledby="t-precio">
+  <div class="marco">
+    <p class="ceja">Cuánto cuesta</p>
+    <h2 id="t-precio">Un precio. Tres servicios. Cero comisión por pedido.</h2>
+    <div class="precio">
+      <p class="cifra num">$1.000.000</p>
+      <p class="precio__al">al mes</p>
+    </div>
+    <p class="entrada">Sistema, vitrina y marketing, juntos. El primer mes es gratis: es el mes en que dejamos todo funcionando.</p>
+    <ul class="hechos">
+      <li class="hecho"><span class="hecho__t">Mes 1</span><b class="num">$0</b><span>Puesta en marcha</span></li>
+      <li class="hecho"><span class="hecho__t">Meses 2 a 12</span><b class="num">11 cuotas</b><span>El precio no sube en el año</span></li>
+      <li class="hecho"><span class="hecho__t">Total del año</span><b class="num">$11.000.000</b><span>Sin cobro de arranque</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- S-B · LO QUE RECIBE — anexo A (:519-563) y «Qué compra la mensualidad» (:93) -->
+<section class="banda banda--papel" aria-labelledby="t-recibe">
+  <div class="marco">
+    <p class="ceja ceja--papel">Lo que recibe por ese precio</p>
+    <h2 id="t-recibe">Se contratan juntos porque funcionan juntos.</h2>
+    <div class="tres">
+      <article class="tarjeta" data-aparece>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10v18l-2.5-1.5L12 21l-2.5-1.5L7 21z"/><path d="M9.5 8h5M9.5 12h5M9.5 16h3"/></svg>
+        <h3>El sistema</h3>
+        <p>Con el que su negocio recibe pedidos, maneja la caja y ve sus reportes.</p>
+        <ul class="lista">
+          <li>Pedidos en línea con carrito y confirmación</li>
+          <li>Caja con turnos: apertura, cierre y arqueo</li>
+          <li>Reportes de cuánto, qué y a qué horas vendió</li>
+          <li>Precio por sede y usuarios de dueño y cajero</li>
+        </ul>
+      </article>
+      <article class="tarjeta" data-aparece>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11v9h16v-9"/><path d="M3 10l2-6h14l2 6"/><path d="M3 10a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M10 20v-5h4v5"/></svg>
+        <h3>La vitrina</h3>
+        <p>Su página propia, en su propio dominio, adaptada al celular.</p>
+        <ul class="lista">
+          <li>Carta o catálogo con fotos y precios</li>
+          <li>Botón directo a WhatsApp</li>
+          <li>Pedidos que entran al sistema, sin comisión</li>
+          <li>Perfil de Google del negocio configurado</li>
+        </ul>
+      </article>
+      <article class="tarjeta" data-aparece>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8.5 7l1.5-3h4l1.5 3"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+        <h3>El marketing</h3>
+        <p>Un día de grabación cada semana y sus redes al día.</p>
+        <ul class="lista">
+          <li>Un día por semana grabando en su local</li>
+          <li>Edición y publicación del material</li>
+          <li>Manejo de sus redes y calendario del mes</li>
+          <li>Reporte mensual de lo publicado y los resultados</li>
+        </ul>
+      </article>
+    </div>
+
+    <h3 class="sub">Qué compra la mensualidad</h3>
+    <ul class="cuatro">
+      <li data-aparece>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg>
+        <b>Que siga funcionando.</b><span>Hosting, dominio, respaldos y actualizaciones.</span>
+      </li>
+      <li data-aparece>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>
+        <b>Que alguien responda.</b><span>Si algo se rompe un viernes por la noche, hay a quién llamar.</span>
+      </li>
+      <li data-aparece>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+        <b>Que mejore.</b><span>Cambios pequeños incluidos cada mes.</span>
+      </li>
+      <li data-aparece>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-7"/></svg>
+        <b>Que le diga algo.</b><span>Un reporte mensual de cómo va.</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- S-C · EL COTIZADOR -->
+<section class="banda banda--noche" id="cotice" aria-labelledby="t-cotice">
+  <div class="marco">
+    <p class="ceja">Cotice en un minuto</p>
+    <h2 id="t-cotice">Con sus números, no de catálogo.</h2>
+    <p class="entrada">Cinco preguntas. La cotización se arma sola y la puede mandar por WhatsApp tal como queda.</p>
+
+    <div class="cotizador">
+      <form class="preguntas" id="preguntas" novalidate>
+        <fieldset class="paso">
+          <legend><span class="paso__n" aria-hidden="true">1</span>¿Qué negocio tiene?</legend>
+          <div class="opciones">
+            <label class="opcion"><input type="radio" name="negocio" value="restaurante"><span>Restaurante o comida rápida</span></label>
+            <label class="opcion"><input type="radio" name="negocio" value="tienda"><span>Tienda o minimercado</span></label>
+            <label class="opcion"><input type="radio" name="negocio" value="plaza"><span>Plaza de mercado</span></label>
+            <label class="opcion"><input type="radio" name="negocio" value="licorera"><span>Licorera o estanco</span></label>
+            <label class="opcion"><input type="radio" name="negocio" value="otro"><span>Otro negocio</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="paso">
+          <legend><span class="paso__n" aria-hidden="true">2</span>¿Cuántas sedes tiene?</legend>
+          <div class="contador">
+            <button type="button" id="sedes-menos" aria-label="Una sede menos">−</button>
+            <output id="sedes" class="num" aria-live="polite">1</output>
+            <button type="button" id="sedes-mas" aria-label="Una sede más">+</button>
+          </div>
+        </fieldset>
+
+        <fieldset class="paso">
+          <legend><span class="paso__n" aria-hidden="true">3</span>¿Vende por aplicaciones de domicilio?</legend>
+          <div class="opciones">
+            <label class="opcion"><input type="radio" name="apps" value="si" checked><span>Sí</span></label>
+            <label class="opcion"><input type="radio" name="apps" value="no"><span>No</span></label>
+          </div>
+          <div class="apps" id="apps-campos">
+            <label class="campo">Pedidos al mes por aplicaciones
+              <input id="pedidos" inputmode="numeric" autocomplete="off" value="60">
+            </label>
+            <label class="campo">Valor promedio de cada pedido
+              <input id="ticket" inputmode="numeric" autocomplete="off" value="$30.000">
+            </label>
+            <input class="rango" id="pedidos-rango" type="range" min="0" max="600" step="5" value="60" aria-label="Pedidos al mes por aplicaciones">
+            <p class="nota">Ejemplo: 60 pedidos de $30.000 al mes. Cámbielo por los suyos.</p>
+          </div>
+        </fieldset>
+
+        <fieldset class="paso">
+          <legend><span class="paso__n" aria-hidden="true">4</span>¿Hace domicilios?</legend>
+          <div class="opciones">
+            <label class="opcion"><input type="radio" name="domicilios" value="no" checked><span>No</span></label>
+            <label class="opcion"><input type="radio" name="domicilios" value="propios"><span>Sí, con mis domiciliarios</span></label>
+            <label class="opcion"><input type="radio" name="domicilios" value="faltan"><span>Sí, y me faltan domiciliarios</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="paso">
+          <legend><span class="paso__n" aria-hidden="true">5</span>¿Le serviría que otras personas recomienden su producto y ganen solo cuando usted vende?</legend>
+          <div class="opciones">
+            <label class="opcion"><input type="radio" name="referidos" value="si"><span>Sí</span></label>
+            <label class="opcion"><input type="radio" name="referidos" value="no" checked><span>No</span></label>
+          </div>
+        </fieldset>
+      </form>
+
+      <aside class="resultado" id="resultado" aria-labelledby="t-resultado">
+        <p class="ceja ceja--papel" id="t-resultado">Su cotización</p>
+        <div class="resultado__cabeza">
+          <span>Servicio integral</span>
+          <strong class="num"><span id="r-mensual">$1.000.000</span><small> / mes</small></strong>
+        </div>
+        <p class="resultado__que">Sistema + vitrina + marketing</p>
+        <dl class="desglose" aria-live="polite">
+          <div><dt>Mes 1 · puesta en marcha</dt><dd class="num">$0</dd></div>
+          <div><dt>Meses 2 a 12</dt><dd class="num" id="r-cuotas">11 × $1.000.000</dd></div>
+          <div><dt>Sedes</dt><dd id="r-sedes">1, incluida</dd></div>
+          <div><dt>IVA</dt><dd id="r-iva">se confirma en la cotización escrita</dd></div>
+          <div><dt>Pauta (el dinero de los anuncios)</dt><dd>la paga usted aparte</dd></div>
+        </dl>
+        <div class="resultado__total">
+          <span>Total del contrato · 12 meses</span>
+          <strong class="num" id="r-total">$11.000.000</strong>
+        </div>
+        <p class="resultado__nota" id="r-total-nota" hidden></p>
+
+        <div class="fuga" id="r-fuga" aria-live="polite">
+          <p class="fuga__t">Hoy le deja a las aplicaciones</p>
+          <p class="fuga__cifra num" id="r-fuga-mes">$360.000 a $540.000</p>
+          <p class="fuga__al" id="r-fuga-anio">al mes · entre $4.320.000 y $6.480.000 al año</p>
+          <p class="fuga__nota">Con la comisión de 20 % a 30 % que cobran las aplicaciones. Los pedidos que entren por su vitrina no pagan comisión.</p>
+        </div>
+
+        <ul class="pronto" id="r-sectores"></ul>
+
+        <a class="cta-wa" id="r-cta" href="#" target="_blank" rel="noopener" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8.5 10.5h7"/></svg>
+          Pedir esta cotización por WhatsApp
+        </a>
+        <p class="cta-pronto" id="r-cta-pronto" hidden>El WhatsApp de Prommter se publica muy pronto. Así quedará el mensaje que nos manda:</p>
+        <details class="mensaje" id="r-mensaje">
+          <summary>Así le llega el mensaje a Prommter</summary>
+          <pre id="r-msg"></pre>
+        </details>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- S-D · LO QUE ES SUYO (:103, :107) Y LO QUE NO ENTRA (anexo A, columnas «No incluye») -->
+<section class="banda banda--papel" aria-labelledby="t-suyo">
+  <div class="marco dos">
+    <div data-aparece>
+      <p class="ceja ceja--papel">Lo que es suyo</p>
+      <h2 id="t-suyo">Su marca, sus datos y su dominio.</h2>
+      <ul class="marcas marcas--si">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Su marca, sus fotos y su carta.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Sus datos: productos, pedidos, clientes y ventas.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Su dominio, registrado a su nombre.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Si un día se va, le entregamos sus datos en archivos que puede abrir (CSV o JSON) en diez días hábiles, y el dominio pasa a su control.</span></li>
+      </ul>
+    </div>
+    <div data-aparece>
+      <p class="ceja ceja--papel">Lo que no entra</p>
+      <h2>Dicho antes de firmar.</h2>
+      <ul class="marcas marcas--no">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>La factura electrónica ante la DIAN. El sistema da comprobantes internos.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Pagos en línea o pasarela de pagos.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>La pauta: el dinero de los anuncios lo pone usted.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Cambiar su logo, sus colores o su nombre.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Pasar datos viejos de otro sistema.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Equipos: impresoras, computadores y celulares.</span></li>
+      </ul>
+      <p class="nota">Lo que no está en el contrato se cotiza aparte, por escrito.</p>
+    </div>
+  </div>
+</section>
+
+<!-- S-E · CÓMO EMPEZAMOS (:95) -->
+<section class="banda banda--noche" aria-labelledby="t-empezar">
+  <div class="marco">
+    <p class="ceja">Cómo empezamos</p>
+    <h2 id="t-empezar">El primer mes corre por nuestra cuenta.</h2>
+    <ol class="pasos">
+      <li data-aparece><b>Nos escribe por WhatsApp</b>con la cotización de arriba.</li>
+      <li data-aparece><b>Le mandamos la cotización escrita y el contrato.</b>Todo lo que cambia de un negocio a otro va en una sola hoja de datos.</li>
+      <li data-aparece><b>Mes 1, gratis: lo dejamos funcionando.</b>A más tardar el día 30 firmamos el acta de entrada en operación. Si nos demoramos por causa nuestra, usted no paga hasta que se firme.<p class="nota">Y si la demora pasa de 60 días, se puede retirar sin deber nada.</p></li>
+      <li data-aparece><b>Desde el mes 2, la mensualidad.</b>Por anticipado, en la fecha fijada en el contrato. El precio no sube en los 12 meses.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- S-F · PROMMTER POR SECTORES (prommter/SECTORES.md) -->
+<section class="banda banda--papel" id="sectores" aria-labelledby="t-sectores">
+  <div class="marco">
+    <p class="ceja ceja--papel">Prommter por sectores</p>
+    <h2 id="t-sectores">Una casa, tres puertas.</h2>
+    <div class="tres">
+      <article class="sector" data-aparece>
+        <span class="pildora pildora--abierto">Abierto</span>
+        <h3>Prommter</h3>
+        <p>El servicio integral: sistema, vitrina y marketing. Es lo que acaba de cotizar.</p>
+      </article>
+      <article class="sector" data-aparece>
+        <span class="pildora pildora--pronto">Abre muy pronto</span>
+        <h3>Prommter Domicilios</h3>
+        <p>Una red abierta de domiciliarios independientes para los negocios que la necesiten.</p>
+      </article>
+      <article class="sector" data-aparece>
+        <span class="pildora pildora--pronto">Abre muy pronto</span>
+        <h3>Prommter Referidos</h3>
+        <p>Personas que recomiendan su producto y ganan solo cuando usted vende.</p>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="pie">
+  <div class="marco">
+    <p class="marca">Prommter</p>
+    <p>Sistema, vitrina y marketing para negocios con punto físico.</p>
+  </div>
+</footer>
+
+<div class="resumen-movil" id="resumen-movil" aria-hidden="true">
+  <span>Su mensualidad <b class="num" id="rm-mensual">$1.000.000</b></span>
+  <a href="#resultado" tabindex="-1">Ver cotización</a>
+</div>
+
+<script>
+/* ─── CONFIG · lo que cambia sin tocar el diseño ───────────────────────────
+   Cada valor lleva su fuente. null = hueco del dueño: la página lo dice de frente
+   («se confirma», «muy pronto») en vez de inventarlo. */
+const CONFIG = {
+  whatsapp: null,           // H-1 · número de Prommter con indicativo, solo dígitos (57 + 10). null = el botón anuncia «muy pronto»
+  mensualidad: 1000000,     // contrato-servicio-integral-v1.md:48
+  mesesContrato: 12,        // contrato:95
+  mesesGratis: 1,           // contrato:49 (mes de cortesía y puesta en marcha)
+  iva: null,                // contrato:53 · true = se suma el 19 % · false = el valor es final · null = se confirma
+  sedesIncluidas: null,     // contrato anexo A.5 (:583) · null = una sede incluida y las demás se cotizan
+  valorSedeAdicional: null, // contrato anexo A.5 (:585) · pesos al mes por cada sede adicional
+  comision: [0.20, 0.30],   // lo que cobran las apps de domicilio (orion/cerebro/temas/cobro-a-clientes.md:66)
+  ejemplo: { pedidos: 60, ticket: 30000 } // cuenta de ejemplo de la casa (cobro-a-clientes.md:68)
+};
+
+const NEGOCIOS = {
+  restaurante: 'un restaurante o negocio de comida rápida',
+  tienda: 'una tienda o minimercado',
+  plaza: 'un negocio de plaza de mercado',
+  licorera: 'una licorera o estanco',
+  otro: 'un negocio'
+};
+
+const $ = (id) => document.getElementById(id);
+const miles = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
+const pesos = (n) => '$' + miles.format(Math.round(n));
+const digitos = (s) => Number(String(s).replace(/\D/g, '')) || 0;
+const valorDe = (nombre) => (document.querySelector(`input[name="${nombre}"]:checked`) || {}).value || '';
+
+const estado = {
+  negocio: '',
+  sedes: 1,
+  apps: 'si',
+  pedidos: CONFIG.ejemplo.pedidos,
+  ticket: CONFIG.ejemplo.ticket,
+  domicilios: 'no',
+  referidos: 'no'
+};
+
+function calcular() {
+  const cuotas = CONFIG.mesesContrato - CONFIG.mesesGratis;
+  const incluidas = Math.max(1, CONFIG.sedesIncluidas ?? 1);
+  const extra = Math.max(0, estado.sedes - incluidas);
+  const extraConocido = extra === 0 || CONFIG.valorSedeAdicional != null;
+  const mensual = CONFIG.mensualidad + (extra && CONFIG.valorSedeAdicional != null ? extra * CONFIG.valorSedeAdicional : 0);
+  const total = mensual * cuotas;
+  const ventasApps = estado.apps === 'si' ? estado.pedidos * estado.ticket : 0;
+  const fuga = CONFIG.comision.map((c) => ventasApps * c);
+  return { cuotas, incluidas, extra, extraConocido, mensual, total, fuga };
+}
+
+function textoSedes(c) {
+  if (c.extra === 0) return estado.sedes === 1 ? '1, incluida' : `${estado.sedes}, incluidas`;
+  const base = `${c.incluidas} ${c.incluidas === 1 ? 'incluida' : 'incluidas'}`;
+  if (!c.extraConocido) return `${base}; ${c.extra} ${c.extra === 1 ? 'adicional se cotiza' : 'adicionales se cotizan'} con usted`;
+  return `${base} + ${c.extra} × ${pesos(CONFIG.valorSedeAdicional)} al mes`;
+}
+
+function mensaje(c) {
+  const lineas = ['Hola, Prommter. Quiero la cotización escrita.'];
+  const quien = estado.negocio ? `Tengo ${NEGOCIOS[estado.negocio]}` : 'Tengo un negocio';
+  lineas.push(`${quien} con ${estado.sedes} ${estado.sedes === 1 ? 'sede' : 'sedes'}.`);
+  if (estado.apps === 'si') {
+    lineas.push(`Hago unos ${miles.format(estado.pedidos)} pedidos al mes por aplicaciones, de unos ${pesos(estado.ticket)} cada uno.`);
+  } else {
+    lineas.push('No vendo por aplicaciones de domicilio.');
+  }
+  if (estado.domicilios === 'faltan') lineas.push('Hago domicilios y me faltan domiciliarios.');
+  if (estado.domicilios === 'propios') lineas.push('Hago domicilios con mis propios domiciliarios.');
+  if (estado.referidos === 'si') lineas.push('Me interesa que otras personas recomienden mi producto.');
+  lineas.push(`Vi el precio de ${pesos(CONFIG.mensualidad)} al mes con el primer mes gratis.`);
+  return lineas.join('\n');
+}
+
+function pintar() {
+  const c = calcular();
+
+  $('sedes').textContent = estado.sedes;
+  $('sedes-menos').disabled = estado.sedes <= 1;
+  $('sedes-mas').disabled = estado.sedes >= 20;
+
+  $('r-mensual').textContent = pesos(c.mensual);
+  $('rm-mensual').textContent = pesos(c.mensual);
+  $('r-cuotas').textContent = `${c.cuotas} × ${pesos(c.mensual)}`;
+  $('r-sedes').textContent = textoSedes(c);
+
+  if (CONFIG.iva === true) $('r-iva').textContent = `+ 19 % (${pesos(c.mensual * 0.19)} al mes)`;
+  else if (CONFIG.iva === false) $('r-iva').textContent = 'no aplica: el valor es final';
+  else $('r-iva').textContent = 'se confirma en la cotización escrita';
+
+  $('r-total').textContent = pesos(c.total) + (CONFIG.iva === true ? ' + IVA' : '');
+  const nota = $('r-total-nota');
+  nota.hidden = c.extraConocido;
+  nota.textContent = c.extraConocido ? '' : 'Más las sedes adicionales, que se cotizan con usted.';
+
+  const fuga = $('r-fuga');
+  fuga.hidden = estado.apps !== 'si';
+  if (estado.apps === 'si') {
+    const [bajo, alto] = c.fuga;
+    $('r-fuga-mes').textContent = `${pesos(bajo)} a ${pesos(alto)}`;
+    $('r-fuga-anio').textContent = `al mes · entre ${pesos(bajo * 12)} y ${pesos(alto * 12)} al año`;
+  }
+
+  const sectores = [];
+  if (estado.domicilios === 'faltan') sectores.push(['Prommter Domicilios', 'Una red abierta de domiciliarios independientes para los negocios que la necesiten.']);
+  if (estado.referidos === 'si') sectores.push(['Prommter Referidos', 'Personas que recomiendan su producto y ganan solo cuando usted vende.']);
+  $('r-sectores').innerHTML = sectores.map(([t, d]) =>
+    `<li><span class="pildora pildora--pronto">Muy pronto</span><div><b>${t}</b><span>${d}</span></div></li>`
+  ).join('');
+
+  const texto = mensaje(c);
+  $('r-msg').textContent = texto;
+  const cta = $('r-cta');
+  if (CONFIG.whatsapp) {
+    cta.href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(texto)}`;
+    cta.hidden = false;
+    $('r-cta-pronto').hidden = true;
+  } else {
+    cta.hidden = true;
+    $('r-cta-pronto').hidden = false;
+    $('r-mensaje').open = true;
+  }
+}
+
+/* Entradas */
+document.querySelectorAll('input[type="radio"]').forEach((r) => r.addEventListener('change', () => {
+  estado.negocio = valorDe('negocio');
+  estado.apps = valorDe('apps');
+  estado.domicilios = valorDe('domicilios');
+  estado.referidos = valorDe('referidos');
+  $('apps-campos').hidden = estado.apps !== 'si';
+  pintar();
+}));
+
+$('sedes-menos').addEventListener('click', () => { estado.sedes = Math.max(1, estado.sedes - 1); pintar(); });
+$('sedes-mas').addEventListener('click', () => { estado.sedes = Math.min(20, estado.sedes + 1); pintar(); });
+
+const pedidos = $('pedidos');
+const rango = $('pedidos-rango');
+pedidos.addEventListener('input', () => {
+  estado.pedidos = Math.min(99999, digitos(pedidos.value));
+  rango.value = Math.min(Number(rango.max), estado.pedidos);
+  pintar();
+});
+pedidos.addEventListener('blur', () => { pedidos.value = miles.format(estado.pedidos); });
+rango.addEventListener('input', () => {
+  estado.pedidos = Number(rango.value);
+  pedidos.value = miles.format(estado.pedidos);
+  pintar();
+});
+
+const ticket = $('ticket');
+ticket.addEventListener('input', () => { estado.ticket = Math.min(99999999, digitos(ticket.value)); pintar(); });
+ticket.addEventListener('blur', () => { ticket.value = pesos(estado.ticket); });
+
+/* Aparición al entrar en pantalla */
+const aparecer = new IntersectionObserver((entradas) => {
+  entradas.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('visto'); aparecer.unobserve(e.target); } });
+}, { rootMargin: '0px 0px -8% 0px' });
+document.querySelectorAll('[data-aparece]').forEach((el) => aparecer.observe(el));
+
+/* Resumen fijo en móvil: se ve mientras responde y se esconde cuando la cotización está en pantalla */
+const resumen = $('resumen-movil');
+let enPreguntas = false;
+let enResultado = false;
+const vigilar = new IntersectionObserver((entradas) => {
+  entradas.forEach((e) => {
+    if (e.target.id === 'preguntas') enPreguntas = e.isIntersecting;
+    if (e.target.id === 'resultado') enResultado = e.isIntersecting;
+  });
+  resumen.classList.toggle('activo', enPreguntas && !enResultado);
+}, { threshold: 0.05 });
+vigilar.observe($('preguntas'));
+vigilar.observe($('resultado'));
+
+pintar();
+</script>
+</body>
+</html>

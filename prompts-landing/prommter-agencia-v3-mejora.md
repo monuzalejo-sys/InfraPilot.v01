@@ -8,6 +8,8 @@ NO sustituye al v2: el v2 sigue siendo la ley del contenido. Este archivo solo
 sube el OFICIO por encima de lo que ya existe.
 Fecha: 2026-08-29 · Origen del encargo: el dueño, textual:
    «me gustó lo que veo pero quiero algo mejor, no re hagas, mejora lo que hiciste»
+Encima de este, el encargo v4 (`prommter-agencia-v4-cotizacion.md`, 2026-09-24)
+descongela S6-S9 y agrega el cotizador y los sectores. Tu armadura §0 sigue rigiendo.
 Léelo entero antes de tocar una línea.
 ═══════════════════════════════════════════════════════════════════════════════
 

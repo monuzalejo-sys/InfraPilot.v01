@@ -3,7 +3,7 @@
 Esto es la prueba de regresión del cerebro. Se corre con:
 
 ```bash
-node C:\Users\Kalel\ORION\tools\cerebro.mjs probar
+node $ORION_HOME/tools/cerebro.mjs probar
 ```
 
 Cada línea es una pregunta escrita **como la haría el dueño** (informal, sin
@@ -84,3 +84,5 @@ como saco el precio de compra si solo tengo el precio de venta y el margen => in
 el cartel dice un precio y la caja cobra otro por que => invertir-formulas-redondeadas
 dividir para sacar la compra no me cuadra con lo que cobra el sistema => invertir-formulas-redondeadas
 como invierto una formula que redondea => invertir-formulas-redondeadas
+el dueno rechazo un video en vectores pero le gusto otro tambien en vectores cual es la diferencia => cortometraje-sobre-ilustracion
+puedo animar un personaje en codigo o se va a ver infantil otra vez => cortometraje-sobre-ilustracion
