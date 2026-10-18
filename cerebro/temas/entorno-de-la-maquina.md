@@ -1,11 +1,11 @@
 ---
 slug: entorno-de-la-maquina
 titulo: Lo que cada máquina puede y no puede hacer (son DOS)
-alias: [push, git push, subir el codigo, subir a github, publicar el repo, credential, credential manager, github desktop, desktop, commit, rama, remoto, terminal, consola, maquina, entorno, esta maquina, mi pc, computador, dos computadores, dos maquinas, mac, macos, darwin, windows, en cual maquina estoy, instalado, no esta instalado, falta instalar, python, python3, pip, docker, brew, homebrew, node, npm, powershell, ps 5.1, bash, heredoc, comando largo, se corta, truncado, utf8, tildes, acentos, mojibake, encoding, json corrupto, puerto, puertos, localhost, launch.json, servidor local, dev server, arrancar el servidor, wifi, wifi del local, firewall, red local, red publica, lan, celular, telefono, escala de windows, permisos del agente, sandbox, scratchpad, limite de sesion, edge, chrome, chrome headless, pdf, orion_home, uptime, carga, carga del sistema, load average, hilos, nucleos, cuantos nucleos tiene esta mac, cuantos hilos, i5, cpu al limite, se cayo el dns, dns caido, ENOTFOUND, resolucion de dns, compilando en segundo plano, compilar mientras corren agentes, brew compilando, kill -STOP, kill -CONT, suspender un proceso, pausar una compilacion, cuantos agentes en paralelo aguanta esta maquina]
+alias: [push, git push, subir el codigo, subir a github, publicar el repo, credential, credential manager, github desktop, desktop, commit, rama, remoto, terminal, consola, maquina, entorno, esta maquina, mi pc, computador, dos computadores, dos maquinas, mac, macos, darwin, windows, en cual maquina estoy, instalado, no esta instalado, falta instalar, python, python3, pip, docker, brew, homebrew, node, npm, powershell, ps 5.1, bash, heredoc, comando largo, se corta, truncado, utf8, tildes, acentos, mojibake, encoding, json corrupto, puerto, puertos, localhost, launch.json, servidor local, dev server, arrancar el servidor, wifi, wifi del local, firewall, red local, red publica, lan, celular, telefono, escala de windows, permisos del agente, sandbox, scratchpad, limite de sesion, edge, chrome, chrome headless, pdf, orion_home, uptime, carga, carga del sistema, load average, hilos, nucleos, cuantos nucleos tiene esta mac, cuantos hilos, i5, cpu al limite, se cayo el dns, dns caido, ENOTFOUND, resolucion de dns, compilando en segundo plano, compilar mientras corren agentes, brew compilando, kill -STOP, kill -CONT, suspender un proceso, pausar una compilacion, cuantos agentes en paralelo aguanta esta maquina, timeout, gtimeout, limite de tiempo, comando colgado, perl alarm]
 preguntas: ["en que maquina estoy trabajando", "puedo hacer push desde la terminal", "que hay instalado en esta maquina y que no", "por que el comando largo se corta a la mitad", "como genero un pdf aqui", "en que puerto arranca cada proyecto"]
 proyectos: [_permanent, infrapilot, prommter, wrd, villa-broaster, placita, estanco-contable, pollo-landing, landings, duo-burger]
 confianza: alta
-actualizado: 2026-09-10
+actualizado: 2026-10-18
 ---
 
 # Lo que cada máquina puede y no puede hacer (son DOS)
@@ -61,6 +61,7 @@ Medido el 2026-09-01 en la Mac y el 2026-08-24 en el PC:
 | Techo por comando de Bash | **sin techo** (15 KB entraron enteros) | ~8 KB, y trunca sin avisar |
 | `pdftoppm` / poppler | NO (pero hay `brew`) | NO |
 | Docker | NO | NO |
+| `timeout` (límite de tiempo a un comando) | **NO** — `command -v timeout gtimeout` vacío (medido 2026-10-18; falla con `command not found`). Usa `perl -e 'alarm 150; exec @ARGV' <comando>`, como en las llamadas largas a Gemini/Veo de duo-burger | no medido |
 | Node / npm / git | v24.18.0 · 11.16.0 · 2.39.2 | v24.16.0 · 11.13.0 · 2.55.0 |
 | CPU | i5, **4 hilos** — no aguanta una ola de agentes mientras algo compila nativo | no medido |
 

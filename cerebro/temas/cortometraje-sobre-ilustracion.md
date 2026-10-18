@@ -1,11 +1,11 @@
 ---
 slug: cortometraje-sobre-ilustracion
 titulo: "Dirigir un cortometraje sobre ilustraciones reales, no redibujarlo en código (Remotion)"
-alias: [corto, cortometraje, video, vídeo, video corto, comercial animado, spot, anuncio animado, animacion, animación, animar, remotion, render de video, renderizar video, camara, cámara, movimiento de camara, empuje de camara, empuje de cámara, paneo, panoramica, panorámica, dolly, travelling, zoom, plano, planos, encuadre, encuadres, foco, foco de camara, centro de la camara, corte, cortes, salto de continuidad, salto de eje, dos planos iguales, mismo encuadre, continuidad visual, ilustracion, ilustración, ilustraciones, pintura, pinturas, arte generado, arte del dueno, arte del dueño, dibujos del dueno, gemini, imagenes generadas, generado con ia, redibujar, redibujar en codigo, redibujar en código, svg, personaje en svg, vectores planos, se ve infantil, se ve feo, muy infantil y feo, rechazo del video, rechazo del corto, fotograma, fotogramas, still, stills, frame, frames, nitidez, varianza laplaciana, laplaciano, se ve borroso, se ve pixelado, se ve estirado, ablandado, borde negro, banda negra, descubre el borde, grano, vineta, viñeta, textura de pelicula, textura comun, mp4, encoder, encoder de video, avassetwriter, swift, swiftc, ffmpeg, remotion render, --sequence, secuencia de imagenes, numeracion de fotogramas, verificar animacion, verificar animación, verificador de fotogramas, ola de verificadores, olas de escenas, director, veredicto del director, cuanto puedo acercar la camara, hasta donde puedo hacer zoom, guia de marca, guía de marca, referencias de arte, resolucion nativa, resolución nativa, macos 13, macos 15, ventura, sequoia, compositor de remotion, sigabrt, continuitycamera, titere, títere, titere svg, rig, rig de personaje, muneco articulado, muñeco articulado, mascota animada, mascotas animadas, animar personaje en codigo, animar personaje en código, vectores fieles a la guia, vectores fieles a la guía, estilo inventado, vuelve duo burguer, juntos otra vez, choque de puños, blanco y negro a color, byn, bn a color, telon de pan, telón de pan, ajonjoli, ajonjolí, mono a estereo, mono a estéreo, audio medido, medir audio, dbfs, curva cuadratica, curva cuadrática, manguera svg, guante de cuatro dedos, guante de 4 dedos]
-preguntas: ["¿cómo hago un corto animado a partir de las ilustraciones del dueño sin que se vea infantil?", "¿hasta dónde puedo acercar la cámara a una pintura sin que se vea borrosa?", "dos escenas me quedaron con el mismo encuadre, ¿cómo las diferencio?", "¿por qué me sale una banda negra cuando empujo la cámara hacia el borde de la pintura?", "¿cómo verifico que una animación quedó bien sin solo leer el código?", "el dueño rechazó el video por infantil, ¿qué hago distinto la próxima vez?", "¿cómo saco el mp4 si Remotion no codifica en esta máquina?", "¿le pido al generador de imágenes que anime, o construyo la animación yo encima de su arte?", "¿por qué el render terminó en verde y no hay ningún archivo de video?", "¿puedo animar un personaje en código (SVG) o eso también se ve infantil?", "el dueño rechazó un video en vectores pero le gustó otro también en vectores, ¿cuál es la diferencia real?", "¿cómo verifico que un personaje animado en código es fiel a la guía de marca?", "¿cómo verifico un efecto de sonido que cambia de mono a estéreo en un fotograma exacto?"]
+alias: [corto, cortometraje, video, vídeo, video corto, comercial animado, spot, anuncio animado, animacion, animación, animar, remotion, render de video, renderizar video, camara, cámara, movimiento de camara, empuje de camara, empuje de cámara, paneo, panoramica, panorámica, dolly, travelling, zoom, plano, planos, encuadre, encuadres, foco, foco de camara, centro de la camara, corte, cortes, salto de continuidad, salto de eje, dos planos iguales, mismo encuadre, continuidad visual, ilustracion, ilustración, ilustraciones, pintura, pinturas, arte generado, arte del dueno, arte del dueño, dibujos del dueno, gemini, imagenes generadas, generado con ia, redibujar, redibujar en codigo, redibujar en código, svg, personaje en svg, vectores planos, se ve infantil, se ve feo, muy infantil y feo, rechazo del video, rechazo del corto, fotograma, fotogramas, still, stills, frame, frames, nitidez, varianza laplaciana, laplaciano, se ve borroso, se ve pixelado, se ve estirado, ablandado, borde negro, banda negra, descubre el borde, grano, vineta, viñeta, textura de pelicula, textura comun, mp4, encoder, encoder de video, avassetwriter, swift, swiftc, ffmpeg, remotion render, --sequence, secuencia de imagenes, numeracion de fotogramas, verificar animacion, verificar animación, verificador de fotogramas, ola de verificadores, olas de escenas, director, veredicto del director, cuanto puedo acercar la camara, hasta donde puedo hacer zoom, guia de marca, guía de marca, referencias de arte, resolucion nativa, resolución nativa, macos 13, macos 15, ventura, sequoia, compositor de remotion, sigabrt, continuitycamera, titere, títere, titere svg, rig, rig de personaje, muneco articulado, muñeco articulado, mascota animada, mascotas animadas, animar personaje en codigo, animar personaje en código, vectores fieles a la guia, vectores fieles a la guía, estilo inventado, vuelve duo burguer, juntos otra vez, choque de puños, blanco y negro a color, byn, bn a color, telon de pan, telón de pan, ajonjoli, ajonjolí, mono a estereo, mono a estéreo, audio medido, medir audio, dbfs, curva cuadratica, curva cuadrática, manguera svg, guante de cuatro dedos, guante de 4 dedos, ia de google, titere sobre material real, titere sobre tomas reales, mascotas sobre video real, mascotas sobre fotos reales, compuesto sobre material real, ya prendimos las luces, anuncio en vector, a01, igual que los cortometrajes, se ve artificial, rechazo del 18 de octubre]
+preguntas: ["¿cómo hago un corto animado a partir de las ilustraciones del dueño sin que se vea infantil?", "¿hasta dónde puedo acercar la cámara a una pintura sin que se vea borrosa?", "dos escenas me quedaron con el mismo encuadre, ¿cómo las diferencio?", "¿por qué me sale una banda negra cuando empujo la cámara hacia el borde de la pintura?", "¿cómo verifico que una animación quedó bien sin solo leer el código?", "el dueño rechazó el video por infantil, ¿qué hago distinto la próxima vez?", "¿cómo saco el mp4 si Remotion no codifica en esta máquina?", "¿le pido al generador de imágenes que anime, o construyo la animación yo encima de su arte?", "¿por qué el render terminó en verde y no hay ningún archivo de video?", "¿puedo animar un personaje en código (SVG) o eso también se ve infantil?", "el dueño rechazó un video en vectores pero le gustó otro también en vectores, ¿cuál es la diferencia real?", "¿cómo verifico que un personaje animado en código es fiel a la guía de marca?", "¿cómo verifico un efecto de sonido que cambia de mono a estéreo en un fotograma exacto?", "¿puedo meter el títere SVG encima de las tomas reales del local?"]
 proyectos: [duo-burger]
 confianza: alta
-actualizado: 2026-10-01
+actualizado: 2026-10-18
 ---
 
 # Dirigir un cortometraje sobre ilustraciones reales, no redibujarlo en código
@@ -31,6 +31,16 @@ personaje en código (un títere vectorial), reemplaza "arte ya terminado" por
 "guía de marca verificable": compara el render directamente contra un
 recorte de la guía en cada entrega, no contra tu criterio. Ver "Cuándo NO
 aplica".
+
+**Contra-matiz (2026-10-18):** la aprobación del 1-oct fue de una pieza ENTERA en
+vectores fieles a la guía, un mundo dibujado de punta a punta. El mismo títere
+**compuesto sobre material real** (fotos y tomas del local) lo rechazó el dueño —
+*«¿esto lo hiciste con la IA de Google? no me gustó para nada el resultado»*
+(`duo-burger/PEND-029`)— y antes había rechazado un anuncio de producto en vectores
+por «igual que el resto de cortometrajes» (A01, 2026-10-04). Con material real
+debajo, el techo está en la edición (color, ritmo, cortes, sonido, tipografía); si
+aparecen personajes, que los genere una IA a partir de sus hojas de marca (ver
+[[TEMA-veo-clips-de-ia-para-componer]]) y no un títere en código pegado encima.
 
 ## Por qué (qué lo pagó)
 
@@ -108,6 +118,22 @@ RMS(L−R)/RMS(L+R) pasa de 0,0000 antes del fotograma 840 a 0,3227 después, y
 el nivel salta de −37,3 dBFS (20 ms antes del golpe) a −11,3 dBFS (en el
 golpe) — la misma disciplina de "ábrelo y mídelo" del fotograma, aplicada
 también al audio (`duo-burger/KN-029`).
+
+**Y lo pagó, diecisiete días después, un rechazo que obliga a matizar el matiz.** El
+2026-10-15 se hicieron una imagen (4:5 y 9:16) y el reel «Ya prendimos las luces»
+(23,2 s) con las fotos y tomas reales del local y las dos mascotas del rig vectorial
+compuestas dentro, y cuidadas a conciencia: sombra de contacto, contraluz ámbar ≤0,4,
+sombra sobre el cuerpo, el mismo grano y seguimiento con Vision de un objeto pegado al
+portacarta (`duo-burger/KN-032`). El 2026-10-18 el dueño respondió *«¿esto lo hiciste
+con la IA de Google? no me gustó para nada el resultado»*: era código (Remotion), sus
+fotos y el títere SVG (`duo-burger/PEND-029`, `feedback_duo_local_mascotas_rechazo.md`).
+La memoria del dueño lo lee como el tercer rechazo de la misma familia, después del
+logo vectorial y del anuncio A01 (`feedback_anuncios_mas_real.md`): para él un dibujo
+vectorial puesto sobre material real no es profesional aunque la integración técnica
+esté bien hecha, y que lo confundiera con IA dice que el montaje se ve artificial. Pidió
+«usa la IA»; lo que se hizo y lo que costó está en
+[[TEMA-veo-clips-de-ia-para-componer]] (veredicto de la v2 aún pendiente,
+`duo-burger/PEND-030`).
 
 ## Cómo se aplica
 
@@ -190,6 +216,11 @@ también al audio (`duo-burger/KN-029`).
   condición que reemplaza "arte ya terminado" es "comparación directa contra
   la guía de marca en cada entrega", no "nunca código"
   (`feedback_video_no_infantil.md`; `duo-burger/KN-028`).
+- **Pero un títere en código, aunque sea fiel a la guía, NO va compuesto sobre
+  material real** (fotos o tomas del local): se rechazó el 2026-10-18 con la
+  integración técnica cuidada. Si el dueño no lo pide explícitamente con ese estilo,
+  no lo propongas; la ruta es edición pura y, si hacen falta personajes, generados por
+  IA desde sus hojas de marca (ver el contra-matiz de la «Respuesta corta»).
 - **Si el arte fuente es vectorial hecho a mano (SVG), no pintura rasterizada**,
   el límite de nitidez por ampliación (laplaciano) no aplica igual —un vector
   no pierde definición al escalar—, pero el límite geométrico del encuadre
@@ -264,6 +295,16 @@ también al audio (`duo-burger/KN-029`).
   (`prommter/duo-burguer-video`) — dos trampas de Remotion: el logo va de SVG
   incrustado (no `<image>`) para no depender de una carga, y el ancho de cada
   letra se mide con canvas sin memo a propósito.
+- `duo-burger/PEND-029` (Done) y `feedback_duo_local_mascotas_rechazo.md` (memoria
+  permanente del dueño) — el rechazo del 2026-10-18 del títere compuesto sobre
+  material real, con su cita textual y la regla «no volver a componerlo sin que él lo
+  pida». `duo-burger/KN-032` — cómo se integraron las mascotas en las tomas.
+  `feedback_anuncios_mas_real.md` — el rechazo del anuncio A01 (2026-10-04).
+- **Contradicción abierta en la memoria del proyecto:** `duo-burger/KN-031` (Current,
+  2026-10-04) afirma que sin fotos reales el techo de un anuncio de comida es el vector
+  fiel; el dueño rechazó justamente ese A01 el mismo día y la memoria del proyecto no lo
+  registra (solo `feedback_anuncios_mas_real.md`). Vale la regla posterior: no más
+  anuncios en vector. No se tocó la memoria del proyecto.
 
 ## Enlaces
 
@@ -275,3 +316,8 @@ también al audio (`duo-burger/KN-029`).
   verificadores, y qué hacer cuando mueren a mitad de ola.
 - [[TEMA-entorno-de-la-maquina]] — por qué esta misma Mac no aguantaba la ola
   de render mientras compilaba ffmpeg.
+- [[TEMA-montar-video-con-material-real-del-celular]] — el caso contrario: el
+  material son tomas reales del iPhone (HDR→SDR, HyperFrames, qué tapar).
+- [[TEMA-veo-clips-de-ia-para-componer]] — lo que se hizo después del rechazo del
+  18-oct: personajes generados por IA (Veo) compuestos sobre el material real, con su
+  color de fondo, recorte, zoom, costo y voces medidos.
