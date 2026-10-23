@@ -31,3 +31,6 @@ cerebro/indice.json
 
 # Agenda y finanzas personales del dueño: repo local propio, nunca al remoto publico de ORION
 agenda/
+
+# Correos de cada empresa: el PDF lleva claves en claro, nunca al remoto publico
+correos/
