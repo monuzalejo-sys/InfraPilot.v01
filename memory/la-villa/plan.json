@@ -1,9 +1,9 @@
 {
   "planId": "la-villa-2026-10-28",
   "projectId": "la-villa",
-  "version": 19,
+  "version": 22,
   "createdAt": "2026-10-28T05:50:49.567Z",
-  "updatedAt": "2026-10-28T16:04:17.678Z",
+  "updatedAt": "2026-10-28T16:13:47.749Z",
   "modo": "genesis",
   "objetivo": "Sistema de minimarket para La Villa, cliente de Prommter: caja que cobra sin depender de internet, inventario con surtido y proveedores, y acceso por puesto antes que por persona",
   "resumen": [
@@ -4627,7 +4627,8 @@
       "id": "T-092",
       "arquetipo": null,
       "dependeDe": [
-        "T-003"
+        "T-003",
+        "T-105"
       ],
       "intocable": [],
       "posee": [
@@ -5064,7 +5065,9 @@
         "docs/modelo-de-datos.md"
       ],
       "intocable": [],
-      "dependeDe": [],
+      "dependeDe": [
+        "T-003"
+      ],
       "dificultad": "normal",
       "ceremonia": "1-builder",
       "modelo": "sonnet",
@@ -5108,7 +5111,9 @@
         "tests/datos/fk-CierreDiario.test.ts"
       ],
       "intocable": [],
-      "dependeDe": [],
+      "dependeDe": [
+        "T-003"
+      ],
       "dificultad": "normal",
       "ceremonia": "1-builder",
       "modelo": "sonnet",
@@ -5152,7 +5157,9 @@
         "tests/datos/fk-Promocion.test.ts"
       ],
       "intocable": [],
-      "dependeDe": [],
+      "dependeDe": [
+        "T-003"
+      ],
       "dificultad": "normal",
       "ceremonia": "1-builder",
       "modelo": "sonnet",
@@ -5262,6 +5269,210 @@
       "cerebro": [
         "tema:entorno-de-la-maquina"
       ]
+    },
+    {
+      "id": "T-105",
+      "arquetipo": null,
+      "dependeDe": [
+        "T-003"
+      ],
+      "intocable": [],
+      "posee": [
+        "prommter/la-villa-repo/docs/regimen-y-contador.md"
+      ],
+      "cerebro": [
+        "tema:cero-datos-inventados",
+        "tema:encargos-verificables"
+      ],
+      "dificultad": "normal",
+      "ceremonia": "inline",
+      "nivel": "N0",
+      "categoria": "producto",
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "titulo": "Preguntarle al contador el régimen del cliente antes de construir nada de impuestos",
+      "porQue": "El régimen decide QUÉ hay que construir, y las dos salidas son muy distintas: si está en Régimen Simple se declara sobre el ingreso bruto y el desglose de IVA por tarifa es casi decorativo; si es responsable de IVA, el desglose es obligatorio y además hace falta el IVA de las compras. Construir el módulo antes de saberlo es construir la mitad equivocada y además es trabajo que el cliente va a ver y a dar por bueno.",
+      "queHacer": [
+        "Pedir por escrito al cliente: régimen (Simple u ordinario), si es responsable de IVA, ventas aproximadas al mes, si es persona natural o jurídica, ciudad (por el ICA), cuántos empleados, y el nombre y contacto de su contador.",
+        "Contrastar las ventas declaradas contra el tope de responsable de IVA: 3.500 UVT al año, que con la UVT de 2026 ($52.374) son $183.309.000 al año, del orden de $509.000 diarios.",
+        "Preguntarle al contador qué informe usa de verdad y con qué periodicidad, y qué software lleva (Siigo, World Office, Helisa u otro) con el formato que importa.",
+        "Preguntar si el cliente ya está habilitado como facturador electrónico ante la DIAN y con qué proveedor, si tiene alguno.",
+        "Dejarlo escrito en el repo y cerrar los huecos correspondientes de HUECOS.md con la respuesta, no con una suposición."
+      ],
+      "aceptacion": [
+        {
+          "check": "Están las siete respuestas del cliente, ninguna en blanco",
+          "comando": "grep -cE \"^\\| *(Régimen|Responsable de IVA|Ventas|Natural o jurídica|Ciudad|Empleados|Contador)\" prommter/la-villa-repo/docs/regimen-y-contador.md",
+          "espera": "7 filas, todas con respuesta y fecha"
+        },
+        {
+          "check": "No queda ninguna respuesta inventada",
+          "comando": "grep -ci \"por confirmar\\|desconocido\" prommter/la-villa-repo/docs/regimen-y-contador.md",
+          "espera": "0 si el cliente ya contestó; si algo sigue sin respuesta, la tarea no está hecha"
+        }
+      ],
+      "modelo": "sonnet",
+      "presupuesto": 0
+    },
+    {
+      "id": "T-106",
+      "arquetipo": null,
+      "dependeDe": [
+        "T-003",
+        "T-105"
+      ],
+      "intocable": [],
+      "posee": [
+        "lib/dominio/compras.ts",
+        "lib/dominio/iva-descontable.ts",
+        "app/(app)/compras/**"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:invertir-formulas-redondeadas"
+      ],
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "nivel": "N1",
+      "categoria": "backend",
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "titulo": "Registrar las compras con su IVA descontable, que es la mitad que falta de la cuenta",
+      "porQue": "Un cierre de VENTAS no produce el impuesto que hay que pagar: el IVA a pagar es el de las ventas MENOS el de las compras. Si el sistema solo entrega ventas, el cliente creería que debe pagar mucho más de lo que debe, o su contador tiene que armar la otra mitad a mano — y entonces la promesa de «tener separado todo lo que hay que declarar» quedó cumplida a medias.",
+      "queHacer": [
+        "Cada entrada de surtido registra el IVA que el proveedor cobró, separado del costo, con el número de la factura del proveedor y su fecha.",
+        "Distinguir las compras con factura de las compras sin factura: solo las primeras dan derecho a descontar, y en una tienda de barrio hay de las dos.",
+        "El informe del periodo entrega las dos columnas juntas: IVA de las ventas, IVA de las compras y la diferencia.",
+        "Si el cliente está en Régimen Simple o no es responsable de IVA, el módulo registra las compras igual (sirven para el costo y el margen) pero NO presenta la cuenta de IVA a pagar: eso se decide con lo que diga T-099.",
+        "Nunca calcular el IVA hacia atrás desde un total redondeado: se guarda la base y el impuesto como el proveedor los facturó."
+      ],
+      "aceptacion": [
+        {
+          "check": "El informe del periodo entrega ventas, compras y diferencia",
+          "comando": "npm test -- iva-periodo",
+          "espera": "test verde: para un periodo con ventas e compras conocidas, el IVA resultante es exactamente ventas menos compras descontables"
+        },
+        {
+          "check": "Las compras sin factura no entran al descontable",
+          "comando": "npm test -- compras-sin-factura",
+          "espera": "test verde: una compra marcada sin factura no suma al IVA descontable pero sí al costo"
+        },
+        {
+          "check": "El IVA no se recalcula desde el total",
+          "comando": "grep -rn \"total *[/*] *1[.,]19\\|/1.19\" lib/dominio/",
+          "espera": "0 líneas"
+        }
+      ],
+      "modelo": "opus",
+      "presupuesto": 277000
+    },
+    {
+      "id": "T-107",
+      "arquetipo": null,
+      "dependeDe": [
+        "T-003",
+        "T-105",
+        "T-092"
+      ],
+      "intocable": [],
+      "posee": [
+        "lib/dominio/periodos-fiscales.ts",
+        "app/(app)/periodos/**"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:caja-y-turnos"
+      ],
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "nivel": "N1",
+      "categoria": "datos",
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "titulo": "Acumular los periodos que de verdad se declaran, no solo el día",
+      "porQue": "Nadie declara diariamente: el IVA es cuatrimestral y los anticipos del Régimen Simple son bimestrales. Un sistema que solo guarda cierres diarios obliga a sumar 120 documentos a mano cada cuatro meses, que es exactamente el trabajo que se prometió quitar.",
+      "queHacer": [
+        "Acumular por mes, por bimestre y por cuatrimestre, calculado desde los cierres diarios y no escrito aparte: un acumulado que se guarda suelto se desincroniza.",
+        "El acumulado de un periodo ya cerrado no cambia porque hoy entren más datos: si aparece una corrección, se ve como corrección con su fecha.",
+        "Mostrar el periodo que viene y cuántos días faltan, para que el dueño no se entere el día del vencimiento.",
+        "Cada acumulado se abre hasta los cierres diarios que lo componen, y cada cierre hasta sus ventas."
+      ],
+      "aceptacion": [
+        {
+          "check": "El acumulado es igual a la suma de sus cierres",
+          "comando": "npm test -- acumulado-cuadra",
+          "espera": "test verde: el acumulado del cuatrimestre es igual a la suma de los cierres diarios de esos días, al peso"
+        },
+        {
+          "check": "Un periodo cerrado no se mueve",
+          "comando": "npm test -- periodo-estable",
+          "espera": "test verde: insertar datos de un periodo ya cerrado aparece como corrección fechada, no cambia el acumulado original"
+        }
+      ],
+      "modelo": "sonnet",
+      "presupuesto": 221000
+    },
+    {
+      "id": "T-108",
+      "arquetipo": null,
+      "dependeDe": [
+        "T-003",
+        "T-105"
+      ],
+      "intocable": [],
+      "posee": [
+        "lib/facturacion/puerta.ts",
+        "lib/facturacion/proveedor-*.ts",
+        "docs/arquitectura/decisiones/0001-facturacion-detras-de-puerta.md"
+      ],
+      "cerebro": [
+        "tema:la-caja-no-puede-parar",
+        "tema:donde-vive-el-dato",
+        "villa-broaster/PEND-001"
+      ],
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "nivel": "N1",
+      "categoria": "arquitectura",
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "titulo": "Dejar la facturación electrónica detrás de una interfaz propia, sin casarse con un proveedor",
+      "porQue": "Según la investigación del 2026-10-28, el documento equivalente POS en papel venció para todos el 1 de julio de 2024: hoy el tiquete de caja se transmite a la DIAN, y en Régimen Simple el cliente está obligado a facturar electrónicamente. Eso es ley, no una función opcional — y el proveedor que lo emite se elige, se cambia y se cae. Si su SDK queda metido dentro de la caja, cambiar de proveedor significa reescribir el cobro, que es lo único que no se puede parar.",
+      "queHacer": [
+        "Definir una interfaz propia con los verbos del negocio —emitir, consultar estado, anular— y escribir la caja contra ESA interfaz, nunca contra el proveedor.",
+        "La primera implementación habla con un proveedor habilitado por la DIAN; dejar una segunda implementación de prueba que no manda nada, para poder desarrollar y probar sin emitir documentos reales.",
+        "La emisión NUNCA bloquea el cobro: la venta se guarda y se cobra en el local, y el documento sale por la cola con reintentos. Si la DIAN o el proveedor están caídos, la caja sigue vendiendo.",
+        "Dejar ver qué documentos quedaron sin transmitir y cuántos días llevan, porque eso sí es un problema legal del cliente.",
+        "EXIGIR AL PROVEEDOR POR ESCRITO que emite el documento equivalente electrónico POS: la investigación encontró que al menos uno dice explícitamente que su plan de emisión ilimitada NO lo incluye.",
+        "El proveedor se contrata a nombre del CLIENTE, igual que el dominio, y su costo mensual no lo paga Prommter."
+      ],
+      "aceptacion": [
+        {
+          "check": "La caja no conoce al proveedor",
+          "comando": "grep -rn \"siigo\\|alegra\\|factus\\|dataico\" lib/dominio/ app/\\(caja\\)/ --include=*.ts --include=*.tsx -il",
+          "espera": "0 líneas: el nombre del proveedor solo aparece dentro de lib/facturacion/"
+        },
+        {
+          "check": "El cobro no depende de la emisión",
+          "comando": "npm test -- cobro-sin-facturador",
+          "espera": "test verde: con el proveedor caído, la venta se registra y se cobra, y el documento queda en cola"
+        },
+        {
+          "check": "Se ve lo que quedó sin transmitir",
+          "comando": "npm test -- documentos-pendientes",
+          "espera": "test verde: un documento no transmitido aparece listado con sus días de atraso"
+        }
+      ],
+      "modelo": "opus",
+      "presupuesto": 277000
     }
   ],
   "escalabilidad": [

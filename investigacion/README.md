@@ -40,4 +40,4 @@ Cada investigación nueva se apunta aquí, la más reciente arriba.
 
 | Fecha | Tema | Para | Estado |
 |-------|------|------|--------|
-| — | (todavía no hay) | — | — |
+| 2026-10-28 | [Qué declara a la DIAN un minimarket y cuál es la forma más eficiente](2026-10-28-dian-minimarket/INFORME.md) | Prommter · minimarket La Villa | terminada |

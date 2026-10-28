@@ -1,6 +1,6 @@
 # Plan de ejecución — la-villa
 
-> GENERADO desde `plan.json` (v19, 2026-10-28). No editar a mano:
+> GENERADO desde `plan.json` (v22, 2026-10-28). No editar a mano:
 > se reescribe entero en cada `plan.mjs md`. La fuente de verdad es el registro.
 
 **Objetivo.** Sistema de minimarket para La Villa, cliente de Prommter: caja que cobra sin depender de internet, inventario con surtido y proveedores, y acceso por puesto antes que por persona
@@ -19,18 +19,18 @@
 
 ## Dónde estamos
 
-5 de 104 tareas hechas · etapa N0 (Cimientos) · presupuesto restante 18.63 M tokens de subagente
+5 de 108 tareas hechas · etapa N0 (Cimientos) · presupuesto restante 19.40 M tokens de subagente
 
 | Categoría | Hechas | Total |
 |---|---|---|
 | accesibilidad | 0 | 4 |
-| arquitectura | 0 | 3 |
-| backend | 0 | 8 |
+| arquitectura | 0 | 4 |
+| backend | 0 | 9 |
 | calidad | 0 | 8 |
-| datos | 0 | 30 |
+| datos | 0 | 31 |
 | frontend | 0 | 10 |
 | operacion | 4 | 18 |
-| producto | 1 | 8 |
+| producto | 1 | 9 |
 | rendimiento | 0 | 5 |
 | seguridad | 0 | 10 |
 
@@ -46,7 +46,7 @@
 - **H8 El dueño mira su negocio desde el celular** — La cifra del día se lee a 390 px sin desplazar ni acercar el teléfono, todo número se abre hasta las ventas que lo producen, el color no es el único indicio de estado, y sin nube muestra los datos locales con su aviso. _(requiere T-097, T-098)_
 - **H9 El siguiente cliente cuesta menos que este** — prommter/ALTA-DE-CLIENTE.md existe con diez pasos o más citando cada uno su archivo, incluida la trampa de la deploy key y lo que nunca se hereda; y el tema de placita ya no afirma que su repo no está en la Mac. _(requiere T-010, T-009)_
 
-## N0 · Cimientos — 5/97
+## N0 · Cimientos — 5/98
 
 Que el proyecto exista de verdad: carpeta, memoria, cartera de clientes, la decisión del camino firmada y el inventario de lo que se hereda — y que ninguna suposición sobre el negocio pase por dato.
 
@@ -408,6 +408,10 @@ Que el proyecto exista de verdad: carpeta, memoria, cartera de clientes, la deci
   - **Por qué:** El proyecto se frena semanas esperando fotos, la carta con precios o el horario de festivos, y nadie sabe qué falta exactamente porque nunca se listó. Mientras tanto se rellena con material inventado que después hay que quitar entero.
   - **Qué hacer:** (1) Recorrer pantalla por pantalla y anotar cada pieza que el negocio tiene y nosotros no: fotos de los productos, lista de precios vigente, horarios y festivos, teléfono y dirección reales, logo en alta, nombres del equipo, textos legales existentes. (2) Por cada pieza: quién la tiene, en qué formato la va a mandar, para cuándo, y qué pantalla queda incompleta sin ella. (3) Ordenar la lista por lo que bloquea antes, y mandarle al dueño solo las tres primeras: una lista de veinte cosas no la llena nadie. (4) Marcar en el inventario lo recibido con la fecha en que llegó; lo no recibido se queda visible, no se sustituye.
   - **Cómo se comprueba:** El inventario existe con dueño y fecha por fila → 6+ filas, todas con 'quién' y 'para cuándo' · Nada figura como recibido sin fecha → 0 líneas
+- [ ] **T-105** Preguntarle al contador el régimen del cliente antes de construir nada de impuestos _(normal, inline)_
+  - **Por qué:** El régimen decide QUÉ hay que construir, y las dos salidas son muy distintas: si está en Régimen Simple se declara sobre el ingreso bruto y el desglose de IVA por tarifa es casi decorativo; si es responsable de IVA, el desglose es obligatorio y además hace falta el IVA de las compras. Construir el módulo antes de saberlo es construir la mitad equivocada y además es trabajo que el cliente va a ver y a dar por bueno.
+  - **Qué hacer:** (1) Pedir por escrito al cliente: régimen (Simple u ordinario), si es responsable de IVA, ventas aproximadas al mes, si es persona natural o jurídica, ciudad (por el ICA), cuántos empleados, y el nombre y contacto de su contador. (2) Contrastar las ventas declaradas contra el tope de responsable de IVA: 3.500 UVT al año, que con la UVT de 2026 ($52.374) son $183.309.000 al año, del orden de $509.000 diarios. (3) Preguntarle al contador qué informe usa de verdad y con qué periodicidad, y qué software lleva (Siigo, World Office, Helisa u otro) con el formato que importa. (4) Preguntar si el cliente ya está habilitado como facturador electrónico ante la DIAN y con qué proveedor, si tiene alguno. (5) Dejarlo escrito en el repo y cerrar los huecos correspondientes de HUECOS.md con la respuesta, no con una suposición.
+  - **Cómo se comprueba:** Están las siete respuestas del cliente, ninguna en blanco → 7 filas, todas con respuesta y fecha · No queda ninguna respuesta inventada → 0 si el cliente ya contestó; si algo sigue sin respuesta, la tarea no está hecha
 
 ### rendimiento
 
@@ -475,11 +479,18 @@ Que el proyecto exista de verdad: carpeta, memoria, cartera de clientes, la deci
   - **Qué hacer:** (1) Poner en toda cookie de sesión: `httpOnly: true`, `secure: process.env.NODE_ENV === 'production'`, `sameSite: 'lax'` y `path: '/'`. (2) Redirigir 308 de http a https en el borde (middleware o configuración del hosting). (3) Revisar que ninguna URL de producción escrita en el código empiece por `http://`. (4) Anotar el dominio exacto de producción en `docs/despliegue.md`.
   - **Cómo se comprueba:** Ninguna cookie se crea sin httpOnly → 0 líneas · No hay URLs http de producción en el código → 0 líneas
 
-## N1 · Funciona — 0/5
+## N1 · Funciona — 0/8
 
 Que el minimarket pueda cobrar: una venta se registra en el local, baja el inventario, la firma quien la hizo con su PIN, y el cierre de caja cuadra al peso.
 
 **Se sale de este nivel cuando:** Se sale de N1 cuando el dueño cobra una venta real en su mostrador, sin internet conectado, y el cierre del día cuadra contra la suma de sus documentos.
+
+### arquitectura
+
+- [ ] **T-108** Dejar la facturación electrónica detrás de una interfaz propia, sin casarse con un proveedor _(hard, 1-builder, 277k)_
+  - **Por qué:** Según la investigación del 2026-10-28, el documento equivalente POS en papel venció para todos el 1 de julio de 2024: hoy el tiquete de caja se transmite a la DIAN, y en Régimen Simple el cliente está obligado a facturar electrónicamente. Eso es ley, no una función opcional — y el proveedor que lo emite se elige, se cambia y se cae. Si su SDK queda metido dentro de la caja, cambiar de proveedor significa reescribir el cobro, que es lo único que no se puede parar.
+  - **Qué hacer:** (1) Definir una interfaz propia con los verbos del negocio —emitir, consultar estado, anular— y escribir la caja contra ESA interfaz, nunca contra el proveedor. (2) La primera implementación habla con un proveedor habilitado por la DIAN; dejar una segunda implementación de prueba que no manda nada, para poder desarrollar y probar sin emitir documentos reales. (3) La emisión NUNCA bloquea el cobro: la venta se guarda y se cobra en el local, y el documento sale por la cola con reintentos. Si la DIAN o el proveedor están caídos, la caja sigue vendiendo. (4) Dejar ver qué documentos quedaron sin transmitir y cuántos días llevan, porque eso sí es un problema legal del cliente. (5) EXIGIR AL PROVEEDOR POR ESCRITO que emite el documento equivalente electrónico POS: la investigación encontró que al menos uno dice explícitamente que su plan de emisión ilimitada NO lo incluye. (6) El proveedor se contrata a nombre del CLIENTE, igual que el dominio, y su costo mensual no lo paga Prommter.
+  - **Cómo se comprueba:** La caja no conoce al proveedor → 0 líneas: el nombre del proveedor solo aparece dentro de lib/facturacion/ · El cobro no depende de la emisión → test verde: con el proveedor caído, la venta se registra y se cobra, y el documento queda en cola · Se ve lo que quedó sin transmitir → test verde: un documento no transmitido aparece listado con sus días de atraso
 
 ### backend
 
@@ -487,6 +498,10 @@ Que el minimarket pueda cobrar: una venta se registra en el local, baja el inven
   - **Por qué:** Es la promesa que el dueño de Prommter ya le hizo al cliente: «va a tener separado todo lo que tiene que declarar al final del día». Si el cierre suma todo en un solo total, el contador tiene que desarmarlo a mano cada mes y la promesa queda incumplida; si separa mal las bases, el cliente declara mal y la multa es suya.
   - **Qué hacer:** (1) Cada producto lleva su tarifa de impuesto como dato del producto, no como cálculo al vender: excluido, exento, 5 %, 19 % e impuesto al consumo si aplica. (2) El cierre del día agrupa las ventas por tarifa y entrega, por cada una: base gravable, impuesto y total — más el gran total que tiene que cuadrar con la plata contada en la caja. (3) Separar también por medio de pago (efectivo, tarjeta, transferencia) porque es lo que permite cuadrar la caja contra el banco. (4) El cierre queda guardado como documento del día, con su número consecutivo, y NO se puede editar después: si hay un error, se corrige con otro documento que lo referencia. (5) Seguir lo que diga investigacion/2026-10-28-dian-minimarket/INFORME.md sobre qué informe usa de verdad el contador y con qué periodicidad; si el informe dice que el cierre diario es solo insumo y la declaración va sobre otra cosa, construir lo que pide el informe y no lo que suena bien. (6) Escribir en la pantalla, visible para el dueño del minimarket, que el sistema produce el informe y que declarar lo hace su contador.
   - **Cómo se comprueba:** Las bases por tarifa suman exactamente el total del día → test verde: para un día con ventas de 0 %, 5 % y 19 % mezcladas, la suma de bases más impuestos es igual al total cobrado, al peso · Un cierre ya emitido no se puede editar → test verde: el intento de modificar un cierre emitido es rechazado y queda registrado · La pantalla dice quién declara → 1+ líneas
+- [ ] **T-106** Registrar las compras con su IVA descontable, que es la mitad que falta de la cuenta _(hard, 1-builder, 277k)_
+  - **Por qué:** Un cierre de VENTAS no produce el impuesto que hay que pagar: el IVA a pagar es el de las ventas MENOS el de las compras. Si el sistema solo entrega ventas, el cliente creería que debe pagar mucho más de lo que debe, o su contador tiene que armar la otra mitad a mano — y entonces la promesa de «tener separado todo lo que hay que declarar» quedó cumplida a medias.
+  - **Qué hacer:** (1) Cada entrada de surtido registra el IVA que el proveedor cobró, separado del costo, con el número de la factura del proveedor y su fecha. (2) Distinguir las compras con factura de las compras sin factura: solo las primeras dan derecho a descontar, y en una tienda de barrio hay de las dos. (3) El informe del periodo entrega las dos columnas juntas: IVA de las ventas, IVA de las compras y la diferencia. (4) Si el cliente está en Régimen Simple o no es responsable de IVA, el módulo registra las compras igual (sirven para el costo y el margen) pero NO presenta la cuenta de IVA a pagar: eso se decide con lo que diga T-099. (5) Nunca calcular el IVA hacia atrás desde un total redondeado: se guarda la base y el impuesto como el proveedor los facturó.
+  - **Cómo se comprueba:** El informe del periodo entrega ventas, compras y diferencia → test verde: para un periodo con ventas e compras conocidas, el IVA resultante es exactamente ventas menos compras descontables · Las compras sin factura no entran al descontable → test verde: una compra marcada sin factura no suma al IVA descontable pero sí al costo · El IVA no se recalcula desde el total → 0 líneas
 
 ### datos
 
@@ -498,6 +513,10 @@ Que el minimarket pueda cobrar: una venta se registra en el local, baja el inven
   - **Por qué:** Sin esto el dueño no sabe a quién reclamarle un faltante ni cuándo le subieron el precio, y descubre el aumento cuando ya pagó. Y el día que un proveedor deja de venir, nadie se acuerda de qué productos dependían de él hasta que los estantes están vacíos.
   - **Qué hacer:** (1) Cada producto sabe de qué proveedores puede venir, no de uno solo: la tienda de barrio compra lo mismo a quien lo tenga. (2) Registrar cada entrada de surtido con su proveedor, su fecha y el precio pagado — ese precio es el costo y es el que manda en los márgenes. (3) Guardar la historia del precio de compra: cuando cambie, se ve cuándo cambió y cuánto, no solo el valor de hoy. (4) Mostrar cada cuánto surte cada proveedor según lo que realmente pasó, no según lo que dijo que haría. (5) Dejar ver qué productos quedan sin fuente si un proveedor desaparece.
   - **Cómo se comprueba:** El costo de un producto es el de su última compra real → test verde: tras registrar una entrada más cara, el margen del producto baja en consecuencia · La historia de precios no se sobreescribe → test verde: tres cambios de precio dejan tres registros con su fecha · Se puede ver qué queda sin fuente → test verde: al desactivar un proveedor, lista los productos que se quedan sin otro
+- [ ] **T-107** Acumular los periodos que de verdad se declaran, no solo el día _(normal, 1-builder, 221k)_
+  - **Por qué:** Nadie declara diariamente: el IVA es cuatrimestral y los anticipos del Régimen Simple son bimestrales. Un sistema que solo guarda cierres diarios obliga a sumar 120 documentos a mano cada cuatro meses, que es exactamente el trabajo que se prometió quitar.
+  - **Qué hacer:** (1) Acumular por mes, por bimestre y por cuatrimestre, calculado desde los cierres diarios y no escrito aparte: un acumulado que se guarda suelto se desincroniza. (2) El acumulado de un periodo ya cerrado no cambia porque hoy entren más datos: si aparece una corrección, se ve como corrección con su fecha. (3) Mostrar el periodo que viene y cuántos días faltan, para que el dueño no se entere el día del vencimiento. (4) Cada acumulado se abre hasta los cierres diarios que lo componen, y cada cierre hasta sus ventas.
+  - **Cómo se comprueba:** El acumulado es igual a la suma de sus cierres → test verde: el acumulado del cuatrimestre es igual a la suma de los cierres diarios de esos días, al peso · Un periodo cerrado no se mueve → test verde: insertar datos de un periodo ya cerrado aparece como corrección fechada, no cambia el acumulado original
 
 ### frontend
 
