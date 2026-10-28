@@ -1,0 +1,33 @@
+{
+  "projectId": "la-villa",
+  "sessionCount": 1,
+  "totalContextSaved": 0,
+  "avgCompressionRatio": 1,
+  "avgKnowledgeDensity": 0,
+  "trendCompressionRatio": "Stable",
+  "lastUpdated": "2026-10-28T00:00:00.000Z",
+  "sessions": [
+    {
+      "sessionId": "session-2026-10-28-alta-del-cliente",
+      "runId": "la-villa-plan-v1",
+      "triggeredBy": "USER_REQUEST",
+      "startedAt": "2026-10-28T00:00:00.000Z",
+      "completedAt": "2026-10-28T00:00:00.000Z",
+      "objectsCreated": 8,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "notes": "Alta del cliente La Villa (minimarket) con catorce palabras de encargo. Entregado: repo prommter/la-villa-repo con README y HUECOS.md, memoria del proyecto, plan v13 de 91 tareas (12 propias + 79 cimientos del catalogo, modo genesis) y seccion propia en el sidebar. 5 de las 91 tareas ya hechas con evidencia (T-001 clon medido AL DIA, T-005 repo, T-006 memoria, T-007 huecos, T-008 cartera). Las 79 del catalogo quedaron bloqueadas tras la firma de T-003 para que nadie construya sobre una suposicion callada. Camino A (dar de alta a La Villa como empresa mas en la base de Mercaplaza) descartado por decision del dueno en el commit 24d1822 y confirmado tecnicamente con KN-002. Precio provisional de 600.000 COP/mes con piso de 250.000, con la contradiccion contrato-vs-cerebro sin cerrar y el dato de que el nicho publica 39.900-153.000.",
+      "measurement_mode": "MEASURED",
+      "modelOutcomes": [
+        { "phase": "traduccion", "model": "opus", "verdict": "ok", "tokens": 24711 },
+        { "phase": "biblioteca", "model": "haiku", "verdict": "ok", "tokens": 70786 },
+        { "phase": "arquitectura", "model": "opus", "verdict": "ok", "tokens": 77246 },
+        { "phase": "estrategia", "model": "sonnet", "verdict": "ok", "tokens": 93611 }
+      ]
+    }
+  ]
+}
