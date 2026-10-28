@@ -40,4 +40,5 @@ Cada investigación nueva se apunta aquí, la más reciente arriba.
 
 | Fecha | Tema | Para | Estado |
 |-------|------|------|--------|
+| 2026-10-28 | [Qué es la «Res.» del recibo viejo y si va en el nuevo](2026-10-28-res-recibo-mercaplaza/INFORME.md) | Mercaplaza · recibo de caja | terminada |
 | 2026-10-28 | [Qué declara a la DIAN un minimarket y cuál es la forma más eficiente](2026-10-28-dian-minimarket/INFORME.md) | Prommter · minimarket La Villa | terminada |
