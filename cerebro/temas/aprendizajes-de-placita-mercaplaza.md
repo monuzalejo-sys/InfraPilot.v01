@@ -61,3 +61,15 @@ enlace discreto para quien atiende, nunca un botón que compita. Se diseña prim
 para el vecino real: Android de gama media, datos limitados, 390 px, una mano y
 sol en la pantalla. El activo diferencial son las 20 siluetas SVG propias de los
 productos — ninguna competencia local tiene una vitrina ilustrada así.
+
+## Lección 6 — El recibo se mide en lo que la cabeza imprime, no en el papel (28-oct-2026)
+
+La impresora del puesto es una térmica de 58 mm («POS Printer Driver V8.10»,
+P58.GPD): marca 48 mm (384 puntos a 203 ppp). El recibo estaba hecho a 80 mm y
+salía mordido por los dos lados, sin las cifras de la derecha. Además,
+`@page { size: var(--x) auto }` era inválido (`var()` no entra a `@page` y `auto`
+no vale como alto) y el navegador lo botaba sin avisar. Sin cortador, el final
+del recibo se queda antes de la sierra y sale arriba del siguiente: hace falta
+avance en blanco al final. Arreglo en placita-repo#2: ancho imprimible (48/72 mm),
+58 de fábrica y `?rollo=80` por equipo. Para probar sin impresora, imprimir el
+recibo a PDF con CDP `Page.printToPDF` y `paperWidth` = 48 mm.
