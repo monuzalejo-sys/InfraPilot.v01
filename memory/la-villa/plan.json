@@ -1,19 +1,19 @@
 {
   "planId": "la-villa-2026-10-28",
   "projectId": "la-villa",
-  "version": 13,
+  "version": 19,
   "createdAt": "2026-10-28T05:50:49.567Z",
-  "updatedAt": "2026-10-28T15:37:35.063Z",
+  "updatedAt": "2026-10-28T16:04:17.678Z",
   "modo": "genesis",
   "objetivo": "Sistema de minimarket para La Villa, cliente de Prommter: caja que cobra sin depender de internet, inventario con surtido y proveedores, y acceso por puesto antes que por persona",
   "resumen": [
-    "La Villa es un minimarket, cliente nuevo de Prommter, y de él sabemos catorce palabras. Este plan NO construye el sistema: crea el proyecto y pone los cimientos, porque con lo que hay hoy cualquier pantalla saldría de un negocio inventado.",
-    "No es Villa Broaster. Ese es un asadero cuyas sedes están en el barrio Villa del Viento, y en esta casa ya se confundieron carpetas antes: Villa Broaster acabó con tres repos y dos obsoletos. El nombre se escribe siempre «La Villa», con artículo.",
-    "El sistema se derivará de placita (Mercaplaza), que lleva 241 archivos en producción con un dueño real usándolo a diario. Se hereda la arquitectura; nunca los datos, los precios, el dominio, los puertos ni la llave de despliegue.",
-    "La forma ya la decidió el dueño el 8 de septiembre: cada negocio con su propio dominio, comprado a su nombre, y varias instancias en un mismo VPS. Por eso La Villa tendrá base e instancia propias, y NO entra como una empresa más en la base de Mercaplaza — ese atajo está descartado por él, no por nosotros.",
-    "Las dos primeras tareas son un inventario: cuáles de los 241 archivos de placita entran en un minimarket y cuáles son de frutería (factura electrónica, DIAN, canastillas, pulpas, báscula al gramo). Sin ese inventario, La Villa nace con 132 archivos que nadie se atreverá a borrar.",
-    "Lo que falta para construir no es técnico, son respuestas: están las nueve en HUECOS.md. La que más pesa es una sola — ¿puede la caja dejar de vender mientras vuelve internet? Si la respuesta fuera «sí puede», el trabajo se reduce a la mitad.",
-    "91 tareas en este plan: 12 de encuadre y 79 de cimientos. El sistema completo, medido sobre este mismo perfil, son 313 tareas para que funcione y 825 para llegar a excelencia. Esos niveles entran cuando el dueño conteste, no antes."
+    "La Villa es un minimarket, cliente nuevo de Prommter. Se le va a ofrecer el PAQUETE COMPLETO de $1.000.000/mes: sistema + vitrina + marketing, juntos y no por separado, con mes 1 de cortesía y 11 cuotas.",
+    "No es Villa Broaster. Ese es un asadero del barrio Villa del Viento, y aquí ya se confundieron carpetas antes. El nombre se escribe siempre «La Villa», con artículo.",
+    "El sistema se deriva de placita (Mercaplaza, 241 archivos en producción) con base e instancia propias en el VPS que ya existe y dominio propio del cliente. Meterla como empresa más en la base de Mercaplaza está descartado por el dueño: el empresa_id de placita resuelve el inquilino en la conexión, así que una instancia sirve a una sola empresa.",
+    "Lo que el dueño pidió el 28 de octubre, además de la caja: el cierre del día con las bases separadas para la DIAN, los archivos del contador, el análisis de qué se mueve y qué está quieto, propuestas de promoción para lo quieto, control de proveedores, y un tablero en el celular intuitivo y colorido. Son las tareas T-092 a T-098.",
+    "Dos verdades que hay que decirle al cliente antes de prometerlas: el análisis de rotación NO sirve el primer día —necesita meses de ventas reales para no mentir— y el sistema produce el informe de la DIAN, pero declarar lo hace su contador.",
+    "El plan son 104 tareas: 19 propias y 85 cimientos del catálogo, modo génesis. Las de construcción están bloqueadas tras la firma del camino, a propósito: nadie construye sobre una suposición callada. Quedan seis huecos del negocio en HUECOS.md.",
+    "Advertencia de venta medida: el nicho publica precios de $39.900 a $153.000/mes con factura electrónica incluida. El millón es 6 a 25 veces más caro que un POS de estantería y no se defiende por funciones, sino por instancia y datos propios, caja que cobra sin internet, y alguien que contesta."
   ],
   "perfil": {
     "stack": [
@@ -23,7 +23,9 @@
     ],
     "superficies": [
       "caja",
-      "panel-interno"
+      "panel-interno",
+      "publico",
+      "movil"
     ],
     "entidades": [
       "Empresa",
@@ -33,14 +35,16 @@
       "Proveedor",
       "Producto",
       "Movimiento",
-      "Venta"
+      "Venta",
+      "Promocion",
+      "CierreDiario"
     ],
     "rutas": [],
     "roles": [
       "dueno",
       "trabajador"
     ],
-    "publico": false,
+    "publico": true,
     "dineroReal": true,
     "datosPersonales": true,
     "multiUsuario": true,
@@ -172,17 +176,54 @@
     {
       "id": "H4",
       "nombre": "Nada se construye sobre una suposición callada",
-      "criterio": "HUECOS.md tiene nueve preguntas o más, cada una marcada como ASUNCIÓN con quién la contesta, y no existe ningún dominio inventado en todo el repo.",
+      "criterio": "HUECOS.md tiene sus preguntas marcadas como ASUNCIÓN con quién las contesta, no existe ningún dominio inventado en el repo, y el registro visual está decidido antes de construir el panel.",
       "requiere": [
         "T-007",
         "T-011",
-        "T-012"
+        "T-012",
+        "T-098"
       ]
     },
     {
       "id": "H5",
+      "nombre": "El minimarket cobra",
+      "criterio": "El dueño cobra una venta real en su mostrador con el internet desconectado, el inventario baja, queda firmada por quien la hizo, y el cierre del día cuadra al peso contra la plata contada.",
+      "requiere": [
+        "T-092"
+      ]
+    },
+    {
+      "id": "H6",
+      "nombre": "El contador deja de teclear el mes a mano",
+      "criterio": "El dueño genera solo el archivo del mes, el contador lo importa en su software sin corregir nada, y el mismo mes regenerado meses después sale idéntico.",
+      "requiere": [
+        "T-093",
+        "T-092"
+      ]
+    },
+    {
+      "id": "H7",
+      "nombre": "El dueño compra surtido con datos en vez de intuición",
+      "criterio": "El análisis dice qué se mueve y qué está quieto con la plata parada en cada cosa, distingue 'no se vendió' de 'no había', y con pocos datos avisa en vez de dar un número que engaña. Las propuestas de promoción traen su cuenta y nunca bajan del costo.",
+      "requiere": [
+        "T-094",
+        "T-095",
+        "T-096"
+      ]
+    },
+    {
+      "id": "H8",
+      "nombre": "El dueño mira su negocio desde el celular",
+      "criterio": "La cifra del día se lee a 390 px sin desplazar ni acercar el teléfono, todo número se abre hasta las ventas que lo producen, el color no es el único indicio de estado, y sin nube muestra los datos locales con su aviso.",
+      "requiere": [
+        "T-097",
+        "T-098"
+      ]
+    },
+    {
+      "id": "H9",
       "nombre": "El siguiente cliente cuesta menos que este",
-      "criterio": "prommter/ALTA-DE-CLIENTE.md existe con diez pasos o más, cada uno citando su archivo, incluida la trampa de la deploy key y la lista de lo que nunca se hereda; y el tema de placita ya no afirma que su repo no está en la Mac.",
+      "criterio": "prommter/ALTA-DE-CLIENTE.md existe con diez pasos o más citando cada uno su archivo, incluida la trampa de la deploy key y lo que nunca se hereda; y el tema de placita ya no afirma que su repo no está en la Mac.",
       "requiere": [
         "T-010",
         "T-009"
@@ -4581,6 +4622,646 @@
       "cerebro": [
         "tema:acceso-roles-y-puestos"
       ]
+    },
+    {
+      "id": "T-092",
+      "arquetipo": null,
+      "dependeDe": [
+        "T-003"
+      ],
+      "intocable": [],
+      "posee": [
+        "lib/dominio/cierre-diario.ts",
+        "lib/dominio/impuestos.ts",
+        "app/(app)/cierre/**"
+      ],
+      "cerebro": [
+        "tema:invariantes-contables",
+        "tema:caja-y-turnos",
+        "tema:documentos-para-personas"
+      ],
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "nivel": "N1",
+      "categoria": "backend",
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "titulo": "Cierre diario con las bases separadas tal como el contador las necesita",
+      "porQue": "Es la promesa que el dueño de Prommter ya le hizo al cliente: «va a tener separado todo lo que tiene que declarar al final del día». Si el cierre suma todo en un solo total, el contador tiene que desarmarlo a mano cada mes y la promesa queda incumplida; si separa mal las bases, el cliente declara mal y la multa es suya.",
+      "queHacer": [
+        "Cada producto lleva su tarifa de impuesto como dato del producto, no como cálculo al vender: excluido, exento, 5 %, 19 % e impuesto al consumo si aplica.",
+        "El cierre del día agrupa las ventas por tarifa y entrega, por cada una: base gravable, impuesto y total — más el gran total que tiene que cuadrar con la plata contada en la caja.",
+        "Separar también por medio de pago (efectivo, tarjeta, transferencia) porque es lo que permite cuadrar la caja contra el banco.",
+        "El cierre queda guardado como documento del día, con su número consecutivo, y NO se puede editar después: si hay un error, se corrige con otro documento que lo referencia.",
+        "Seguir lo que diga investigacion/2026-10-28-dian-minimarket/INFORME.md sobre qué informe usa de verdad el contador y con qué periodicidad; si el informe dice que el cierre diario es solo insumo y la declaración va sobre otra cosa, construir lo que pide el informe y no lo que suena bien.",
+        "Escribir en la pantalla, visible para el dueño del minimarket, que el sistema produce el informe y que declarar lo hace su contador."
+      ],
+      "aceptacion": [
+        {
+          "check": "Las bases por tarifa suman exactamente el total del día",
+          "comando": "npm test -- cierre-diario",
+          "espera": "test verde: para un día con ventas de 0 %, 5 % y 19 % mezcladas, la suma de bases más impuestos es igual al total cobrado, al peso"
+        },
+        {
+          "check": "Un cierre ya emitido no se puede editar",
+          "comando": "npm test -- cierre-inmutable",
+          "espera": "test verde: el intento de modificar un cierre emitido es rechazado y queda registrado"
+        },
+        {
+          "check": "La pantalla dice quién declara",
+          "comando": "grep -ril \"lo declara su contador\\|declarar lo hace\" app/\\(app\\)/cierre/",
+          "espera": "1+ líneas"
+        }
+      ],
+      "modelo": "opus",
+      "presupuesto": 277000
+    },
+    {
+      "id": "T-093",
+      "arquetipo": null,
+      "dependeDe": [
+        "T-003",
+        "T-092"
+      ],
+      "intocable": [],
+      "posee": [
+        "lib/dominio/exportar-contador.ts",
+        "app/api/exportar/**"
+      ],
+      "cerebro": [
+        "tema:documentos-para-personas",
+        "tema:invariantes-contables"
+      ],
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "nivel": "N1",
+      "categoria": "datos",
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "titulo": "Exportar el archivo que el contador abre sin pelear con él",
+      "porQue": "Un informe que el contador no puede importar lo obliga a teclear el mes entero a mano, y entonces el sistema le añadió trabajo en vez de quitárselo. El ecosistema ya pagó esta lección en otra forma: una fórmula de Excel sin su valor precalculado se pierde en silencio.",
+      "queHacer": [
+        "Preguntarle al contador del cliente qué software usa (Siigo, World Office, Helisa u otro) y qué formato importa; mientras no se sepa, exportar CSV con separador y codificación que Excel colombiano abre sin romper tildes.",
+        "Un archivo por mes con una fila por documento: fecha, consecutivo, base por cada tarifa, impuesto, total, medio de pago.",
+        "Toda celda calculada lleva su valor escrito, nunca una fórmula: un archivo con fórmulas se rompe al abrirlo en otro programa.",
+        "El mismo archivo se puede volver a generar tal cual meses después y sale idéntico: los informes del pasado no cambian porque hoy haya más datos.",
+        "Dejar un botón que lo genere el dueño solo, sin pedírnoslo a nosotros ni al contador."
+      ],
+      "aceptacion": [
+        {
+          "check": "El archivo de un mes cerrado se regenera idéntico",
+          "comando": "npm test -- exportar-contador-estable",
+          "espera": "test verde: dos generaciones del mismo mes producen archivos byte a byte iguales"
+        },
+        {
+          "check": "No hay fórmulas en el archivo",
+          "comando": "npm test -- exportar-sin-formulas",
+          "espera": "test verde: ninguna celda empieza por '='"
+        },
+        {
+          "check": "Las tildes sobreviven",
+          "comando": "npm test -- exportar-codificacion",
+          "espera": "test verde: un producto llamado 'Panela orgánica' se lee igual tras exportar e importar"
+        }
+      ],
+      "modelo": "sonnet",
+      "presupuesto": 221000
+    },
+    {
+      "id": "T-094",
+      "arquetipo": null,
+      "dependeDe": [
+        "T-003"
+      ],
+      "intocable": [],
+      "posee": [
+        "lib/dominio/rotacion.ts",
+        "app/(app)/analisis/**"
+      ],
+      "cerebro": [
+        "tema:verificar-con-evidencia",
+        "tema:cero-datos-inventados"
+      ],
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "nivel": "N2",
+      "categoria": "datos",
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "titulo": "Decir qué se mueve y qué está quieto, con la plata que cada uno representa",
+      "porQue": "El dueño del minimarket compra surtido con su intuición y se equivoca en los dos extremos: se le agota lo que más vende y se le queda plata dormida en lo que nadie compra. Sin este análisis, cada pedido al proveedor es una apuesta. ATENCIÓN: esto NO sirve el primer día — necesita meses de ventas reales para decir algo verdadero.",
+      "queHacer": [
+        "Clasificar los productos por rotación con la plata que mueven, no solo por unidades: el que vende 200 bolsas de 500 pesos no es lo mismo que el que vende 3 cosas de 40.000.",
+        "Marcar explícitamente los productos QUIETOS: cuántos días sin una sola venta, y cuánta plata hay parada en ellos.",
+        "Separar 'no se vende' de 'no había': un producto agotado tres semanas no es un producto que nadie quiere, y confundirlos hace que el dueño deje de comprar lo que sí se vendía.",
+        "No mostrar ninguna conclusión antes de tener datos suficientes: si el periodo es corto, la pantalla lo dice con las palabras del negocio en vez de dar un número que engaña.",
+        "Cada cifra se puede abrir hasta las ventas que la producen: un número que no se puede auditar no se le cree."
+      ],
+      "aceptacion": [
+        {
+          "check": "Con pocos datos, no inventa conclusiones",
+          "comando": "npm test -- rotacion-datos-insuficientes",
+          "espera": "test verde: con menos del periodo mínimo declarado, devuelve el aviso de datos insuficientes y ningún ranking"
+        },
+        {
+          "check": "Distingue agotado de no vendido",
+          "comando": "npm test -- rotacion-agotados",
+          "espera": "test verde: un producto sin existencia durante el periodo no aparece como producto quieto"
+        },
+        {
+          "check": "La plata parada cuadra con el inventario",
+          "comando": "npm test -- rotacion-plata-parada",
+          "espera": "test verde: la suma de la plata en productos quietos es igual a existencia por costo de esos productos"
+        }
+      ],
+      "modelo": "opus",
+      "presupuesto": 277000
+    },
+    {
+      "id": "T-095",
+      "arquetipo": null,
+      "dependeDe": [
+        "T-003",
+        "T-094"
+      ],
+      "intocable": [],
+      "posee": [
+        "lib/dominio/promociones.ts",
+        "app/(app)/promociones/**"
+      ],
+      "cerebro": [
+        "tema:invertir-formulas-redondeadas",
+        "tema:cero-datos-inventados"
+      ],
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "nivel": "N2",
+      "categoria": "producto",
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "titulo": "Proponer promociones de lo que está quieto, con la cuenta hecha",
+      "porQue": "Una sugerencia de promoción sin la cuenta detrás es una corazonada con tipografía bonita: puede hacer que el dueño venda por debajo del costo y pierda plata creyendo que la está recuperando. La promoción solo sirve si dice cuánto se deja de ganar y para qué.",
+      "queHacer": [
+        "Proponer solo sobre productos que el análisis de rotación marcó quietos y que tengan existencia real que valga la pena mover.",
+        "Cada propuesta lleva su cuenta visible: costo, precio actual, precio propuesto, cuánto se deja de ganar por unidad y cuántas unidades hay que mover para que valga la pena.",
+        "Nunca proponer un precio por debajo del costo: ese límite se comprueba en el servidor, no se confía a la pantalla.",
+        "Priorizar lo que además está cerca de vencerse, si el producto tiene fecha: ahí la pérdida es segura si no se mueve.",
+        "La propuesta se acepta o se descarta con un toque, y queda registrado qué se hizo con ella: una sugerencia que nadie mide no se vuelve a mirar.",
+        "Medir después: si la promoción se aplicó, decir si movió el producto o no."
+      ],
+      "aceptacion": [
+        {
+          "check": "Nunca propone vender por debajo del costo",
+          "comando": "npm test -- promocion-piso-de-costo",
+          "espera": "test verde: toda propuesta tiene precio propuesto mayor que el costo, y el intento de forzar uno menor es rechazado en el servidor"
+        },
+        {
+          "check": "Cada propuesta trae su cuenta completa",
+          "comando": "npm test -- promocion-cuenta-visible",
+          "espera": "test verde: ninguna propuesta se emite sin costo, precio actual, precio propuesto y margen resultante"
+        },
+        {
+          "check": "Se mide si funcionó",
+          "comando": "npm test -- promocion-resultado",
+          "espera": "test verde: una promoción aplicada y vencida reporta unidades movidas antes y después"
+        }
+      ],
+      "modelo": "opus",
+      "presupuesto": 277000
+    },
+    {
+      "id": "T-096",
+      "arquetipo": null,
+      "dependeDe": [
+        "T-003"
+      ],
+      "intocable": [],
+      "posee": [
+        "lib/dominio/proveedores.ts",
+        "app/(app)/proveedores/**"
+      ],
+      "cerebro": [
+        "tema:donde-vive-el-dato",
+        "tema:dominio-migraciones-y-copias"
+      ],
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "nivel": "N1",
+      "categoria": "datos",
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "titulo": "Llevar el control de proveedores: quién surte qué, cada cuánto y a qué precio",
+      "porQue": "Sin esto el dueño no sabe a quién reclamarle un faltante ni cuándo le subieron el precio, y descubre el aumento cuando ya pagó. Y el día que un proveedor deja de venir, nadie se acuerda de qué productos dependían de él hasta que los estantes están vacíos.",
+      "queHacer": [
+        "Cada producto sabe de qué proveedores puede venir, no de uno solo: la tienda de barrio compra lo mismo a quien lo tenga.",
+        "Registrar cada entrada de surtido con su proveedor, su fecha y el precio pagado — ese precio es el costo y es el que manda en los márgenes.",
+        "Guardar la historia del precio de compra: cuando cambie, se ve cuándo cambió y cuánto, no solo el valor de hoy.",
+        "Mostrar cada cuánto surte cada proveedor según lo que realmente pasó, no según lo que dijo que haría.",
+        "Dejar ver qué productos quedan sin fuente si un proveedor desaparece."
+      ],
+      "aceptacion": [
+        {
+          "check": "El costo de un producto es el de su última compra real",
+          "comando": "npm test -- proveedor-costo-vigente",
+          "espera": "test verde: tras registrar una entrada más cara, el margen del producto baja en consecuencia"
+        },
+        {
+          "check": "La historia de precios no se sobreescribe",
+          "comando": "npm test -- proveedor-historia-precios",
+          "espera": "test verde: tres cambios de precio dejan tres registros con su fecha"
+        },
+        {
+          "check": "Se puede ver qué queda sin fuente",
+          "comando": "npm test -- proveedor-productos-huerfanos",
+          "espera": "test verde: al desactivar un proveedor, lista los productos que se quedan sin otro"
+        }
+      ],
+      "modelo": "sonnet",
+      "presupuesto": 221000
+    },
+    {
+      "id": "T-097",
+      "arquetipo": null,
+      "dependeDe": [
+        "T-003",
+        "T-098"
+      ],
+      "intocable": [],
+      "posee": [
+        "app/(app)/principal/**",
+        "lib/dominio/metricas-dia.ts"
+      ],
+      "cerebro": [
+        "tema:pantalla-publica",
+        "tema:verdad-visual",
+        "tema:la-caja-no-puede-parar"
+      ],
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "nivel": "N1",
+      "categoria": "frontend",
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "titulo": "El tablero que el dueño mira en el celular y entiende en diez segundos",
+      "porQue": "El dueño de un minimarket no se sienta a leer informes: mira el celular entre cliente y cliente. Un tablero con veinte cifras no se lee, y uno con cifras que no puede comprobar no se cree. Si no entiende la pantalla en diez segundos, deja de abrirla y el sistema se vuelve solo una caja.",
+      "queHacer": [
+        "Decidir con el dueño del minimarket CUÁLES son las cifras que mira todos los días, y que sean pocas: lo vendido hoy contra ayer, la plata en caja, lo que se está agotando, lo que está quieto. Una pantalla con todo no dice nada.",
+        "Diseñar primero para un celular de gama media a 390 px, y que la cifra principal se lea sin acercar el teléfono.",
+        "Todo número se puede tocar y abre de dónde salió: la cifra que no se puede auditar no se le cree a nadie.",
+        "El color comunica estado y nada más —lo que está bien, lo que hay que mirar, lo que urge—, y nunca es el único indicio: el que ve poco los colores también tiene que entenderlo.",
+        "Estados completos: qué muestra un día sin ventas todavía, qué muestra cuando no hay datos suficientes, y qué muestra si la nube no responde (la caja sigue cobrando).",
+        "Medir la pantalla antes de opinar sobre ella: tomar la medida del pliegue a 390 px y decir cuántos toques hacen falta para llegar a cada cifra."
+      ],
+      "aceptacion": [
+        {
+          "check": "La cifra principal cabe sin desplazar a 390 px",
+          "comando": "node tools/edge-cdp.mjs --ruta /principal --ancho 390 --medir-pliegue",
+          "espera": "la cifra del día queda por encima del pliegue, medido, no estimado"
+        },
+        {
+          "check": "Toda cifra se puede abrir hasta su origen",
+          "comando": "npm test -- metricas-auditables",
+          "espera": "test verde: cada tarjeta del tablero expone el enlace a las ventas que la componen"
+        },
+        {
+          "check": "El color no es el único indicio de estado",
+          "comando": "npm test -- tablero-estado-sin-color",
+          "espera": "test verde: cada estado trae además texto o icono"
+        },
+        {
+          "check": "Funciona sin nube",
+          "comando": "npm test -- tablero-sin-nube",
+          "espera": "test verde: sin conexión muestra los datos locales y un aviso, no una pantalla en blanco"
+        }
+      ],
+      "modelo": "opus",
+      "presupuesto": 277000
+    },
+    {
+      "id": "T-098",
+      "arquetipo": null,
+      "dependeDe": [
+        "T-003"
+      ],
+      "intocable": [],
+      "posee": [
+        "prommter/la-villa-repo/docs/registro-visual.md"
+      ],
+      "cerebro": [
+        "tema:aprendizajes-de-placita-mercaplaza",
+        "tema:generadores-de-diseno",
+        "tema:verdad-visual"
+      ],
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "nivel": "N1",
+      "categoria": "producto",
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "titulo": "Decidir el registro visual del panel antes de construirlo: colorido sin volverlo ilegible",
+      "porQue": "El dueño pidió que sea «lo más intuitivo posible, colorido», y el manifiesto visual de la casa —el estudio del ingeniero moderno— gobierna justo el interior de la app con lo contrario: sobrio y con aire. Esa tensión ya se pagó una vez en placita, cuando el dueño rechazó una portada minimalista con las palabras «es una basura». Si no se decide ANTES, se construye el panel dos veces.",
+      "queHacer": [
+        "Escribir la frontera: qué manda el manifiesto y dónde manda el colorido. La lección de placita separa la PORTADA (vender, dar antojo) del INTERIOR (donde alguien trabaja seis horas) — pero aquí el dueño pide color en el interior, así que la frontera hay que redibujarla a propósito.",
+        "Proponer la salida concreta: estructura y tipografía sobrias para que la cifra se lea, y el color cargado reservado al ESTADO (bien, mirar, urgente) y a distinguir los módulos entre sí.",
+        "Fijar la paleta con contraste MEDIDO, no a ojo: cada par de color y fondo con su número, porque el celular se mira a la luz del mostrador.",
+        "Llevarle al dueño del minimarket dos opciones en pantalla real para que elija, en vez de discutirlo en palabras: la lección de placita dice que un encargo con adjetivos deja la página igual.",
+        "Dejar la decisión escrita en el código, no solo en un documento, para que ningún rediseño posterior la deshaga."
+      ],
+      "aceptacion": [
+        {
+          "check": "La frontera entre sobrio y colorido está escrita y es accionable",
+          "comando": "grep -ciE \"color.*estado|estado.*color\" prommter/la-villa-repo/docs/registro-visual.md",
+          "espera": "1+ líneas, diciendo qué usa color y qué no"
+        },
+        {
+          "check": "Cada par de color lleva su contraste medido",
+          "comando": "grep -cE \"[0-9]+[.,][0-9]+ *: *1|ratio\" prommter/la-villa-repo/docs/registro-visual.md",
+          "espera": "4 o más mediciones, no adjetivos"
+        },
+        {
+          "check": "Está registrada la tensión con el manifiesto y cómo se resuelve",
+          "comando": "grep -ci \"ingeniero moderno\" prommter/la-villa-repo/docs/registro-visual.md",
+          "espera": "1 o más"
+        }
+      ],
+      "modelo": "sonnet",
+      "presupuesto": 221000
+    },
+    {
+      "id": "T-099",
+      "titulo": "Dar a CierreDiario su tabla, su clave primaria y su índice en la misma migración",
+      "categoria": "datos",
+      "nivel": "N0",
+      "arquetipo": "dat.modelo.entidad-nueva-trae-tabla-clave-e-indice",
+      "_clave": "dat.modelo.entidad-nueva-trae-tabla-clave-e-indice#CierreDiario",
+      "porQue": "Una entidad que llega sin su propia migración se improvisa encima de otra tabla o vive en una columna suelta: el día que CierreDiario necesita su propio filtro, separar filas ya mezcladas con las de otra cosa cuesta una migración de emergencia contra datos reales.",
+      "queHacer": [
+        "Crear la migración de CierreDiario con su propia tabla, nunca como columnas añadidas a otra que ya existía.",
+        "Declarar la clave primaria y al menos un índice sobre la columna por la que de verdad se va a filtrar (sede, estado o fecha de negocio).",
+        "Nombrar la tabla como el dueño llama a CierreDiario, no como la bautizó el primer builder.",
+        "Aplicar la migración contra una base vacía antes de escribir la primera pantalla que la usa."
+      ],
+      "posee": [
+        "supabase/migrations/**",
+        "docs/modelo-de-datos.md"
+      ],
+      "intocable": [],
+      "dependeDe": [],
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "modelo": "sonnet",
+      "aceptacion": [
+        {
+          "check": "CierreDiario tiene su propia migración",
+          "comando": "grep -rl 'CierreDiario' supabase/migrations/*.sql | wc -l",
+          "espera": "1+ archivos"
+        },
+        {
+          "check": "La migración declara clave primaria e índice",
+          "comando": null,
+          "espera": "el archivo de CierreDiario tiene PRIMARY KEY y al menos un CREATE INDEX; se cita la línea"
+        }
+      ],
+      "presupuesto": 221000,
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "T-100",
+      "titulo": "Dar a Promocion su tabla, su clave primaria y su índice en la misma migración",
+      "categoria": "datos",
+      "nivel": "N0",
+      "arquetipo": "dat.modelo.entidad-nueva-trae-tabla-clave-e-indice",
+      "_clave": "dat.modelo.entidad-nueva-trae-tabla-clave-e-indice#Promocion",
+      "porQue": "Una entidad que llega sin su propia migración se improvisa encima de otra tabla o vive en una columna suelta: el día que Promocion necesita su propio filtro, separar filas ya mezcladas con las de otra cosa cuesta una migración de emergencia contra datos reales.",
+      "queHacer": [
+        "Crear la migración de Promocion con su propia tabla, nunca como columnas añadidas a otra que ya existía.",
+        "Declarar la clave primaria y al menos un índice sobre la columna por la que de verdad se va a filtrar (sede, estado o fecha de negocio).",
+        "Nombrar la tabla como el dueño llama a Promocion, no como la bautizó el primer builder.",
+        "Aplicar la migración contra una base vacía antes de escribir la primera pantalla que la usa."
+      ],
+      "posee": [
+        "supabase/migrations/**",
+        "docs/modelo-de-datos.md"
+      ],
+      "intocable": [],
+      "dependeDe": [],
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "modelo": "sonnet",
+      "aceptacion": [
+        {
+          "check": "Promocion tiene su propia migración",
+          "comando": "grep -rl 'Promocion' supabase/migrations/*.sql | wc -l",
+          "espera": "1+ archivos"
+        },
+        {
+          "check": "La migración declara clave primaria e índice",
+          "comando": null,
+          "espera": "el archivo de Promocion tiene PRIMARY KEY y al menos un CREATE INDEX; se cita la línea"
+        }
+      ],
+      "presupuesto": 221000,
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "T-101",
+      "titulo": "Declarar en la base la clave foránea de CierreDiario hacia sus padres reales",
+      "categoria": "datos",
+      "nivel": "N0",
+      "arquetipo": "dat.integridad.clave-foranea-declarada-en-la-base",
+      "_clave": "dat.integridad.clave-foranea-declarada-en-la-base#CierreDiario",
+      "porQue": "Sin una FK real, borrar la sede deja gastos apuntando a un local_id que ya no existe: la pantalla que junta gasto con sede muestra fila vacía o revienta, y para cuando alguien lo nota ya hay cientos de registros huérfanos sin fecha clara de origen.",
+      "queHacer": [
+        "Declarar REFERENCES en la base para toda columna de CierreDiario que apunte a otra tabla, no solo mantener la convención en el código.",
+        "Elegir el comportamiento ON DELETE a propósito para cada relación, sin dejar el valor por defecto sin revisar.",
+        "Migrar primero los datos existentes que ya tengan una referencia rota, decidiendo con el dueño qué hacer con cada una.",
+        "Probar que un INSERT de CierreDiario con un padre inexistente lo rechaza la base."
+      ],
+      "posee": [
+        "supabase/migrations/**",
+        "tests/datos/fk-CierreDiario.test.ts"
+      ],
+      "intocable": [],
+      "dependeDe": [],
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "modelo": "sonnet",
+      "aceptacion": [
+        {
+          "check": "CierreDiario declara sus claves foráneas en la base",
+          "comando": "grep -A 20 'create table.*CierreDiario' supabase/migrations/*.sql | grep -c references",
+          "espera": "1+ por cada relación real"
+        },
+        {
+          "check": "Un padre inexistente se rechaza al crear CierreDiario",
+          "comando": "npm test -- fk-CierreDiario",
+          "espera": "exit 0"
+        }
+      ],
+      "presupuesto": 221000,
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "T-102",
+      "titulo": "Declarar en la base la clave foránea de Promocion hacia sus padres reales",
+      "categoria": "datos",
+      "nivel": "N0",
+      "arquetipo": "dat.integridad.clave-foranea-declarada-en-la-base",
+      "_clave": "dat.integridad.clave-foranea-declarada-en-la-base#Promocion",
+      "porQue": "Sin una FK real, borrar la sede deja gastos apuntando a un local_id que ya no existe: la pantalla que junta gasto con sede muestra fila vacía o revienta, y para cuando alguien lo nota ya hay cientos de registros huérfanos sin fecha clara de origen.",
+      "queHacer": [
+        "Declarar REFERENCES en la base para toda columna de Promocion que apunte a otra tabla, no solo mantener la convención en el código.",
+        "Elegir el comportamiento ON DELETE a propósito para cada relación, sin dejar el valor por defecto sin revisar.",
+        "Migrar primero los datos existentes que ya tengan una referencia rota, decidiendo con el dueño qué hacer con cada una.",
+        "Probar que un INSERT de Promocion con un padre inexistente lo rechaza la base."
+      ],
+      "posee": [
+        "supabase/migrations/**",
+        "tests/datos/fk-Promocion.test.ts"
+      ],
+      "intocable": [],
+      "dependeDe": [],
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "modelo": "sonnet",
+      "aceptacion": [
+        {
+          "check": "Promocion declara sus claves foráneas en la base",
+          "comando": "grep -A 20 'create table.*Promocion' supabase/migrations/*.sql | grep -c references",
+          "espera": "1+ por cada relación real"
+        },
+        {
+          "check": "Un padre inexistente se rechaza al crear Promocion",
+          "comando": "npm test -- fk-Promocion",
+          "espera": "exit 0"
+        }
+      ],
+      "presupuesto": 221000,
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "T-103",
+      "titulo": "Confirmar si el hosting borra los archivos que el proyecto escribe en disco",
+      "categoria": "operacion",
+      "nivel": "N0",
+      "arquetipo": "ops.persistencia.detectar-disco-efimero-antes-de-publicar",
+      "_clave": "ops.persistencia.detectar-disco-efimero-antes-de-publicar",
+      "porQue": "Un hosting serverless reinicia el sistema de archivos en cada despliegue: lo que el proyecto haya escrito en disco —un JSON local, imágenes subidas— desaparece en el siguiente deploy. Un proyecto real de esta casa lo descubrió tarde, después de que ya había datos ahí.",
+      "queHacer": [
+        "Revisar el código buscando toda escritura a disco: fs.writeFile, fs.appendFile, un JSON en data/, subida de imágenes a una carpeta local.",
+        "Confirmar en la documentación del proveedor de hosting elegido si su sistema de archivos es persistente o efímero.",
+        "Si es efímero y el proyecto escribe algo que tiene que sobrevivir, moverlo a una base de datos o almacenamiento de objetos ANTES de publicar, no después del primer dato perdido.",
+        "Dejar la decisión escrita: hosting elegido, si su disco es persistente o no, con la fuente."
+      ],
+      "posee": [
+        "docs/persistencia.md"
+      ],
+      "intocable": [],
+      "dependeDe": [],
+      "dificultad": "hard",
+      "ceremonia": "1-builder",
+      "modelo": "opus",
+      "aceptacion": [
+        {
+          "check": "Toda escritura a disco del proyecto está identificada y clasificada",
+          "comando": "grep -rnE \"writeFileSync|appendFileSync|createWriteStream|\\bwriteFile\\(|\\bappendFile\\(\" --include=*.ts --include=*.js --exclude-dir=node_modules --exclude-dir=.next .",
+          "espera": "cada resultado tiene su fila en docs/persistencia.md diciendo a dónde va en producción. El patrón incluye `writeFile(` a secas a propósito: node:fs/promises se importa suelto (`await writeFile(...)`) y un grep sobre `fs.writeFile` NO lo ve. Medido en villa-broaster 2026-08-27: el patrón anterior devolvía solo el cerrojo —justo lo único que NO tiene que sobrevivir a un reinicio— y dejaba fuera las dos escrituras que son el negocio."
+        },
+        {
+          "check": "La naturaleza del disco del hosting elegido está documentada con fuente",
+          "comando": "grep -nE \"efímero|efimero|persistente\" docs/persistencia.md",
+          "espera": "1+ líneas con URL de la documentación oficial del proveedor. Se usan alternativas literales y no una clase `[ií]`: en UTF-8 la clase compara byte a byte y no casa con la vocal acentuada (medido: `grep \"ef[ií]mero\"` sobre la palabra «efímero» devuelve 0)."
+        }
+      ],
+      "presupuesto": 277000,
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "cerebro": [
+        "tema:donde-vive-el-dato"
+      ]
+    },
+    {
+      "id": "T-104",
+      "titulo": "Publicar el proyecto y confirmar que responde desde internet, no solo local",
+      "categoria": "operacion",
+      "nivel": "N0",
+      "arquetipo": "ops.despliegue.primer-despliegue-real",
+      "_clave": "ops.despliegue.primer-despliegue-real",
+      "porQue": "De los proyectos de esta casa, casi ninguno ha sido desplegado de verdad a internet — 'definir hosting' lleva bloqueado como pendiente en más de uno. Un proyecto que solo corre en localhost es una demo, no un proyecto en producción.",
+      "queHacer": [
+        "Confirmar con el dueño el proveedor de hosting elegido (esta tarea no impone cuál).",
+        "Configurar el despliegue desde el repo o subir el build manualmente, según el proveedor.",
+        "Confirmar que el sitio responde desde una red distinta a la de esta máquina, por ejemplo un celular con datos móviles.",
+        "Anotar la URL real de producción en docs/despliegue.md."
+      ],
+      "posee": [
+        "docs/despliegue.md"
+      ],
+      "intocable": [],
+      "dependeDe": [],
+      "dificultad": "normal",
+      "ceremonia": "1-builder",
+      "modelo": "sonnet",
+      "aceptacion": [
+        {
+          "check": "El sitio responde desde internet, no solo localhost",
+          "comando": "curl -s -o /dev/null -w \"%{http_code}\" https://<url-real>",
+          "espera": "200 (o el código esperado de la ruta pública)"
+        },
+        {
+          "check": "La URL de producción está documentada",
+          "comando": "grep -n \"https://\" docs/despliegue.md",
+          "espera": "1+ líneas"
+        }
+      ],
+      "presupuesto": 221000,
+      "estado": "pendiente",
+      "bloqueadoPor": null,
+      "evidencia": null,
+      "gastoReal": null,
+      "cerebro": [
+        "tema:entorno-de-la-maquina"
+      ]
     }
   ],
   "escalabilidad": [
@@ -4625,26 +5306,27 @@
     "costoEstimadoCOP": 232000,
     "horasEquivalentes": 53,
     "precioSugerido": {
-      "modelo": "mensualidad",
-      "montoCOP": 600000,
+      "modelo": "mensualidad con permanencia (paquete integral del contrato)",
+      "montoCOP": 1000000,
       "permanenciaMeses": 12,
       "incluye": [
-        "Caja (cobro por unidad, cierre de turno, trabaja sin internet y sincroniza) y panel del dueño, alcance N0+N1 'que funciona' del plan la-villa",
-        "Instancia propia en el VPS de Prommter (srv1854367), subdominio temporal prommter.online hasta que exista el dominio del cliente",
-        "Respaldos, actualizaciones, hosting y administración técnica del dominio (contrato 11.6)",
-        "Soporte por WhatsApp en horario pactado y cambios pequeños cada mes",
-        "Reporte mensual de cómo va el negocio",
-        "Mes 1 de cortesía y puesta en marcha (11 cuotas pagadas, mismo mecanismo del contrato vigente)",
-        "Datos del cliente entregables en CSV/JSON al terminar (contrato 14.x)"
+        "PAQUETE COMPLETO decidido por el dueno el 2026-10-28: sistema + vitrina + marketing, juntos y no por separado (contrato 3.4)",
+        "Caja que cobra sin internet, inventario, cierre de turno y acceso por puesto",
+        "Cierre diario con las bases separadas por tarifa para la DIAN (promesa hecha al cliente; el sistema produce el informe, declarar lo hace su contador)",
+        "Archivo mensual para el contador, regenerable y sin formulas",
+        "Analisis de rotacion (que se mueve y que esta quieto, con la plata parada) y propuestas de promocion con su cuenta",
+        "Control de proveedores con historia de precios de compra",
+        "Tablero en el celular con las cifras del dia, auditables tocandolas",
+        "Instancia propia en el VPS, respaldos, hosting y administracion tecnica del dominio",
+        "Mes 1 de cortesia y 11 cuotas = 11.000.000 el primer ano, permanencia 12 meses, penalidad 2.000.000",
+        "Datos entregables en CSV/JSON al terminar"
       ],
       "noIncluye": [
-        "Vitrina pública, marketing y grabación semanal (el integral de $1.000.000/mes los incluye; este precio NO)",
-        "Factura electrónica DIAN y su costo por documento",
-        "Domicilios, venta por peso/báscula, suscripción, multi-local",
-        "Compra y renovación del dominio (a cargo y a nombre del cliente; .com.co 91.900 COP/año de renovación en Hostinger CO)",
-        "Hardware: computador/tablet, lector de código de barras, impresora térmica, datáfono",
-        "Migración de datos viejos (inventario o ventas previas) y capacitación más allá de la entrega",
-        "Módulos de N2-N4 (aguantar, escalar, excelencia) y cualquier integración con terceros: se cotizan por disparador",
+        "Factura electronica DIAN como tal y su costo por documento: ALCANCE PENDIENTE de la investigacion de investigacion/2026-10-28-dian-minimarket",
+        "Compra y renovacion del dominio (a nombre del cliente)",
+        "Hardware: computador, lector de codigo de barras, impresora termica, datafono",
+        "Migracion de datos viejos y capacitacion mas alla de la entrega",
+        "Venta por peso con bascula, domicilios y multi-local: cada uno tiene su disparador en escalabilidad",
         "IVA: si Prommter es responsable, se adiciona 19 % (contrato 5.3)"
       ]
     },
@@ -4693,6 +5375,9 @@
       }
     ],
     "supuestos": [
+      "ADVERTENCIA DE VENTA que el dueno debe tener presente: el nicho publica precios de 39.900 a 153.000 COP/mes con factura electronica incluida (Tin Pos, POS Colombia, Posdata, Scrampi). El paquete de 1.000.000 es 6 a 25 veces mas caro que un POS de estanteria y no se defiende por funciones, sino por instancia y datos propios, dominio del cliente, caja que cobra sin internet, vitrina y marketing incluidos, y alguien que contesta.",
+      "ALCANCE AMPLIADO el 2026-10-28 por pedido del dueno: cierre diario para la DIAN, archivos para el contador, analisis de rotacion con sugerencias de promocion, control de proveedores, tablero movil y registro visual colorido. Son 7 tareas nuevas (T-092 a T-098) y mueven el plan de 91 a 104 tareas y el presupuesto de 15,70 a 18,85 M tokens solo en N0. El analisis de rotacion y las promociones son N2: NO sirven el primer dia, necesitan meses de ventas reales.",
+      "PRECIO DECIDIDO POR EL DUENO el 2026-10-28: paquete completo de 1.000.000 COP/mes, la lectura A del contrato vigente (sistema + vitrina + marketing). Queda descartada la lectura B de escalones del cerebro y el precio de 600.000 solo-sistema que se habia propuesto. Mecanica del contrato: mes 1 gratis, 11 cuotas = 11.000.000, permanencia 12 meses, penalidad 2.000.000.",
       "ESCENARIO COTIZADO: el precio cubre alcance N0+N1 ('que funciona': cobra una venta real sin internet, baja inventario, cierre cuadra) = 313 tareas / 62,6 M tokens medidos por el generador del plan para este perfil. costoTokens=15.697.000 es solo N0 (91 tareas, suma de presupuesto de plan.json, medido); N0+N1 = 62,6 M y completo N0-N4 = 205 M (825 tareas) van aparte, no se suman. N2 (aguanta) a N4 no están en el precio.",
       "TARIFA (citado, 2026-10-28, platform.claude.com/docs/en/about-claude/pricing, USD por millón de tokens, entrada/salida): Opus 5.5 4/20; Sonnet 5.5 2/10; Haiku 5.5 0,10/0,50. Tiers asignados por dificultad de la tarea (hard=opus, normal=sonnet, trivial=haiku): 31,2 % / 67,6 % / 1,2 % de los 15,697 M tokens, y se asume la misma mezcla para los otros dos escenarios (estimado).",
       "El campo subagent_tokens es UN solo total: el corpus no separa entrada, salida ni caché. Por eso el costo es un rango: piso = todo a precio de entrada (mezcla 2,60 USD/M); referencia = 80 % entrada / 20 % salida (4,68 USD/M, esa proporción es estimada, no medida); techo = todo a precio de salida (13,00 USD/M). El piso no descuenta caché, así que no es un mínimo real.",
