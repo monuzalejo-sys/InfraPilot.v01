@@ -34,6 +34,11 @@
    entregue una vigente; si la entrega, se llena `resolucion` en `lib/emisor.ts` y el
    renglón aparece solo.
 
+## Decisión del dueño (28-oct-2026)
+
+**Por ahora sin factura electrónica.** El recibo sigue como «Recibo de venta» sin
+resolución. La pregunta de abajo queda para cuando el tema vuelva.
+
 ## La pregunta que hay que hacerle al contador (o a Leady)
 
 **¿Mercaplaza vende más de $183 millones al año (unos $509.000 diarios)?**
