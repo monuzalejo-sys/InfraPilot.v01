@@ -1,0 +1,27 @@
+{
+  "projectId": "que-cremoso",
+  "sessionCount": 1,
+  "totalContextSaved": 0,
+  "avgCompressionRatio": 1,
+  "avgKnowledgeDensity": 0,
+  "trendCompressionRatio": "Stable",
+  "lastUpdated": "2026-10-31T00:00:00.000Z",
+  "sessions": [
+    {
+      "sessionId": "session-2026-10-31-alta-de-la-empresa",
+      "runId": "que-cremoso-alta-v1",
+      "triggeredBy": "USER_REQUEST",
+      "startedAt": "2026-10-31T00:00:00.000Z",
+      "completedAt": "2026-10-31T00:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "notes": "Alta de Que Cremoso (Popayan) con nombre y ciudad como unicos datos. Repo, memoria, huecos, carpeta del Escritorio, correo por crear y seccion de la barra con seis ventanas.",
+      "measurement_mode": "ESTIMATED"
+    }
+  ]
+}

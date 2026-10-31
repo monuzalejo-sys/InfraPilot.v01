@@ -1,0 +1,40 @@
+{
+  "projectId": "que-cremoso",
+  "snapshotDate": "2026-10-31T00:00:00.000Z",
+  "version": 2,
+  "lastAmmRun": "2026-10-31T00:00:00.000Z",
+  "objects": [
+    {
+      "id": "DEC-001",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-10-31T00:00:00.000Z",
+      "updated": "2026-10-31T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [],
+      "title": "Este run crea el proyecto y sus ventanas; NO construye nada",
+      "description": "El dueno dio el nombre (Que Cremoso) y la ciudad (Popayan). No dijo que vende. Se entrega repo con README y HUECOS.md, memoria, carpeta en el Escritorio, correo apuntado como por crear y seccion propia en la barra con seis ventanas por tema. La construccion espera a que conteste HUECOS.md.",
+      "reason": "Con dos hechos cualquier pantalla, carta o video seria negocio inventado (cero-datos-inventados)."
+    },
+    {
+      "id": "PEND-001",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-10-31T00:00:00.000Z",
+      "updated": "2026-10-31T00:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Blocked",
+      "dependencies": [],
+      "title": "El dueno contesta los nueve huecos, empezando por que vende",
+      "description": "prommter/que-cremoso-repo/HUECOS.md. El primero (que vende) decide carta, marca, sistema y videos; el segundo (cliente o empresa propia) decide precio y contrato.",
+      "task": "Que el dueno conteste prommter/que-cremoso-repo/HUECOS.md, empezando por que vende",
+      "reason": "Sin esas respuestas cualquier construccion inventa el negocio"
+    }
+  ],
+  "archives": []
+}
