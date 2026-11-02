@@ -18,10 +18,11 @@ aquí: lee ese archivo.** El que más pesa: ¿qué vende?
 
 ## Marca (2026-11-02)
 
-**Elegida la ruta 2, Ciudad Blanca:** sello azul con portón payanés, una copa adentro y cinta teja. La
-propuesta 2 está afinada, en curvas y con controles: https://claude.ai/artifact/9kbU1cjEHq3qtR7oJ7zsyv
-Fuente y logos en `prommter/que-cremoso-repo/marca/` (README). Falta la combinación final del dueño y saber
-qué vende (DEC-003, PEND-002).
+**MARCA CERRADA (2026-11-02):** Ciudad Blanca, aprobada «así como está». Es un sello azul con portón payanés,
+copa con cereza y cinta teja con «Qué Cremoso» en Fraunces cursiva; abajo dice POPAYÁN.
+https://claude.ai/artifact/9kbU1cjEHq3qtR7oJ7zsyv
+Logos y piezas de imprenta en curvas en `prommter/que-cremoso-repo/marca/` (README, `imprenta/PIEZAS.md`).
+Faltan el vaso (plantilla del proveedor), el letrero (medidas) y los datos de contacto (DEC-004, PEND-003).
 
 ## Dónde vive cada cosa
 

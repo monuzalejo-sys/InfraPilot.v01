@@ -1,8 +1,8 @@
 {
   "projectId": "que-cremoso",
-  "snapshotDate": "2026-11-02T13:00:00.000Z",
-  "version": 4,
-  "lastAmmRun": "2026-11-02T13:00:00.000Z",
+  "snapshotDate": "2026-11-02T14:00:00.000Z",
+  "version": 5,
+  "lastAmmRun": "2026-11-02T14:00:00.000Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -57,18 +57,19 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-11-02T12:00:00.000Z",
-      "updated": "2026-11-02T13:00:00.000Z",
+      "updated": "2026-11-02T14:00:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
-      "status": "Blocked",
+      "status": "Done",
       "dependencies": [
         "DEC-002"
       ],
       "title": "El dueño cierra su combinación de la ruta 2 y dice qué vende",
       "description": "Ruta 2 elegida. Falta su combinación (botón «Copiar mi elección» del tablero), qué cambiaría, qué vende (hueco 1) y el @ de redes. Después: regenerar logo/ con su combinación y hacer las piezas de imprenta en PDF en curvas con trazar.mjs.",
       "task": "Con la combinación del dueño, regenerar logo/ y producir las piezas de imprenta en curvas",
-      "reason": "Sin la elección cualquier kit de producción se haría por triplicado"
+      "reason": "Sin la elección cualquier kit de producción se haría por triplicado",
+      "resolution": "El dueño aprobó «así como está»: copa con cereza, cursiva, cinta teja, POPAYÁN."
     },
     {
       "id": "DEC-003",
@@ -86,6 +87,41 @@
       "title": "La marca es la ruta 2, Ciudad Blanca; propuesta 2 afinada y en curvas",
       "description": "El dueño eligió la ruta 2 el 2026-11-02 («mucho mejor, pero aún se puede mejorar»); antes dijo «la exclamación» y se corrigió. Propuesta 2 en el mismo enlace (versión 2): sello con anillo azul, portón con clave y repisas, cinta teja con pliegues y Fraunces en curvas. Tiene controles: dibujo del centro (copa/cono/malteada/taza), cereza, letra cursiva o recta, cinta teja/crema/azul y abajo POPAYÁN o CIUDAD BLANCA. Los logos en curvas, con la combinación de partida, están en prommter/que-cremoso-repo/marca/logo y se regeneran con fuente/construir.mjs.",
       "reason": "El dibujo del centro depende de qué vende (hueco 1), así que se deja como control en vez de decidirlo."
+    },
+    {
+      "id": "DEC-004",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-11-02T14:00:00.000Z",
+      "updated": "2026-11-02T14:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-003"
+      ],
+      "title": "Marca de Qué Cremoso CERRADA: Ciudad Blanca, copa con cereza, cursiva, cinta teja, POPAYÁN",
+      "description": "Aprobada por el dueño el 2026-11-02 («así como está»). Es DEFECTO en marca/fuente/componer.mjs. Los logos están en marca/logo. Las piezas de imprenta en PDF en curvas (sticker de 6 cm, sticker de 4 cm, tarjeta 9×5 frente y respaldo, sello de caucho de 40 mm) están en marca/imprenta con PIEZAS.md, comprobadas con trazar.mjs. Tablero cerrado: https://claude.ai/artifact/9kbU1cjEHq3qtR7oJ7zsyv",
+      "reason": "El dueño la aprobó sin cambios; vitrina y videos ya pueden usarla como marca definitiva."
+    },
+    {
+      "id": "PEND-003",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-11-02T14:00:00.000Z",
+      "updated": "2026-11-02T14:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Blocked",
+      "dependencies": [
+        "DEC-004"
+      ],
+      "title": "Piezas que esperan datos: vaso, letrero, y contacto en la tarjeta",
+      "description": "El vaso necesita la plantilla de desplegado del proveedor. El letrero necesita las medidas de la fachada. Teléfono, dirección, @ y página siguen siendo huecos: cuando existan, la tarjeta lleva QR. Si el hueco 1 dice que no vende helado ni postres, se cambia DEFECTO.dibujo y se reconstruye.",
+      "task": "Con la plantilla del vaso y las medidas de la fachada, sacar esas piezas con imprenta.mjs",
+      "reason": "Sin la plantilla del proveedor y sin las medidas, el arte saldría deformado o fuera de escala"
     }
   ],
   "archives": []
