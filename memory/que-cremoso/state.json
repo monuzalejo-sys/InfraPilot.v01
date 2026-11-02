@@ -1,8 +1,8 @@
 {
   "projectId": "que-cremoso",
-  "snapshotDate": "2026-11-02T12:00:00.000Z",
-  "version": 3,
-  "lastAmmRun": "2026-11-02T12:00:00.000Z",
+  "snapshotDate": "2026-11-02T13:00:00.000Z",
+  "version": 4,
+  "lastAmmRun": "2026-11-02T13:00:00.000Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -57,7 +57,7 @@
       "type": "Pending",
       "tier": "Project",
       "created": "2026-11-02T12:00:00.000Z",
-      "updated": "2026-11-02T12:00:00.000Z",
+      "updated": "2026-11-02T13:00:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
@@ -65,10 +65,27 @@
       "dependencies": [
         "DEC-002"
       ],
-      "title": "El dueño elige la ruta de marca y se perfecciona",
-      "description": "Falta saber cuál ruta elige o cuál mezcla, qué vende (hueco 1), si el negocio ya tiene algo pintado (hueco 6) y el @ de redes. Después viene la propuesta 2 y el kit de producción como el de Mercaplaza: curvas con opentype.js y PDF de imprenta con trazar.mjs. El tablero actual usa fuentes web y NO sirve para la imprenta.",
-      "task": "Con la elección del dueño, perfeccionar la ruta y armar el kit de producción en prommter/que-cremoso-repo/marca/",
+      "title": "El dueño cierra su combinación de la ruta 2 y dice qué vende",
+      "description": "Ruta 2 elegida. Falta su combinación (botón «Copiar mi elección» del tablero), qué cambiaría, qué vende (hueco 1) y el @ de redes. Después: regenerar logo/ con su combinación y hacer las piezas de imprenta en PDF en curvas con trazar.mjs.",
+      "task": "Con la combinación del dueño, regenerar logo/ y producir las piezas de imprenta en curvas",
       "reason": "Sin la elección cualquier kit de producción se haría por triplicado"
+    },
+    {
+      "id": "DEC-003",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-11-02T13:00:00.000Z",
+      "updated": "2026-11-02T13:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-002"
+      ],
+      "title": "La marca es la ruta 2, Ciudad Blanca; propuesta 2 afinada y en curvas",
+      "description": "El dueño eligió la ruta 2 el 2026-11-02 («mucho mejor, pero aún se puede mejorar»); antes dijo «la exclamación» y se corrigió. Propuesta 2 en el mismo enlace (versión 2): sello con anillo azul, portón con clave y repisas, cinta teja con pliegues y Fraunces en curvas. Tiene controles: dibujo del centro (copa/cono/malteada/taza), cereza, letra cursiva o recta, cinta teja/crema/azul y abajo POPAYÁN o CIUDAD BLANCA. Los logos en curvas, con la combinación de partida, están en prommter/que-cremoso-repo/marca/logo y se regeneran con fuente/construir.mjs.",
+      "reason": "El dibujo del centro depende de qué vende (hueco 1), así que se deja como control en vez de decidirlo."
     }
   ],
   "archives": []

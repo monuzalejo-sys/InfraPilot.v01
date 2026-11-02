@@ -1,11 +1,11 @@
 {
   "projectId": "que-cremoso",
-  "sessionCount": 2,
+  "sessionCount": 3,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-11-02T12:00:00.000Z",
+  "lastUpdated": "2026-11-02T13:00:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-10-31-alta-de-la-empresa",
@@ -37,6 +37,22 @@
       "outcome": "DONE",
       "fixCycles": 2,
       "notes": "Tablero de marca con tres rutas, hecho inline y sin subagentes. Se verificó con Chrome sin ventana, porque el pane tenía 5 servidores de otras sesiones. Hubo dos correcciones vistas en las capturas: unas comillas dobles dentro de style=\"\" rompían la fuente del SVG, y el dibujo de la ruta 2 parecía una nube o un emoji y pasó a ser una copa.",
+      "measurement_mode": "ESTIMATED"
+    },
+    {
+      "sessionId": "session-2026-11-02-marca-propuesta-2",
+      "runId": "que-cremoso-marca-v2",
+      "triggeredBy": "USER_REQUEST",
+      "startedAt": "2026-11-02T13:00:00.000Z",
+      "completedAt": "2026-11-02T13:00:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 1,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "outcome": "DONE",
+      "fixCycles": 2,
+      "notes": "Ruta 2 afinada inline. Fraunces variable funciona en opentype.js con variation {wght,SOFT,WONK,opsz}, corrigiendo el avance contra el ejemplar por defecto. El texto del anillo va en curvas con una matriz por letra. Correcciones vistas en capturas: el chorro de la copa parecía una lengua (ahora es un contorno abierto sin tapa) y la columna 1fr del afinador desbordaba en el celular (ahora minmax(0,1fr)).",
       "measurement_mode": "ESTIMATED"
     }
   ]

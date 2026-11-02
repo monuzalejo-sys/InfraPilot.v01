@@ -18,9 +18,10 @@ aquí: lee ese archivo.** El que más pesa: ¿qué vende?
 
 ## Marca (2026-11-02)
 
-Propuesta 1 publicada, con tres rutas a elegir: https://claude.ai/artifact/9kbU1cjEHq3qtR7oJ7zsyv
-Fuente y resumen en `prommter/que-cremoso-repo/marca/README.md`. Está a la espera de que el dueño elija
-(DEC-002, PEND-002).
+**Elegida la ruta 2, Ciudad Blanca:** sello azul con portón payanés, una copa adentro y cinta teja. La
+propuesta 2 está afinada, en curvas y con controles: https://claude.ai/artifact/9kbU1cjEHq3qtR7oJ7zsyv
+Fuente y logos en `prommter/que-cremoso-repo/marca/` (README). Falta la combinación final del dueño y saber
+qué vende (DEC-003, PEND-002).
 
 ## Dónde vive cada cosa
 
