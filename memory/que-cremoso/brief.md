@@ -33,6 +33,12 @@ Faltan el vaso (plantilla del proveedor), el letrero (medidas) y los datos de co
   ventanas: estado y plan · sistema · vitrina · marca · videos animados · videos reales
 - Correo: `quecremoso.oficial@gmail.com`, por crear (lo crea el dueño)
 
+## Vitrina (2-nov)
+
+Armada en `prommter/que-cremoso-repo/vitrina/` con la marca cerrada: portada con sello tocable, mostrador que se
+arma solo desde `datos.js` (hoy vacío = hueco 1), portones de «cómo pedir», tarjetas de huecos que se voltean.
+Nada inventado. Sin publicar: falta repo remoto y dominio (hueco 8). Copia en `~/Desktop/Qué Cremoso/Vitrina/`.
+
 ## Restricciones que son ley
 
 - `cero-datos-inventados` — lo que falte va como hueco visible.
