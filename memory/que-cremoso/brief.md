@@ -16,6 +16,12 @@ resultados para ese nombre en Popayán.
 Nueve huecos en `prommter/que-cremoso-repo/HUECOS.md`. **No los rellenes desde
 aquí: lee ese archivo.** El que más pesa: ¿qué vende?
 
+## Marca (2026-11-02)
+
+Propuesta 1 publicada, con tres rutas a elegir: https://claude.ai/artifact/9kbU1cjEHq3qtR7oJ7zsyv
+Fuente y resumen en `prommter/que-cremoso-repo/marca/README.md`. Está a la espera de que el dueño elija
+(DEC-002, PEND-002).
+
 ## Dónde vive cada cosa
 
 - Repo: `prommter/que-cremoso-repo` (git propio, ignorado por el repo prommter)

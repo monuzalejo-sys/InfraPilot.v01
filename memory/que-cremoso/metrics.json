@@ -1,11 +1,11 @@
 {
   "projectId": "que-cremoso",
-  "sessionCount": 1,
+  "sessionCount": 2,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-10-31T00:00:00.000Z",
+  "lastUpdated": "2026-11-02T12:00:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-10-31-alta-de-la-empresa",
@@ -21,6 +21,22 @@
       "outcome": "DONE",
       "fixCycles": 0,
       "notes": "Alta de Que Cremoso (Popayan) con nombre y ciudad como unicos datos. Repo, memoria, huecos, carpeta del Escritorio, correo por crear y seccion de la barra con seis ventanas.",
+      "measurement_mode": "ESTIMATED"
+    },
+    {
+      "sessionId": "session-2026-11-02-marca-propuesta-1",
+      "runId": "que-cremoso-marca-v1",
+      "triggeredBy": "USER_REQUEST",
+      "startedAt": "2026-11-02T12:00:00.000Z",
+      "completedAt": "2026-11-02T12:00:00.000Z",
+      "objectsCreated": 2,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "outcome": "DONE",
+      "fixCycles": 2,
+      "notes": "Tablero de marca con tres rutas, hecho inline y sin subagentes. Se verificó con Chrome sin ventana, porque el pane tenía 5 servidores de otras sesiones. Hubo dos correcciones vistas en las capturas: unas comillas dobles dentro de style=\"\" rompían la fuente del SVG, y el dibujo de la ruta 2 parecía una nube o un emoji y pasó a ser una copa.",
       "measurement_mode": "ESTIMATED"
     }
   ]

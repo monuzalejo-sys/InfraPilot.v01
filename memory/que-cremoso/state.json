@@ -1,8 +1,8 @@
 {
   "projectId": "que-cremoso",
-  "snapshotDate": "2026-10-31T00:00:00.000Z",
-  "version": 2,
-  "lastAmmRun": "2026-10-31T00:00:00.000Z",
+  "snapshotDate": "2026-11-02T12:00:00.000Z",
+  "version": 3,
+  "lastAmmRun": "2026-11-02T12:00:00.000Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -34,6 +34,41 @@
       "description": "prommter/que-cremoso-repo/HUECOS.md. El primero (que vende) decide carta, marca, sistema y videos; el segundo (cliente o empresa propia) decide precio y contrato.",
       "task": "Que el dueno conteste prommter/que-cremoso-repo/HUECOS.md, empezando por que vende",
       "reason": "Sin esas respuestas cualquier construccion inventa el negocio"
+    },
+    {
+      "id": "DEC-002",
+      "type": "Decision",
+      "tier": "Project",
+      "created": "2026-11-02T12:00:00.000Z",
+      "updated": "2026-11-02T12:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "DEC-001"
+      ],
+      "title": "La marca se diseña antes de que contesten los huecos, porque el dueño la pidió",
+      "description": "2026-11-02, ventana marca: el dueño pidió «toda la identidad de marca, logos y todo; primero la perfeccionamos». Se publicó la propuesta 1 (https://claude.ai/artifact/9kbU1cjEHq3qtR7oJ7zsyv) con tres rutas: 1 La exclamación (Bagel Fat One, fresa/cacao, la tilde de la é es gota y la palabra se derrite), 2 Ciudad Blanca (sello con arco payanés, copa cremosa y cinta, Fraunces suave, azul balcón/teja/cal), 3 El remolino (la Q es un remolino de dos sabores con gota de cola, Unbounded, lila/durazno). Fuente en prommter/que-cremoso-repo/marca/.",
+      "reason": "La marca solo NOMBRA y no afirma ningún hecho del negocio, así que se puede proponer sin saber qué vende. Las rutas sirven para cualquier cosa cremosa y las piezas no llevan dirección, teléfono, precios ni @ (cero-datos-inventados)."
+    },
+    {
+      "id": "PEND-002",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-11-02T12:00:00.000Z",
+      "updated": "2026-11-02T12:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "status": "Blocked",
+      "dependencies": [
+        "DEC-002"
+      ],
+      "title": "El dueño elige la ruta de marca y se perfecciona",
+      "description": "Falta saber cuál ruta elige o cuál mezcla, qué vende (hueco 1), si el negocio ya tiene algo pintado (hueco 6) y el @ de redes. Después viene la propuesta 2 y el kit de producción como el de Mercaplaza: curvas con opentype.js y PDF de imprenta con trazar.mjs. El tablero actual usa fuentes web y NO sirve para la imprenta.",
+      "task": "Con la elección del dueño, perfeccionar la ruta y armar el kit de producción en prommter/que-cremoso-repo/marca/",
+      "reason": "Sin la elección cualquier kit de producción se haría por triplicado"
     }
   ],
   "archives": []
