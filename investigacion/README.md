@@ -38,6 +38,8 @@ El `INFORME.md` empieza siempre así:
 
 Cada investigación nueva se apunta aquí, la más reciente arriba.
 
+- **2026-11-02 · [Delta en el Cauca](2026-11-02-delta-cauca/INFORME.md)** — qué es el software que se usa en Popayán, sus ocho grietas con evidencia, y por qué la jugada es el *piso de arriba* de Delta y no reemplazarlo. Para Prommter.
+
 | Fecha | Tema | Para | Estado |
 |-------|------|------|--------|
 | 2026-10-28 | [Qué declara a la DIAN un minimarket y cuál es la forma más eficiente](2026-10-28-dian-minimarket/INFORME.md) | Prommter · minimarket La Villa | terminada |
