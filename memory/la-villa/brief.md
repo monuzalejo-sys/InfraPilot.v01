@@ -39,6 +39,16 @@ nombre del cliente**. Meterla como empresa más en la base de Mercaplaza está
 **descartado por el dueño** (commit `24d1822`). De una plantilla se hereda la
 arquitectura y nunca los datos, precios, dominio, puertos ni la deploy key.
 
+## Dónde vive cada cosa
+
+- Repo: `prommter/la-villa-repo` (git propio, sin remoto todavía)
+- Memoria: `memory/la-villa/`
+- Entregas: `~/Desktop/La Villa/<Tema>/`
+- Barra lateral: sección «La Villa» (`cg-33a0c7b2-fc4a-4cb8-b096-b88800a0e652`),
+  ventanas: estado y plan · sistema · vitrina · marca · videos animados · videos reales
+  (el detalle y el mensaje de arranque de cada una: `prommter/la-villa-repo/docs/ventanas.md`)
+- Lo que el cliente YA usa hoy, leído de 10 fotos de su POS: `prommter/la-villa-repo/docs/sistema-actual.md`
+
 ## Restricciones que son ley
 
 - `la-caja-no-puede-parar` — la venta se guarda en el LOCAL; la nube es espejo.
