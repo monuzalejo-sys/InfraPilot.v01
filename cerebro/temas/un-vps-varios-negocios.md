@@ -5,7 +5,7 @@ alias: [vps, servidor, hostinger, kvm, kvm 1, varios clientes, multi cliente, mu
 preguntas: ["como agrego otro negocio al mismo vps", "cuantos clientes caben en un vps", "que puertos le doy a cada cliente", "como aislo un cliente de otro en el mismo servidor", "cuanto me cuesta cada cliente al mes", "que pasa si se cae el servidor con varios clientes dentro"]
 proyectos: [_permanent, villa-broaster, placita]
 confianza: alta
-actualizado: 2026-09-08
+actualizado: 2026-11-02
 ---
 
 # Un VPS, varios negocios
@@ -51,6 +51,10 @@ duo-burger       sistema 3210   vitrina 3211
    *Settings → Deploy keys* **sin** permiso de escritura.
 3. **Clonar** pasando la llave en el propio comando — ver
    `construir-no-es-arrancar` para las trampas de `sudo -u` y de la huella.
+   **Fija la rama a propósito:** la que clona el servidor tiene que ser la misma donde
+   se fusiona el trabajo, y se revisa cada vez que cambia ese flujo; si no, `publicar`
+   termina bien sin traer nada (en placita el PR #2 del 2026-10-28 quedó en `main`
+   mientras el servidor seguía en `master`). Ver [[TEMA-publicar-al-servidor]].
 4. **Compilar**: `npm ci && npm run build` como el usuario del servicio.
 5. **Servicios**: copiar los dos `.service`, cambiar **puerto, rutas y el archivo
    de entorno** para que no choquen con los del vecino, `daemon-reload`,
@@ -73,3 +77,8 @@ es el error opuesto y también cuesta.
 **Y los datos de un negocio nunca se mezclan con los de otro.** Carpeta propia,
 usuario propio si se quiere apretar más, y jamás dos procesos sobre la misma
 carpeta — esa regla no cambia por estar acompañados.
+
+## Enlaces
+
+- [[TEMA-publicar-al-servidor]] — el ciclo DESPUÉS de instalar: la rama que sirve el
+  servidor, las migraciones antes del build y cómo comprobar que quedó publicado.

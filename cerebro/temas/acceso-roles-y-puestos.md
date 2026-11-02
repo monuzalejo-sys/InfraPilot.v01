@@ -252,3 +252,6 @@ delega, no cuánta plata se le muestra.
   mostrador; el arqueo es la pantalla que el cajero justamente no ve.
 - [[TEMA-generadores-de-diseno]] — cómo se le encarga la **pantalla** de login a
   un generador de diseño (el estándar "estilo Orama" citado arriba).
+- [[TEMA-ayuda-dentro-del-sistema]] — la guía de ayuda por perfil (apoyo, cajero, dueño) es el
+  espejo de estos roles dentro de la app; `puedeVer` sigue siendo la única autoridad y la
+  prueba de la ayuda la vigila.

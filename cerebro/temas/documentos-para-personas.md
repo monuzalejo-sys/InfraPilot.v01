@@ -5,7 +5,7 @@ alias: [manual, manuales, manual de uso, documento, documentos, documentacion, i
 preguntas: ["¿cómo le explico el proyecto a un empleado nuevo?", "¿cómo le enseño el sistema a un cajero nuevo?", "¿qué documento le entrego al equipo para que arranque?", "¿cómo escribo un manual que la gente sí lea?", "¿por qué me rechazaron el plan de trabajo que escribí?"]
 proyectos: [villa-broaster, placita, wrd, prommter, estanco-contable]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-11-02
 ---
 
 # Escribir un documento que una persona de verdad va a usar
@@ -56,7 +56,11 @@ stub informativo que **no emite**. Costó ~557.000 tokens (dos builders opus,
 251.800 + 305.153, `placita/metrics.json`
 `session-2026-08-21-manual-pantalla-completa`) y a cambio quedó como *"la única
 fuente oficial de verdad operativa del dueño"*. Redactar para una persona obliga
-a abrir cada pantalla: es una auditoría con otro nombre.
+a abrir cada pantalla: es una auditoría con otro nombre. **Y duró diez semanas**: el
+2026-11-02 el dueño pidió que la ayuda viviera dentro del sistema porque ese manual ya
+mentía (tope de 3 facturas, PIN `0000`, dominio viejo); desde entonces el manual al
+día es la sección Ayuda y `MANUAL-DE-USO.md` lleva un letrero de que ya no se
+actualiza — ver [[TEMA-ayuda-dentro-del-sistema]].
 
 **La honestidad se escribe en el papel, no se promete.** De las 18 secciones,
 **12 se verificaron en vivo y 6 contra código**, y cada una cierra diciendo cuál
@@ -119,6 +123,13 @@ Presupuesta la relectura desde el principio; no es un extra.
 
 ## Cuándo NO aplica
 
+- **Si el documento describe un sistema que sigue cambiando, no es un archivo: es
+  una parte del sistema.** Un `.md` o un PDF no se rompe cuando el producto cambia,
+  solo miente. Para un sistema vivo, la ayuda va dentro de la app, por perfil, con
+  novedades por versión y una prueba que falla si falta un tema; el archivo queda
+  para lo de una sola vez (instalación, plan, setup). La regla 3 de arriba (una
+  sección = un archivo para imprimir) vale para eso último. Detalle y el costo de
+  ignorarlo en [[TEMA-ayuda-dentro-del-sistema]].
 - **Si el lector es una máquina, todo se invierte.** `CLAUDE.md`, `AGENTS.md`,
   briefs de agente y objetos de memoria se escriben densos y con cita
   `archivo:línea`, sin ruta de lectura ni tono amable: ver [[TEMA-memoria-y-cierre]].
@@ -153,6 +164,9 @@ Presupuesta la relectura desde el principio; no es un extra.
   del destino ha leído los planes.
 - `placita/KN-037` — manual de 18 secciones / 54 páginas, 12 verificadas en vivo
   y 6 contra código, pie de verificación por sección; hallazgos de producto.
+  **Superado en parte el 2026-11-02** por `placita/DEC-046` (Ayuda dentro del
+  sistema) y `placita/POL-001` (mantenerla al día en el mismo commit): el manual
+  de agosto se conserva como referencia, no como fuente oficial.
 - `placita/KN-040` — el aviso en pantalla nombra la migración que falta; el
   manual solo la explica.
 - `prommter/KN-001` — plantilla de plan y la regla "toda idea se vuelve plan
@@ -182,3 +196,5 @@ Presupuesta la relectura desde el principio; no es un extra.
 - [[TEMA-acceso-roles-y-puestos]] — qué ve cada persona en el sistema; el documento por rol es su espejo en papel.
 - [[TEMA-generadores-de-diseno]] — cuando la pieza la construye un generador de diseño.
 - [[TEMA-memoria-y-cierre]] — el documento que se escribe para máquinas, no para personas.
+- [[TEMA-ayuda-dentro-del-sistema]] — cuando el documento es la ayuda de un sistema vivo:
+  dentro de la app, por perfil y con una prueba que la vigila.

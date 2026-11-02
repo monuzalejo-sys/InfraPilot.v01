@@ -5,7 +5,7 @@ alias: [migracion, migraciones, migrar, migrarlo, migro, migracion de datos, mig
 preguntas: ["como agrego un campo a algo que ya esta guardado", "como pruebo una migracion sql", "se me rompio la pagina con los datos viejos", "en que orden se aplican las migraciones", "en que orden aplico las migraciones y cual va primero", "se puede probar sql aca si no hay docker ni psql", "puedo desplegar si el cliente todavia no ha corrido la migracion", "el sql lo revise y se ve bien - ya cuenta como probado?", "voy a copiar el modulo de caja de otro proyecto: que le reviso antes?", "empezamos a vender por unidad ademas de por peso - que se me rompe?"]
 proyectos: [placita, infrapilot, estanco-contable, arroces, villa-broaster]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-11-02
 ---
 
 # Cambiar la forma de datos que ya existen sin romperle el sistema a nadie
@@ -129,7 +129,8 @@ reconstruir un mes después (`placita lib/persistencia.ts:242-270`).
      compra de hoy (`:260-264`).
    - En SQL, el orden es **operativo y se comunica**: primero
      `2026-08-21-gastos-y-cierre.sql`, después `2026-08-22-unidades.sql`
-     (`placita/KN-040`).
+     (`placita/KN-040`). Cuando eres dueño del servidor, desde el 2-nov-2026 no se
+     comunica: lo ejecuta el script (punto 5, «techo»).
 
 5. **Que el código pueda ir por delante del esquema — pero que lo diga con su
    propio código de error.** Detecta en la ruta el error de "eso no existe"
@@ -149,6 +150,20 @@ reconstruir un mes después (`placita lib/persistencia.ts:242-270`).
    `app/(app)/ventas/page.tsx:1473`). Verificado en vivo: *"FALTA APLICAR LA
    MIGRACIÓN 2026-08-21"*, y **nada se pierde porque el outbox reintenta solo**
    hasta que la migración exista (`placita/KN-040`).
+   **El techo de este patrón, medido (placita, oct-nov 2026).** El banner solo
+   cubre las rutas que traducen el error, y pegar el SQL a mano depende de que
+   alguien se acuerde: el 2026-10-18 se encontró producción **sin dos migraciones
+   cuyo código llevaba 17 días desplegado**, sin ningún aviso (`placita/KN-072`), y
+   una fila que la base rechaza trababa la cola de sincronización entera
+   (`placita/KN-074`). Por eso, **cuando el servidor y la base son tuyos, el orden
+   se automatiza en vez de comunicarse**: `publicar.sh` aplica, después del `git
+   pull` y antes de compilar, las migraciones que no estén en
+   `public.migraciones_aplicadas`, y si una falla no compila y el servicio vuelve
+   con el código anterior (`placita/KN-075`, `despliegue/publicar.sh:88-128`). Dos
+   prácticas con su condición: **SQL que pega el cliente → código por delante +
+   error con código + banner; SQL que aplica tu propio script → migración primero,
+   automática.** Ojo: la automática aún no se ha visto correr en el VPS
+   (`placita/PEND-033`). Detalle en [[TEMA-publicar-al-servidor]].
    Corolario del propio SQL: se pega **entero, en una sola transacción** —
    *"pegar la mitad deja la tabla creada sin su RLS, que es una tabla abierta"*
    (`2026-08-21-gastos-y-cierre.sql:4-11`).
@@ -275,6 +290,9 @@ reconstruir un mes después (`placita lib/persistencia.ts:242-270`).
   producción; el QA debe probar con datos de la versión anterior; la trampa
   `Object.defineProperty` para cazar el `undefined.X` en vivo; la clave real es
   `placita:datos:<empresaId>`.
+- `placita/KN-072`, `placita/KN-074`, `placita/KN-075` — el techo del patrón del
+  banner (producción 17 días sin 2 migraciones; cola trabada por una fila
+  rechazada) y la migración automática dentro de `publicar.sh` (2026-11-02).
 - `placita/KN-040` — orden obligatorio de las dos migraciones, aviso verificado en
   vivo y outbox que reintenta solo. `placita/DEC-022` — eje de unidades en el
   Movimiento, costo por unidad propio, **$4.000 de ganancia bruta sobre $20.000**
@@ -365,5 +383,7 @@ reconstruir un mes después (`placita lib/persistencia.ts:242-270`).
 - [[TEMA-caja-y-turnos]] — el otro lado de la lección 7: la regla de negocio
   (*"la plata pertenece al turno del cobro"*) que el hermano no tenía y hubo que
   diseñar desde cero.
+- [[TEMA-publicar-al-servidor]] — el otro lado del orden: qué rama sirve el servidor y
+  cómo `publicar.sh` aplica las migraciones pendientes antes de compilar.
 - [[TEMA-memoria-y-cierre]] — por qué esto se guarda: `infrapilot/KN-035` no nació
   de trabajo nuevo, nació de cruzar dos memorias que llevaban un mes sin hablarse.

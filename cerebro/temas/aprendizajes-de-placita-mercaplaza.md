@@ -73,3 +73,16 @@ del recibo se queda antes de la sierra y sale arriba del siguiente: hace falta
 avance en blanco al final. Arreglo en placita-repo#2: ancho imprimible (48/72 mm),
 58 de fábrica y `?rollo=80` por equipo. Para probar sin impresora, imprimir el
 recibo a PDF con CDP `Page.printToPDF` y `paperWidth` = 48 mm.
+
+## Lección 7 — La ayuda vive dentro del sistema y «publicado» es lo que sirve el servidor (2-nov-2026)
+
+Dos reglas salieron del pulido de noviembre. (1) El manual Markdown de agosto
+(`MANUAL-DE-USO.md` + `manual/`, ~557.000 tokens) quedó desactualizado en diez semanas;
+el dueño pidió una sección **Ayuda** dentro del sistema, con novedades por versión y una
+guía por perfil (apoyo y bodega, cajero, dueño), y la regla de actualizarla en el mismo
+commit de cada cambio visible (`placita/DEC-046`, `placita/POL-001`; detalle en
+[[TEMA-ayuda-dentro-del-sistema]]). (2) El PR #2 del recibo se fusionó en `main` el 28-oct
+pero el VPS clona `master`, así que nunca salió; ahora `publicar.sh` imprime la rama y el
+commit, aplica sola las migraciones pendientes antes de compilar y el flujo es PR a `main`
+y luego `git push origin origin/main:master` (`placita/KN-075`; detalle en
+[[TEMA-publicar-al-servidor]]).
