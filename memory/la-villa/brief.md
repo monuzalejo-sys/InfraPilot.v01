@@ -47,6 +47,7 @@ arquitectura y nunca los datos, precios, dominio, puertos ni la deploy key.
 - Barra lateral: sección «La Villa» (`cg-33a0c7b2-fc4a-4cb8-b096-b88800a0e652`),
   ventanas: estado y plan · sistema · vitrina · marca · videos animados · videos reales
   (el detalle y el mensaje de arranque de cada una: `prommter/la-villa-repo/docs/ventanas.md`)
+  — las seis ABIERTAS desde el 2-nov-2026, cada una con su mensaje de arranque (cwd `/Users/g/orion`, Sonnet)
 - Lo que el cliente YA usa hoy, leído de 10 fotos de su POS: `prommter/la-villa-repo/docs/sistema-actual.md`
 
 ## Restricciones que son ley
