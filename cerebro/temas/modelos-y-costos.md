@@ -5,12 +5,20 @@ alias: [modelo, modelos, que modelo, elegir modelo, seleccion de modelo, calibra
 preguntas: ["que modelo uso para un builder visual", "cuando uso haiku y cuando opus", "cuanto cuesta una ola de agentes", "cual es el modelo mas barato que aguanta esta tarea", "cuantos tokens gasta un builder", "vale la pena pagar opus para esto"]
 proyectos: [infrapilot, placita, villa-broaster, estanco-contable, wrd, arroces, landings, orion, _permanent]
 confianza: alta
-actualizado: 2026-09-09
+actualizado: 2026-11-02
 ---
 
 # Qué modelo usar para cada tipo de trabajo, y cuánto cuesta de verdad
 
 ## Respuesta corta
+
+**⚠ Corrección 2026-11-02:** todas las cifras de tokens de este tema (por spawn, por ola,
+«298 spawns / 39 M») son `subagent_tokens` = tamaño del contexto FINAL del agente, **no su
+gasto**. El gasto real es ~70–110× mayor y se mide con `node tools/costos.mjs real`: un
+constructor largo en Opus cuesta **20–100 M tokens reales (US$ 12–50)**, un agente sonnet
+medio ~4 M. Usa las cifras de abajo para ORDENAR tiers; para presupuestar, `costos.mjs real`.
+Las reglas que salieron de esto (presupuesto en US$, modelo explícito, encargos ≤ 90 pasos,
+sin crítico por paquete, disparador `vigilar`) están en el skill `orion` §1e.
 
 **Antes de elegir modelo, elige ceremonia**: una tarea de 1 archivo se hace inline con
 cero spawns — el pipeline completo cuesta ~10x (168k tokens de subagente para un README
@@ -28,9 +36,9 @@ app entera desde cero fueron 12 spawns / **1,11 M tokens**; una ola grande de pr
 
 Esto no es criterio: son **298 spawns medidos y 39.372.000 tokens** (corte 2026-08-26; antes 280 y 32,7 M) registrados en
 `modelOutcomes` de seis memorias (infrapilot, placita, villa-broaster, estanco-contable,
-wrd, arroces). La medición es real, no estimada: la notificación de fin de cada spawn trae
-`subagent_tokens` y el orquestador la persiste (`_permanent/KN-002`); el consumo inline del
-propio orquestador **no está metrado y nunca se inventa**.
+wrd, arroces). Ojo: esa «medición» es `subagent_tokens`, el contexto final de cada spawn, no su gasto
+(`_permanent/KN-002`, corregido 2026-11-02). El gasto real —incluido el del orquestador— sale
+de las transcripciones con `costos.mjs real`.
 
 **Lo que la medición contradice.** Si se cuentan los veredictos crudos, los tres tiers
 fallan casi igual: haiku 1 de 24, sonnet 6 de 149, opus 3 de 101. Eso **no** significa que
@@ -211,8 +219,8 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
   inline (168k tokens de subagente para un README de 91 líneas).
 - `infrapilot/DEC-008` — calibración aplicada: subtipos `build:visual|page|api|lib|infra`
   para no diluir señal, y "infra-deaths no cuentan como señal de capacidad".
-- `_permanent/KN-002` — `subagent_tokens` medido por spawn; el consumo inline del
-  orquestador no está metrado y nunca se fabrica.
+- `_permanent/KN-002` — corregido 2026-11-02: `subagent_tokens` es el contexto final del
+  spawn, no su gasto; el gasto real, incluido el del orquestador, sale de `costos.mjs real`.
 - `infrapilot/KN-018` — 3 de 10 spawns muertos dejando trabajo real en disco; protocolo de
   recuperación y regla de no re-spawnear a ciegas.
 - `estanco-contable/KN-009` y `placita/KN-041` — 4 builders muertos que ya habían

@@ -33,3 +33,16 @@ make the SMALLEST changes that address the failing conditions in a QAReport.
 Report: the exact files you modified, which failing conditions each change
 addresses, and anything the re-verification pass should re-check. Factual,
 ≤12 lines.
+
+## Disciplina de gasto (obligatoria)
+Cada paso relee TODO tu contexto: lo que metes se paga en cada paso que sigue
+(medido 2026-11: un constructor de 236 pasos y 647k de contexto costó 101 M tokens).
+- Salidas cortas: todo comando con salida larga va con `| tail -n 30` o `| grep …`.
+  Nunca imprimas un HTML entero, un log completo de tests, un diff o un JSON grande.
+- Lee por coordenadas: `grep -n` primero y luego solo el rango (`sed -n 'a,bp'` o
+  Read con offset/limit). Un archivo de más de 250 líneas no se lee entero.
+- Imágenes: máximo 8 en todo el encargo, a ancho de teléfono o recortadas, y nunca
+  la misma dos veces. Textos y estados se comprueban con curl + grep, no con capturas.
+- Solo lo que el QAReport nombra: no reexplores el proyecto para entenderlo entero.
+- Tope: **40 pasos**. Si te acercas, entrega lo hecho y marca lo pendiente como
+  parcial, con qué falta — no sigas a ciegas.

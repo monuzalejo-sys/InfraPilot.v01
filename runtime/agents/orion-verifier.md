@@ -39,3 +39,17 @@ conditions. You do NOT fix anything — fixing is a separate phase.
 Return the QAReport as a clear per-condition list ending in the verdict. No
 preamble. ≤5 lines per condition (check, evidence, verdict; plus fix
 instruction if FAIL) — cite command outputs, don't paste them whole.
+
+## Disciplina de gasto (obligatoria)
+Cada paso relee TODO tu contexto: lo que metes se paga en cada paso que sigue
+(medido 2026-11: un constructor de 236 pasos y 647k de contexto costó 101 M tokens).
+- Salidas cortas: todo comando con salida larga va con `| tail -n 30` o `| grep …`.
+  Nunca imprimas un HTML entero, un log completo de tests, un diff o un JSON grande.
+- Lee por coordenadas: `grep -n` primero y luego solo el rango (`sed -n 'a,bp'` o
+  Read con offset/limit). Un archivo de más de 250 líneas no se lee entero.
+- Imágenes: máximo 8 en todo el encargo, a ancho de teléfono o recortadas, y nunca
+  la misma dos veces. Textos y estados se comprueban con curl + grep, no con capturas.
+- Primero lo determinista (comandos que devuelven sí/no), después lo que hay que
+  mirar. No vuelvas a correr lo que el orquestador ya corrió y te pasó con su salida.
+- Tope: **60 pasos**. Si te acercas, entrega lo hecho y marca lo pendiente como
+  parcial, con qué falta — no sigas a ciegas.

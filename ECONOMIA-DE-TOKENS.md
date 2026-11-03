@@ -1,5 +1,17 @@
 # En qué se va el gasto, y cómo bajarlo
 
+> **⚠ CORRECCIÓN 2026-11-02 — leer antes que todo lo de abajo.** Las cifras de este
+> documento suman `subagent_tokens`, que es el tamaño del contexto FINAL de cada agente,
+> no su gasto. Cada paso relee todo el contexto: el gasto real es ~70–110× mayor
+> (Escuadra: 13,3 M anotados contra 1.437 M reales en 36 agentes). Medido de verdad con
+> `node tools/costos.mjs real`: desde el 2026-09-01, **6.362 M tokens ≈ US$ 3.600–4.060**
+> a precio de API, 97 % Opus. Las dos fugas reales: **agentes gigantes** (150–290 pasos,
+> contexto de 600–900k, todo en Opus) y **sesiones principales larguísimas** (200–666 M
+> cada una). Las tablas de abajo siguen sirviendo para ORDENAR tiers, no como costo. Las
+> palancas nuevas — presupuesto en US$, modelo explícito, encargos ≤ 90 pasos, sin crítico
+> por paquete, lo determinista por Bash, disparador `costos.mjs vigilar`, sesiones cortas —
+> son obligatorias: skill `orion` §1e y bloque «Disciplina de gasto» de los agentes.
+
 **Medido el 2026-08-26 sobre 298 spawns y 39,37 M tokens** registrados en los
 `metrics.json` de 9 proyectos. No es criterio: cada notificación de fin de
 subagente trae `subagent_tokens` y el orquestador los persiste. Se reproduce

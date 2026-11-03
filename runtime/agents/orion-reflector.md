@@ -66,7 +66,8 @@ Permanent→Permanent. Top level: bump `version`, set `snapshotDate` and
    (created/merged/archived, byTier, byType), `triggeredBy`, timestamps, and a
    `modelOutcomes` list — one entry per agent spawn this run:
    `{phase, model, verdict, tokens}` (verdict: ok | fail | escalate; `tokens`
-   = the measured `subagent_tokens` the orchestrator gives you — omit the
+   = the REAL tokens from `costos.mjs real` the orchestrator gives you, never
+   `subagent_tokens` (that is final context size, ~70–110× below spend) — omit the
    field if not provided, NEVER invent it). This is the learning signal future
    runs use to calibrate model choice. Other token fields (contextSaved,
    compressionRatio inputs, etc.) stay 0 unless given measured values.

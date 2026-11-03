@@ -148,7 +148,7 @@ project-specific names/paths"*: es justamente el puente a la ley 2.
 
 ### Ley 2 — Separa la REGLA de la COORDENADA: la regla no caduca, la coordenada sí
 
-Con los proyectos repartidos en tres raíces (`ORION\`, `prommter\proyectos\`,
+Con los proyectos repartidos en tres raíces (`ORION\`, `prommter/proyectos\`,
 `fable 5\`), **la evidencia `archivo:línea` envejece más rápido de lo que se
 cura** (`_permanent/KN-015`). Dos coordenadas podridas, verificadas hoy abriendo
 el disco en vez de creerle a la memoria:
@@ -157,14 +157,14 @@ el disco en vez de creerle a la memoria:
   fecha UTC: en Bogotá una venta de las 11 p.m. cae al día siguiente— y remata con
   la coordenada *"pasa por fechaNegocio(fecha) de lib/dominio/facturacion.ts"*.
   Falso hoy: `fechaNegocio` se **define** en
-  `prommter/proyectos/estanco-contable/lib/dominio/jornada.ts:34`; `facturacion.ts`
+  `prommter/estanco-contable/lib/dominio/jornada.ts:34`; `facturacion.ts`
   solo la re-exporta y deja escrito en su línea 76 *"viven ahora en jornada.ts (una
   sola fuente)"*. **El código dejó la nota del traslado y la memoria nunca se
   enteró.** La regla sigue siendo verdad; caducó solo la dirección.
 - **`pollo-landing/DEC-001`** afirma que el repo vive en
-  `C:/Users/Kalel/fable 5/pollo-landing`. Verificado hoy: esa carpeta no existe
+  `(fable 5 — carpeta del PC, no existe en la Mac)/pollo-landing`. Verificado hoy: esa carpeta no existe
   —`fable 5` contiene `.claude`, `wrd` y `wrd-serve.mjs`— y el repo real está en
-  `C:\Users\Kalel\prommter\proyectos\pollo-landing`. Un agente que le crea abre una
+  `$ORION_HOME/prommter/pollo-landing`. Un agente que le crea abre una
   ruta muerta y puede concluir que el proyecto se perdió.
 
 **Cómo se escribe entonces.** Dos frases, siempre en este orden:
@@ -232,13 +232,14 @@ premisa muerta queda visible, con fecha y con el puntero a lo que la mató.
    un terminal de alto impacto, **extrae su lección reusable a un Knowledge**. Al
    final, regenera `brief.md`.
 5. **Escribe la sesión en `metrics.json` con números medidos**: un `modelOutcomes`
-   por spawn `{phase, model, verdict, tokens}` con el `subagent_tokens` que
-   entrega el orquestador. Si no te lo dieron, **omite el campo — jamás lo
-   inventes**; el consumo inline del orquestador no está medido (`_permanent/KN-002`).
-6. **Validar**: `node C:\Users\Kalel\ORION\tools\validate-memory.mjs <memoria>`.
+   por spawn `{phase, model, verdict, tokens}` con los tokens REALES que el
+   orquestador saca de `costos.mjs real` (no el `subagent_tokens`, que es el contexto
+   final: `_permanent/KN-002`, corregido 2026-11-02). Si no te los dieron, **omite el
+   campo — jamás lo inventes**. El gasto del orquestador también sale de ese reporte.
+6. **Validar**: `node $ORION_HOME/tools/validate-memory.mjs <memoria>`.
    No se cierra dejando memoria inválida. Invariante que ya falló antes:
    `sessionCount` debe ser igual a `sessions.length`.
-7. **Regenerar el vault**: `node C:\Users\Kalel\ORION\tools\generate-vault.mjs
+7. **Regenerar el vault**: `node $ORION_HOME/tools/generate-vault.mjs
    <memoria>` — script determinista, **lo corre el orquestador, nunca un agente**;
    los agentes solo hacen trabajo de juicio (`infrapilot/DEC-008`). Borra
    `wave.json` si su ola terminó. Ese diff es el detector de pérdidas.
@@ -318,8 +319,8 @@ escríbelo aquí.**
   para evitar doble escritor sobre el árbol sucio de ORION.
 - `prommter/KN-002` — lección de máquina atrapada en la memoria del proyecto
   equivocado; su propio `context` pide la copia a `permanent` que sigue sin hacerse.
-- `_permanent/KN-002` — `subagent_tokens` medidos por spawn; el consumo inline del
-  orquestador no está medido y **nunca se fabrica**.
+- `_permanent/KN-002` — corregido 2026-11-02: `subagent_tokens` es contexto final, no
+  gasto; el gasto real (también el del orquestador) sale de `costos.mjs real` y **nunca se fabrica**.
 - `_permanent/KN-014` — ley 1: una lección pagada en un segundo proyecto sube a
   permanent; el recuento de lecciones repetidas (8 en 6 proyectos / 5 en 4 / 8 en 6).
 - `_permanent/KN-015` — ley 2: la regla no caduca, la coordenada sí; por eso el
@@ -338,10 +339,10 @@ escríbelo aquí.**
   dice `lib/dominio/facturacion.ts` y `fechaNegocio` se define en
   `lib/dominio/jornada.ts:34` (con `facturacion.ts:76` anunciando el traslado y la
   línea 84 re-exportando); `pollo-landing/DEC-001` apunta a
-  `C:/Users/Kalel/fable 5/pollo-landing`, carpeta inexistente (`fable 5` solo tiene
+  `(fable 5 — carpeta del PC, no existe en la Mac)/pollo-landing`, carpeta inexistente (`fable 5` solo tiene
   `.claude`, `wrd`, `wrd-serve.mjs`), con el repo real en
-  `C:\Users\Kalel\prommter\proyectos\pollo-landing`.
-- Ley 2 hecha máquina: `C:\Users\Kalel\ORION\tools\cerebro.mjs:509-513` — el
+  `$ORION_HOME/prommter/pollo-landing`.
+- Ley 2 hecha máquina: `$ORION_HOME/tools/cerebro.mjs:509-513` — el
   verificador de citas resuelve `proyecto/ID` contra el índice y no intenta
   resolver ninguna ruta de archivo.
 - Regla del curador matizada, no derogada:

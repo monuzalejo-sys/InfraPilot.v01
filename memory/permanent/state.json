@@ -1,6 +1,6 @@
 {
   "projectId": "_permanent",
-  "snapshotDate": "2026-09-02T03:12:36.000Z",
+  "snapshotDate": "2026-10-01T00:00:00.000Z",
   "objects": [
     {
       "id": "KN-001",
@@ -22,14 +22,14 @@
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-07-02T05:45:00.000Z",
-      "updated": "2026-07-02T05:45:00.000Z",
+      "updated": "2026-11-03T01:30:00.000Z",
       "lifetime": "Permanent",
       "impact": "High",
       "priority": "High",
       "status": "Current",
       "dependencies": [],
-      "fact": "Claude Code agent-spawn completion notifications include measured usage: subagent_tokens, tool_uses, duration_ms. The ORION orchestrator collects these per spawn and passes them to the reflector, so metrics.json modelOutcomes carry MEASURED token costs per phase/model (measurement_mode MEASURED for spawns). The orchestrator's own inline consumption remains unmetered — never fabricate it.",
-      "context": "Discovered 2026-07-02 during the E2E pipeline test; upgraded ORION's Context Economy from conceptual to measured for delegated work.",
+      "fact": "CORREGIDO 2026-11-02: el subagent_tokens de la notificación de fin de un agente es el tamaño de su contexto FINAL, NO su gasto. Cada paso relee todo el contexto, así que el gasto real es ~70–110× mayor (Escuadra: 13,3 M anotados contra 1.437 M reales en 36 agentes). El gasto real se mide leyendo el usage de las transcripciones de Claude Code (~/.claude/projects/<proyecto>/<sesión>.jsonl y <sesión>/subagents/**): node $ORION_HOME/tools/costos.mjs real --sesion <id>. Ahí también sale el consumo del orquestador, que ya no es «no metrado». Todo lo calibrado antes con subagent_tokens (ECONOMIA-DE-TOKENS.md, tabla de 1b, tema modelos-y-costos, presupuestos de plan.mjs) sirve para ORDENAR tiers, no como costo.",
+      "context": "Descubierto 2026-07-02 (versión original, que tomaba subagent_tokens por gasto). Corregido 2026-11-02 cuando el dueño vio que Escuadra llevaba ~2.340 M tokens reales mientras metrics.json decía ~18 M: las sumas de contexto final coincidían con lo anotado (13,27 vs 14,49 M; 3,61 vs 3,53 M).",
       "source": "session 2026-07-02"
     },
     {
@@ -94,21 +94,21 @@
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-08T00:00:00.000Z",
-      "updated": "2026-08-08T00:00:00.000Z",
+      "updated": "2026-09-03T15:01:33.000Z",
       "lifetime": "Permanent",
       "impact": "Medium",
       "priority": "Medium",
       "status": "Current",
       "dependencies": [],
-      "fact": "VERIFICAR UI EN EL NAVEGADOR EMBEBIDO con el pane oculto (usuario ausente): las acciones del computer tool (click, screenshot) se cuelgan/timeout porque la pagina no compone frames. Lo que SI funciona sin pane visible: get_page_text, read_page, form_input (maneja inputs controlados de React), y javascript_tool con boton.click() nativo + esperas. Para llenar inputs React NO sirve el setter nativo via Object.getOwnPropertyDescriptor (Illegal invocation en el sandbox del tool) — usar form_input. Un builder ya perdio tiempo con esto (S6 broaster 2026-08-08); el orquestador completo el e2e con esta combinacion.",
-      "context": "Descubierto verificando el flujo de pedido de broaster-app 2026-08-08."
+      "fact": "EL NAVEGADOR EMBEBIDO YA NO SE CUELGA. Reverificado 2026-09-03 en la Mac: un computer{action:'screenshot'} devolvio la imagen correcta sin timeout, y la captura mostraba solo el elemento visible (los visibility:hidden y display:none no aparecian), que es el comportamiento correcto. || EL SINTOMA VIEJO ERA DEL PC: alli, con el pane oculto, click y screenshot se colgaban porque la pagina no componia frames, y solo servian get_page_text, read_page, form_input y javascript. Ese parrafo describia otra maquina. || LO QUE SI HAY QUE SABER AQUI, y es nuevo: el pane sirve los archivos LOCALES como data: URL, o sea un snapshot estatico, no el archivo vivo. Y si el archivo esta FUERA de la carpeta del proyecto, javascript_tool responde 'No site is open in this tab' — medido con un archivo en el scratchpad. Para ejercitar una pagina local con JS hay que tenerla dentro del proyecto; para ejercitar la app de verdad, levantar el dev server con preview_start y trabajar sobre http://localhost, no sobre file://.",
+      "context": "Reverificado el 2026-09-03 con una pagina de prueba de cuatro casos de visibilidad."
     },
     {
       "id": "KN-008",
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-10T00:00:00.000Z",
-      "updated": "2026-08-10T00:00:00.000Z",
+      "updated": "2026-09-03T15:01:33.000Z",
       "lifetime": "Permanent",
       "impact": "High",
       "priority": "High",
@@ -116,8 +116,8 @@
       "dependencies": [
         "KN-007"
       ],
-      "fact": "VERDAD DE TERRENO VISUAL/CSS = EDGE HEADLESS, NO el navegador embebido. Amplia KN-007: el pane embebido no solo cuelga screenshots con el pane oculto, sino que ADEMAS reporta mal getComputedStyle(...).visibility y element.checkVisibility({visibilityProperty:true}) — un visibility:hidden real (incluso !important o inline) puede reportarse como 'visible', llevando a diagnosticar mal un CSS que en realidad funciona. Fiables en el pane: .hidden (propiedad/atributo), checkVisibility para display, y display:none. NO fiables: 'visibility' computada y screenshots. Para confirmar de verdad como se ve algo: Edge headless a PNG y leer el PNG — & 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe' --headless=new --disable-gpu --hide-scrollbars --window-size=390,780 --virtual-time-budget=6000 --user-data-dir=<perfil-fresco-en-scratchpad> --screenshot=<out.png> <url>. Perfil fresco = localStorage limpio (util para probar primeras visitas). Edge ya estaba confirmado para PDF (KN-004).",
-      "context": "WRD sesion 4 (2026-08-10): el pane afirmaba que <main> con .wrd-cargando (visibility:hidden) seguia visible; Edge headless probo que el cloak funcionaba (pantalla negra + solo el gate). Se perdieron iteraciones confiando en el pane."
+      "fact": "EL PANE EMBEBIDO YA NO MIENTE SOBRE LA VISIBILIDAD. Reverificado 2026-09-03 con una pagina de cuatro casos (visible, visibility:hidden, display:none, y un hijo que hereda visibility:hidden del padre) medida DOS veces: una con Chrome headless por CDP y otra con javascript_tool en el pane. Los dos dieron IDENTICO en los cuatro: getComputedStyle().visibility correcto, y checkVisibility({visibilityProperty:true}) devolvio false en los tres ocultos y true en el visible. La unica diferencia fue el alto del rect de un hijo (38 frente a 18 px), que es layout del contenedor, no visibilidad. || EL SINTOMA VIEJO ERA DEL PC con Edge: alli el pane reportaba mal visibility y checkVisibility, y por eso este objeto ordenaba no fiarse de el. Ya no aplica. || LO QUE SIGUE EN PIE, y es la parte que valia: para juzgar como se VE algo, la verdad de terreno es un navegador de verdad midiendo sobre el DOM pintado — no un grep del CSS, que no ve clamp() ni cascada. La herramienta es $ORION_HOME/tools/edge-cdp.mjs (KN-010). Y ojo con el limite del pane que registra KN-007: los archivos locales llegan como snapshot data:, no como el archivo vivo.",
+      "context": "Reverificado el 2026-09-03 comparando pane contra Chrome headless en el mismo caso de prueba."
     },
     {
       "id": "KN-009",
@@ -171,13 +171,13 @@
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-24T09:00:00.000Z",
-      "updated": "2026-09-02T03:12:36.000Z",
+      "updated": "2026-09-03T00:00:00.000Z",
       "lifetime": "Permanent",
       "impact": "High",
       "priority": "High",
       "status": "Current",
       "dependencies": [],
-      "fact": "EXISTE UN CEREBRO TRANSVERSAL Y SE CONSULTA ANTES DE PENSAR. `node /Users/g/orion/tools/cerebro.mjs buscar \"<pregunta>\"` responde con lo que YA sabe el ecosistema (11 memorias, ~275 objetos, sus metricas de costo por modelo, los documentos de doctrina y los temas curados) y devuelve la cita de donde salio cada cosa. Comandos: buscar, tema <slug>, probar (prueba de regresion), citas (verifica que ninguna cita este inventada), estado (huecos), exportar (vista de la boveda), indexar. Cuesta ~0 y se reindexa solo cuando algo cambia, asi que se llama varias veces por turno sin pensarlo. La FUENTE DE VERDAD de la capa transversal son los archivos de C:\\Users\\Kalel\\ORION\\cerebro\\temas\\; la boveda (ORION-Vault\\Cerebro) es una vista regenerable. Lo consumen el skill orion-cerebro (responder con cita), el agente orion-harvester (alimentarlo) y la fase 1 del skill orion (consultar antes de analizar).",
+      "fact": "EXISTE UN CEREBRO TRANSVERSAL Y SE CONSULTA ANTES DE PENSAR. `node /Users/g/orion/tools/cerebro.mjs buscar \"<pregunta>\"` responde con lo que YA sabe el ecosistema (11 memorias, ~275 objetos, sus metricas de costo por modelo, los documentos de doctrina y los temas curados) y devuelve la cita de donde salio cada cosa. Comandos: buscar, tema <slug>, probar (prueba de regresion), citas (verifica que ninguna cita este inventada), estado (huecos), exportar (vista de la boveda), indexar. Cuesta ~0 y se reindexa solo cuando algo cambia, asi que se llama varias veces por turno sin pensarlo. La FUENTE DE VERDAD de la capa transversal son los archivos de $ORION_HOME/cerebro/temas/; la boveda (ORION-Vault/Cerebro) es una vista regenerable. Lo consumen el skill orion-cerebro (responder con cita), el agente orion-harvester (alimentarlo) y la fase 1 del skill orion (consultar antes de analizar).",
       "context": "Construido la noche del 2026-08-24. Antes de esto la boveda era un espejo pasivo: una nota por objeto, aislada por proyecto, y para saber si algo ya se habia aprendido habia que abrir once state.json — que en la practica nadie abria.",
       "source": "session 2026-08-24 bloque EL CEREBRO"
     },
@@ -228,7 +228,7 @@
       "dependencies": [
         "KN-012"
       ],
-      "fact": "EN LA MEMORIA, SEPARA LA REGLA DE LA COORDENADA: la regla no caduca, la coordenada si. Con los proyectos repartidos en tres raices (ORION\\, prommter\\proyectos\\, fable 5\\), la evidencia archivo:linea envejece mas rapido de lo que se cura: pollo-landing apunta a una carpeta que ya no existe, estanco dice que fechaNegocio vive en facturacion.ts cuando se movio a jornada.ts, y landings avisa que sus propios numeros de linea se desplazaron. Al escribir conocimiento, enuncia la regla de forma que sobreviva sola y trata la ruta como una pista que hay que RE-VERIFICAR en el momento de citarla, no como un hecho.",
+      "fact": "EN LA MEMORIA, SEPARA LA REGLA DE LA COORDENADA: la regla no caduca, la coordenada si. Con los proyectos repartidos en tres raices (ORION\\, prommter/proyectos\\, fable 5\\), la evidencia archivo:linea envejece mas rapido de lo que se cura: pollo-landing apunta a una carpeta que ya no existe, estanco dice que fechaNegocio vive en facturacion.ts cuando se movio a jornada.ts, y landings avisa que sus propios numeros de linea se desplazaron. Al escribir conocimiento, enuncia la regla de forma que sobreviva sola y trata la ruta como una pista que hay que RE-VERIFICAR en el momento de citarla, no como un hecho.",
       "context": "Hallado al cruzar las 11 memorias el 2026-08-24. Es tambien por que el verificador de citas (`cerebro.mjs citas`) comprueba proyecto/ID —que es estable— y no rutas de archivo.",
       "source": "diagnostico transversal 2026-08-24"
     },
@@ -254,7 +254,7 @@
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-24T11:00:00.000Z",
-      "updated": "2026-08-24T11:00:00.000Z",
+      "updated": "2026-09-03T00:00:00.000Z",
       "lifetime": "Permanent",
       "impact": "High",
       "priority": "High",
@@ -262,7 +262,7 @@
       "dependencies": [
         "KN-016"
       ],
-      "fact": "UN AGREGADOR QUE 'CORRE Y DEVUELVE RESULTADOS' NO ESTA VERIFICADO: hay que comprobarlo contra un caso con respuesta conocida a mano, igual que cualquier otro trabajo. El sintetizador de costos de `cerebro.mjs` (escrito por el orquestador la misma noche de KN-012..KN-016) se dio por bueno porque indexaba, buscaba y devolvia resultados con forma correcta -- nadie lo comparo contra un numero calculado a mano. Horas despues, un agente que escribia el tema `modelos-y-costos` SI cruzo el agregado contra el `metrics.json` crudo de estanco-contable y encontro que mentia: contaba muertes por limite de sesion como fallos del modelo porque el ecosistema las marca de DOS formas que el agregador no leia ninguna: campo `infraDeath: true` (estanco-contable, 10 filas en modelOutcomes) y sufijo `:infra-death` en el nombre de la fase (wrd, 2 filas). Con el bug, `build:page` con sonnet en estanco-contable salia '4 fallidas de 10'; la cifra real es 6 corridas juzgables con 0 fallidas (verificado en `C:\\Users\\Kalel\\prommter\\proyectos\\estanco-contable\\memory\\estanco-contable\\metrics.json`, filas con `infraDeath: true` en build:page/sonnet). Corregido en `C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs` (busca `infraDeath === true || porSufijo`), que ahora reconoce las dos convenciones y aparta las muertes en su propio conteo (`a.infra`) en vez de sumarlas a `a.mal`.",
+      "fact": "UN AGREGADOR QUE 'CORRE Y DEVUELVE RESULTADOS' NO ESTA VERIFICADO: hay que comprobarlo contra un caso con respuesta conocida a mano, igual que cualquier otro trabajo. El sintetizador de costos de `cerebro.mjs` (escrito por el orquestador la misma noche de KN-012..KN-016) se dio por bueno porque indexaba, buscaba y devolvia resultados con forma correcta -- nadie lo comparo contra un numero calculado a mano. Horas despues, un agente que escribia el tema `modelos-y-costos` SI cruzo el agregado contra el `metrics.json` crudo de estanco-contable y encontro que mentia: contaba muertes por limite de sesion como fallos del modelo porque el ecosistema las marca de DOS formas que el agregador no leia ninguna: campo `infraDeath: true` (estanco-contable, 10 filas en modelOutcomes) y sufijo `:infra-death` en el nombre de la fase (wrd, 2 filas). Con el bug, `build:page` con sonnet en estanco-contable salia '4 fallidas de 10'; la cifra real es 6 corridas juzgables con 0 fallidas (verificado en `$ORION_HOME/prommter/estancorepo/memory/estanco-contable/metrics.json`, filas con `infraDeath: true` en build:page/sonnet). Corregido en `$ORION_HOME/tools/cerebro.mjs` (busca `infraDeath === true || porSufijo`), que ahora reconoce las dos convenciones y aparta las muertes en su propio conteo (`a.infra`) en vez de sumarlas a `a.mal`.",
       "context": "Medicion adicional al cruzar las 11 memorias por la convencion: SOLO estanco-contable usa el campo (10 filas) y SOLO wrd usa el sufijo (2 filas, mas ~5 muertes mas mencionadas solo en la nota de sesion sin fila alguna en modelOutcomes -- `wrd/metrics.json` linea 174). infrapilot no usa ninguna de las dos: su nota de sesion narra una tercera convencion de facto ('verdict: escalate, tokens: 0 por convencion') que nunca aparece como campo ni sufijo inspeccionable -- invisible para cualquier lector que no abra la prosa. placita y villa-broaster documentan muertes de sesion en sus notas (villa-broaster: '4 muertes por limite de sesion reanudadas por SendMessage'; placita: el builder de gastos+cierre 'muerto' que en realidad termino antes de morir) sin marcar NINGUNA fila de modelOutcomes de ninguna forma. Osea: 3 memorias (infrapilot, placita, villa-broaster) tienen muertes documentadas sin marca estructurada, y de esas 3 solo infrapilot deja rastro de una convencion propia, solo en prosa. RECOMENDACION PARA SESIONES FUTURAS: usa el campo `infraDeath: true` sobre la fila de `modelOutcomes`, no el sufijo -- ya es la convencion mayoritaria (10 filas contra 2) y no obliga a nadie a hacer cirugia de texto sobre el nombre de la fase para recuperarla despues. El sufijo sigue siendo leido por compatibilidad, pero no se recomienda para filas nuevas.",
       "source": "session 2026-08-24, hallado escribiendo el tema modelos-y-costos, corregido en cerebro.mjs"
     },
@@ -287,13 +287,13 @@
       "type": "Pending",
       "tier": "Permanent",
       "created": "2026-08-24T11:00:00.000Z",
-      "updated": "2026-08-24T11:00:00.000Z",
+      "updated": "2026-09-03T00:00:00.000Z",
       "lifetime": "Permanent",
       "impact": "Medium",
       "priority": "Medium",
       "status": "Ready",
       "dependencies": [],
-      "task": "La skill `orion` NO le dice a sus builders que carguen la skill `estudio-diseno` (el manifiesto visual de la casa) cuando el paso que les toca es de UI. Verificado el 2026-08-24: grep de 'estudio-diseno' en C:\\Users\\Kalel\\.claude\\skills\\orion\\SKILL.md devuelve 0 apariciones, mientras la skill sí nombra `code-review` y `run` como opcionales. Un subagente arranca sin el contexto de la conversación, así que si el brief no lo apunta al manifiesto, diseña con su promedio — que es exactamente el fallo que ya se pagó con una landing rechazada (ver el tema `generadores-de-diseno` del cerebro: lo que salva no es prohibir, es RELLENAR el hueco con tus tokens). ARREGLO: en la fase BUILDING de la skill `orion`, una línea que obligue a incluir en el brief de todo builder con trabajo visual (a) que cargue `estudio-diseno`, y (b) los tokens concretos del proyecto con sus contrastes ya calculados, no la referencia al archivo. Recordar que el espejo canónico es ORION\\runtime\\skills\\orion.SKILL.md y que después hay que correr node tools/generar-instalador.mjs.",
+      "task": "La skill `orion` NO le dice a sus builders que carguen la skill `estudio-diseno` (el manifiesto visual de la casa) cuando el paso que les toca es de UI. Verificado el 2026-08-24: grep de 'estudio-diseno' en ~/.claude/skills/orion/SKILL.md devuelve 0 apariciones, mientras la skill sí nombra `code-review` y `run` como opcionales. Un subagente arranca sin el contexto de la conversación, así que si el brief no lo apunta al manifiesto, diseña con su promedio — que es exactamente el fallo que ya se pagó con una landing rechazada (ver el tema `generadores-de-diseno` del cerebro: lo que salva no es prohibir, es RELLENAR el hueco con tus tokens). ARREGLO: en la fase BUILDING de la skill `orion`, una línea que obligue a incluir en el brief de todo builder con trabajo visual (a) que cargue `estudio-diseno`, y (b) los tokens concretos del proyecto con sus contrastes ya calculados, no la referencia al archivo. Recordar que el espejo canónico es ORION/runtime/skills/orion.SKILL.md y que después hay que correr node tools/generar-instalador.mjs.",
       "reason": "Hallado en conversación al contar cuántas skills usa ORION. Es barato de arreglar (una línea) y ataca la causa raíz de un fallo ya pagado: el ejecutor barato rellena con su promedio el hueco que le dejes en el encargo."
     },
     {
@@ -301,13 +301,13 @@
       "type": "Pending",
       "tier": "Permanent",
       "created": "2026-09-01T05:03:23.000Z",
-      "updated": "2026-09-02T03:12:36.000Z",
+      "updated": "2026-09-03T15:01:33.000Z",
       "lifetime": "Permanent",
       "impact": "High",
       "priority": "High",
       "status": "Done",
       "dependencies": [],
-      "task": "[HECHO 2026-09-01] Los 17 KN revisados uno a uno contra la Mac. CORREGIDOS con verificacion real: KN-001 (push si funciona), KN-004 (hay python3; el PDF sale con Chrome, no con Edge), KN-005 (pdftoppm sigue sin estar, pero hay brew), KN-009 (el piso de viewport de 480px era de Edge/Windows: Chrome respeta 390), KN-010 (ruta nueva + herramienta arreglada), KN-011 (el limite de 8 KB por comando era de Windows), KN-012 y KN-013 (rutas nuevas; el cerebro da 65/66). SIN CAMBIOS por no depender de la maquina: KN-002, KN-003, KN-006, KN-014 a KN-017. NUEVO KN-018 con el kit completo de la Mac. PENDIENTE MENOR, no bloquea: KN-007 y KN-008 hablan del navegador embebido frente a Edge headless — la leccion (la verdad visual es el navegador de verdad, no el pane) se sostiene, pero no se reverificaron los sintomas concretos en la Mac. Y las memorias de PROYECTO todavia citan rutas C:\\ en su contenido (p. ej. landings/KN-005): eso se cura solo cuando se toque cada proyecto.",
+      "task": "[HECHO 2026-09-01] Los 17 KN revisados uno a uno contra la Mac. CORREGIDOS con verificacion real: KN-001 (push si funciona), KN-004 (hay python3; el PDF sale con Chrome, no con Edge), KN-005 (pdftoppm sigue sin estar, pero hay brew), KN-009 (el piso de viewport de 480px era de Edge/Windows: Chrome respeta 390), KN-010 (ruta nueva + herramienta arreglada), KN-011 (el limite de 8 KB por comando era de Windows), KN-012 y KN-013 (rutas nuevas; el cerebro da 65/66). SIN CAMBIOS por no depender de la maquina: KN-002, KN-003, KN-006, KN-014 a KN-017. NUEVO KN-018 con el kit completo de la Mac. CERRADO DEL TODO el 2026-09-03: KN-007 y KN-008 reverificados con un experimento de dos mediciones (pane contra Chrome headless sobre el mismo caso) — los dos sintomas eran del PC y ya no aplican; el pane acierta y el screenshot no se cuelga. Las rutas de Windows en las memorias de PROYECTO tambien se limpiaron: quedan solo dos apariciones legitimas, una en este texto (que habla del patron) y una en un archivo inmutable de infrapilot.",
       "reason": "Pedido del dueno el 2026-09-01 ('ahora que ya tienes la boveda y el conocimiento'): una boveda que describe otra maquina produce decisiones equivocadas -- p. ej. no intentar un push que si se puede, o buscar herramientas por rutas de Windows."
     },
     {
@@ -342,9 +342,43 @@
       ],
       "fact": "EL KIT DE LA MAC, VERIFICADO PIEZA POR PIEZA (2026-09-01). Lo que HAY: node v24, python3 y pip3 en /usr/bin, brew, gh autenticado, Google Chrome (NO Edge), Safari. Lo que NO hay: Edge, pdftoppm/poppler. || RUNTIME: `node tools/instalar-orion.mjs` escribe 13 agentes y 8 skills en ~/.claude. Estaba SIN INSTALAR hasta hoy — la sesion solo veia los 7 agentes de fase y 5 skills que trae el plugin, y faltaban los agentes arquitecto/bibliotecario/estratega/harvester/landing/traductor y las skills orion-baul, orion-cerebro y orion-plan. El instalador es idempotente y guarda .bak; correrlo es barato y es lo primero que hay que comprobar en una maquina nueva. Las skills se cargan de inmediato; los agentes piden reiniciar la sesion. || BOVEDA: baul.mjs y export-vault.mjs la buscan en $ORION/../ORION-Vault, o sea /Users/g/ORION-Vault. Estaba en ~/Downloads y por eso `baul.mjs estado` respondia 'no existe la boveda'. Movida a su sitio: 1137 notas, repo git propio sin remoto. Quedo una copia duplicada sin git en ~/Downloads/5f470c5d-ORIONVault. || HERRAMIENTAS COMPROBADAS: cerebro.mjs (buscar y probar), plan.mjs, costos.mjs, baul.mjs, check-r8.mjs, runtime.mjs, generar-instalador.mjs, validate-memory.mjs y generate-vault.mjs (pide <memory-dir>, no falla). || TRAMPA MEDIDA: `export-vault.mjs --help` NO imprime ayuda — toma el argumento como carpeta destino y escribe una boveda entera en ./--help/. generar-instalador.mjs tampoco tiene --help: reescribe el instalador. Con estas dos, mirar el codigo antes de tantear.",
       "context": "Auditoria de paridad Windows -> Mac pedida por el dueno el 2026-09-01: 'quiero que orion sea igual, que mas necesitas para estar listo'."
+    },
+    {
+      "id": "KN-019",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-10-01T00:00:00.000Z",
+      "updated": "2026-10-01T00:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "KN-018"
+      ],
+      "fact": "FFMPEG YA ESTA INSTALADO EN ESTA MAC (verificado 2026-10-01): /usr/local/bin/ffmpeg, version 9.0.1, con libx264. KN-018 (2026-09-01) lo listaba en 'lo que NO hay' porque `brew install ffmpeg` tardo mas de cuatro horas compilando desde fuente (ver duo-burger/KN-003 y el tema de cerebro cortometraje-sobre-ilustracion); para esa fecha ya quedo instalado por esa via. Consecuencia practica: la ruta de encoder Swift + AVAssetWriter (duo-burger/KN-009) ya NO es la unica salida de video en esta maquina cuando el compositor nativo de Remotion no arranca — comprobar primero `which ffmpeg` antes de escribir un encoder a mano o de esperar una compilacion.",
+      "context": "Encontrado de paso mientras se verificaban citas del corto 'Juntos otra vez' (prommter/duo-burguer-video) para el cerebro de ORION."
+    },
+    {
+      "id": "DEC-002",
+      "type": "Decision",
+      "tier": "Permanent",
+      "created": "2026-11-03T01:30:00.000Z",
+      "updated": "2026-11-03T01:30:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Accepted",
+      "dependencies": [
+        "KN-002"
+      ],
+      "title": "GUARDARRAÍLES DE GASTO obligatorios en todo run ORION (2026-11-02)",
+      "reason": "Pedido del dueño el 2026-11-02 («que este tipo de errores no pasen, vamos a organizarlo bien»). Medido con costos.mjs real: desde septiembre 6.362 M tokens ≈ US$ 3.600–4.060 a precio de API, 97 % Opus; Escuadra 2.340 M en 99 agentes (98 en Opus por herencia), constructores de 150–236 pasos con 600k de contexto, crítico por paquete de 35–45 M, sesiones principales de 200–666 M. Nada saltó porque se medía el contexto final.",
+      "description": "Skill orion §1e + bloque «Disciplina de gasto» en orion-builder/verifier/fixer: (1) presupuesto en US$ antes de lanzar; > US$ 100 espera el sí del dueño; (2) modelo explícito en cada spawn y cada agent() de Workflow; (3) agentType orion-builder/verifier/fixer en Workflows; (4) encargos de ≤ 90 pasos; (5) sin crítico por paquete, un verificador sonnet al final; (6) lo determinista por Bash del orquestador; (7) disparador costos.mjs vigilar en segundo plano en cada ola; (8) sesión principal > ~300k de contexto → /orion-close y sesión nueva; (9) cierre con costos.mjs real; (10) Ultracode no anula nada de esto.",
+      "source": "sesión 2026-11-02 (Escuadra, b5eb380b)"
     }
   ],
   "archives": [],
-  "lastAmmRun": "2026-08-24T11:00:00.000Z",
-  "version": 14
+  "lastAmmRun": "2026-10-01T00:00:00.000Z",
+  "version": 18
 }

@@ -7,7 +7,7 @@ description: "Runs a task end-to-end through the ORION cognitive-runtime lifecyc
 
 You are acting as an ORION-compliant Cognitive Runtime, executing ONE Task
 end-to-end with minimal check-ins. ORION is the user's own standard, defined
-in `$ORION_HOME/ORION_STANDARD.md` and its `RFC\*.md` files. Treat
+in `$ORION_HOME/ORION_STANDARD.md` and its `RFC/*.md` files. Treat
 those files as the source of truth for phase order, object shapes, and
 terminal-state rules — this skill is the operating procedure, not a
 duplicate of the spec. Re-read the relevant RFC if a phase's exact rules
@@ -15,7 +15,7 @@ matter and you haven't read it yet this session:
 
 - `RFC-0001-OBJECT-MODEL.md` — Task/QAReport/ContextBudget shapes
 - `RFC-0003-LIFECYCLE-PROTOCOL.md` — the state machine below
-- `Skills\autonomous-memory-manager\schemas\knowledge-objects.ts` — memory object shapes
+- `Skills/autonomous-memory-manager/schemas/knowledge-objects.ts` — memory object shapes
 
 ## 0. Get the objective
 
@@ -141,11 +141,13 @@ How to apply it:
 
 MEASURED DEFAULTS (298 spawns / 39.4M tokens across 9 projects, 2026-08-26 —
 reproduce with `node $ORION_HOME/tools/costos.mjs fases`). Sample size
-in parentheses; a cell with (1) is an anecdote, not a measurement:
+in parentheses; a cell with (1) is an anecdote, not a measurement.
+⚠ These cells are FINAL CONTEXT SIZE per spawn (`subagent_tokens`), not spend:
+read them to RANK tiers, never as a cost. Real spend is ~70–110× larger — see 1e.
 
 | phase | haiku | sonnet | opus | default |
 |---|---|---|---|---|
-| analysis | — | 64k (24) | 580k (3) | **sonnet — never opus**, it costs 9× |
+| analysis | — | 64k (24) | 580k (3) | **sonnet — never opus**, its context runs 9× larger |
 | planning | — | 19k (6) | — | sonnet |
 | build:page | 62k (5) | 158k (40) | 325k (17) | **sonnet** (40 clean spawns) |
 | build:lib | 37k (3) | 118k (19) | 255k (15) | **sonnet** |
@@ -162,12 +164,16 @@ A session-limit death is not a FAIL of capability and must not raise a tier.
 And never put business facts or public-facing copy on the cheap tier regardless
 of cost: `verdict: ok` measures that the spawn landed, not that it was right.
 
-Cost measurement: each agent spawn's REAL token usage arrives in its
-completion notification (`subagent_tokens`). Collect these and hand them to
-the reflector so `metrics.json` records MEASURED per-phase consumption
-(`measurement_mode: MEASURED` for spawns, RFC-0001 §3.3). Your own inline
-consumption is not metered — never invent a figure for it. Model choice is
-the cost lever; the measured numbers tell you whether it's working.
+Cost measurement (CORRECTED 2026-11-02): `subagent_tokens` in the completion
+notification is the agent's FINAL CONTEXT SIZE, not its spend — every step
+re-reads the whole context, so real spend is ~70–110× larger (Escuadra: 13.3 M
+noted vs 1,437 M real over 36 agents). Real spend comes from the transcripts:
+`node $ORION_HOME/tools/costos.mjs real --sesion <session-id>` (per session,
+workflow and agent, with US$ and the bloated-agent marks). That figure — not
+`subagent_tokens` — is what goes to the reflector, to `metrics.json`
+(`measurement_mode: MEASURED`) and to `plan.mjs hecho --tokens`. The
+orchestrator's own spend is in the same report (group «orquestador»): it is
+metered now, so never guess it. Model choice and agent size are the levers.
 
 Learning loop: `metrics.json` sessions carry `modelOutcomes` entries
 (`{phase, model, verdict, tokens}`) from past runs. When you read memory in phase 1,
@@ -208,7 +214,7 @@ Subagent spawns are the token cost of an ORION run. Control them:
   summary — not the other steps' details.
 - **BATCH the trivial ones into ONE builder.** A spawn's cost is mostly fixed
   (a fresh agent re-reads everything before it can act). Ten trivial steps in
-  ten haiku builders is ~450k tokens; the same ten in ONE haiku builder, listed
+  ten haiku builders is ~450k tokens (final context, not spend — ~70× that in real tokens); the same ten in ONE haiku builder, listed
   as ten numbered items over the same namespace, is ~60-80k. Only batch steps
   that are (a) trivial, (b) in the same area of the tree, and (c) independent
   of each other — otherwise a single failure takes the whole batch down.
@@ -239,6 +245,46 @@ When in doubt between two levels, start lower — a FAIL from verification
 escalates the next attempt naturally. Reflection is NEVER skipped at any
 level; inline reflection just means you write state.json/metrics.json
 yourself, to the same schema the reflector uses.
+
+## 1e. Guardarraíles de gasto — OBLIGATORIOS (nacieron de un sobrecosto real)
+
+Medido el 2026-11-02 con `costos.mjs real`: desde septiembre, 6.362 M tokens
+(≈ US$ 3.600–4.060 a precio de API), 97 % Opus. Escuadra sola: 2.340 M en 99
+agentes, 98 de ellos en Opus por herencia; constructores de 150–236 pasos con
+contexto de 600k releído en cada paso; un crítico por paquete que rehacía todo
+(35–45 M cada uno); sesiones principales de 200–666 M. Ninguna regla saltó
+porque se medía el contexto final, no el gasto. Desde ahora:
+
+1. **Presupuesto en US$ antes de lanzar.** Agentes × media real del tier
+   (`costos.mjs real` la imprime: hoy opus ≈ 24 M ≈ US$ 12–15 por agente largo,
+   sonnet ≈ 4 M). Toda ola se anuncia con su cifra; si pasa de **US$ 100**, se
+   espera el sí del dueño antes de lanzarla.
+2. **Modelo explícito en CADA spawn**, también en cada `agent()` de un Workflow
+   (`model: 'sonnet'`…). Heredar = Opus para todo. Opus solo para lo que la
+   tabla de 1b manda (arte público, diseño transversal, seguridad, reglas muy
+   difíciles).
+3. **Los agentes de un Workflow llevan la disciplina**: `agentType:
+   'orion-builder'` / `'orion-verifier'` / `'orion-fixer'` (cargan «Disciplina
+   de gasto»); si se usa otro tipo, se pega ese bloque en el brief.
+4. **Encargo que cierra en ≤ 90 pasos** (≈ una pantalla o un módulo con sus
+   pruebas). Un paquete de 4 tareas + capturas + flujo real son 200 pasos: se
+   parte antes de lanzar.
+5. **Sin crítico por paquete por defecto.** Un solo verificador (sonnet) al
+   final. Crítico adversarial solo donde un fallo sale caro (seguridad, dinero,
+   datos de clientes), y en sonnet salvo diseño transversal.
+6. **Lo determinista lo corre el orquestador por Bash** (lint, typecheck, tests,
+   build, migraciones, curl + grep): casi gratis. El verificador agente solo
+   observa lo que no se puede comprobar con un comando.
+7. **Disparador en vivo**: al lanzar una ola, en segundo plano
+   `node $ORION_HOME/tools/costos.mjs vigilar <carpeta de la ola> --agente 40 --total <presupuesto×1,3>`.
+   Si sale con código 3: parar, partir o seguir con la razón escrita.
+8. **El orquestador también gasta.** Con más de ~300k de contexto, cada turno
+   relee todo: al cerrar un bloque grande, `/orion-close` y sesión nueva desde
+   `brief.md` en vez de seguir arrastrando.
+9. **Cierre con la cifra real**: `costos.mjs real --sesion <id>` en cada cierre;
+   esa cifra va a metrics, al plan y al reporte al dueño.
+10. Ultracode y los Workflows NO anulan estas reglas: deciden cómo se orquesta,
+    no cuánto se gasta.
 
 ## 2. ANALYZING → `orion-analyst`
 
@@ -302,8 +348,8 @@ a precise summary of what's blocking. Don't loop indefinitely.
 
 Hand the `orion-reflector` subagent a summary of the run: objective, what was
 built, the verdict, fix-cycle count, outcome, AND the model choices you made
-per phase/step with each one's result and its measured `subagent_tokens` from
-the completion notification — the reflector records these as `modelOutcomes`
+per phase/step with each one's result and its REAL tokens from
+`costos.mjs real` (not `subagent_tokens`, see 1b) — the reflector records these as `modelOutcomes`
 so future runs can calibrate (see 1b learning loop). Give it
 the absolute memory dir path. Reflection is MANDATORY on every terminal path,
 including ESCALATED/ABORTED.
@@ -334,8 +380,8 @@ same way:
 
 Append one entry to `<repo-root>/memory/<projectId>/metrics.json` in the
 `SessionMetrics` shape (counts of objects created/merged/archived are
-enough; there's no live token metering in this environment, so
-context/compression fields can be left at reasonable defaults).
+enough; the token fields carry the REAL spend from `costos.mjs real --sesion <id>`,
+never `subagent_tokens`; context/compression fields can be left at reasonable defaults).
 
 ## 7a. WRITE BACK TO THE PLAN — mandatory when the task came from one
 
@@ -346,13 +392,14 @@ node $ORION_HOME/tools/plan.mjs hecho <plan.json> T-042 \
   --evidencia "<the fact the verifier OBSERVED, not 'done'>" --tokens <measured>
 ```
 
-`--evidencia` is the verifier's evidence verbatim, and `--tokens` is the sum of
-the `subagent_tokens` this task actually cost. Without the write-back the plan
+`--evidencia` is the verifier's evidence verbatim, and `--tokens` is the REAL
+spend this task cost (`costos.mjs real`, not `subagent_tokens`). Without the write-back the plan
 is a document; with it, it is a control loop — and it is the loop that makes
 `presupuesto` converge on reality instead of staying a guess forever. Check
 `plan.mjs estado` for the calibration line; if it says the budget is off by
-more than 25 % over 5+ measured tasks, that is a real signal to adjust `COSTO`
-in `tools/plan.mjs`, not noise.
+more than 25 % over 5+ tasks measured in REAL tokens, that is a real signal to adjust
+`COSTO` in `tools/plan.mjs`, not noise (older context-unit measurements are excluded
+from that line automatically).
 
 ## 7b. COMMIT — autocommit on verification pass
 

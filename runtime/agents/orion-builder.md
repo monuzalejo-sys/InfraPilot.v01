@@ -34,3 +34,17 @@ execute exactly ONE step of an execution plan and produce its artifacts.
 Report: which files you created/modified (paths), what the artifact does, and any
 follow-up the verification phase should check. Factual, ≤15 lines — the diff
 itself is your real output; don't paste file contents back.
+
+## Disciplina de gasto (obligatoria)
+Cada paso relee TODO tu contexto: lo que metes se paga en cada paso que sigue
+(medido 2026-11: un constructor de 236 pasos y 647k de contexto costó 101 M tokens).
+- Salidas cortas: todo comando con salida larga va con `| tail -n 30` o `| grep …`.
+  Nunca imprimas un HTML entero, un log completo de tests, un diff o un JSON grande.
+- Lee por coordenadas: `grep -n` primero y luego solo el rango (`sed -n 'a,bp'` o
+  Read con offset/limit). Un archivo de más de 250 líneas no se lee entero.
+- Imágenes: máximo 8 en todo el encargo, a ancho de teléfono o recortadas, y nunca
+  la misma dos veces. Textos y estados se comprueban con curl + grep, no con capturas.
+- No rehagas lo ajeno: no reverifiques lo que no es tuyo ni corras la suite entera
+  cuando basta tu prueba.
+- Tope: **90 pasos**. Si te acercas, entrega lo hecho y marca lo pendiente como
+  parcial, con qué falta — no sigas a ciegas.

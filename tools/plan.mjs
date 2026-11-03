@@ -33,18 +33,21 @@ const ORION_HOME = process.env.ORION_HOME
   ?? resolve(dirname(fileURLToPath(import.meta.url)), "..")
 const DIR_CATALOGO = join(ORION_HOME, "catalogo")
 
-/* ── Costo por tarea ──────────────────────────────────────────────────────
-   NO son estimaciones: salen de 280 spawns medidos en `modelOutcomes` de seis
-   memorias (cerebro/temas/modelos-y-costos.md §5). `presupuesto` cuenta SOLO
-   tokens de subagente: el consumo inline del orquestador no está metrado en
-   este entorno y no se inventa. Por eso una tarea `inline` presupuesta 0 — no
-   es que sea gratis, es que es el único número que se puede controlar. */
+/* ── Costo por tarea, en TOKENS REALES (corregido 2026-11-02) ────────────────
+   Antes esta tabla salía de `subagent_tokens`, que es el contexto FINAL de cada
+   agente y no su gasto (~70–110× menos). Ahora es gasto real leído de las
+   transcripciones con `costos.mjs real`: media de 321 agentes desde 2026-09
+   (opus 24 M, sonnet 3,7 M, haiku 1 M), bajada para opus porque la «Disciplina
+   de gasto» topa los encargos en 90 pasos; un verificador sonnet disciplinado
+   midió 0,5 M. PROVISIONAL: se recalibra con `plan.mjs estado` cuando haya 5+
+   tareas cerradas con `--tokens` reales. Una tarea `inline` presupuesta 0: su
+   gasto va al orquestador, que `costos.mjs real` también mide. */
 const COSTO = {
-  haiku:  { build: 45_000,  verificacion: 19_000 },
-  sonnet: { build: 150_000, verificacion: 71_000 },
-  opus:   { build: 206_000, verificacion: 284_000 },
+  haiku:  { build: 1_000_000,  verificacion: 300_000 },
+  sonnet: { build: 5_000_000,  verificacion: 1_500_000 },
+  opus:   { build: 15_000_000, verificacion: 8_000_000 },
 }
-const ADVERSARIAL = 110_000            // par de jueces opus; solo donde el fallo es caro
+const ADVERSARIAL = 8_000_000           // juez opus; solo donde el fallo es caro
 const MODELO_POR_DIFICULTAD = { trivial: "haiku", normal: "sonnet", hard: "opus" }
 const NIVELES = ["N0", "N1", "N2", "N3", "N4"]
 const NIVEL_NOMBRE = {
@@ -458,10 +461,14 @@ function cmdEstado() {
   const plan = leerJSON(ruta)
   const por = val("por", "categoria")
   const T = plan.tareas
-  const hechas = T.filter((t) => t.estado === "hecho")
+  /* El presupuesto se recalcula con el COSTO vigente (el guardado en cada tarea puede
+     estar en la unidad vieja) y la calibración solo usa mediciones en tokens reales. */
+  const todasHechas = T.filter((t) => t.estado === "hecho")
+  const hechas = todasHechas.filter((t) => t.gastoUnidad === "real")
+  const viejas = todasHechas.filter((t) => t.gastoReal && t.gastoUnidad !== "real").length
   const gastado = hechas.reduce((s, t) => s + (t.gastoReal ?? 0), 0)
-  const presupuestado = hechas.reduce((s, t) => s + t.presupuesto, 0)
-  const restante = T.filter((t) => t.estado !== "hecho" && t.estado !== "descartado").reduce((s, t) => s + t.presupuesto, 0)
+  const presupuestado = hechas.reduce((s, t) => s + presupuestar(t), 0)
+  const restante = T.filter((t) => t.estado !== "hecho" && t.estado !== "descartado").reduce((s, t) => s + presupuestar(t), 0)
 
   console.log(`${plan.projectId} · plan v${plan.version} · modo ${plan.modo} · etapa ${plan.perfil.etapa}`)
   console.log(`${barra(hechas.length, T.length)}  ${hechas.length}/${T.length} hechas`)
@@ -475,7 +482,8 @@ function cmdEstado() {
     const etiqueta = por === "nivel" ? `${g} ${NIVEL_NOMBRE[g]}` : g
     console.log(`  ${etiqueta.padEnd(20)} ${barra(h, ts.length, 14)} ${String(h).padStart(3)}/${String(ts.length).padEnd(3)}${b ? `  ${b} bloqueadas` : ""}`)
   }
-  console.log(`\npresupuesto restante: ${(restante / 1e6).toFixed(2)} M tokens de subagente`)
+  console.log(`\npresupuesto restante: ${(restante / 1e6).toFixed(0)} M tokens reales de subagente (≈ US$ ${Math.round((restante / 1e6) * 0.3)}–${Math.round((restante / 1e6) * 0.62)} entre sonnet y opus; mídelo con costos.mjs real)`)
+  if (viejas) console.log(`  (${viejas} mediciones viejas en unidad de contexto quedan fuera de la calibración)`)
   if (hechas.length && gastado) {
     const desvio = ((gastado / presupuestado - 1) * 100).toFixed(0)
     console.log(`calibración: ${hechas.length} tareas medidas · presupuestado ${(presupuestado / 1e6).toFixed(2)} M · gastado ${(gastado / 1e6).toFixed(2)} M (${desvio > 0 ? "+" : ""}${desvio}%)`)
@@ -483,7 +491,7 @@ function cmdEstado() {
        un presupuesto por una tarea que salió barata. */
     if (hechas.length >= 5 && Math.abs(Number(desvio)) > 25)
       console.log(`  → descalibrado más de un 25 % sobre ${hechas.length} tareas medidas: revisa COSTO en tools/plan.mjs.`)
-  } else if (hechas.length) {
+  } else if (todasHechas.length && !viejas) {
     console.log(`calibración: ${hechas.length} hechas pero sin --tokens medidos. Sin eso el presupuesto nunca converge (N8-R10).`)
   }
   const bloq = T.filter((t) => t.estado === "bloqueado")
@@ -503,13 +511,13 @@ function cmdHecho() {
   t.estado = "hecho"
   t.evidencia = evidencia
   t.bloqueadoPor = null
-  if (val("tokens")) t.gastoReal = Number(val("tokens"))
+  if (val("tokens")) { t.gastoReal = Number(val("tokens")); t.gastoUnidad = "real" }   // costos.mjs real
   const v = guardar(ruta, plan)
   const desbloqueadas = plan.tareas.filter((x) =>
     (x.estado === "pendiente" || x.estado === "bloqueado")
     && (x.dependeDe ?? []).includes(id)
     && (x.dependeDe ?? []).every((d) => plan.tareas.find((y) => y.id === d)?.estado === "hecho"))
-  console.log(`${id} hecha (v${v})${t.gastoReal ? ` · ${Math.round(t.gastoReal / 1000)}k tokens medidos vs ${Math.round(t.presupuesto / 1000)}k presupuestados` : " · sin medición de tokens"}`)
+  console.log(`${id} hecha (v${v})${t.gastoReal ? ` · ${(t.gastoReal / 1e6).toFixed(1)} M tokens reales vs ${(presupuestar(t) / 1e6).toFixed(1)} M presupuestados` : " · sin medición de tokens"}`)
   if (desbloqueadas.length) console.log(`desbloquea: ${desbloqueadas.map((x) => x.id).join(", ")}`)
 }
 
@@ -749,7 +757,7 @@ function cmdMd() {
   L.push(`**Modo.** ${plan.modo === "genesis" ? "Génesis — se construye de cero, no hay nada que romper." : "Evolución — hay un sistema vivo y alguien usándolo: toda tarea lleva chequeo de regresión."}`, "")
   if (plan.resumen?.length) { L.push(`## El plan en una lectura`, ""); for (const r of plan.resumen) L.push(`- ${r}`); L.push("") }
   L.push(`## Dónde estamos`, "")
-  L.push(`${hechas} de ${T.length} tareas hechas · etapa ${plan.perfil.etapa} (${NIVEL_NOMBRE[plan.perfil.etapa] ?? "?"}) · presupuesto restante ${(T.filter((t) => t.estado !== "hecho").reduce((s, t) => s + t.presupuesto, 0) / 1e6).toFixed(2)} M tokens de subagente`, "")
+  L.push(`${hechas} de ${T.length} tareas hechas · etapa ${plan.perfil.etapa} (${NIVEL_NOMBRE[plan.perfil.etapa] ?? "?"}) · presupuesto restante ${(T.filter((t) => t.estado !== "hecho" && t.estado !== "descartado").reduce((s, t) => s + presupuestar(t), 0) / 1e6).toFixed(0)} M tokens reales de subagente`, "")
   L.push(`| Categoría | Hechas | Total |`, `|---|---|---|`)
   const cats = [...new Set(T.map((t) => t.categoria))].sort()
   for (const c of cats) { const ts = T.filter((t) => t.categoria === c); L.push(`| ${c} | ${ts.filter((t) => t.estado === "hecho").length} | ${ts.length} |`) }

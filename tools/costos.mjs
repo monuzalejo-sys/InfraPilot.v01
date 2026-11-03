@@ -14,19 +14,36 @@
  *   node tools/costos.mjs fugas                dónde se está tirando plata
  *   node tools/costos.mjs presupuesto --spawns 5 --modelo sonnet   cuánto costaría
  *
+ *   node tools/costos.mjs real [--proyecto <texto>] [--sesion <uuid>] [--desde AAAA-MM-DD] [--top 12]
+ *        GASTO REAL leído de las transcripciones de Claude Code (~/.claude/projects): el
+ *        `usage` de cada mensaje (entrada, escritura y lectura de caché, salida) por sesión,
+ *        flujo y agente, con US$ a precio de API y las marcas de agente inflado.
+ *   node tools/costos.mjs vigilar <carpeta> [--agente 40] [--total 400] [--cada 30]
+ *        DISPARADOR en vivo para una ola: relee la carpeta del flujo o de la sesión y sale con
+ *        código 3 en cuanto un agente pasa de --agente M tokens reales o la carpeta de --total M.
+ *        Se lanza en segundo plano junto con la ola; cuando salta, el orquestador decide parar.
+ *
+ * ⚠ CORRECCIÓN 2026-11-02: `subagent_tokens` (lo que guardan los metrics.json y suman los
+ * comandos de arriba) NO es el gasto: es el tamaño del contexto FINAL de cada agente. Cada
+ * paso relee todo el contexto, así que el gasto real es 70–110× mayor (Escuadra: 13,3 M
+ * anotados contra 1.437 M reales en 36 agentes). Para presupuestar y vigilar: `real`.
+ *
  * El consumo INLINE del orquestador no está metrado en este entorno y NUNCA se
  * inventa: todo lo de aquí es gasto de subagente, que es además el único que se
  * puede controlar eligiendo ceremonia y modelo.
  *
  * Cero dependencias.
  */
-import { readFileSync, readdirSync, existsSync, statSync } from "node:fs"
+import { readFileSync, readdirSync, existsSync, statSync, openSync, readSync, closeSync } from "node:fs"
+import { homedir } from "node:os"
 import { join, resolve, basename, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const ORION = process.env.ORION_HOME ?? resolve(dirname(fileURLToPath(import.meta.url)), "..")
-const RAICES = [join(ORION, "memory"), "C:\\Users\\Kalel\\prommter\\proyectos", "C:\\Users\\Kalel\\fable 5"]
-const SUELTAS = ["C:\\Users\\Kalel\\prommter\\memory\\prommter"]
+/* Misma pareja de raíces que cerebro.mjs y baul.mjs: memory/ del propio ORION más
+   prommter/ completo, escaneado (nada de repos listados a mano ni rutas de una
+   plataforma). Si prommter/ no existe, el barrido de abajo simplemente lo salta. */
+const RAICES = [join(ORION, "memory"), join(ORION, "prommter")]
 const ARGV = process.argv.slice(2)
 const cmd = ARGV[0] ?? "resumen"
 const val = (n, d) => { const i = ARGV.indexOf(`--${n}`); return i >= 0 && ARGV[i + 1] ? ARGV[i + 1] : d }
@@ -35,7 +52,7 @@ const k = (n) => n >= 1e6 ? `${(n / 1e6).toFixed(2)} M` : `${Math.round(n / 1000
 const pct = (a, b) => b ? `${((a / b) * 100).toFixed(1)}%` : "—"
 
 function memorias() {
-  const out = new Set(SUELTAS)
+  const out = new Set()
   for (const raiz of RAICES) {
     if (!existsSync(raiz)) continue
     for (const e of readdirSync(raiz)) {
@@ -94,6 +111,147 @@ function filas() {
   }
   return out
 }
+
+/* ─── Gasto REAL (transcripciones) ─────────────────────────────────────────────
+   Precios por millón de tokens a precio de API (skill claude-api, 2026-11). La lectura
+   de caché cuesta 0,1× la entrada; la escritura 1,25× (caché de 5 min) a 2× (de 1 h): por
+   eso el costo sale como rango. Un modelo desconocido se cobra como opus (lo prudente). */
+const PRECIOS = { opus: { e: 4, s: 20 }, sonnet: { e: 2, s: 10 }, haiku: { e: 0.1, s: 0.5 } }
+const familia = (m = "") => (m.includes("haiku") ? "haiku" : m.includes("sonnet") ? "sonnet" : "opus")
+const PROYECTOS = join(homedir(), ".claude", "projects")
+const M = (n) => `${(n / 1e6).toLocaleString("es-CO", { maximumFractionDigits: 1 })} M`
+const usd = (n) => `US$ ${n.toLocaleString("es-CO", { maximumFractionDigits: n < 10 ? 2 : 0 })}`
+
+/* Un archivo .jsonl de transcripción → su gasto. Las líneas de un mismo mensaje se repiten
+   mientras se transmite: se cuenta UNA vez por message.id (la última trae el uso final). */
+function nuevoAcumulado() { return { usos: new Map(), imgs: 0, modelos: new Map(), offset: 0, resto: "" } }
+function leerIncremental(archivo, a) {
+  const tam = statSync(archivo).size
+  if (tam <= a.offset) return a
+  const fd = openSync(archivo, "r")
+  const buf = Buffer.alloc(tam - a.offset)
+  readSync(fd, buf, 0, buf.length, a.offset); closeSync(fd)
+  a.offset = tam
+  const lineas = (a.resto + buf.toString("utf8")).split("\n")
+  a.resto = lineas.pop()
+  for (const l of lineas) {
+    if (!l.includes('"usage"') && !l.includes('"image"')) continue
+    let e; try { e = JSON.parse(l) } catch { continue }
+    const m = e.message
+    if (!m || typeof m !== "object") continue
+    if (Array.isArray(m.content)) for (const b of m.content)
+      if (b?.type === "tool_result" && Array.isArray(b.content)) a.imgs += b.content.filter((x) => x?.type === "image").length
+    if (m.usage && m.model !== "<synthetic>") {
+      a.usos.set(m.id ?? e.uuid, m.usage)
+      a.modelos.set(m.model, (a.modelos.get(m.model) ?? 0) + 1)
+    }
+  }
+  return a
+}
+function resumirAcumulado(a) {
+  let ent = 0, esc = 0, lec = 0, sal = 0, ctx = 0
+  for (const u of a.usos.values()) {
+    ent += u.input_tokens ?? 0; esc += u.cache_creation_input_tokens ?? 0
+    lec += u.cache_read_input_tokens ?? 0; sal += u.output_tokens ?? 0
+    ctx = Math.max(ctx, (u.input_tokens ?? 0) + (u.cache_creation_input_tokens ?? 0) + (u.cache_read_input_tokens ?? 0))
+  }
+  const modelo = [...a.modelos].sort((x, y) => y[1] - x[1])[0]?.[0] ?? "?"
+  const p = PRECIOS[familia(modelo)]
+  const base = (ent * p.e + lec * p.e * 0.1 + sal * p.s) / 1e6
+  return { modelo, pasos: a.usos.size, ctx, imgs: a.imgs, ent, esc, lec, sal, total: ent + esc + lec + sal,
+    usdMin: base + (esc * p.e * 1.25) / 1e6, usdMax: base + (esc * p.e * 2) / 1e6 }
+}
+const gastoDe = (archivo) => resumirAcumulado(leerIncremental(archivo, nuevoAcumulado()))
+function etiqueta(archivo) {
+  try { return JSON.parse(readFileSync(archivo.replace(/\.jsonl$/, ".meta.json"), "utf8")).description ?? basename(archivo) } catch { return basename(archivo, ".jsonl") }
+}
+const listar = (dir, f = () => true) => (existsSync(dir) ? readdirSync(dir).filter(f).map((x) => join(dir, x)) : [])
+/* Una sesión = <uuid>.jsonl (el orquestador) + <uuid>/subagents/*.jsonl (agentes sueltos)
+   + <uuid>/subagents/workflows/<wf>/*.jsonl (cada flujo, con su nombre del guion). */
+function sesiones() {
+  const out = []
+  const desde = val("desde") ? new Date(val("desde")).getTime() : 0
+  for (const pdir of listar(PROYECTOS)) {
+    if (val("proyecto") && !basename(pdir).includes(val("proyecto"))) continue
+    for (const f of listar(pdir, (x) => x.endsWith(".jsonl"))) {
+      const id = basename(f, ".jsonl")
+      if (val("sesion") && !id.startsWith(val("sesion"))) continue
+      if (statSync(f).mtimeMs < desde) continue
+      const sdir = join(pdir, id)
+      const grupos = [{ nombre: "orquestador", archivos: [f] }]
+      const sueltos = listar(join(sdir, "subagents"), (x) => x.endsWith(".jsonl"))
+      if (sueltos.length) grupos.push({ nombre: "subagentes", archivos: sueltos })
+      const guiones = listar(join(sdir, "workflows", "scripts"))
+      for (const w of listar(join(sdir, "subagents", "workflows"))) {
+        const g = guiones.find((x) => x.includes(basename(w)))
+        grupos.push({ nombre: `flujo ${g ? basename(g).replace(/-wf_.*$/, "") : basename(w)}`, archivos: listar(w, (x) => x.endsWith(".jsonl")) })
+      }
+      out.push({ proyecto: basename(pdir), id, grupos })
+    }
+  }
+  return out
+}
+function real() {
+  const S = sesiones()
+  if (!S.length) { console.log("no encontré transcripciones con ese filtro en " + PROYECTOS); return }
+  const agentes = [], porGrupo = [], porModelo = new Map()
+  const T = { total: 0, ent: 0, esc: 0, lec: 0, sal: 0, usdMin: 0, usdMax: 0 }
+  for (const s of S) for (const g of s.grupos) {
+    const fila = { nombre: `${s.id.slice(0, 8)} · ${g.nombre}`, agentes: 0, total: 0, usdMin: 0, usdMax: 0 }
+    for (const f of g.archivos) {
+      const r = gastoDe(f)
+      if (!r.pasos) continue
+      fila.agentes++; fila.total += r.total; fila.usdMin += r.usdMin; fila.usdMax += r.usdMax
+      for (const k2 of Object.keys(T)) T[k2] += r[k2]
+      const fm = familia(r.modelo); const pm = porModelo.get(fm) ?? { n: 0, total: 0, usdMax: 0 }
+      pm.n++; pm.total += r.total; pm.usdMax += r.usdMax; porModelo.set(fm, pm)
+      if (g.nombre !== "orquestador") agentes.push({ ...r, etiqueta: etiqueta(f), grupo: g.nombre })
+    }
+    if (fila.agentes) porGrupo.push(fila)
+  }
+  console.log(`GASTO REAL · ${S.length} sesiones · ${agentes.length} subagentes  (transcripciones de ${PROYECTOS})`)
+  console.log(`  total ${M(T.total)} tokens = lectura de caché ${M(T.lec)} (${pct(T.lec, T.total)}) · escritura ${M(T.esc)} · salida ${M(T.sal)} · entrada ${M(T.ent)}`)
+  console.log(`  a precio de API ≈ ${usd(T.usdMin)} – ${usd(T.usdMax)}  (escritura de caché a 1,25×–2×)`)
+  console.log(`  por modelo: ${[...porModelo].map(([m, x]) => `${m} ${x.n} · ${M(x.total)} · media ${M(x.total / x.n)}`).join("  |  ")}`)
+  console.log(`
+  por grupo:`)
+  for (const g of porGrupo.sort((a, b) => b.total - a.total).slice(0, 20))
+    console.log(`    ${g.nombre.padEnd(46)} ${String(g.agentes).padStart(3)} ag  ${M(g.total).padStart(10)}  ${usd(g.usdMin)}–${usd(g.usdMax)}`)
+  const top = Number(val("top", "12"))
+  console.log(`
+  los ${top} agentes más caros  (⚠ = más de 100 pasos, contexto > 300k o > 20 imágenes: partir el encargo)`)
+  for (const a of agentes.sort((x, y) => y.total - x.total).slice(0, top)) {
+    const marca = a.pasos > 100 || a.ctx > 3e5 || a.imgs > 20 ? "⚠" : " "
+    console.log(`  ${marca} ${a.etiqueta.slice(0, 30).padEnd(30)} ${familia(a.modelo).padEnd(6)} ${M(a.total).padStart(9)}  ${usd(a.usdMax).padStart(10)}  ${String(a.pasos).padStart(4)} pasos  ctx ${Math.round(a.ctx / 1000)}k  ${a.imgs} img`)
+  }
+}
+async function vigilar() {
+  const dir = ARGV[1]
+  if (!dir || !existsSync(dir)) { console.log("uso: costos.mjs vigilar <carpeta de flujo o de sesión> [--agente 40] [--total 400] [--cada 30]"); process.exit(1) }
+  const limAg = Number(val("agente", "40")) * 1e6, limTot = Number(val("total", "400")) * 1e6, cada = Number(val("cada", "30")) * 1000
+  const acum = new Map()
+  const archivos = () => {
+    const out = []
+    const rec = (d) => { for (const x of listar(d)) { try { if (statSync(x).isDirectory()) rec(x); else if (x.endsWith(".jsonl")) out.push(x) } catch {} } }
+    rec(dir); return out
+  }
+  console.log(`vigilando ${dir} · agente > ${M(limAg)} o total > ${M(limTot)} · cada ${cada / 1000} s`)
+  for (;;) {
+    let total = 0
+    for (const f of archivos()) {
+      const a = leerIncremental(f, acum.get(f) ?? nuevoAcumulado()); acum.set(f, a)
+      const r = resumirAcumulado(a); total += r.total
+      if (r.total > limAg) {
+        console.log(`⚠ DISPARADOR: «${etiqueta(f)}» (${familia(r.modelo)}) va en ${M(r.total)} tokens reales (≈ ${usd(r.usdMax)}), ${r.pasos} pasos, contexto ${Math.round(r.ctx / 1000)}k, ${r.imgs} imágenes. Límite por agente ${M(limAg)}.`)
+        process.exit(3)
+      }
+    }
+    if (total > limTot) { console.log(`⚠ DISPARADOR: la carpeta va en ${M(total)} tokens reales. Límite total ${M(limTot)}.`); process.exit(3) }
+    await new Promise((r) => setTimeout(r, cada))
+  }
+}
+if (cmd === "real") { real(); process.exit(0) }
+if (cmd === "vigilar") { await vigilar() }
 
 const F = filas()
 const TOTAL = F.reduce((a, x) => a + x.tokens, 0)
@@ -256,4 +414,5 @@ if (!CMD[cmd]) {
   process.exit(1)
 }
 if (!F.length) { console.log("no hay ni un solo spawn medido en los metrics.json encontrados."); process.exit(0) }
+console.log("⚠ unidad: subagent_tokens = contexto FINAL de cada agente, no su gasto (el real es ~70–110× mayor). Gasto real: costos.mjs real\n")
 CMD[cmd]()
