@@ -222,7 +222,7 @@ function real() {
   los ${top} agentes más caros  (⚠ = más de 100 pasos, contexto > 300k o > 20 imágenes: partir el encargo)`)
   for (const a of agentes.sort((x, y) => y.total - x.total).slice(0, top)) {
     const marca = a.pasos > 100 || a.ctx > 3e5 || a.imgs > 20 ? "⚠" : " "
-    console.log(`  ${marca} ${a.etiqueta.slice(0, 30).padEnd(30)} ${familia(a.modelo).padEnd(6)} ${M(a.total).padStart(9)}  ${usd(a.usdMax).padStart(10)}  ${String(a.pasos).padStart(4)} pasos  ctx ${Math.round(a.ctx / 1000)}k  ${a.imgs} img`)
+    console.log(`  ${marca} ${a.etiqueta.slice(0, 30).padEnd(30)} ${a.grupo.replace(/^flujo /, "").slice(0, 22).padEnd(22)} ${familia(a.modelo).padEnd(6)} ${M(a.total).padStart(9)}  ${usd(a.usdMax).padStart(10)}  ${String(a.pasos).padStart(4)} pasos  ctx ${Math.round(a.ctx / 1000)}k  ${a.imgs} img`)
   }
 }
 async function vigilar() {
