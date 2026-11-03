@@ -268,7 +268,11 @@ porque se medía el contexto final, no el gasto. Desde ahora:
    de gasto»); si se usa otro tipo, se pega ese bloque en el brief.
 4. **Encargo que cierra en ≤ 90 pasos** (≈ una pantalla o un módulo con sus
    pruebas). Un paquete de 4 tareas + capturas + flujo real son 200 pasos: se
-   parte antes de lanzar.
+   parte antes de lanzar. El tope escrito en el brief NO se respeta solo
+   (medido 2026-11-02: un constructor sonnet con 6 encargos + kit de capturas
+   dio 162 pasos con tope 90): el tamaño se controla partiendo — **≤ 3
+   sub-objetivos por constructor**, y lo que sea «refrescar capturas» va en
+   un constructor aparte y barato.
 5. **Sin crítico por paquete por defecto.** Un solo verificador (sonnet) al
    final. Crítico adversarial solo donde un fallo sale caro (seguridad, dinero,
    datos de clientes), y en sonnet salvo diseño transversal.
