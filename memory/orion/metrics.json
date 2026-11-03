@@ -1,11 +1,11 @@
 {
   "projectId": "orion",
-  "sessionCount": 6,
+  "sessionCount": 7,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-09-09T15:05:00.000Z",
+  "lastUpdated": "2026-11-03T02:10:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-08-26-orion-v4",
@@ -307,6 +307,29 @@
       "notes": "Archivados PEND-003 y PEND-004 como Expired (sprint de 2 semanas sin progreso); archivado RSK-001 como Deprecated (mitigación redundante con PEND-002 + validada por KN-024). Resultado: 28→25 objetos.",
       "measurement_mode": "MEASURED",
       "modelOutcomes": []
+    },
+    {
+      "sessionId": "session-2026-11-02-gasto-real",
+      "runId": "orion-gasto-real",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-11-03T00:40:00.000Z",
+      "completedAt": "2026-11-03T02:10:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 2,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 1,
+      "modelOutcomes": [
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 490000,
+          "note": "verificador de las correcciones de gasto, con Disciplina de gasto: 18 pasos, 0,49 M reales ≈ US$ 0,32 (costos.mjs real). Primer dato en unidad real."
+        }
+      ],
+      "tokensReales": 490000,
+      "notaMedicion": "tokens = gasto real (costos.mjs real), no subagent_tokens"
     }
   ]
 }

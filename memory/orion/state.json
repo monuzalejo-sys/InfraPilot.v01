@@ -1,7 +1,7 @@
 {
   "projectId": "orion",
   "snapshotDate": "2026-09-09T00:00:00.000Z",
-  "version": 13,
+  "version": 14,
   "lastAmmRun": "2026-09-09T00:00:00.000Z",
   "objects": [
     {
@@ -90,13 +90,13 @@
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-26T06:30:00.000Z",
-      "updated": "2026-08-26T06:30:00.000Z",
+      "updated": "2026-11-03T02:10:00.000Z",
       "lifetime": "Permanent",
       "impact": "High",
       "priority": "Critical",
       "status": "Current",
       "dependencies": [],
-      "fact": "GASTO MEDIDO DEL ECOSISTEMA a 2026-08-26: 298 spawns, 39,37 M tokens de subagente, 9 proyectos. Reparto por tier: opus 112 spawns / 20,27 M / 51,5 % del gasto; sonnet 155 / 14,97 M / 38 %; workflows mixtos 5 / 3,48 M / 8,8 %; haiku 24 / 651k / 1,7 %. Fallos reales de capacidad: 10 de 298 (3,4 %). Por proyecto: placita 33,6 %, villa-broaster 21,5 %, wrd 14,7 %. Costo medio por spawn y fase (muestra entre parentesis): analysis sonnet 64k (24) vs opus 580k (3); build:page sonnet 158k (40) vs opus 325k (17); build:lib sonnet 118k (19) vs opus 255k (15); build:visual sonnet 149k (3) vs opus 173k (32); verification sonnet 60k (22).",
+      "fact": "SUPERADO 2026-11-02 (ver _permanent/KN-002 y DEC-002): los «39,37 M tokens de 298 spawns» eran subagent_tokens = contexto FINAL de cada agente, no gasto. Gasto real medido con costos.mjs real desde 2026-09-01: 6.362 M tokens ≈ US$ 3.600–4.060, 97 % Opus; las tablas por fase sirven para ordenar tiers, no como costo. Texto original: GASTO MEDIDO DEL ECOSISTEMA a 2026-08-26: 298 spawns, 39,37 M tokens de subagente, 9 proyectos. Reparto por tier: opus 112 spawns / 20,27 M / 51,5 % del gasto; sonnet 155 / 14,97 M / 38 %; workflows mixtos 5 / 3,48 M / 8,8 %; haiku 24 / 651k / 1,7 %. Fallos reales de capacidad: 10 de 298 (3,4 %). Po",
       "context": "Se reproduce con `node tools/costos.mjs`. Hasta hoy estos numeros vivian repartidos en once metrics.json y nadie los sumaba. Leer la tabla al reves ('opus casi no falla, bajemoslo todo') es el error: opus no falla porque la rubrica le da lo dificil.",
       "source": "sesion 2026-08-26, tools/costos.mjs sobre 11 metrics.json"
     },
