@@ -84,8 +84,10 @@ se pierde por precio, por confianza y por contabilidad, las tres a la vez.
 
 Y un detalle que dice la edad del producto: el sitio sigue vendiendo que la Contabilidad
 «aplica el sistema de **ajustes integrales por inflación** en forma automática». En
-Colombia los ajustes por inflación se eliminaron hace casi veinte años. `sin fuente
-citada en esta investigación — confirmar con el contador antes de usarlo como argumento`
+Colombia los ajustes por inflación se eliminaron hace casi veinte años. `confirmado
+después: Decreto 1536 de 2007 y Ley 1111 de 2006 — ver
+[salida de datos de Delta §4](../2026-11-02-salida-de-datos-delta/INFORME.md), que dice
+también cómo usarlo y cómo no`
 
 ## 4. Las tres rutas
 
@@ -146,6 +148,11 @@ arriba a ningún cliente**.
 - **No tenemos treinta años aquí.** Eso se compensa contestando, no diciéndolo.
 
 ## 7. Lo que no se pudo confirmar
+
+> Avances del mismo día en [Salida de datos de Delta](../2026-11-02-salida-de-datos-delta/INFORME.md):
+> el 3 ya tiene dos hipótesis y un campo del XML que las decide; el 5 quedó resuelto
+> (el documento POS trae ítems y precio unitario); 1, 2, 4 y 6 siguen abiertos y están
+> en el [pedido a La Villa](../2026-11-02-salida-de-datos-delta/PEDIDO-LA-VILLA.md).
 
 1. **Cuánto cuesta Delta.** No publica precios. Hay que preguntarlo a un cliente suyo.
 2. **Cuántos negocios de Popayán lo usan.** El dueño dice «bastante»; no está verificado.

@@ -38,6 +38,7 @@ El `INFORME.md` empieza siempre así:
 
 Cada investigación nueva se apunta aquí, la más reciente arriba.
 
+- **2026-11-02 · [Salida de datos de Delta](2026-11-02-salida-de-datos-delta/INFORME.md)** — en curso. Delta no es proveedor tecnológico DIAN; el XML trae el detalle por producto y el precio unitario, pero la DIAN no lo da en lote; ajustes por inflación eliminados en 2007. Lo demás, en el [pedido a La Villa](2026-11-02-salida-de-datos-delta/PEDIDO-LA-VILLA.md). Para Prommter.
 - **2026-11-02 · [Delta en el Cauca](2026-11-02-delta-cauca/INFORME.md)** — qué es el software que se usa en Popayán, sus ocho grietas con evidencia, y por qué la jugada es el *piso de arriba* de Delta y no reemplazarlo. Para Prommter.
 
 | Fecha | Tema | Para | Estado |
