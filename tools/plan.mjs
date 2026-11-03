@@ -471,7 +471,7 @@ function cmdEstado() {
   const restante = T.filter((t) => t.estado !== "hecho" && t.estado !== "descartado").reduce((s, t) => s + presupuestar(t), 0)
 
   console.log(`${plan.projectId} · plan v${plan.version} · modo ${plan.modo} · etapa ${plan.perfil.etapa}`)
-  console.log(`${barra(hechas.length, T.length)}  ${hechas.length}/${T.length} hechas`)
+  console.log(`${barra(todasHechas.length, T.length)}  ${todasHechas.length}/${T.length} hechas`)
   const grupos = {}
   for (const t of T) (grupos[por === "nivel" ? t.nivel : t.categoria] ??= []).push(t)
   const claves = por === "nivel" ? NIVELES.filter((n) => grupos[n]) : Object.keys(grupos).sort()
@@ -492,7 +492,7 @@ function cmdEstado() {
     if (hechas.length >= 5 && Math.abs(Number(desvio)) > 25)
       console.log(`  → descalibrado más de un 25 % sobre ${hechas.length} tareas medidas: revisa COSTO en tools/plan.mjs.`)
   } else if (todasHechas.length && !viejas) {
-    console.log(`calibración: ${hechas.length} hechas pero sin --tokens medidos. Sin eso el presupuesto nunca converge (N8-R10).`)
+    console.log(`calibración: ${todasHechas.length} hechas pero sin --tokens reales medidos. Sin eso el presupuesto nunca converge (N8-R10).`)
   }
   const bloq = T.filter((t) => t.estado === "bloqueado")
   if (bloq.length) {
