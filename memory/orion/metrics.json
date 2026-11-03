@@ -1,11 +1,11 @@
 {
   "projectId": "orion",
-  "sessionCount": 7,
+  "sessionCount": 8,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-11-03T02:10:00.000Z",
+  "lastUpdated": "2026-11-03T04:30:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-08-26-orion-v4",
@@ -330,6 +330,36 @@
       ],
       "tokensReales": 490000,
       "notaMedicion": "tokens = gasto real (costos.mjs real), no subagent_tokens"
+    },
+    {
+      "sessionId": "session-2026-11-02-delta-por-que-lo-eligen",
+      "runId": "orion-delta-por-que",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-11-03T03:20:00.000Z",
+      "completedAt": "2026-11-03T04:30:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "modelOutcomes": [
+        {
+          "phase": "research",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 3000000,
+          "note": "evidencia local de Delta: 28 pasos, US$ 1,34; hallazgos clave verificados por el orquestador"
+        },
+        {
+          "phase": "research",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 1400000,
+          "note": "12 alternativas con precio: 15 pasos, US$ 0,84; 2 precios verificados"
+        }
+      ],
+      "tokensReales": 4400000,
+      "notaMedicion": "tokens = gasto real (costos.mjs real) de los subagentes; la sesion completa (2 investigaciones + orquestador) va en 16,8 M ≈ US$ 9,2–10"
     }
   ]
 }

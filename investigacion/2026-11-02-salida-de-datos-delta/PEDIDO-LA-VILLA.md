@@ -44,6 +44,9 @@ una visita. **Reglas:**
    ¿Paga el certificado de firma digital? ¿Cuánto?
 8. ¿Conoce otros negocios de Popayán que usen Delta? ¿Cuáles? (Para contar el mercado
    sin inventarlo.)
+8b. **¿Quién le recomendó Delta?** ¿Su contador, otro negocio, Delta mismo? ¿Su
+   contador lleva otros clientes en Delta? (Comprueba si el que decide es el contador —
+   ver [qué tiene Delta §2.3](../2026-11-02-que-tiene-delta-y-por-que-lo-eligen/INFORME.md).)
 
 ## D. Al contador (el de La Villa o cualquiera de Popayán)
 

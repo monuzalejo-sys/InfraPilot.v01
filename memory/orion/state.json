@@ -1,7 +1,7 @@
 {
   "projectId": "orion",
-  "snapshotDate": "2026-09-09T00:00:00.000Z",
-  "version": 14,
+  "snapshotDate": "2026-11-03T04:30:00.000Z",
+  "version": 15,
   "lastAmmRun": "2026-09-09T00:00:00.000Z",
   "objects": [
     {
@@ -441,6 +441,21 @@
       "risk": "Bajar de tier leyendo mal la estadistica: que opus pase 102 de 107 veces NO significa que sobre, significa que la rubrica le esta dando lo dificil. Bajarlo todo de golpe convierte un ahorro en una tanda de ciclos de correccion, que cuestan mas que el ahorro.",
       "probability": "Medium",
       "mitigation": "Bajar por TIPO DE TRABAJO con historial limpio y muestra suficiente, uno cada vez, y dejar que un FAIL real lo suba solo. Y nunca poner hechos de negocio ni copy publico en el tier barato aunque salga ok: verdict ok mide que el spawn aterrizo, no que acerto (_permanent/KN-016)."
+    },
+    {
+      "id": "KN-026",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-11-03T04:30:00.000Z",
+      "updated": "2026-11-03T04:30:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "INVESTIGACION EN UN RUN DE ORION (2026-11-02, Delta de Popayan para Prommter): el reparto que funciono fue orquestador hace el inventario de la fuente primaria que ya tiene a mano + 2 agentes sonnet de busqueda en paralelo (evidencia local; competidores con precio) con la ley cero-datos-inventados en el brief y salida <=60 lineas. Costaron 3 M y 1,4 M reales (US$ 1,34 y 0,84; costos.mjs real), 28 y 15 pasos. El orquestador ABRIO las fuentes clave antes de escribir (tesis PDF via PDFKit, aviso de empleo, 2 precios) y todas cuadraron; el resumen de buscador fallo 3 veces ese mismo dia (ver tema cero-datos-inventados).",
+      "context": "Para la proxima investigacion: agentes de busqueda en sonnet, nunca opus; verificar en persona solo las 3-5 fuentes en que descansa la conclusion; marcar lo demas como reportado por el agente.",
+      "source": "investigacion/2026-11-02-que-tiene-delta-y-por-que-lo-eligen/ y costos.mjs real --sesion 8a27a2bb"
     }
   ],
   "archives": [

@@ -1,11 +1,11 @@
 ---
 slug: cero-datos-inventados
 titulo: "Qué se puede escribir como dato y qué es mentira verosímil"
-alias: [datos, dato, poner datos, que datos, inventar, inventado, inventados, inventarme, no inventar, sin inventar nada, mentira, mentiras, verosimil, verosimiles, relleno, copy de relleno, rellenar, placeholder, placeholders, marcador, marcadores, hueco, huecos, hueco explicito, faltante, faltantes, falta el dato, dato falso, datos falsos, precio, precios, precio inventado, precios inventados, precios de ejemplo, precio de maniqui, maniqui, catalogo, catalogo de ejemplo, carta, menu, semilla, seed, demo, demos, datos demo, datos ficticios, ficticio, ficticios, maqueta, maquetas, mockup, prototipo, prototipos, ejemplo, ejemplos, muestra, pagina publica, pagina, publica, publico, publicar, publicacion, web publica, sitio publico, landing, landings, portada, vitrina, mostrador, cara al cliente, cliente final, testimonio, testimonios, resenas, opiniones, cifras, cifras sociales, anos de experiencia, numero de clientes, premios, horario, horarios, telefono, telefonos, whatsapp, direccion, direcciones, sede, sedes, ciudad, barrio, marca, marca real, nombre provisional, logo, stock, disponibilidad, agotado, promo, promos, cupon, cupones, codigo, descuento, descuentos, rebaja, rebajas, antes y ahora, foto, fotos, foto de stock, imagenes, seo, keywords, metadata, pronostico, prediccion, predicciones, auditar copy, revisar copy, se puede inventar, puedo inventar, que puedo publicar, autorizacion, autorizado, frontera, parquear, parquearlo, parqueado, aparcar, bloqueante, pendiente bloqueante, compuerta, compuerta de publicacion, declarado, placeholder declarado, sin declarar, cosmetico, cosmetica, identitario, identidad, afirmacion, afirmacion de hecho, cambia el comportamiento, umbral, umbrales, blocked, ready, sigo construyendo, puedo seguir, me falta el nombre, nombre pendiente, promesa comercial, compromiso comercial, incentivos, niveles, nivel]
-preguntas: ["que datos puedo poner en una pagina publica", "puedo inventar precios para una demo", "¿qué pongo donde todavía no tengo el dato real?", "¿puedo poner un horario o un teléfono de ejemplo mientras el cliente me pasa el bueno?", "¿puedo poner testimonios o años de experiencia si no me los han dado?", "¿cómo marco lo que es de mentiras en una demo para que el cliente no crea que ya funciona?", "me falta el nombre de la marca, ¿paro o sigo construyendo?", "¿qué placeholder puedo dejar vivo mientras construyo y cuál no?", "¿un pendiente bloqueante alcanza para tapar un dato inventado?"]
+alias: [datos, dato, poner datos, que datos, inventar, inventado, inventados, inventarme, no inventar, sin inventar nada, mentira, mentiras, verosimil, verosimiles, relleno, copy de relleno, rellenar, placeholder, placeholders, marcador, marcadores, hueco, huecos, hueco explicito, faltante, faltantes, falta el dato, dato falso, datos falsos, precio, precios, precio inventado, precios inventados, precios de ejemplo, precio de maniqui, maniqui, catalogo, catalogo de ejemplo, carta, menu, semilla, seed, demo, demos, datos demo, datos ficticios, ficticio, ficticios, maqueta, maquetas, mockup, prototipo, prototipos, ejemplo, ejemplos, muestra, pagina publica, pagina, publica, publico, publicar, publicacion, web publica, sitio publico, landing, landings, portada, vitrina, mostrador, cara al cliente, cliente final, testimonio, testimonios, resenas, opiniones, cifras, cifras sociales, anos de experiencia, numero de clientes, premios, horario, horarios, telefono, telefonos, whatsapp, direccion, direcciones, sede, sedes, ciudad, barrio, marca, marca real, nombre provisional, logo, stock, disponibilidad, agotado, promo, promos, cupon, cupones, codigo, descuento, descuentos, rebaja, rebajas, antes y ahora, foto, fotos, foto de stock, imagenes, seo, keywords, metadata, pronostico, prediccion, predicciones, auditar copy, revisar copy, se puede inventar, puedo inventar, que puedo publicar, autorizacion, autorizado, frontera, parquear, parquearlo, parqueado, aparcar, bloqueante, pendiente bloqueante, compuerta, compuerta de publicacion, declarado, placeholder declarado, sin declarar, cosmetico, cosmetica, identitario, identidad, afirmacion, afirmacion de hecho, cambia el comportamiento, umbral, umbrales, blocked, ready, sigo construyendo, puedo seguir, me falta el nombre, nombre pendiente, promesa comercial, compromiso comercial, incentivos, niveles, nivel, buscador, resumen del buscador, extracto del buscador, resumen automatico, resumidor, resumen de ia, snippet, snippets, citar, citar una fuente, fuente, fuentes, fuente primaria, no verificado, sin verificar, verificar una cita, abrir el documento, investigacion, investigar, informe de investigacion, pdf, extraer texto de un pdf, pdfkit, pdftotext, 404, aviso de empleo, atribucion, atribuyo, la fuente dice]
+preguntas: ["que datos puedo poner en una pagina publica", "puedo inventar precios para una demo", "¿qué pongo donde todavía no tengo el dato real?", "¿puedo poner un horario o un teléfono de ejemplo mientras el cliente me pasa el bueno?", "¿puedo poner testimonios o años de experiencia si no me los han dado?", "¿cómo marco lo que es de mentiras en una demo para que el cliente no crea que ya funciona?", "me falta el nombre de la marca, ¿paro o sigo construyendo?", "¿qué placeholder puedo dejar vivo mientras construyo y cuál no?", "¿un pendiente bloqueante alcanza para tapar un dato inventado?", "el buscador me dio un dato con su fuente, ¿ya lo puedo meter al informe?", "¿puedo citar lo que me resumió el buscador sin abrir la página?", "¿cómo marco un dato que solo vi en el extracto de google?", "¿cómo saco el texto de un PDF en esta Mac si no hay pdftotext?"]
 proyectos: [landings, villa-broaster, infrapilot, orama, wrd, pollo-landing, placita]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-11-02
 ---
 
 # Qué se puede escribir como dato y qué es mentira verosímil
@@ -27,6 +27,12 @@ sirve; "11:00 a.m. – 9:00 p.m." es una mentira que alguien va a creer.
 **NOMBRA** (marca provisional, logo, dominio) se parquea con placeholder declarado más un
 pendiente **bloqueante de publicación**; lo que **AFIRMA** un hecho, una cifra, o
 cualquier dato que el código lea para calcular, **nunca** —ni declarado—.
+
+**Lo mismo vale para un informe de investigación: el resumen de un buscador web (o de un
+resumidor automático) NO es la fuente.** Antes de citar un dato, **abre el documento y
+encuentra la frase**. Lo que solo viste en el extracto se marca **«no verificado»** y no
+se cuenta como evidencia. En PDFs, extrae el texto y cita **página** (en esta Mac:
+PDFKit vía `swift`; no hay `pdftotext`).
 
 ## Por qué (qué lo pagó)
 
@@ -83,6 +89,43 @@ cerrado**; un cupón publicado *"es una promesa que alguien reclama en el mostra
 mañana"*; un "antes/ahora" inventado hace que el carrito prometa menos de lo que la orden
 confirma, porque el servidor congela el precio del catálogo y no sabe de descuentos
 (`villa-broaster/KN-009`, `villa-app/lib/promos.ts:14-24`).
+
+## Del lado de la investigación: el extracto del buscador también es relleno verosímil
+
+El mismo mecanismo (algo que suena bien y nadie abrió) aparece cuando el dato no lo
+escribe un builder sino que lo **devuelve un buscador**. Tres casos del mismo día,
+2026-11-02, en las investigaciones de Prommter sobre Delta (el software contable de
+Popayán):
+
+1. **Atribución equivocada, ya escrita en el informe.** Un buscador atribuyó a la
+   derogatoria de los ajustes por inflación (Ley 1111 de 2006, art. 78) los artículos
+   318–322 y 328 del Estatuto Tributario. Al abrir la Circular DIAN 0009 de 2007, esos
+   artículos son del impuesto complementario de **remesas**. Ya estaba redactado y hubo
+   que corregirlo: `investigacion/2026-11-02-salida-de-datos-delta/INFORME.md:182-184`
+   (nota «Ojo, corregido»).
+2. **Fuente que no existe.** El buscador mostraba un curso de Comfacauca «Manejo Software
+   contable Siigo y Delta»; la página da 404 y la búsqueda interna del sitio no lo tiene.
+   No se contó: `investigacion/2026-11-02-que-tiene-delta-y-por-que-lo-eligen/fuentes.md:39-40`
+   e `INFORME.md:206`.
+3. **Frase que el documento no contiene.** Un buscador citaba «empresa payanesa… más de
+   diez años» como si saliera de un manual en Studocu; al abrir los manuales la frase no
+   aparece. No se contó. (Verificado en la sesión; esta exclusión no quedó escrita en
+   los `fuentes.md`, solo en el reporte de la sesión.)
+
+**El caso contrario enseña el método.** Un aviso de empleo de ACOPI Cauca («manejo
+comprobable del sistema contable Delta») no apareció al abrir el listado de ofertas de
+Popayán, y quedó primero como *«señal no verificada»*
+(`salida-de-datos-delta/fuentes.md:40-44`, `INFORME.md:202`). Se encontró después por su
+**URL directa**, se abrió y se citó con fecha, 5-oct-2026
+(`que-tiene-delta-y-por-que-lo-eligen/fuentes.md:21`). Que un listado no lo muestre no
+prueba que no exista; que un buscador lo muestre no prueba que exista.
+
+**Regla práctica:** (a) todo lo que solo se vio en el extracto va en la lista de
+«buscado y no encontrado / no verificado», con el motivo, y no sube a la tesis;
+(b) para citar se abre el documento y se busca la frase literal; (c) PDFs: extraer el
+texto con PDFKit y citar la página (la tesis de Comfacauca se cita así, pp. 8, 11, 42…:
+`que-tiene-delta…/fuentes.md:19`); (d) un dato verificado y uno no verificado conviven en
+el informe **etiquetados**, nunca mezclados.
 
 ## La frontera: qué se puede parquear mientras construyes, y qué no
 
@@ -321,6 +364,12 @@ la primera publicación.
   `lib/dominio/surtido.ts:43-49` (por qué `modoVenta` se pregunta antes de
   crear, no después) y `:190-227` (bloque "LO QUE NO ESTABA EN EL DICTADO" y
   `SIN_MODO_DICTADO`).
+- `investigacion/2026-11-02-salida-de-datos-delta/INFORME.md:182-184, :202` y
+  `salida-de-datos-delta/fuentes.md:40-44` — el buscador atribuyó mal los arts. 318–322 y
+  328 del E.T. (eran de remesas) y devolvió un aviso de ACOPI que no aparecía en el listado.
+- `investigacion/2026-11-02-que-tiene-delta-y-por-que-lo-eligen/fuentes.md:19, :21, :39-40`
+  e `INFORME.md:206` — tesis Comfacauca extraída con PDFKit y citada por página; aviso de
+  ACOPI Cauca abierto por URL directa (5-oct-2026); curso de Comfacauca con 404, no contado.
 
 ## Enlaces
 
