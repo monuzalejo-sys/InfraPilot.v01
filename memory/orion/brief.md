@@ -17,8 +17,9 @@
 - Build: parallelizable tasks must have disjoint `posee` (file ownership); criterios can't quantify over files they don't own
 - Measurement: only 5 canonical phase subtypes (build:visual, build:page, build:api, build:lib, build:infra); always log subagent_tokens
 
-**Open work (1 Pending item):**
+**Open work (2 Pending items):**
 - PEND-001: Test /orion-plan pipeline end-to-end (villa-broaster, placita, orama); calibrate COSTO table in plan.mjs (High priority, blocking model tier decisions)
+- PEND-002: build:page and build:lib to sonnet by default, one at a time (Ready, Sprint). Its savings figure uses the token corpus that KN-002 corrects; review before acting.
 
 **Decisions this week (Sept 2-9):**
 - DEC-006: Runtime portable via `$ORION_HOME` (Mac migration, 21 hardcoded paths fixed)
@@ -26,4 +27,4 @@
 - KN-021: Machine facts must include machine + date or they rot in silence
 - KN-022: Vocabulary mismatch bug (web-publica vs publico) ⇐ ¿checked all enum values before deploy?
 
-**Memory health:** 25 active objects (at threshold); 13 archived total; 4 sessions + 1 curation run.
+**Memory health:** 27 objects (26 non-terminal; KN-002 Deprecated/Low, kept because KN-005, KN-024 and PEND-002 depend on it); 12 archived; 9 metric sessions (3 curation runs). Above the 25-object threshold.

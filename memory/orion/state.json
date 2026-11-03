@@ -1,8 +1,8 @@
 {
   "projectId": "orion",
-  "snapshotDate": "2026-11-03T04:30:00.000Z",
-  "version": 15,
-  "lastAmmRun": "2026-09-09T00:00:00.000Z",
+  "snapshotDate": "2026-11-03T04:39:07.000Z",
+  "version": 17,
+  "lastAmmRun": "2026-11-03T04:39:07.000Z",
   "objects": [
     {
       "id": "DEC-001",
@@ -90,13 +90,13 @@
       "type": "Knowledge",
       "tier": "Permanent",
       "created": "2026-08-26T06:30:00.000Z",
-      "updated": "2026-11-03T02:10:00.000Z",
+      "updated": "2026-11-03T04:39:07.000Z",
       "lifetime": "Permanent",
-      "impact": "High",
+      "impact": "Low",
       "priority": "Critical",
-      "status": "Current",
+      "status": "Deprecated",
       "dependencies": [],
-      "fact": "SUPERADO 2026-11-02 (ver _permanent/KN-002 y DEC-002): los «39,37 M tokens de 298 spawns» eran subagent_tokens = contexto FINAL de cada agente, no gasto. Gasto real medido con costos.mjs real desde 2026-09-01: 6.362 M tokens ≈ US$ 3.600–4.060, 97 % Opus; las tablas por fase sirven para ordenar tiers, no como costo. Texto original: GASTO MEDIDO DEL ECOSISTEMA a 2026-08-26: 298 spawns, 39,37 M tokens de subagente, 9 proyectos. Reparto por tier: opus 112 spawns / 20,27 M / 51,5 % del gasto; sonnet 155 / 14,97 M / 38 %; workflows mixtos 5 / 3,48 M / 8,8 %; haiku 24 / 651k / 1,7 %. Fallos reales de capacidad: 10 de 298 (3,4 %). Po",
+      "fact": "SUPERADO 2026-11-02 (ver _permanent/KN-002 y _permanent/DEC-002 en memory/permanent/state.json; el DEC-002 de esta memoria es otro: RFC-0008): los «39,37 M tokens de 298 spawns» eran subagent_tokens = contexto FINAL de cada agente, no gasto. Gasto real medido con costos.mjs real desde 2026-09-01: 6.362 M tokens ≈ US$ 3.600–4.060, 97 % Opus; las tablas por fase sirven para ordenar tiers, no como costo. Texto original: GASTO MEDIDO DEL ECOSISTEMA a 2026-08-26: 298 spawns, 39,37 M tokens de subagente, 9 proyectos. Reparto por tier: opus 112 spawns / 20,27 M / 51,5 % del gasto; sonnet 155 / 14,97 M / 38 %; workflows mixtos 5 / 3,48 M / 8,8 %; haiku 24 / 651k / 1,7 %. Fallos reales de capacidad: 10 de 298 (3,4 %). Po",
       "context": "Se reproduce con `node tools/costos.mjs`. Hasta hoy estos numeros vivian repartidos en once metrics.json y nadie los sumaba. Leer la tabla al reves ('opus casi no falla, bajemoslo todo') es el error: opus no falla porque la rubrica le da lo dificil.",
       "source": "sesion 2026-08-26, tools/costos.mjs sobre 11 metrics.json"
     },
@@ -393,7 +393,7 @@
       "type": "Knowledge",
       "tier": "Project",
       "created": "2026-09-09T00:00:00.000Z",
-      "updated": "2026-09-09T00:00:00.000Z",
+      "updated": "2026-11-03T05:00:00.000Z",
       "lifetime": "Project",
       "impact": "Medium",
       "priority": "Medium",
@@ -403,7 +403,7 @@
         "RSK-001",
         "PEND-002"
       ],
-      "fact": "SENAL DE CALIBRACION build:lib, medida en el refuerzo de catalogo del 2026-09-09: sonnet produjo los cuatro refuerzos (operacion, backend, seguridad, rendimiento; 18-25 arquetipos cada uno) sin un solo FAIL y sin problemas de validacion. Opus produjo las dos categorias nuevas (arquitectura 52, saas 54), tambien limpias, pero costo del orden de 1,7x por unidad de trabajo frente a los refuerzos de sonnet.",
+      "fact": "SENAL DE CALIBRACION build:lib, medida en el refuerzo de catalogo del 2026-09-09: sonnet produjo los cuatro refuerzos (operacion, backend, seguridad, rendimiento; 18-25 arquetipos cada uno) sin un solo FAIL y sin problemas de validacion. Opus produjo las dos categorias nuevas (arquitectura 52, saas 54), tambien limpias, pero costo del orden de 1,7x por unidad de trabajo frente a los refuerzos de sonnet. CORRECCION 2026-11-02: los tokens de esta senal (118.790/101.333/92.721/82.791 y 145.270/167.453, y el 'total 721.338' de la sesion 2026-09-09 en metrics.json) son subagent_tokens = contexto FINAL de cada agente, NO gasto (ver KN-002 y _permanent/KN-002); el gasto real es 70-110 veces mayor y de este run no consta en ninguna parte. La senal de CALIDAD sigue en pie (sonnet limpio en refuerzos con esquema fijo; opus al inventar taxonomia) y la razon ~1,7x solo vale como proporcion entre agentes del mismo run, no como dinero. No presupuestar con estas cifras; re-medir con `node tools/costos.mjs real` o rotular el registro.",
       "context": "Para escribir arquetipos de catalogo con esquema fijo y ejemplos a la vista (refuerzo de una categoria ya existente), sonnet parece suficiente; opus se justifico donde habia que inventar la taxonomia desde cero (categoria nueva, sin ejemplos que copiar). Es evidencia a favor de PEND-002 acotada a este tipo de trabajo -'refuerzo con ejemplos' vs 'taxonomia nueva'-, no una generalizacion a build:lib completo: la mitigacion de RSK-001 sigue aplicando.",
       "source": "sesion 2026-09-09, enfoque-web-real: modelOutcomes de 6 spawns build:lib"
     },

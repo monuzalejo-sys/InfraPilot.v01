@@ -1,11 +1,11 @@
 {
   "projectId": "orion",
-  "sessionCount": 8,
+  "sessionCount": 9,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-11-03T04:30:00.000Z",
+  "lastUpdated": "2026-11-03T04:39:07.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-08-26-orion-v4",
@@ -360,6 +360,23 @@
       ],
       "tokensReales": 4400000,
       "notaMedicion": "tokens = gasto real (costos.mjs real) de los subagentes; la sesion completa (2 investigaciones + orquestador) va en 16,8 M ≈ US$ 9,2–10"
+    },
+    {
+      "sessionId": "curation-2026-11-02-orion-curator",
+      "runId": "orion-curator-2026-11-02",
+      "triggeredBy": "SESSION_CLOSE",
+      "startedAt": "2026-11-03T04:39:07.000Z",
+      "completedAt": "2026-11-03T04:39:07.000Z",
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 1,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "tokensReales": 0,
+      "notes": "Curacion por tope (27 > 25). Sin fusiones: no hay duplicados reales. Sin archivos: no hay terminales sin dependientes. KN-002 pasa a Deprecated + impact Low (R9: lo referencian KN-005, KN-024, PEND-002; no archivable hasta reapuntar o waiver). Resultado: 27 objetos (26 no terminales), umbral 25 sin cumplir.",
+      "modelOutcomes": []
     }
   ]
 }
