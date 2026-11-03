@@ -1,16 +1,26 @@
 ---
 slug: entorno-de-la-maquina
 titulo: Lo que cada máquina puede y no puede hacer (son DOS)
-alias: [push, git push, subir el codigo, subir a github, publicar el repo, credential, credential manager, github desktop, desktop, commit, rama, remoto, terminal, consola, maquina, entorno, esta maquina, mi pc, computador, dos computadores, dos maquinas, mac, macos, darwin, windows, en cual maquina estoy, instalado, no esta instalado, falta instalar, python, python3, pip, docker, brew, homebrew, node, npm, powershell, ps 5.1, bash, heredoc, comando largo, se corta, truncado, utf8, tildes, acentos, mojibake, encoding, json corrupto, puerto, puertos, localhost, launch.json, servidor local, dev server, arrancar el servidor, wifi, wifi del local, firewall, red local, red publica, lan, celular, telefono, escala de windows, permisos del agente, sandbox, scratchpad, limite de sesion, edge, chrome, chrome headless, pdf, orion_home, uptime, carga, carga del sistema, load average, hilos, nucleos, cuantos nucleos tiene esta mac, cuantos hilos, i5, cpu al limite, se cayo el dns, dns caido, ENOTFOUND, resolucion de dns, compilando en segundo plano, compilar mientras corren agentes, brew compilando, kill -STOP, kill -CONT, suspender un proceso, pausar una compilacion, cuantos agentes en paralelo aguanta esta maquina, timeout, gtimeout, limite de tiempo, comando colgado, perl alarm]
-preguntas: ["en que maquina estoy trabajando", "puedo hacer push desde la terminal", "que hay instalado en esta maquina y que no", "por que el comando largo se corta a la mitad", "como genero un pdf aqui", "en que puerto arranca cada proyecto"]
-proyectos: [_permanent, infrapilot, prommter, wrd, villa-broaster, placita, estanco-contable, pollo-landing, landings, duo-burger]
+alias: [push, git push, subir el codigo, subir a github, publicar el repo, credential, credential manager, github desktop, desktop, commit, rama, remoto, terminal, consola, maquina, entorno, esta maquina, mi pc, computador, dos computadores, dos maquinas, mac, macos, darwin, windows, en cual maquina estoy, instalado, no esta instalado, falta instalar, python, python3, pip, docker, brew, homebrew, node, npm, powershell, ps 5.1, bash, heredoc, comando largo, se corta, truncado, utf8, tildes, acentos, mojibake, encoding, json corrupto, puerto, puertos, localhost, launch.json, servidor local, dev server, arrancar el servidor, wifi, wifi del local, firewall, red local, red publica, lan, celular, telefono, escala de windows, permisos del agente, sandbox, scratchpad, limite de sesion, edge, chrome, chrome headless, pdf, orion_home, uptime, carga, carga del sistema, load average, hilos, nucleos, cuantos nucleos tiene esta mac, cuantos hilos, i5, cpu al limite, se cayo el dns, dns caido, ENOTFOUND, resolucion de dns, compilando en segundo plano, compilar mientras corren agentes, brew compilando, kill -STOP, kill -CONT, suspender un proceso, pausar una compilacion, cuantos agentes en paralelo aguanta esta maquina, timeout, gtimeout, limite de tiempo, comando colgado, perl alarm, tarea programada, scheduled task, permitir siempre, permiso pendiente, AbortError, la pagina no se actualizo, no corrio sola, keep awake, request_keep_awake, caffeinate, mac dormida, se durmio la mac, no dejes apagar, panel del navegador, se cayo el localhost, no me deja abrir, preview_start, Maximum 5 dev servers, http.server, storage is disabled, file://, bsd sed, swiftshader, webgl lento, playwright lento, pruebas tardan 30 minutos, iris plus 640, whisper-cpp, brew install whisper, large-v3-turbo, no hay excel, libreoffice, xlsx, gh auth login, device flow, login/device, dos cuentas github, self-modification, settings.json, settings.local.json, modo automatico, auto mode, clasificador, donde clono, prommter/proyectos, gitlink, typecheck con miles de errores, eslint no termina, carpeta compartida]
+preguntas: ["en que maquina estoy trabajando", "puedo hacer push desde la terminal", "que hay instalado en esta maquina y que no", "por que el comando largo se corta a la mitad", "como genero un pdf aqui", "en que puerto arranca cada proyecto", "por que no se publico sola la pagina si dejamos la tarea programada", "por que se me caen los localhost cuando cierro el panel del navegador", "por que las pruebas del 3D tardan una eternidad en la Mac", "como dejo la Mac logueada en mi GitHub", "por que Claude no me puede escribir el settings.json", "en que carpeta clono un proyecto nuevo"]
+proyectos: [_permanent, infrapilot, prommter, wrd, villa-broaster, placita, estanco-contable, pollo-landing, landings, duo-burger, que-cremoso, la-villa, cerebro-3d, mercado-de-plantillas, orion-rutina]
 confianza: alta
-actualizado: 2026-10-18
+actualizado: 2026-11-02
 ---
 
 # Lo que cada máquina puede y no puede hacer (son DOS)
 
 ## Respuesta corta
+
+**⚠ Corrección 2026-11-02:** este tema decía que en el PC el push por terminal «NO»
+funciona. Es verdad solo del push **interactivo** (el diálogo de Git Credential Manager
+sin `/dev/tty`). El 2026-09-22 se configuró el sincronizador de duo-burguer para publicar
+en el PC con `git -c credential.helper=manager` y `GIT_TERMINAL_PROMPT=0`, y se reportó
+que el PC ya publicaba solo; la primera publicación automática en vivo de ese día la hizo
+el propio script **en la Mac**, tras rebasar sobre lo que subió el PC. Falta una medición
+directa en el PC con ese `-c`: confírmala con un push real antes de afirmarla. La fila de
+la tabla se matizó y la historia de abajo se deja tal cual. Además, esta
+ola agregó las trampas del **arnés** en la Mac (pasos 12 a 22 de «Cómo se aplica»).
 
 **Hay dos máquinas y no se parecen: mide en cuál estás antes de citar cualquier
 límite.** `uname -s` responde en un segundo: `Darwin` es la **Mac**, cualquier otra
@@ -20,11 +30,16 @@ es dar por imposible algo que funciona.
 
 **En la Mac: `git push` funciona** (`gh` autenticado como `kalelfelpem-glitch` hace de
 credential helper), **hay `python3` y `pip3`**, **no hay Edge pero hay Chrome**, y **no
-existe el techo de ~8 KB por comando**. En el PC: nada de eso — el push sale por GitHub
-Desktop, no hay Python, y el heredoc largo se trunca.
+existe el techo de ~8 KB por comando**. En el PC: el push interactivo no sale (con `-c credential.helper=manager` el sincronizador está configurado para publicar, sin medición propia aún; ver arriba), no hay
+Python, y el heredoc largo se trunca.
 
 Lo que NO cambia de máquina: **medir antes de rendirse**, y no confundir *"la máquina
 no puede"* con *"el agente murió"*.
+
+**Tres cosas que en la Mac nadie ve venir:** una tarea programada que publica se atasca en
+un permiso que nadie aprobó; cerrar el panel del navegador de la app apaga los servidores
+que el dueño va a abrir; y la Mac dormida mata las corridas largas. Remedios en los pasos
+12 a 15.
 
 ## Por qué (qué lo pagó)
 
@@ -54,7 +69,7 @@ Medido el 2026-09-01 en la Mac y el 2026-08-24 en el PC:
 
 | | Mac (`Darwin 22.6.0`, x86_64) | PC (Windows) |
 |---|---|---|
-| `git push` por terminal | **SÍ** — `gh` es el helper | NO — Credential Manager sin `/dev/tty` |
+| `git push` por terminal | **SÍ** — `gh` es el helper | interactivo NO (Credential Manager sin `/dev/tty`); con `-c credential.helper=manager` el sincronizador está configurado para publicar y se reportó que funciona (`51184930`, 2026-09-22), sin medición propia aún |
 | Python | **SÍ** — `python3` 3.9.6 y `pip3` | NO |
 | Navegador Chromium | **Chrome** (no hay Edge) | **Edge** en `Program Files (x86)` |
 | Viewport móvil real <480 px | **SÍ**, respeta 390 exactos | NO — Edge calculaba a ~480 |
@@ -123,6 +138,70 @@ skills sirvan en las dos.
     sesiones y otra podía pisarlo, así que verifica tu entrada antes de arrancar
     (`wrd/KN-001`).
 
+12. **Tarea programada que publica: apruébale los permisos ANTES de llamarla
+    «automática».** Córrela una vez a mano y marca «Permitir siempre» para cada
+    herramienta que usa (`git`, `publicar.sh`, `curl`); si no, queda esperando un permiso
+    que nadie ve y muere con `Tool permission request failed: AbortError`. Su hora es «a
+    partir de»: la app la mueve (pedí las 12:10 a.m. y quedó a las 12:23 a.m.) y con la
+    Mac dormida corre al despertar, así que lo que debe estar a las 6:00 se programa con
+    horas de margen. Al día siguiente comprueba en el sitio real que corrió, y dale
+    condición de fin y autoridad mínima (sin commits ni redes).
+13. **Corrida larga sin supervisión: keep-awake, sin límite de tiempo y verificado.**
+    Pide `request_keep_awake` (o `caffeinate` atado al proceso), confirma al retomar que
+    sigue activo y suéltalo al terminar. Uno con tiempo límite caduca solo (el del 9-sep
+    había vencido veinte minutos antes de notarse). Un proceso de cobertura quieto, sin
+    hijos y sin CPU por 50 min es un cuelgue, no un fallo de prueba: mátalo y repite (en
+    esa corrida la Mac además se durmió 80 min y canceló 7 pruebas que pasaron al repetirlas
+    despierta).
+14. **Servidores que el dueño va a abrir: procesos independientes, no del panel.** La app
+    apaga los servidores de `preview_start` al cerrarse el panel. Arráncalos aparte,
+    comprueba con una petición real a cada puerto y, antes de una ola o de pedirle que
+    mire, avísale «no cierres el panel» y deja un vigilante que reinicie. En producción el
+    sistema exige https: en local corre en modo desarrollo.
+15. **«Maximum 5 dev servers per folder»**: no detengas los de otras ventanas; sirve la
+    carpeta con `python3 -m http.server` en un puerto libre (p. ej. 3610) y ciérralo al
+    terminar (una entrada nueva en `launch.json` no destraba el tope). Una app con
+    `localStorage` **no se prueba como `file://`** (Storage queda deshabilitado). Y en
+    macOS el `sed` BSD falla con flags GNU: edita con Python.
+16. **Pruebas con WebGL: el Chrome instalado, sin forzar SwiftShader.** `channel:
+    'chrome'` headless; si pasas `--use-angle=swiftshader` renderiza por software a ~1
+    fps. Sin forzar nada Chrome elige ANGLE-Metal y rinde a 60 fps. Si dudas, corre el
+    mismo script con 3 variantes de args y lee renderer, fps y tiempo de carga.
+17. **whisper.cpp: compílalo a mano y córrelo en CPU.** No `brew install` (compila Python
+    entero: horas). v1.9.x con cmake desde el código (~3 min), `whisper-cli` en
+    `/usr/local/bin`, siempre con `-ng` (sin Metal); el modelo large-v3-turbo (1,6 GB) va
+    fuera de git. Presupuesto: 8 s de voz ≈ 45 s; un video de 15 s ≈ 1,5 min.
+18. **No hay Excel, LibreOffice ni librería de .xlsx en la Mac.** Lee los .xlsx con un
+    script propio que no instale nada, verifica los totales de las hojas que generes con
+    un cálculo independiente y dile al dueño que **no se abrieron en Excel real**. Mide
+    con `uname -s` antes de darlo por imposible: el PC puede tener Excel.
+19. **`gh auth login`: flujo de dispositivo a mano, no con `expect`.** La consola de `gh`
+    descarta lo que llega antes de pintar la pregunta. El dueño escribe el código de un
+    solo uso en `github.com/login/device`, logueado con la cuenta correcta, y el token
+    queda en el almacén de `gh` sin pasar por pantalla. Con dos cuentas en la Mac, da a
+    cada clon sus credenciales locales.
+20. **Los ajustes de Claude los instala el dueño con un `cp`.** El clasificador del modo
+    automático bloquea que Claude escriba `.claude/settings.json`, `settings.local.json`
+    o hooks (Self-Modification) y los reintentos por otras rutas caen en Instruction
+    Poisoning o Auto-Mode Bypass. No insistas ni lo rodees: deja la plantilla en el repo
+    (`docs/publicacion-automatica/settings.json`) y dale el `cp` de una línea más `git
+    add`, commit y push para cada máquina. Y no leas el bloqueo como un no del dueño sin
+    confirmarlo: el 22-sep Claude se detuvo tras un rechazo de herramienta a las 17:07 y el
+    dueño tuvo que escribir «continua con mi peticion» (17:12, tras un `/compact`);
+    después el clasificador bloqueó la escritura con Self-Modification (17:16).
+21. **Dónde se clona cada cosa:** orion (la casa: memoria, cerebro, herramientas) →
+    `prommter/` (la empresa, repo propio) → proyectos clonados dentro de `prommter/`,
+    también cada repo de las cuentas. Se registran en el `.gitignore` de prommter como
+    repo anidado, nunca submódulo ni gitlink. En el PC la ruta equivalente es
+    `prommter/proyectos/<proyecto>`; confirma la vigente antes de dictarle un comando al
+    dueño.
+22. **Proyecto en carpeta compartida: acota `tsconfig`, ESLint y Prettier a su código**
+    (`src/` y la configuración de la raíz) y deja escrito en su CLAUDE.md que todo código
+    nuevo fuera de `src/` (un seed en `prisma/`, por ejemplo) se añade a los tres. Con
+    `**/*.ts`, `typecheck` daba miles de errores ajenos y `lint` no terminó en 5 minutos;
+    acotado, typecheck 7 s y build 23 s. Entre acotar y mover el proyecto, el dueño
+    prefirió el cambio mínimo (`prommter/DEC-001`).
+
 ## Cuándo NO aplica
 
 - **No confundas "la máquina no puede" con "el agente murió"**. Cuando un builder cae
@@ -138,6 +217,23 @@ skills sirvan en las dos.
 - **Los límites de PowerShell son del PC y allá siguen vigentes**: PS 5.1 corrompe JSON
   UTF-8 con BOM y mojibake (`prommter/KN-002`). En la Mac no existe PowerShell, y por eso
   se quitó de las herramientas de `orion-verifier`.
+
+- **Tarea programada (12):** no hace falta si es de solo lectura sin permisos o si hay
+  alguien al lado para aprobar. Para una hora fija pública que no es secreta, mejor que el
+  reloj del cliente la muestre y la tarea solo deje el contenido listo de madrugada.
+- **Keep-awake y servidores (13–15):** no aplican al PC Windows ni a una máquina que no
+  duerme; si el dueño no necesita abrir nada, el servidor del panel basta para las
+  pruebas propias. Páginas sin estado local pueden mirarse como `file://`.
+- **GPU (16):** en el PC o en un contenedor sin GPU Chrome sí cae a SwiftShader (deja
+  `--enable-unsafe-swiftshader` de respaldo y asume pruebas lentas); sin WebGL no se nota.
+- **whisper (17):** con GPU real o Apple Silicon, Metal sí acelera y Homebrew no compila Python.
+- **Excel (18):** si el dueño solo necesita CSV no hace falta .xlsx.
+- **gh (19):** si el dueño puede teclear `gh auth login` en su terminal (ahí el modo
+  interactivo sí funciona) o `gh auth status` ya muestra la cuenta correcta.
+- **Ajustes (20):** si el dueño aprueba la escritura en el momento en la interfaz no hace
+  falta el `cp`; jamás esquives el bloqueo escribiendo por otra ruta.
+- **Carpetas (21–22):** repos de terceros u organizaciones ajenas no se clonan en la
+  empresa sin permiso; si el proyecto es el único en su carpeta no hay nada que acotar.
 
 ## Evidencia
 
@@ -166,6 +262,21 @@ push real: villa-app-repo 09859a5..de20b97 · Equipo-villa-broaster 4f91358..f3b
 - `estanco-contable/KN-008` — se puede probar SQL real: `embedded-postgres` en el scratchpad, 37/37.
 - `duo-burger/KN-008` — i5 de 4 hilos; carga 46 tumbó el DNS con `brew` compilando y tres
   agentes renderizando a la vez; `kill -STOP`/`-CONT` como remedio que no pierde trabajo.
+
+Cosecha de las ventanas (2026-11-02):
+
+- Contradicción del push en el PC: «En el PC publica con `-c credential.helper=manager`, que es justo lo que esa máquina midió que funciona» y «el propio script hizo el rebase y publicó solo» (esa ejecución fue en la Mac, no en el PC) — ventana [[2026-09-09-duo-burger|Duo Burger]] (transcrito `51184930`, 2026-09-22).
+- Tarea programada atascada: «Tool permission request failed: AbortError: Tool permission stream closed before response received» — ventana [[2026-10-05-duo-burguer-publicar-la-pagina-cada-dia-00-10-ante|Publicar la página cada día]] (transcrito `2cc930f8`, 2026-10-19); «Corrió el 5 de octubre y no volvió a publicar.» y «La hora la ajustó la app (yo pedí 12:10).» — [[2026-09-09-duo-burger|Duo Burger]] (`51184930`, 2026-10-21 y 2026-10-04); «Ya pasaron las 06:00 en Bogotá (son las 09:39). Publico.» y el mismo AbortError el 11-02 — [[2026-10-24-duo-burguer-publicar-la-revelacion-del-evento-sab-|Revelación del evento]] (`d6a3781b`, 2026-10-24). Que esa publicación siga esperando permiso es inferencia del AbortError.
+- Servidores y sueño: «no me deja abrir» y «The app shut both servers down when it closed the browser panel, about 28 minutes ago.» — [[2026-09-09-duo-burger|Duo Burger]] (`7f456016`, 2026-10-23); «lleva 50 minutos sin usar CPU» (2026-10-24) y «Siete pruebas se habían cancelado solo porque la Mac se durmió 80 minutos» (2026-10-25) — misma ventana. «Cerrar el panel del navegador apaga los servidores.» — ventana [[2026-10-22-orion-app-de-rutina-sincronizada|ORION app de rutina]] (`b5eb380b`, 2026-10-23).
+- Keep-awake: «Buen aviso: el anterior había caducado hace veinte minutos. Ya está reactivado, ahora sin límite de tiempo.» (2026-09-10) y «no lo dejes apagar hasta que acabe» (2026-09-24) — [[2026-09-09-duo-burger|Duo Burger]] (`51184930`). Que el bloqueo caducado fuera `caffeinate` es lectura, no cita.
+- Tope de 5 servidores: «Maximum 5 dev servers per folder reached; 5 belong to other chats.» — ventana [[2026-10-31-que-cremoso-marca|Qué Cremoso marca]] (`72ffaa4c`, 2026-11-02); «no los voy a detener yo. Lo rodeo: levanto la vitrina con un servidor estático» y «BSD sed falló; aplico el cambio con Python» — [[2026-10-31-que-cremoso-vitrina|Qué Cremoso vitrina]] (`6f3a4ef7`, 2026-11-02); «Failed to read the 'localStorage' property from 'Window': Storage is disabled» — [[2026-09-09-la-villa-sistema|La Villa sistema]] (`129e1026`, 2026-11-02).
+- GPU: «Playwright 1.63 ya no trae Chromium para macOS 13, que es la versión de este equipo.», «Cada página tarda 20-40 s porque el navegador sin interfaz dibuja el 3D por software.» y «58 de 58 pruebas pasan, ahora en 3,6 minutos en vez de 16,6.» — ventana [[2026-10-19-prototipo-web-de-cerebro-3d-interactivo-con-enferm|Prototipo cerebro 3D]] (`71c5f9e6`, 2026-10-19). Las cifras del experimento de 3 filas (ANGLE-Metal sobre Intel Iris Plus 640, 60,3 fps, carga 21,3 s la primera y 5,2 y 4,5 s las siguientes) salen del transcrito crudo (21:53–21:54), no del resumen.
+- whisper: «Con Homebrew no se pudo, porque se puso a compilar Python entero y en esta Mac eso tarda horas» y «8 s de voz tardaron 45 s» — ventana [[2026-10-26-contenido-motiongraphus-llamativo|Contenido motion graphics]] (`1f894ae1`, 2026-10-26); el flag `-ng` sale de la memoria del dueño (project_video_en_esta_mac).
+- Excel: «en esta Mac no hay Excel ni LibreOffice» y «Los totales coinciden exactamente con un cálculo independiente» (costo directo $98.300.000, total $116.927.850) — [[2026-10-19-mercado-de-plantillas-arquitectura|Mercado de plantillas]] (`007a9e6f`, 2026-10-19); «El Mac no tiene librería para Excel, así que los leo con un script propio que no instala nada.» — [[2026-10-19-dropshipping-con-flujo-n8n|Dropshipping n8n]] (`00af789e`, 2026-10-21).
+- gh: «El pipe a través de script no entrega el input a la consola de gh.», «La consola de gh descarta el input pendiente cuando entra en modo lectura» y «los push de placita salen con tu cuenta nueva, sin tocar las credenciales viejas del resto de la Mac» (cuatro intentos en ~14 min, solo el flujo manual funcionó) — ventana [[2026-08-31-sincronizar-orion-y-proyectos-fork|Sincronizar ORION]] (`630e0fde`, 2026-08-31). Misma ventana para la jerarquía: «adentro de ella va prommter que es nuestra empresa», «y infrapilot es un proyecto mas d prommter, los repos en la cuena tambien son proyectos, guardalos» y «El gitdir movido aún apuntaba al worktree viejo en su config y git no podía ni arrancar para corregirlo».
+- Ajustes: «Permission for this action was denied by the Claude Code auto mode classifier. Reason: [Self-Modification].» (17:16), `[Instruction Poisoning]` y `[Auto-Mode Bypass]` (18:16, 18:18), «continua con mi peticion» y «Te lo dejé listo; son dos comandos.» — [[2026-09-09-duo-burger|Duo Burger]] (`51184930`, 2026-09-22).
+- Carpeta compartida: «npm run typecheck falla con miles de errores, pero todos vienen de otras carpetas», «npm run lint no terminó en 5 minutos» y «Typecheck en verde (7 s)» — ventana [[2026-10-24-bot-recolector-de-informacion-prommter-fork|Bot recolector Prommter]] (`34a80c58`, 2026-10-24).
+- Objetos de memoria de esta cosecha: `_permanent/KN-020` a `KN-024`.
 
 ### Huecos explícitos (el corpus NO lo respalda)
 

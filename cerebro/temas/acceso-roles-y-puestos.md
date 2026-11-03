@@ -1,11 +1,11 @@
 ---
 slug: acceso-roles-y-puestos
 titulo: "Acceso: roles, puesto por equipo y qué ve cada persona"
-alias: [login, logins, iniciar sesion, inicio de sesion, sesion, sesiones, entrar al sistema, pin, pines, clave, claves, contrasena, contrasenas, usuario, usuarios, perfil, perfiles, rol, roles, permiso, permisos, cajero, cajeros, caja, cajas, mostrador, arqueo, turno, turnos, dueno, duenos, admin, administrador, trabajador, empleado, empleados, puesto, puestos, equipo, equipos, pc, dispositivo, dispositivos, sede, sedes, local, locales, sucursal, sucursales, vincular, vinculacion, desvincular, bloqueo, bloqueado, intentos fallidos, fuerza bruta, timing-safe, cookie, cookie firmada, hmac, scrypt, bcrypt, verificar_pin, 401, 403, gate, gating, autenticacion, autorizacion, acceso, personas, quien ve que, que ve el cajero, modelo mercaplaza, manda el pc, doble login, re-pin, escalada de privilegios]
-preguntas: ["¿cómo es el login de los sistemas de la casa?", "el cajero qué puede ver", "¿qué ve un cajero y qué no ve?", "¿cómo hago que cada PC facture en la sede que le toca?", "¿con PIN o con usuario y contraseña?", "¿cómo se arman los roles y permisos en estos sistemas?"]
-proyectos: [placita, villa-broaster, estanco-contable, wrd, arroces]
+alias: [login, logins, iniciar sesion, inicio de sesion, sesion, sesiones, entrar al sistema, pin, pines, clave, claves, contrasena, contrasenas, usuario, usuarios, perfil, perfiles, rol, roles, permiso, permisos, cajero, cajeros, caja, cajas, mostrador, arqueo, turno, turnos, dueno, duenos, admin, administrador, trabajador, empleado, empleados, puesto, puestos, equipo, equipos, pc, dispositivo, dispositivos, sede, sedes, local, locales, sucursal, sucursales, vincular, vinculacion, desvincular, bloqueo, bloqueado, intentos fallidos, fuerza bruta, timing-safe, cookie, cookie firmada, hmac, scrypt, bcrypt, verificar_pin, 401, 403, gate, gating, autenticacion, autorizacion, acceso, personas, quien ve que, que ve el cajero, modelo mercaplaza, manda el pc, doble login, re-pin, escalada de privilegios, no me deja entrar, ese pin no es, circulitos del pin, autocapitalize, autocorrector, teclado del celular, usuario dueno, caja-1, vincular equipo, api admin expuesto, lista blanca, reenvio, proxy, subdominio caja, un solo dominio, separar vitrina y panel, seguridad del panel]
+preguntas: ["¿cómo es el login de los sistemas de la casa?", "el cajero qué puede ver", "¿qué ve un cajero y qué no ve?", "¿cómo hago que cada PC facture en la sede que le toca?", "¿con PIN o con usuario y contraseña?", "¿cómo se arman los roles y permisos en estos sistemas?", "El dueño dice que el PIN es correcto y el sistema no lo deja entrar, ¿qué revisamos?", "¿Está bien tener la vitrina y la caja bajo el mismo dominio o las separo?"]
+proyectos: [placita, villa-broaster, estanco-contable, wrd, arroces, duo-burguer]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-11-02
 ---
 
 # Acceso: roles, puesto por equipo y qué ve cada persona
@@ -146,6 +146,21 @@ en cada caja hoy —un cajero que la abriera vería el cajón del compañero*
 del cajero**; lo que cambia entre negocios es cuánto trabajo físico se le
 delega, no cuánta plata se le muestra.
 
+13. **La pantalla de acceso no le pide al dueño teclear identificadores.** En celular, que
+    elija su nombre de una lista (no `usu-dueno` ni `caja-1`); si hay campos de texto, con
+    `autocapitalize`, `autocorrect` y `spellcheck` apagados y el valor normalizado (trim, minúsculas,
+    ñ a n; el autocorrector del teclado fue una hipótesis sin confirmar, la causa confirmada fue un
+    typo). **Los círculos del PIN deben coincidir con el largo del PIN de ESE usuario** (6 para el
+    dueño, no 4 por defecto).
+14. **La vitrina pública reenvía solo una lista blanca.** Separar por subdominio no basta: si la
+    vitrina reenvía todo `/api/*` al sistema, la API del panel responde (401) desde el dominio que se
+    reparte por WhatsApp. Reenvía solo las rutas que la vitrina usa (ahí `/api/productos` y
+    `/api/ordenes`) y comprueba **en producción, desde el dominio público**, que `/api/admin/*` da
+    404 y no 401. El panel va en su propio subdominio: otro origen, y su cookie de sesión no se
+    alcanza desde lo público.
+15. **Secretos del login:** cómo diagnosticar un PIN sin imprimirlo, dónde viven `ADMIN_CLAVE` y los
+    PIN, y qué hacer si el dueño los pega en el chat están en [[TEMA-claves-cuentas-y-secretos]].
+
 ## Cuándo NO aplica
 
 - **"El cajero solo ventas" no se copia sin traducir.** En el asadero cobrar es
@@ -175,6 +190,16 @@ delega, no cuánta plata se le muestra.
   administración: responde un **error neutro que no revela que la cuenta es de
   admin** y expulsa la sesión si quedó colada (`wrd/DEC-009`). No pongas ni un
   enlace del sitio público hacia el sistema (`wrd/DEC-008`).
+- **Matiz del mensaje único (punto 7):** «usuario no existe» y «clave mala» con el mismo texto es lo
+  correcto en producción (no revelar qué usuarios existen). Pero **durante la puesta en marcha** (28-sep, Duo)
+  el dueño tardó unos 47 min en entrar; parte fue un PIN de fábrica caducado. El mensaje único «Ese PIN
+  no es» ocultó la causa: escribía «uso-dueno» en lugar de «usu-dueno», el sistema no anotó el intento
+  fallido porque el usuario no existía y la pantalla mostraba 4 círculos para un PIN de 6. La pista fue
+  la tabla de intentos fallidos vacía. Deja una pista (en el registro del servidor o en un mensaje temporal) hasta que el dueño haya
+  entrado, y quítala después. Con teclado físico o PIN pad numérico no hay autocorrección y el punto 13
+  sobra.
+- **Si vitrina y sistema son un solo proceso sin proxy**, la lista blanca (punto 14) va en el propio
+  servidor; el principio de no exponer lo admin en el dominio público sigue valiendo.
 - **Gating por dispositivo es UX, no seguridad.** WRD permite crear cuenta solo
   en celular y lo repite en el servidor como defensa en profundidad, pero lo dice
   explícito: *la barrera real de datos sigue siendo RLS, el servidor no puede
@@ -210,6 +235,14 @@ delega, no cuánta plata se le muestra.
   validó **37/37** contra un Postgres real levantado con `embedded-postgres`.
 - `wrd/KN-004` — 16 hallazgos que los smokes no vieron, incluido un PIN de admin
   en un comentario; ronda adversarial obligatoria en auth/admin/RLS.
+- «dice revisa lo que escribistte son 4 digitos o 6 si eres el dueño», «ahora me pedi un codigo de 4»,
+  «me dice que ese pin no es y que tampoco me deja cambiarlo», «intentos fallidos: []» — ventana
+  [[2026-09-09-duo-burger|Duo Burger]] (transcrito `51184930`, 2026-09-28).
+- «La vitrina reenvía todo /api/* al sistema, así que la API del panel es alcanzable desde el dominio
+  público» y «/api/admin/* ahora da 404 desde el dominio público, /api/productos sigue en 200» —
+  ventana [[2026-09-08-sistema-de-villa-orion|Sistema de Villa Orion]] (transcrito `f7689b06`,
+  2026-09-09). La pregunta del dueño («un solo dominio para las dos cosas, ¿te parece buena?») lo
+  destapó; no era un agujero (hay bloqueo tras 5 intentos) pero sí la puerta del panel expuesta.
 - Código, con archivo y línea: `villa-broaster/broaster-app/lib/acceso/{roles.ts,
   sesion.ts,puestos.ts,bloqueos.ts,usuarios.ts,usuarios-disco.ts}`,
   `app/admin/_lib/auth.ts:135-141,238-244,276-289,305-307`;
@@ -248,6 +281,8 @@ delega, no cuánta plata se le muestra.
 
 ## Enlaces
 
+- [[TEMA-claves-cuentas-y-secretos]] — conducta con PIN, claves y tokens (nada por el chat, nada
+  impreso), mapa de qué clave vive dónde.
 - [[TEMA-caja-y-turnos]] — a quién pertenece la plata que entra por este mismo
   mostrador; el arqueo es la pantalla que el cajero justamente no ve.
 - [[TEMA-generadores-de-diseno]] — cómo se le encarga la **pantalla** de login a

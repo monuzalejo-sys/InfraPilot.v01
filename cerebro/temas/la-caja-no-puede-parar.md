@@ -1,11 +1,11 @@
 ---
 slug: la-caja-no-puede-parar
 titulo: La caja no puede parar — local primero, nube después, para negocios con mostrador
-alias: [caja, mostrador, punto de venta, pos, sin internet, se cayo internet, se fue el internet, sin conexion, offline, offline first, local primero, funciona sin internet, sincronizacion, sincronizar, sincronizador, outbox, cola de subida, cola pendiente, subir, bajar, merge, conflicto, convergencia, tiempo real, en vivo, ver desde el celular, desde cualquier celular, el dueno quiere ver, control total, dos sedes, dos locales, multi sede, multi local, varias sucursales, sucursales, centralizar, base de datos centralizada, nube, supabase, consecutivo, numero de orden, L1-0007, codigo reasignado, pedidos de la landing, pedidos desde la web, la pagina manda pedidos, interruptor, interruptores, booleano, booleanos, opt-in, opt in, aplicaSi, catalogo de arquetipos, mecanismo en vez de advertencia, restriccion de negocio, restriccion que nadie recuerda, saas.*, tareas de saas, cero tareas de saas]
-preguntas: ["que necesito para que el dueno vea las dos sedes desde el celular", "como hago que la caja siga vendiendo sin internet", "como sincronizo el local con la nube", "cada cuanto debe subir y bajar datos un punto de venta", "que pasa con los consecutivos cuando hay varias sedes", "como llegan a la caja los pedidos de la pagina web", "que es tiempo real de verdad en un mostrador", "como evito que un plan le meta tareas de saas a una caja registradora", "como protejo una restriccion de negocio para que no dependa de que alguien se acuerde"]
-proyectos: [_permanent, placita, villa-broaster, estanco-contable, orion]
+alias: [caja, mostrador, punto de venta, pos, sin internet, se cayo internet, se fue el internet, sin conexion, offline, offline first, local primero, funciona sin internet, sincronizacion, sincronizar, sincronizador, outbox, cola de subida, cola pendiente, subir, bajar, merge, conflicto, convergencia, tiempo real, en vivo, ver desde el celular, desde cualquier celular, el dueno quiere ver, control total, dos sedes, dos locales, multi sede, multi local, varias sucursales, sucursales, centralizar, base de datos centralizada, nube, supabase, consecutivo, numero de orden, L1-0007, codigo reasignado, pedidos de la landing, pedidos desde la web, la pagina manda pedidos, interruptor, interruptores, booleano, booleanos, opt-in, opt in, aplicaSi, catalogo de arquetipos, mecanismo en vez de advertencia, restriccion de negocio, restriccion que nadie recuerda, saas.*, tareas de saas, cero tareas de saas, vender siempre, facturar siempre, sin piso, sin stock no deja cobrar, bloqueo de facturacion, no me deja cobrar, necesito base de datos, fin del sistema, landing de ventas, disco persistente, dos replicas, prueba de 5 minutos]
+preguntas: ["que necesito para que el dueno vea las dos sedes desde el celular", "como hago que la caja siga vendiendo sin internet", "como sincronizo el local con la nube", "cada cuanto debe subir y bajar datos un punto de venta", "que pasa con los consecutivos cuando hay varias sedes", "como llegan a la caja los pedidos de la pagina web", "que es tiempo real de verdad en un mostrador", "como evito que un plan le meta tareas de saas a una caja registradora", "como protejo una restriccion de negocio para que no dependa de que alguien se acuerde", "por que la caja no me deja cobrar si el producto si esta ahi", "necesito una base de datos para que el dueno vea las ventas de los dos locales desde el celular"]
+proyectos: [_permanent, placita, villa-broaster, estanco-contable, orion, mercaplaza, duo-burguer]
 confianza: alta
-actualizado: 2026-09-09
+actualizado: 2026-11-02
 ---
 
 # La caja no puede parar
@@ -112,3 +112,63 @@ puede —lo normal en comida y en tienda de barrio—, entra este tema entero.
 
 No la contesta el que programa. La contesta el dueño, y conviene contestarla
 antes de escribir la primera línea, porque cambia la arquitectura, no el detalle.
+
+## Nunca bloquees una venta real por algo que el sistema cree, no mide
+
+Si el sistema impide cobrar porque «cree» que no hay mercancía, saldo o permiso, y la
+realidad del negocio dice que sí se puede vender, **cambia la regla para que la venta
+se registre igual, anotada como excepción con aviso visible**, en vez de bloquearla.
+En Mercaplaza (2-nov) el dueño pidió «que se deje facturar siempre»: un producto «sin
+piso» ni siquiera se dejaba marcar en la cuenta, y la báscula exigía que la pesa se
+quedara quieta. Se cambió para que se venda igual, y el aviso dejó de decir «NO SE
+PUDO» en rojo (confundía) y pasó a ser informativo. **Esto vale solo para condiciones
+internas de inventario o contabilidad**, no para bloqueos de seguridad o legales
+(sesión vencida, rol sin permiso, el PIN del dueño o que solo el dueño facture en
+bodega: el dueño pidió esas restricciones el mismo 2-nov): esos sí bloquean. En cambio,
+cobrar a un cliente con mercancía ya marcada después de que la otra caja cerró el día
+SÍ se deja, y la venta queda anotada como «después del cierre». La decisión de no
+facturar electrónicamente por ahora está en [[TEMA-recibos-comprobantes-y-dian]].
+
+## Antes de recomendar infraestructura, confirma el fin
+
+En los sistemas de negocio de Prommter el fin es siempre el mismo: **funciona en el
+local aunque se caiga internet, recibe los pedidos de la landing y el dueño ve el
+movimiento en tiempo real desde cualquier celular, con control total**. Con ese fin,
+la base centralizada no es opcional. El 8-sep Claude recomendó primero «Puede que no
+necesites base de datos» (prueba de 5 min: pedido de prueba, redeploy, ¿sigue ahí?)
+razonando desde el hosting; el dueño declaró el fin y la respuesta se invirtió: una
+sola verdad para dos sedes visible desde el celular, 22 métodos de almacén (18 de
+datos y 4 de usuarios) tras un contrato que ya existía, con la caja local primero. La
+pregunta «¿sobrevive el disco al despliegue?» solo decide cuando las cajas son
+independientes. **Pregunta el fin antes de mirar el hosting.**
+
+## Riesgo: la caja y el servidor comparten VPS
+
+La caja de Duo Burguer corre en el mismo VPS que estuvo sin responder del 22 al 25-oct
+(ver [[TEMA-un-vps-varios-negocios]]; la causa, plan sin pagar, es una inferencia sin
+confirmar). **Si el local ya cobrara solo con esa caja, el corte la dejaría sin
+servicio y chocaría con el principio de este tema.** Mientras la venta se guarde
+primero en el local (outbox), el corte solo retrasa el espejo; si el local depende del
+servidor para cobrar, no está cumpliendo la regla.
+
+## Cuándo NO aplica (lo nuevo)
+
+- **Vender siempre:** no se aplica a bloqueos de seguridad o legales reales (sesión
+  vencida, rol sin permiso, PIN del dueño, solo el dueño factura en bodega). Cobrar
+  tras el cierre de la otra caja sí se deja y queda anotado «después del cierre».
+- **Base centralizada:** con una sola caja y nadie mirando de lejos basta un disco
+  persistente (la prueba de 5 min lo decide); dos réplicas de la app rompen aunque el
+  disco persista.
+
+## Evidencia (lo nuevo)
+
+- «quiero que se deje facturar siempre» (2026-11-02 20:09) y «un producto sin piso ni
+  siquiera se deja marcar en la cuenta. Lo cambio para que se venda igual» (20:47) —
+  ventana [[2026-10-15-mercaplaza-sistema|Mercaplaza, sistema]] (transcrito `1760cf3b`,
+  2026-11-02).
+- «Puede que no necesites base de datos», «el fin es ese para los proyectos para los
+  negocios, control total y que puedan verlo en tiempo real» y «con ese objetivo, la
+  base de datos sí entra» — ventana [[2026-09-08-sistema-de-villa-orion|Sistema de
+  Villa]] (transcrito `f7689b06`, 2026-09-08).
+- «el servidor volvió, pero con el sistema viejo.» — ventana
+  [[2026-09-09-duo-burger|Duo Burger]] (transcrito `7f456016`, 2026-10-25).

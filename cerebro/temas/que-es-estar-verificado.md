@@ -1,18 +1,18 @@
 ---
 slug: que-es-estar-verificado
 titulo: Qué significa que algo "ya quedó": la definición de hecho
-alias: [ya quedo, ya quedó, quedo listo, quedo bien, ya esta, ya está, esta listo, listo, terminado, terminada, terminar, estar terminado, esta terminado, cuando esta terminado, que es estar terminado, cuando doy por terminada una tarea, terminado de verdad, acabado, hecho, done, definicion de hecho, definicion de terminado, criterio de aceptacion, criterios de aceptacion, cuando digo que esta listo, dar por bueno, dar por buena, dar por hecho, declarar listo, decir que funciona, compila, compilo, compilar, compilar no es funcionar, basta con compilar, no basta con compilar, corre pero no sirve, funciona pero no hace nada, arranca pero, typecheck, type check, tsc, tsc --noEmit, strict, tsconfig, tsconfig ad-hoc, build, build verde, pasa el build, todo verde, en verde, tests en verde, pasan los tests, self-tests, self tests, selftests, unitarios, tests unitarios, smoke, smokes, camino feliz, e2e, E2E, prueba e2e, punta a punta, de punta a punta, prueba de punta a punta, ejercitar, probar de verdad, qa, QA, qa de agente, reviso, revisar, revision, revisar el trabajo de un agente, reviso el trabajo de un agente, como reviso el trabajo de un agente, revisar el trabajo del agente, revisar lo que hizo el agente, revisar lo que entrego el agente, recibir el trabajo de un agente, auditar el trabajo de un agente, calificar el trabajo de un agente, aprobar el trabajo de un agente, revisar entrega de agente, revisar builder, revisar al builder, revisar subagente, agente, agentes, subagente, builder, builders, el agente dice que quedo, el agente dice que ya quedo, confiar en el agente, confiar en lo que dice el agente, le creo al agente, verifier, verificador, verificacion, verificado, no verificado, QAReport, PASS, FAIL, adversarial, refutador, refutadores, romper el gating, seguridad, auth, admin, RLS, seed, seed limpio, con seed, sin seed, empresa nueva, cuenta nueva, base vacia, catalogo vacio, estado sucio, e2e sucio, datos viejos, datos de la version anterior, version anterior, VERSION_DATOS, migracion, middleware, proxy, PUBLIC_PATHS, curl, sw.js, manifest, webhook, 307, porcentaje, porcentaje de avance, avance, cuanto llevamos, quien califica, quien pone el porcentaje, juez, juez externo, autorreportado, se califica solo, falso positivo, falsos positivos, verde mentiroso, agregador, agregadores, sintetizador, agregado, agregar metricas, herramienta de medicion, herramienta de agregacion, script de metricas, dashboard, panel de costos, numero mentiroso, verificar un agregador, como verifico un script que suma numeros, el script corrio pero el numero esta mal, cruzar contra el numero real, caso con respuesta conocida, spot check, numero de tests subio, subieron los tests, tests duplicados, tests que corren dos veces, suite corre dos veces, doble conteo, contar dos veces, restar antes de celebrar, cifra que sube, el numero subio, cobertura falsa, glob de tests, test glob, importar tests dentro de otro test, archivo de tests que importa tests, muestra de control, recorte de alcance, recortar de mas, recorte de mas, no te pases recortando, acotar un filtro, restringir un filtro, estrechar un criterio, estrechar el alcance, condicion de aplicacion, aplicasi, grupo de control, caso de control, perfil de control, perfiles de respaldo, conteo de respaldo, verificar hacia atras, verificar en los dos sentidos, los dos sentidos de una verificacion, dano colateral, efecto colateral de un cambio, comprobar que no rompi otros casos, regresion en sentido contrario, un arquetipo que aplica siempre casi nunca existe, auditoria transversal, auditoria cruzada, validador local, cada validador local, seis validadores en verde, defectos que ningun validador vio, placeholder sin instanciar, placeholder sin porCada, etapa como string, tipo de dato inconsistente entre archivos hermanos, codigo de salida, código de salida, exit code, termino en verde y no hay archivo, render verde, render sin archivo, el render no produjo nada, pipe se traga el error, error tragado por un pipe, artefacto, el artefacto no existe, comprobar el artefacto]
-preguntas: ["como se si algo quedo bien", "que es estar terminado", "basta con que compile", "como reviso el trabajo de un agente", "el build paso verde, ya puedo decir que funciona?", "que pruebo antes de decirle al dueño que quedo listo?", "los tests pasan pero el bug salio en produccion, que me falto probar?", "quien pone el porcentaje de avance?", "mi typecheck da errores y el del proyecto no, a cual le creo?", "hice login y panel de admin, con el verifier normal basta?", "escribi un script que suma metricas de varios proyectos, ya quedo?", "como se si mi agregador de costos esta calculando bien?", "el numero de tests subio de golpe, es buena senal?", "subieron los tests sin escribir tests nuevos, que paso?", "le puse una condicion a una regla para que aplicara menos, como se que no me pase recortando?", "restringi un filtro y el numero bajo como esperaba, eso ya prueba que quedo bien?", "como verifico que un recorte de alcance no daño casos que no debian cambiar?"]
-proyectos: [estanco-contable, arroces, placita, infrapilot, wrd, villa-broaster, orion, _permanent, duo-burger]
+alias: [ya quedo, ya quedó, quedo listo, quedo bien, ya esta, ya está, esta listo, listo, terminado, terminada, terminar, estar terminado, esta terminado, cuando esta terminado, que es estar terminado, cuando doy por terminada una tarea, terminado de verdad, acabado, hecho, done, definicion de hecho, definicion de terminado, criterio de aceptacion, criterios de aceptacion, cuando digo que esta listo, dar por bueno, dar por buena, dar por hecho, declarar listo, decir que funciona, compila, compilo, compilar, compilar no es funcionar, basta con compilar, no basta con compilar, corre pero no sirve, funciona pero no hace nada, arranca pero, typecheck, type check, tsc, tsc --noEmit, strict, tsconfig, tsconfig ad-hoc, build, build verde, pasa el build, todo verde, en verde, tests en verde, pasan los tests, self-tests, self tests, selftests, unitarios, tests unitarios, smoke, smokes, camino feliz, e2e, E2E, prueba e2e, punta a punta, de punta a punta, prueba de punta a punta, ejercitar, probar de verdad, qa, QA, qa de agente, reviso, revisar, revision, revisar el trabajo de un agente, reviso el trabajo de un agente, como reviso el trabajo de un agente, revisar el trabajo del agente, revisar lo que hizo el agente, revisar lo que entrego el agente, recibir el trabajo de un agente, auditar el trabajo de un agente, calificar el trabajo de un agente, aprobar el trabajo de un agente, revisar entrega de agente, revisar builder, revisar al builder, revisar subagente, agente, agentes, subagente, builder, builders, el agente dice que quedo, el agente dice que ya quedo, confiar en el agente, confiar en lo que dice el agente, le creo al agente, verifier, verificador, verificacion, verificado, no verificado, QAReport, PASS, FAIL, adversarial, refutador, refutadores, romper el gating, seguridad, auth, admin, RLS, seed, seed limpio, con seed, sin seed, empresa nueva, cuenta nueva, base vacia, catalogo vacio, estado sucio, e2e sucio, datos viejos, datos de la version anterior, version anterior, VERSION_DATOS, migracion, middleware, proxy, PUBLIC_PATHS, curl, sw.js, manifest, webhook, 307, porcentaje, porcentaje de avance, avance, cuanto llevamos, quien califica, quien pone el porcentaje, juez, juez externo, autorreportado, se califica solo, falso positivo, falsos positivos, verde mentiroso, agregador, agregadores, sintetizador, agregado, agregar metricas, herramienta de medicion, herramienta de agregacion, script de metricas, dashboard, panel de costos, numero mentiroso, verificar un agregador, como verifico un script que suma numeros, el script corrio pero el numero esta mal, cruzar contra el numero real, caso con respuesta conocida, spot check, numero de tests subio, subieron los tests, tests duplicados, tests que corren dos veces, suite corre dos veces, doble conteo, contar dos veces, restar antes de celebrar, cifra que sube, el numero subio, cobertura falsa, glob de tests, test glob, importar tests dentro de otro test, archivo de tests que importa tests, muestra de control, recorte de alcance, recortar de mas, recorte de mas, no te pases recortando, acotar un filtro, restringir un filtro, estrechar un criterio, estrechar el alcance, condicion de aplicacion, aplicasi, grupo de control, caso de control, perfil de control, perfiles de respaldo, conteo de respaldo, verificar hacia atras, verificar en los dos sentidos, los dos sentidos de una verificacion, dano colateral, efecto colateral de un cambio, comprobar que no rompi otros casos, regresion en sentido contrario, un arquetipo que aplica siempre casi nunca existe, auditoria transversal, auditoria cruzada, validador local, cada validador local, seis validadores en verde, defectos que ningun validador vio, placeholder sin instanciar, placeholder sin porCada, etapa como string, tipo de dato inconsistente entre archivos hermanos, codigo de salida, código de salida, exit code, termino en verde y no hay archivo, render verde, render sin archivo, el render no produjo nada, pipe se traga el error, error tragado por un pipe, artefacto, el artefacto no existe, comprobar el artefacto, basta con que compile, que es estar terminado, comprobador, verificador ciego, dio verde y estaba mal, falso positivo, falso negativo, caso malo conocido, prueba en negativo, calibrar metrica, umbral, revisar el trabajo del pc, trabajo de la otra maquina, sin rutas de venta, imitacion del sistema, stub, mock, probar contra el sistema real, dejo conectado, quiero publicar, campo obligatorio nuevo, calendario de campana, campana diaria, faltan piezas, dinamica del dia, palabra del dia, tienda vacia, 0 productos, semilla, seed, CARPETA_DATOS, catalogo vacio, probar con datos nuevos, le escribi al bot y funciono, funciono bien, comando sin modelo, revisar la base, limpiar la base de pruebas, funciona en build pero no en dev, npm run dev no carga, solo probe produccion, modo desarrollo, decoder draco, vite dev, la prueba se rompe con cada cambio, las pruebas pasan pero no funciona, revisar el trabajo del equipo, revisar el trabajo de otro, revisar lo que entrego el equipo, ya dejo todo conectado, ya deje todo conectado, tienda sin productos, sale sin productos, carpeta de datos nueva]
+preguntas: ["como se si algo quedo bien", "que es estar terminado", "basta con que compile", "como reviso el trabajo de un agente", "el build paso verde, ya puedo decir que funciona?", "que pruebo antes de decirle al dueño que quedo listo?", "los tests pasan pero el bug salio en produccion, que me falto probar?", "quien pone el porcentaje de avance?", "mi typecheck da errores y el del proyecto no, a cual le creo?", "hice login y panel de admin, con el verifier normal basta?", "escribi un script que suma metricas de varios proyectos, ya quedo?", "como se si mi agregador de costos esta calculando bien?", "el numero de tests subio de golpe, es buena senal?", "subieron los tests sin escribir tests nuevos, que paso?", "le puse una condicion a una regla para que aplicara menos, como se que no me pase recortando?", "restringi un filtro y el numero bajo como esperaba, eso ya prueba que quedo bien?", "como verifico que un recorte de alcance no daño casos que no debian cambiar?", "el comprobador me dio verde y estaba mal, como lo calibro", "el otro equipo dice que ya dejo todo conectado, como compruebo si se puede publicar", "como me aseguro de que cada dia de la campana tenga su pieza lista", "desplegue y la tienda sale sin productos, que paso", "probe el bot y me funciono, como se que de verdad guardo lo que le dije", "probe el build y funcionaba, por que en npm run dev no carga", "como se si lo que entrego el equipo de verdad funciona", "por que la prueba de la ayuda se rompe con un cambio pequeno", "¿cómo reviso el trabajo que entregó un agente o alguien del equipo?", "desplegué y la tienda sale sin productos, ¿qué pasó?"]
+proyectos: [estanco-contable, arroces, placita, infrapilot, wrd, villa-broaster, orion, _permanent, duo-burger, mercaplaza, escuadra, cerebro-3d, dropshipping, prommter]
 confianza: alta
-actualizado: 2026-09-10
+actualizado: 2026-11-02
 ---
 
 # Qué significa que algo "ya quedó": la definición de hecho
 
 ## Respuesta corta
 
-**Compilar no es funcionar.** `tsc` en verde y "el código aterrizó en disco" no son
+**¿Qué es estar terminado? ¿Basta con que compile? No: compilar no es funcionar.** `tsc` en verde y "el código aterrizó en disco" no son
 evidencia de nada: solo dicen que **corre**, no que **hace lo que promete**.
 Para decir "ya quedó", **ejercita el camino completo** — y córrelo en los tres estados
 que el seed esconde: **base vacía** (empresa nueva), **base sucia** (restos de otro), y
@@ -21,6 +21,13 @@ que el seed esconde: **base vacía** (empresa nueva), **base sucia** (restos de 
 **El porcentaje de avance lo pone un juez externo con criterio verificable, nunca
 quien hizo el trabajo**: autoverificarse tiene techo. Y si toca auth, admin o permisos,
 suma **refutadores dedicados** — el verifier prueba que funcione, no que se rompa.
+
+**Y también hay verdes que son de la herramienta y de quien probó, no del sistema** (cosecha de
+las ventanas, 2026-11-02). No basta con que algo compile o con que el comprobador diga ✓:
+**haz fallar el comprobador a propósito** (un caso malo conocido), **ejercita el sistema ajeno
+como lo llamaría el cliente real**, **levanta con la carpeta de datos nueva del servidor y mira
+que haya productos**, y **contrasta el «me funcionó» del dueño con la base y el registro**.
+El detalle y las cifras están abajo (pasos 13 a 19).
 
 ## Por qué (qué lo pagó)
 
@@ -144,6 +151,39 @@ que la comprobación de cada builder es local a SU archivo, y una contradicción
 con una política que vive en OTRO archivo, o un patrón de forma que solo se ve
 comparando varios archivos entre sí, ningún autochequeo aislado la puede cazar.
 
+### Lo que pagaron las ventanas de ago-nov 2026 (ocho verdes que no eran verdad)
+
+- **Un comprobador que da ✓ sin haber fallado nunca.** El 24-sep el comprobador de `trazar` dio
+  ✓ a dos EPS que eran **una sola foto de 26081×43090 px**; lo cazó el agente del rompetráfico,
+  no la herramienta. Luego, con la carta de 21×27, la misma herramienta marcó «no se ve igual» con
+  1,77 y 1,97 (tope 1,5) por puro suavizado de letra, siendo idénticas a 400 ppp. El
+  comprobador falló en las dos direcciones: un falso verde y un falso rojo.
+- **«Dejé todo conectado» con 507 pruebas en verde.** El 13-sep el sistema del PC pasaba sus 507
+  pruebas y aun así **no tenía las rutas de venta** (carta y pedidos respondían «no encontrado»):
+  publicar habría sido publicar solo una pantalla de ingreso con PIN. Y el 22-sep, al probar la
+  vitrina contra el sistema REAL y no contra mi imitación, apareció un **campo obligatorio nuevo
+  (autorización de datos)** que la imitación no exigía.
+- **Entregas del equipo que «pasaban» y estaban rotas.** Revisando las entregas de tres
+  personas del equipo (25-sep): una de ellas, ya en `main`, tenía 2 pruebas en rojo, un aviso de promos que guardaba los
+  correos solo en el celular de quien los escribía, y un número de pedido negro sobre rojo oscuro;
+  y en producción, cada celular con un pedido activo preguntaba al sistema **36 veces en 10
+  segundos** en vez de una vez cada 15. Nada de eso lo muestra un diff.
+- **Una campaña de 22 días con 4 días construidos.** El 21-oct (día 19) el dueño pidió ver la
+  página y solo existían los juegos del 3 al 6 de octubre: del 7 al 21 la tarjeta del día mandaba
+  a mirar el video y jugar, sin juego, y la palabra del día nunca apareció; además la publicación
+  automática llevaba dos semanas sin correr. Compilaba y publicaba; no había contenido.
+- **La tienda vacía.** Con la carpeta de datos fuera del repo el sistema publicaba **0 productos**;
+  con la semilla copiada, 14 (9-sep). El cliente habría entrado a una tienda vacía.
+- **«Le escribí al bot y funcionó».** Era solo `/ayuda`, que el bot contesta sin modelo: la base
+  estaba vacía y sin ninguna llamada al modelo (20-oct). En la prueba guiada de cuatro pasos, tres
+  quedaron guardadas y la pregunta final nunca llegó al bot.
+- **Build verde, `npm run dev` roto.** Al quitar una copia del decodificador Draco solo se probó el
+  build de producción; en desarrollo el modelo se quedaba en «Cargando cerebro…» (19-oct,
+  arreglado en el commit 4c6c217, de paso 188 kB en vez de 279 kB).
+- **Una prueba que exigía un mínimo fijo.** La prueba de la sección de Ayuda de Mercaplaza exigía
+  al menos 5 novedades con la fecha más nueva y habría roto el siguiente cambio pequeño; se
+  corrigió antes de publicar (2-nov).
+
 ## Cómo se aplica
 
 **La escalera de "ya quedó".** Cada peldaño responde una pregunta distinta, y ninguno
@@ -238,6 +278,46 @@ responde la del siguiente. Di en voz alta en cuál estás.
     exactamente el hueco que dejó pasar 7 defectos con los seis validadores en
     verde (`orion/KN-025`).
 
+13. **Prueba tu comprobador con un caso malo y uno bueno antes de fiarte.** Un ✓ no vale hasta
+    que la herramienta haya fallado a propósito al menos una vez. Pásale un caso malo conocido
+    (un precio cambiado, un teléfono que no debe estar, un horario que falta) y uno bueno, y
+    **calibra el umbral con los dos**. Para archivos derivados (EPS, PDF en curvas) reconviértelos
+    al formato de origen y cuenta lo que importa (imágenes, fuentes): no busques una palabra en el
+    texto. Si el comprobador da un rojo raro sobre piezas que a la vista son idénticas, afina la
+    métrica (ignorar el suavizado de bordes) sin volverla ciega a un cambio real, y vuelve a
+    probarla en negativo. Ver [[TEMA-imprenta-desde-html]].
+14. **Revisa el trabajo ajeno ejercitándolo como el cliente real, no leyendo su plan ni su
+    diff.** Cuando el otro equipo (o un agente, o el PC) dice «ya dejé todo conectado», instala su
+    sistema y llámalo como lo llamaría la vitrina: pide la carta, crea un pedido, modifícalo.
+    **Cuenta rutas, no pruebas verdes.** Prueba tu parte contra el sistema REAL y no contra tu
+    imitación, que envejece. Si hay datos que pasarles, entrégalos ya traducidos a su formato y
+    validados con SU validador (0 errores) y deja lo medido en el PR o issue. Con trabajo de
+    personas del equipo, lo que se mira a mano son login, flujo completo y casos
+    límite: texto ilegible, listas que no llegan a nadie, sondeos desbocados.
+15. **Audita el calendario contra la página real.** Una campaña con un entregable por día se
+    audita lista en mano: cada día con su pieza construida (juego, portada, texto, premio), los
+    vacíos marcados ANTES de arrancar y una vez por semana, abriendo la página real en el
+    celular. Que compile y que publique no prueba que haya contenido; confirma también que la
+    publicación automática corrió. Ver [[TEMA-pedidos-y-dinamicas-de-un-local]].
+16. **Antes de entregar, levanta sistema y vitrina JUNTOS con una carpeta de datos nueva** (la
+    que tendrá el servidor) y pregunta `/api/productos`: si la semilla se busca dentro de la
+    carpeta de datos, sacarla del repo deja la tienda vacía. Con prisa, quita la variable que lo
+    causa (aquí `CARPETA_DATOS`; los datos van a `<repo>/data/`) en vez de refactorizar el almacén.
+    Tras desplegar, repite desde fuera: catálogo con productos y precio por sede (en producción
+    salieron 14 productos y la pechuga a 12.000 vs 12.500 según la sede).
+17. **Contrasta el «funcionó» del dueño con la base y el registro.** Cuando prueba el bot a mano
+    y dice «listo», mira QUÉ camino se ejercitó: un comando que el bot contesta sin modelo
+    (`/ayuda`) no prueba el camino con el modelo, y un mensaje pudo no llegar nunca. Dale la
+    lista de pruebas **en orden**, para que cada una deje huella en la base, y limpia los datos de
+    prueba (dejando respaldo) antes de que entre el cliente piloto.
+18. **Si cambias cómo se resuelven archivos estáticos (decodificadores wasm/Draco, workers,
+    rutas base), arranca `npm run dev` Y sirve el build** antes de decir «listo». En Vite,
+    importa el archivo como URL (`?url`) para que valga en los dos modos.
+19. **Una prueba que valida «la ayuda está actualizada» exige PRESENCIA, no cantidad.** Una prueba
+    con un mínimo fijo («al menos 5 novedades con la fecha más nueva») se rompe con el primer
+    cambio pequeño de una sola novedad; exige que haya al menos una reciente. Si el cambio chico
+    rompe una prueba que no tiene nada que ver con él, la rota es la prueba.
+
 ## Cuándo NO aplica
 
 - **Cambios puramente de tipos o refactors sin comportamiento nuevo**: ahí `tsc` + build
@@ -284,6 +364,20 @@ responde la del siguiente. Di en voz alta en cuál estás.
   por separado y se comprueba que sumen.
 - **El barrido completo cuesta.** La escalera entera se justifica ante un release o ante
   código que toca plata; no ante un cambio de una línea — ver [[TEMA-modelos-y-costos]].
+
+- **Comprobadores triviales** (un contador de una línea): no hace falta calibrarlos; sí cualquier
+  herramienta que decida pasa/no pasa sobre un entregable que irá a imprenta o a un cliente.
+- **Leer un documento del otro equipo** no exige ejercitar todo su sistema; ejercítalo cuando vas
+  a afirmar que está listo para publicar o a conectar contra él.
+- **Campañas de 3 días o menos**, o piezas sin calendario diario: basta una revisión visual al
+  publicar.
+- **Semilla importada en el código** (no leída de disco), y **nunca** pruebes con la carpeta de
+  datos reales del cliente.
+- **Dueño que solo probó apariencia** (un menú, un texto de bienvenida): sin datos que cruzar,
+  su «funcionó» alcanza.
+- **Proyectos sin servidor de desarrollo** (HTML estático) o cambios que no tocan la carga de
+  recursos: no hay segundo modo que arrancar.
+- **Cambios triviales de texto o estilo sin lógica nueva**: ahí leer el diff sí basta.
 
 ## Evidencia
 
@@ -380,6 +474,37 @@ responde la del siguiente. Di en voz alta en cuál estás.
   de E2: *"Base construida y verificada (…107 tests) = 50; integrada en main con QA
   independiente = 80; T-11 completa = 100"*, sobre trabajo **construido y verificado por
   el propio ORION** (campo `resumen`). El techo de la autoverificación es un número, y es 50.
+
+**Verdes que no eran verdad (cosecha de ventanas, 2026-11-02)**
+- Comprobador ciego: «los dos EPS eran una foto de la página entera … y `trazar` igual dio ✓» —
+  ventana [[2026-09-09-duo-burger|Duo Burger]] (transcrito `51184930`, 2026-09-24); «Pero la comparación de
+  `trazar` la marca con 1,77 y 1,97 de diferencia, contra un tope de 1,5.» y «Probé en negativo:
+  caza un precio cambiado, el teléfono, Nequi y el horario que falta.» — misma ventana, 2026-09-24.
+- Sistema ajeno: «Sus 507 pruebas pasan todas, sin vulnerabilidades.» / «No tiene rutas de venta.
+  Faltan la que entrega la carta y la que recibe pedidos.» — ventana
+  [[2026-09-09-duo-burger|Duo Burger]] (`51184930`, 2026-09-13); «El PC agregó un campo obligatorio de
+  autorización de datos que mi vitrina no mandaba» y «Después probé la vitrina contra su sistema
+  real, no contra mi imitación» — misma ventana (2026-09-22).
+- Revisión del equipo: «el número de pedido y el estado quedan en letra oscura sobre fondo rojo
+  oscuro, casi invisibles» y «le pregunta al sistema 36 veces en 10 segundos» — ventana
+  [[2026-09-24-revision-de-trabajo-prommter|Revisión de trabajo Prommter]] (`cbb92e83`, 2026-09-25).
+- Calendario: «Los juegos del 7 al 21 no se construyeron.» y «la palabra del día nunca apareció en
+  la página» — ventana [[2026-09-09-duo-burger|Duo Burger]] (`51184930`, 2026-10-21).
+- Tienda vacía: «El sistema arranca pero publica 0 productos» / «sin la semilla, 0 productos; con
+  ella, 14» / «el cliente habría entrado a una tienda vacía» — ventana
+  [[2026-09-08-sistema-de-villa-orion|Sistema de Villa]] (`f7689b06`, 2026-09-09). En memoria de
+  proyecto: `villa-broaster/KN-047` (semilla vs carpeta de datos) y `villa-broaster/RSK-006`
+  (Resolved: separar semilla de datos vivos).
+- «Funcionó» del dueño: «lo que funcionó fue /ayuda, que el bot contesta sin usar el modelo» y «la
+  pregunta 4 nunca llegó al bot» — ventana [[2026-10-19-dropshipping-con-flujo-n8n|Dropshipping con flujo n8n]]
+  (`00af789e`, 2026-10-20).
+- Build vs dev: «Antes solo había probado el build de producción, donde sí funcionaba.» y
+  «Decodificador Draco importado como URL de Vite (arregla la carga en desarrollo)» — ventana
+  [[2026-10-19-prototipo-web-de-cerebro-3d-interactivo-con-enferm|Prototipo web de cerebro 3D]]
+  (`71c5f9e6`, 2026-10-19).
+- Prueba con mínimo fijo: «exige al menos 5 novedades con la fecha más nueva. Eso rompería las pruebas
+  en el próximo cambio pequeño» — ventana [[2026-10-15-mercaplaza-sistema|Mercaplaza sistema]]
+  (`1760cf3b`, 2026-11-02).
 
 **Hueco medido — la definición de hecho no está enforced en ninguna parte.** El protocolo
 la enuncia (`orion.SKILL.md:220-221`) pero nada la comprueba: `PEND-016` y `PEND-017`

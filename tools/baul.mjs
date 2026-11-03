@@ -33,9 +33,9 @@ const DESTINO = resolve(val("destino", join(ORION, "..", "ORION-Vault")))
 
 /* Las mismas raíces que ya usan cerebro.mjs y export-vault.mjs. Si un proyecto
    vive fuera de ellas, es invisible para las tres herramientas a la vez — que
-   es mejor que ser invisible solo para una y que nadie se entere. */
-const RAICES = [join(ORION, "memory"), "C:\\Users\\Kalel\\prommter\\proyectos", "C:\\Users\\Kalel\\fable 5"]
-const SUELTAS = ["C:\\Users\\Kalel\\prommter\\memory\\prommter"]
+   es mejor que ser invisible solo para una y que nadie se entere. prommter/ se
+   escanea completo (sin listar repos a mano): cada repo con memory/ real entra. */
+const RAICES = [join(ORION, "memory"), join(ORION, "prommter")]
 
 const NIVEL_NOMBRE = { N0: "Cimientos", N1: "Funciona", N2: "Aguanta", N3: "Escala", N4: "Excelencia" }
 const esc = (s) => String(s ?? "").replace(/\r?\n/g, " ").trim()
@@ -49,7 +49,7 @@ const slug = (s) => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u
 const esMemoria = (d) => existsSync(join(d, "state.json")) || existsSync(join(d, "plan.json"))
 
 function descubrirMemorias() {
-  const out = new Set(SUELTAS)
+  const out = new Set()
   for (const raiz of RAICES) {
     if (!existsSync(raiz)) continue
     for (const entrada of readdirSync(raiz)) {
@@ -63,7 +63,35 @@ function descubrirMemorias() {
       }
     }
   }
-  return [...out].filter(esMemoria)
+  const lista = [...out].filter(esMemoria)
+
+  /* Dos memorias distintas pueden compartir projectId — hoy pasa con "placita"
+     (prommter/placita y prommter/mercaplazarepo). Aguas abajo todo se indexa por
+     `basename(dir)`, así que sin resolverlo la segunda pisaría en la bóveda la
+     carpeta de la primera en silencio. Mismo criterio que cerebro.mjs: gana el
+     memoria con MÁS ids (objetos + archivados); el mtime solo deshace empates
+     exactos. Desempatar por fecha salió mal una vez: ganó una copia de 38 ids
+     sobre la memoria real de 115 por ser cinco minutos más nueva. El resto se avisa por
+     consola en vez de pisarse sin decir nada. */
+  const porNombre = new Map()
+  const idsDe = (d) => { try { const j = JSON.parse(readFileSync(join(d, "state.json"), "utf8"))
+    return (j.objects || []).length + (j.archives || []).length } catch { return 0 } }
+  const mtimeDe = (d) => Math.max(
+    (() => { try { return statSync(join(d, "state.json")).mtimeMs } catch { return 0 } })(),
+    (() => { try { return statSync(join(d, "plan.json")).mtimeMs } catch { return 0 } })(),
+  )
+  for (const d of lista) {
+    const nombre = basename(d)
+    const mtime = mtimeDe(d), ids = idsDe(d)
+    const previo = porNombre.get(nombre)
+    if (!previo || ids > previo.ids || (ids === previo.ids && mtime >= previo.mtime)) {
+      if (previo) console.error(`  aviso: "${nombre}" duplicado — gana ${d} (${ids} ids), se ignora ${previo.dir} (${previo.ids})`)
+      porNombre.set(nombre, { dir: d, mtime, ids })
+    } else {
+      console.error(`  aviso: "${nombre}" duplicado — gana ${previo.dir} (${previo.ids} ids), se ignora ${d} (${ids})`)
+    }
+  }
+  return [...porNombre.values()].map((x) => x.dir)
 }
 
 function limpiarMd(dir) {
@@ -198,7 +226,7 @@ function subirSesiones(mdir, proj) {
       `spawns: ${mo.length}`, `tokens: ${tokens}`, "---", "",
       `# ${s.sessionId ?? id}`, "",
       `**${fecha}** · \`${proj}\` · disparo ${s.triggeredBy ?? "?"} · resultado **${s.outcome ?? "?"}**`,
-      `**Spawns:** ${mo.length} · **Tokens medidos:** ${tokens.toLocaleString("es-CO")} · **Objetos de memoria tocados:** ${objetos} (${s.objectsCreated ?? 0} nuevos, ${s.objectsMerged ?? 0} fusionados, ${s.objectsArchived ?? 0} archivados)`, ""]
+      `**Spawns:** ${mo.length} · **Tokens anotados:** ${tokens.toLocaleString("es-CO")} · **Objetos de memoria tocados:** ${objetos} (${s.objectsCreated ?? 0} nuevos, ${s.objectsMerged ?? 0} fusionados, ${s.objectsArchived ?? 0} archivados)`, ""]
     if (s.notes) L.push(esc(s.notes), "")
     if (mo.length) {
       L.push("## Qué corrió y qué costó", "", "| Fase | Modelo | Veredicto | Tokens |", "|---|---|---|---|")
@@ -215,7 +243,8 @@ function subirSesiones(mdir, proj) {
   filas.sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)))
   const L = ["---", `proyecto: ${proj}`, `tipo: historial`, "---", "",
     `# Historial de sesiones — ${proj}`, "",
-    `${sesiones.length} sesiones · **${(tokensTotal / 1e6).toFixed(2)} M tokens de subagente medidos**`, "",
+    `${sesiones.length} sesiones · **${(tokensTotal / 1e6).toFixed(2)} M tokens anotados**`, "",
+    "> Hasta el 2026-11-02 se anotaba `subagent_tokens`, que es el contexto FINAL de cada agente y no su gasto (el real es ~70–110× mayor). El gasto real sale de `node tools/costos.mjs real`.", "",
     "| Sesión | Fecha | Resultado | Spawns | Tokens | Fallos | Muertes |", "|---|---|---|---|---|---|---|"]
   for (const f of filas) L.push(`| [[${slug(proj)}-${f.id}\\|${f.id}]] | ${f.fecha} | ${f.outcome} | ${f.spawns} | ${f.tokens.toLocaleString("es-CO")} | ${f.fallos} | ${f.muertes} |`)
   L.push("", "> Las **muertes de sesión** no son fallos del modelo: el agente se quedó sin cuota, no sin capacidad.")
@@ -241,6 +270,42 @@ function subirEncargos(mdir, proj) {
   return n ? { proj, encargos: n } : null
 }
 
+/* ── ventanas ─────────────────────────────────────────────────────────── */
+/* Las fichas viven en cerebro/ventanas/ (las escribe `ventanas.mjs escribir`
+   después de cada cosecha). Aquí solo se copian, agrupadas por la SECCIÓN de la
+   barra de la app, que es como el dueño las encuentra: «Duo Burguer», «Investigación». */
+function subirVentanas() {
+  const origen = join(ORION, "cerebro", "ventanas")
+  if (!existsSync(origen)) return null
+  const dir = join(DESTINO, "Ventanas")
+  mkdirSync(dir, { recursive: true })
+  limpiarMd(dir)
+  const fm = (raw, k) => raw.match(new RegExp(`^${k}:\\s*(.*)$`, "m"))?.[1]?.replace(/^"|"$/g, "") ?? ""
+  const porSeccion = new Map()
+  for (const f of readdirSync(origen)) {
+    if (!f.endsWith(".md")) continue
+    const raw = readFileSync(join(origen, f), "utf8")
+    const seccion = fm(raw, "seccion") || "Sin sección"
+    mkdirSync(join(dir, slug(seccion)), { recursive: true })
+    writeFileSync(join(dir, slug(seccion), f), raw)
+    if (!porSeccion.has(seccion)) porSeccion.set(seccion, [])
+    porSeccion.get(seccion).push({ f, titulo: fm(raw, "titulo"), desde: fm(raw, "desde"), hasta: fm(raw, "hasta"),
+      temas: (fm(raw, "temas").match(/[a-z0-9-]+/g) ?? []).length })
+  }
+  const n = [...porSeccion.values()].reduce((a, v) => a + v.length, 0)
+  const L = ["---", "tipo: indice-ventanas", "---", "", "# Ventanas — lo que pasó en cada sesión de trabajo", "",
+    `${n} ventanas cosechadas. Cada nota dice para qué fue la ventana, qué rechazó y qué decidió el dueño,`,
+    "y qué lecciones dejó al cerebro (los enlaces `TEMA-` llevan a la regla ya curada).", ""]
+  for (const [seccion, vs] of [...porSeccion].sort((a, b) => b[1].length - a[1].length)) {
+    L.push(`## ${seccion}`, "")
+    for (const v of vs.sort((a, b) => String(b.hasta).localeCompare(String(a.hasta))))
+      L.push(`- [[${v.f.replace(/\.md$/, "")}|${v.titulo}]] — ${v.desde} → ${v.hasta}${v.temas ? ` · ${v.temas} tema(s)` : ""}`)
+    L.push("")
+  }
+  writeFileSync(join(dir, "_VENTANAS.md"), L.join("\n") + "\n")
+  return { ventanas: n, secciones: porSeccion.size }
+}
+
 /* ── comandos ─────────────────────────────────────────────────────────── */
 function empujar() {
   const soloProyecto = val("proyecto")
@@ -264,6 +329,7 @@ function empujar() {
     const s = subirSesiones(mdir, proj); if (s) sesiones.push(s)
     const e = subirEncargos(mdir, proj); if (e) encargos.push(e)
   }
+  const ventanas = soloProyecto ? null : subirVentanas()
 
   /* Portada: se ESCRIBE ENCIMA de la de export-vault a propósito. Dos portadas
      compitiendo es peor que una desactualizada — quien abre la bóveda tiene que
@@ -278,6 +344,7 @@ function empujar() {
     "sí lo encuentra, así que no se pierde.", "",
     "## Empieza aquí", "",
     "- [[_CEREBRO]] — los temas curados: una lección pagada en un negocio decide en los otros.",
+    ventanas ? `- [[_VENTANAS]] — ${ventanas.ventanas} ventanas de trabajo en ${ventanas.secciones} secciones: qué se rechazó, qué se decidió y qué lección dejó cada una.` : null,
     "- Para preguntar en vez de navegar:", "",
     "  ```bash",
     `  node "${join(ORION, "tools", "cerebro.mjs")}" buscar "tu pregunta"`,
@@ -291,7 +358,7 @@ function empujar() {
     "",
     "## Historial y gasto", "",
     sesiones.length
-      ? `${sesiones.reduce((a, s) => a + s.sesiones, 0)} sesiones registradas · **${(totalTokens / 1e6).toFixed(2)} M tokens de subagente medidos** en todo el ecosistema.`
+      ? `${sesiones.reduce((a, s) => a + s.sesiones, 0)} sesiones registradas · **${(totalTokens / 1e6).toFixed(2)} M tokens anotados** en todo el ecosistema (hasta el 2026-11-02, contexto final de cada agente y no gasto: el gasto real sale de \`costos.mjs real\`).`
       : "_Sin historial de sesiones todavía._", "",
     ...sesiones.sort((a, b) => b.tokens - a.tokens).map((s) => `- **${s.proj}** — ${s.sesiones} sesiones, ${(s.tokens / 1e6).toFixed(2)} M tokens → \`Sesiones/${s.proj}/\``),
     "",
@@ -311,15 +378,16 @@ function empujar() {
 
   console.log(`\nbóveda → ${DESTINO}`)
   console.log(`  planes:    ${planes.length} (${totalTareas} tareas, ${totalHechas} hechas)`)
-  console.log(`  sesiones:  ${sesiones.reduce((a, s) => a + s.sesiones, 0)} (${(totalTokens / 1e6).toFixed(2)} M tokens medidos)`)
+  console.log(`  sesiones:  ${sesiones.reduce((a, s) => a + s.sesiones, 0)} (${(totalTokens / 1e6).toFixed(2)} M tokens anotados, no gasto)`)
   console.log(`  encargos:  ${encargos.reduce((a, e) => a + e.encargos, 0)}`)
+  if (ventanas) console.log(`  ventanas:  ${ventanas.ventanas} en ${ventanas.secciones} secciones`)
 }
 
 function estado() {
   if (!existsSync(DESTINO)) { console.log(`no existe la bóveda en ${DESTINO}`); return }
   const contar = (d) => { let n = 0; const w = (x) => { if (!existsSync(x)) return; for (const f of readdirSync(x)) { const p = join(x, f); try { statSync(p).isDirectory() ? w(p) : f.endsWith(".md") && n++ } catch {} } }; w(d); return n }
   console.log(`bóveda: ${DESTINO}`)
-  for (const s of ["Cerebro", "Proyectos", "Planes", "Sesiones", "Encargos", "Sistema"])
+  for (const s of ["Cerebro", "Proyectos", "Planes", "Sesiones", "Encargos", "Ventanas", "Sistema"])
     console.log(`  ${s.padEnd(12)} ${String(contar(join(DESTINO, s))).padStart(5)} notas`)
   console.log(`  ${"TOTAL".padEnd(12)} ${String(contar(DESTINO)).padStart(5)} notas`)
 }

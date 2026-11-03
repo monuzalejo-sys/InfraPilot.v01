@@ -1,11 +1,11 @@
 ---
 slug: veo-clips-de-ia-para-componer
 titulo: "Clips de IA (Veo) para componer sobre video real: color del fondo, recorte, zoom, costo y voces"
-alias: [veo, veo 3, veo 3.1, veo3, veo 3.1 fast, veo fast, veo lite, google veo, vertex veo, vertex ai, generar video con ia, video con ia, video de ia, video generado con ia, video generativo, imagen a video, image to video, clip de ia, clips de ia, clip de veo, clips de veo, animar con ia, animar un personaje con ia, mascotas con ia, mascota con ia, mascotas de ia, personaje de ia, personajes de ia, hamburguesitas, nano banana, gemini image, gemini flash image, gemini 2.5 flash image, flash image, fondo azul, fondo verde, pantalla azul, pantalla verde, green screen, blue screen, croma, chroma, chromakey, chroma key, quitar el fondo, sacar el fondo, recortar el fondo, recorte de fondo, fondo transparente, despill, derrame de color, similitud, se come los ojos, me comio los ojos, ojos transparentes, piernas transparentes, translucido, 0x40a5da, 0038ff, azul puro, el azul que pedi, color pedido, color real del fondo, camara fija, camara estatica, locked-off, static camera, no zoom, zoom de veo, veo hace zoom, veo se acerca, el personaje crece, cambia de tamano, salto de tamano, encuadre cuadro a cuadro, normalizar el encuadre, cropdetect, alphaextract, percentil, cummax, franja negra, barra negra, bordes negros, 720p, 1080p, sin audio, con audio, generateaudio, voces de veo, voz de veo, voces distintas, voz consistente, tts, gemini tts, gemini 2.5 pro tts, una linea por llamada, subtitulos karaoke, karaoke, tiempos por silaba, tiempos exactos, costo de veo, precio de veo, cuanto cuesta veo, cuanto cuesta un video con ia, cuanto cuesta un clip de ia, dolares por segundo, usd por segundo, gastos.csv, costo estimado, credito de prueba, google cloud, optimizar el gasto, escalon mas barato, nostdin, ffmpeg nostdin, while read, ffmpeg se come la entrada, ffmpeg dentro de un bucle, salta lineas, carpeta sque, como llegar a duo, duo como llegar]
-preguntas: ["¿cuánto cuesta Veo por segundo y cuál modelo me conviene?", "Veo me hace zoom aunque le pida cámara fija, ¿cómo lo arreglo?", "¿cómo recorto el fondo de un clip de Veo para ponerlo encima de un video real?", "¿de qué color pido el fondo para quitarlo después?", "el chroma key me comió los ojos y las piernas del personaje, ¿qué le muevo?", "¿genero los clips de Veo con audio o sin audio?", "¿cómo hago que los personajes de IA suenen siempre con la misma voz?", "los personajes cambian de tamaño de un clip a otro, ¿cómo los empareja?", "¿cuánto me cuesta un video de 30 segundos con personajes de IA?", "¿por qué Veo me devuelve una franja negra arriba y abajo?", "ffmpeg me saltó líneas dentro de un while read, ¿qué pasó?"]
-proyectos: [duo-burger]
+alias: [veo, veo 3, veo 3.1, veo3, veo 3.1 fast, veo fast, veo lite, google veo, vertex veo, vertex ai, generar video con ia, video con ia, video de ia, video generado con ia, video generativo, imagen a video, image to video, clip de ia, clips de ia, clip de veo, clips de veo, animar con ia, animar un personaje con ia, mascotas con ia, mascota con ia, mascotas de ia, personaje de ia, personajes de ia, hamburguesitas, nano banana, gemini image, gemini flash image, gemini 2.5 flash image, flash image, fondo azul, fondo verde, pantalla azul, pantalla verde, green screen, blue screen, croma, chroma, chromakey, chroma key, quitar el fondo, sacar el fondo, recortar el fondo, recorte de fondo, fondo transparente, despill, derrame de color, similitud, se come los ojos, me comio los ojos, ojos transparentes, piernas transparentes, translucido, 0x40a5da, 0038ff, azul puro, el azul que pedi, color pedido, color real del fondo, camara fija, camara estatica, locked-off, static camera, no zoom, zoom de veo, veo hace zoom, veo se acerca, el personaje crece, cambia de tamano, salto de tamano, encuadre cuadro a cuadro, normalizar el encuadre, cropdetect, alphaextract, percentil, cummax, franja negra, barra negra, bordes negros, 720p, 1080p, sin audio, con audio, generateaudio, voces de veo, voz de veo, voces distintas, voz consistente, tts, gemini tts, gemini 2.5 pro tts, una linea por llamada, subtitulos karaoke, karaoke, tiempos por silaba, tiempos exactos, costo de veo, precio de veo, cuanto cuesta veo, cuanto cuesta un video con ia, cuanto cuesta un clip de ia, dolares por segundo, usd por segundo, gastos.csv, costo estimado, credito de prueba, google cloud, optimizar el gasto, escalon mas barato, nostdin, ffmpeg nostdin, while read, ffmpeg se come la entrada, ffmpeg dentro de un bucle, salta lineas, carpeta sque, como llegar a duo, duo como llegar, marca de agua, watermark, logo de veo, synthid, runware, fal.ai, minimo de recarga, creditos gratis google cloud, 300 dolares, agent platform, gcloud, application default login, cuenta de servicio, llave json, google ai pro, flow, veo en gemini, prompts para gemini, prompts uno por uno, pegar prompts, genera tu, crear material, imagenes con ia, prueba de 10 s, muestra, ejemplo primero, ejemplo para corregir, lote de videos, cuanto cuesta un video, mas barato, lo mas barato, costo de la ia, gastos.csv, cuanto gastamos, flyer del almuerzo, flyer de hoy, gemini-3-pro-image, nano banana pro, se colgo, timeout, pieza urgente, retoque con ia, editar fotos reales, borra productos de la foto, gasto de ia a medias, costo cortado, gastos.csv incompleto, imagenes ilustrativas, costo de imagenes, flyers con ia, arte con ia]
+preguntas: ["¿cuánto cuesta Veo por segundo y cuál modelo me conviene?", "Veo me hace zoom aunque le pida cámara fija, ¿cómo lo arreglo?", "¿cómo recorto el fondo de un clip de Veo para ponerlo encima de un video real?", "¿de qué color pido el fondo para quitarlo después?", "el chroma key me comió los ojos y las piernas del personaje, ¿qué le muevo?", "¿genero los clips de Veo con audio o sin audio?", "¿cómo hago que los personajes de IA suenen siempre con la misma voz?", "los personajes cambian de tamaño de un clip a otro, ¿cómo los empareja?", "¿cuánto me cuesta un video de 30 segundos con personajes de IA?", "¿por qué Veo me devuelve una franja negra arriba y abajo?", "ffmpeg me saltó líneas dentro de un while read, ¿qué pasó?", "¿cómo genero con Veo sin marca de agua y sin gastar plata si el dueño solo tiene 60 mil pesos?", "¿hago todo el lote de videos de una, o primero le muestro uno cortico y cuánto costó?", "¿le paso al dueño los prompts para que los pegue en Gemini o los genero yo directo?", "el dueño necesita un flyer para hoy y el modelo de imagen no responde, ¿qué hago?", "¿por qué la foto retocada con IA no sirve si solo le quité el desorden?", "¿cuánto cuesta hacer las imágenes de los flyers con la IA de Google?"]
+proyectos: [duo-burger, prommter, mercaplaza]
 confianza: media
-actualizado: 2026-10-18
+actualizado: 2026-11-02
 ---
 
 # Clips de IA (Veo) para componer sobre video real
@@ -30,6 +30,14 @@ actualizado: 2026-10-18
    solo ahorra US$0,02/s.
 4. **Dentro de un `while read`, todo `ffmpeg` lleva `-nostdin`**, o se come la
    entrada del bucle y salta líneas.
+
+**Seis reglas más (2026-11-02), de cómo se contrata y se pide la IA:**
+5. **Muestra antes que lote:** una muestra de 10–12 s con su costo y correcciones concretas; el lote (14 anuncios por semana, 21 días de campaña) solo con su visto bueno.
+6. **Genera tú por API y entrega solo lo aprobado:** no le des al dueño hojas de prompts para pegar en Gemini o Flow. A él déjale lo que solo él hace: cuentas, tarjeta, fotos reales.
+7. **Poca plata, créditos de Google Cloud:** US$300 de prueba por 90 días y `gcloud auth application-default login`; por API el video sale sin el logo «Veo» visible (según guías de terceros; solo se comprobó que la foto por API no trae marca visible; verifica el primer clip de Veo).
+8. **Pieza con hora:** usa el modelo de imagen que ya respondió en la sesión anterior, pon un tope corto de espera por llamada (a definir; en el caso real no se midió ninguno) y cae al modelo que ya funcionó al primer timeout.
+9. **Retoque de fotos reales con IA:** compara con el original antes del lote; si borra productos que sí están, frena aunque sea más barato.
+10. **Gasto cortado a medias:** dilo en la entrega y pídele al dueño que lo confirme en la facturación de Google.
 
 ## Por qué (qué lo pagó)
 
@@ -150,6 +158,45 @@ Cuanto más dura la codificación, más come: con `d=1,5` se llevó 1 carácter 
 `d=3` cuatro; con las secuencias de JPG reales, hasta dejar «sque». Con `-nostdin`
 (`preparar.sh:16`) el `tramos.log` salió con los 13 tramos completos.
 
+**Lo pagó la plata del dueño y su desconfianza de los prompts (5-6 de octubre).** El dueño
+puso 60.000 COP (≈ US$15). Claude dijo que Runware pedía «al menos 5 dólares» en la cuenta
+(el saldo gratis de 5 centavos no alcanzaba); el dueño replicó que el mínimo de recarga era
+de 50 dólares, más del triple de lo que quería poner, y Runware se descartó. La memoria
+anterior decía ≥US$5: vale lo que él midió. Se pivotó a la prueba gratis de Google Cloud
+(US$300 en créditos durante 90 días): la primera foto de la Cheddar salió en 12 s, sin marca
+visible y sin archivo de llave que filtrar (la política de Google bloquea descargar llaves de
+cuenta de servicio en cuentas nuevas), y después sirvió para TTS, Lyria y Veo: los US$6,83 de
+«Cómo llegar» salieron del crédito. Antes, tras recibir seis prompts para fotos de la
+Cheddar, el dueño respondió que no sentía que fueran a quedar bien y pidió que Claude edite
+y use algo para crear el material. El logo «Veo» visible en la app de Gemini y en Flow con
+plan Pro viene de guías de terceros: no se probó.
+
+**Lo pagó la costumbre del dueño de pedir una muestra y preguntar el precio.** Pidió «primero
+un ejemplo para ver que hay que corregir» (A01, 12 s: se rechazó antes de producir la parrilla)
+y «primero un clip de 10 s para darle forma a la idea» (Cómo llegar: US$3,45, unos 14.000
+pesos, «me agradó un poco más»; la v2 de 30 s con sus correcciones, US$3,38). A cada
+cotización de IA respondió con «¿no hay forma de que sea más barato?» o «¿es lo más barato
+que hay?». Las tarifas por segundo salían de tablas de terceros: «estimados y no la factura
+real».
+
+**Lo pagó una pieza con hora.** El 6-oct a las 16:09 UTC (11:09 en Popayán) pidió el flyer
+del almuerzo de hoy; los dos modelos de imagen más nuevos de Google se quedaron colgados sin
+responder y hubo que volver al que ya había funcionado. Entrega a las 19:58 UTC, casi las 3
+p.m.: 3 h 49 min después, pasada la hora de almuerzo.
+
+**Lo pagó un retoque que borró uchuvas (Mercaplaza).** Al retocar fotos reales del local para
+quitar los cartelitos de precio, el modelo barato quitó los precios pero también se llevó las
+uchuvas del centro: dejó de ser el local real. Se pasó a Gemini 3 Pro Image; 8 retoques
+más una prueba con el modelo barato costaron US$1,11 (~4.500 pesos). Los retoques que se cortaron a medias no quedaron
+en `gastos.csv` y hubo que pedirle al dueño que lo confirmara en Google Cloud.
+
+**Lo midieron las imágenes de flyers.** Las imágenes de arte salieron a ~US$0,04 cada una (modelo
+no registrado; el retoque con Gemini 3 Pro Image salió a ~US$0,12 por llamada, así que cotiza
+según el modelo): 10 imágenes del arte de Halloween (21-oct) fueron US$0,40 (unos 1.600 COP) y 6 de los flyers de
+bandeja paisa, Duo Drácula y Duo Lobo (25-oct) US$0,24 (unos 1.000 COP). Se dijo que las
+fotos de la comida no eran los platos reales y al flyer de la bandeja no se le puso precio
+porque el dueño no lo dio.
+
 ## Cómo se aplica
 
 1. **Primero la imagen, después el video.** Una imagen cuesta ≈US$0,04 y un clip de 8 s
@@ -181,6 +228,26 @@ Cuanto más dura la codificación, más come: con `d=1,5` se llevó 1 carácter 
 9. **En cada `ffmpeg` dentro de un `while read`, `-nostdin`.** Fuera de un bucle no hace
    falta.
 
+10. **Cotizando IA, el escalón más barato primero** y qué se pierde, antes del recomendado;
+    al entregar, el total real en US$ y en pesos, aclarando si es estimado.
+11. **Conecta la API y genera tú** (Google con la sesión de la Mac); mira cada resultado y
+    entrega solo lo aprobado. Primera foto de la Cheddar: 12 s, el orden de capas salió mal y
+    se corrigió en los prompts siguientes. Antes de pedir una recarga a otro proveedor,
+    verifica su mínimo en su página oficial.
+12. **Para piezas publicables no uses Veo desde la app de Gemini ni Flow con plan Pro**; por
+    API sale sin el logo (según guías de terceros; solo se comprobó que la foto por API no trae
+    marca visible; verifica el primer clip de Veo), aunque queda la firma invisible y las redes
+    pueden etiquetar «IA».
+13. **Pieza con hora:** modelo de imagen ya probado, tope corto de espera por llamada (a definir; no se midió ninguno),
+    caer al modelo que ya funcionó al primer timeout, y dejar anotado en el código cuál es el estable. Los modelos nuevos se
+    prueban en piezas sin hora.
+14. **Foto real retocada:** compárala contra el original ANTES de procesar el lote; si el modelo
+    quita o altera algo que sí está en la foto, frena todo.
+15. **Si un proceso de pago se interrumpe, anótalo en la entrega** («esto no quedó en
+    `gastos.csv`, confírmalo en la facturación del proveedor»), no solo lo completado.
+16. **Imágenes de IA de comida o de local:** rotúlalas ilustrativas y no «el plato real»; no les
+    pongas ingredientes ni precio que el dueño no dio; cámbialas cuando haya fotos reales.
+
 ## Cuándo NO aplica
 
 - **Si la pieza entera es vectorial** (un corto con las mascotas fieles a la guía) no
@@ -200,6 +267,24 @@ Cuanto más dura la codificación, más come: con `d=1,5` se llevó 1 carácter 
   facturación de Google Cloud antes de presupuestar o de citarla.
 - **El clip de celebración (saltos, giros, brazos arriba)** no se normaliza por caja; ver
   el paso 5.
+
+- **Créditos de Google (reglas 7 y 12):** pasados los 90 días (hasta comienzos de enero) o
+  agotados los US$300 el gasto es real: mira la factura de Google, no las tarifas de terceros.
+  En un servidor sin navegador la sesión de usuario no sirve (usa identidad de servicio). Para
+  borradores internos la marca visible no importa.
+- **Muestra antes que lote (regla 5):** si el formato ya fue aprobado y producir cada pieza
+  cuesta casi nada (plantillas diarias validadas), se produce el lote sin pedir muestra.
+- **Generar tú (regla 6):** no aplica si la herramienta no tiene API o solo se maneja
+  automatizando el navegador (Flow; a este dueño Facebook ya le marcó la cuenta por
+  automatización), ni si el dueño quiere probar él mismo. Las fotos reales del producto solo
+  las toma él.
+- **Tope de espera corto (regla 8):** no sirve para video (Veo tarda minutos); y en piezas sin
+  urgencia justo se quiere probar el modelo nuevo.
+- **Retoque (regla 9):** no aplica a fotos genéricas o ilustraciones que no pretenden
+  documentar el local real. **Gasto a medias (regla 10):** si el proceso se completó, el gasto
+  anotado en `gastos.csv` basta.
+- **Costo de imágenes:** ~US$0,04 (arte de flyers; el retoque con Gemini 3 Pro Image ~US$0,12) es solo imagen; video, voz y música tienen otras tarifas. Si
+  el dueño exige foto real del producto, la IA solo sirve de relleno marcado.
 
 ## Evidencia
 
@@ -226,8 +311,14 @@ Cuanto más dura la codificación, más come: con `d=1,5` se llevó 1 carácter 
   comando de recorte de la v2 (1162), consulta de precios y su resultado (905-913),
   diagnóstico del destello de 0:26 (1414).
 
+- Ventana [[2026-10-05-plan-de-anuncios-profesionales|Plan de anuncios profesionales]] (transcrito `3d75e606`): «pide al menos 5 dólares en la cuenta» (2026-10-06); «el problema es que es minimo de 50 dolares» (2026-10-06); «Google regala 300 dólares en créditos durante 90 días a las cuentas nuevas de Google Cloud» (2026-10-06); «Esa traba es una regla de seguridad que Google pone por defecto a las cuentas nuevas: no deja descargar llaves.» (2026-10-06); «no hay forma de que no haya marca de agua?» y «llevan un logo visible de «Veo»» (2026-10-06); «dame primero un ejemplo para ver que hay que corregir de el plan» (2026-10-05); «y no hay forma de que sea mas barato?» y «es lo mas barato que hay>» (2026-10-06); «no siento que vaya a quedar bien ni tampoco me parece que realmente esos promts den algo bueno» (2026-10-05); «y si quiero que tu edites y uses algo para crear el material un material de buena calidad» y «La primera foto de la Cheddar salió en 12 segundos, con los créditos gratis de Google» (2026-10-06); «quiero que hagas un flayer para el almuerzo hoy», «los dos modelos de imagen más nuevos de Google se quedaron colgados sin responder» y «Ya son casi las 3 de la tarde.» (2026-10-06).
+- Ventana [[2026-10-01-mejora-de-video-en-artefactos|Mejora de video en artefactos]] (transcritos `5f2b61e1` y `fc142d00`): «Salió del crédito gratis de prueba de Google Cloud (US$300), así que de tu bolsillo no se ha pagado nada» (`5f2b61e1`, 2026-10-18); «quiero que primero edites un clip de 10 s para que le demos forma a la idea» y «explotes de la mejor forma lo que tenemos en ia a disposicion» (`5f2b61e1`, 2026-10-18); «unos US$3,45 (alrededor de 14.000 pesos)» (`5f2b61e1`, 2026-10-18); «lo optimices de la mejor manera sin perder calidad» y «los costos son estimados y no la factura real» (`fc142d00`, 2026-10-18).
+- Ventana [[2026-10-15-mercaplaza-vitrina|Mercaplaza vitrina]] (transcrito `587359bb`, 2026-11-03 UTC): «el modelo barato quitó los precios pero también se llevó productos (las uchuvas del centro). Eso no sirve porque deja de ser el local real» y «Los retoques que corté a medias no aparecen ahí, así que confírmalo en la facturación de Google».
+- Ventana [[2026-09-09-duo-burger|Duo Burger]] (transcrito `7f456016`): «Costo de la IA para el arte: US$0,40 (unos 1.600 pesos), 10 imágenes con Gemini» (2026-10-21); «Las 6 imágenes costaron US$0,24, unos $1.000 pesos» y «no son tus platos reales» (2026-10-25).
+
 ## Huecos de este tema
 
+- **Tampoco se probó que el video de Veo por API salga sin logo visible:** solo la foto por API se comprobó sin marca.
 - **La v2 no tiene veredicto del dueño** (`duo-burger/PEND-030`) y nadie ha oído las voces.
 - **«Cada clip de Veo trae voces distintas» es lo esperado, no lo medido:** solo se generó
   UN clip con audio (`veo-v1`); no se comparó entre clips. Del caso sin audio solo hay una
@@ -241,6 +332,7 @@ Cuanto más dura la codificación, más come: con `d=1,5` se llevó 1 carácter 
   clips.
 - **Mantenimiento:** el SDK avisa que `generateVideos({prompt, image})` está deprecado y
   pide el argumento `source` (`veo2-A.log:1`); `google.mjs:79` lo usa tal cual.
+- **El logo «Veo» visible en la app de Gemini y en Flow con plan Pro** viene de guías de terceros citadas en la ventana del 6-oct; no se probó. La procedencia del mínimo de 50 dólares de Runware es lo que dijo el dueño (la ventana cita una página de ayuda de Runware, no abierta aquí).
 
 ## Enlaces
 
@@ -255,3 +347,5 @@ Cuanto más dura la codificación, más come: con `d=1,5` se llevó 1 carácter 
 - [[TEMA-modelos-y-costos]] — el costo de los agentes se mide en tokens; este tema es el
   de los medios generativos, que se factura por segundo o por pieza.
 - [[TEMA-entorno-de-la-maquina]] — ffmpeg y las herramientas de esta Mac.
+- [[TEMA-como-pide-el-dueno]] — muestra primero, material real, cuánto cuesta.
+- [[TEMA-gusto-visual-del-dueno]] — por qué pidió IA y rechazó el vector sobre material real.

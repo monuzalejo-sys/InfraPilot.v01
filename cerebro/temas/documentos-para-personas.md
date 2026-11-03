@@ -1,11 +1,11 @@
 ---
 slug: documentos-para-personas
 titulo: Escribir un documento que una persona de verdad va a usar
-alias: [manual, manuales, manual de uso, documento, documentos, documentacion, instructivo, instrucciones, guia, guias, cartilla, plan, planes, plan de equipo, plan de trabajo, onboarding, induccion, capacitacion, capacitar, entrenar, ensenar, explicar, explicarle, explico, empleado, empleado nuevo, empleados, trabajador, trabajador nuevo, personal, gente, equipo, cajero, cajera, mostrador, rol, roles, paso a paso, tutorial, ayuda, readme, pdf, imprimir, celular, folleto, hoja, procedimiento, protocolo, entrega al cliente, para que arranque]
-preguntas: ["¿cómo le explico el proyecto a un empleado nuevo?", "¿cómo le enseño el sistema a un cajero nuevo?", "¿qué documento le entrego al equipo para que arranque?", "¿cómo escribo un manual que la gente sí lea?", "¿por qué me rechazaron el plan de trabajo que escribí?"]
-proyectos: [villa-broaster, placita, wrd, prommter, estanco-contable]
+alias: [manual, manuales, manual de uso, documento, documentos, documentacion, instructivo, instrucciones, guia, guias, cartilla, plan, planes, plan de equipo, plan de trabajo, onboarding, induccion, capacitacion, capacitar, entrenar, ensenar, explicar, explicarle, explico, empleado, empleado nuevo, empleados, trabajador, trabajador nuevo, personal, gente, equipo, cajero, cajera, mostrador, rol, roles, paso a paso, tutorial, ayuda, readme, pdf, imprimir, celular, folleto, hoja, procedimiento, protocolo, entrega al cliente, para que arranque, pdf para el contador, pdf del contador, pdf para quien lo reenvia, lo reenvia sin traducir, hoja de datos del cliente, chrome headless, print-to-pdf, no-pdf-header-footer, kMDItemNumberOfPages, qlmanage, pdftoppm, guion para grabar, guiones para grabar, guiones de reel, reel por dia, grabar videos reales, que me falta para que funcione, ya quedo, paso uno detallado, guiar paso a paso, un paso a la vez, dns, hpanel, a quien le toca]
+preguntas: ["¿cómo le explico el proyecto a un empleado nuevo?", "¿cómo le enseño el sistema a un cajero nuevo?", "¿qué documento le entrego al equipo para que arranque?", "¿cómo escribo un manual que la gente sí lea?", "¿por qué me rechazaron el plan de trabajo que escribí?", "¿Qué nos falta para que ya funcionen los pedidos en línea y qué me toca hacer a mí?", "¿Cómo armo el PDF de lo que necesitamos del contador y cómo lo reviso en esta Mac?", "El dueño quiere grabar videos reales en el local, ¿cómo le armo los guiones para que le sirvan?"]
+proyectos: [villa-broaster, placita, wrd, prommter, estanco-contable, duo-burguer, la-villa]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-11-02
 ---
 
 # Escribir un documento que una persona de verdad va a usar
@@ -117,6 +117,33 @@ Presupuesta la relectura desde el principio; no es un extra.
     sonnet para los PDF formales largos (`villa-broaster/KN-013`, calibración
     confirmada en `session-2026-08-22-plan-equipo-tres-repos`).
 
+13. **Si el lector es el dueño y le toca ejecutar, guíalo de a UN paso.** A «¿ya
+    funciona?» o «¿qué nos falta?» contesta con hechos, sondeando lo real (¿resuelve el
+    DNS?, ¿responde con HTTPS?, ¿qué carta y versión tiene el sistema?, ¿ya cambió el
+    PIN?), y reparte los bloqueos por responsable (dueño / PC / Mac), primero el que
+    frena todo. Luego: dónde tocar, valores campo por campo, qué NO tocar; espera su «ya
+    quedó» y compruébalo tú antes del siguiente paso. Lee el procedimiento en el código,
+    no en la documentación de otro agente (la del PC decía que reiniciar activaba el PIN
+    nuevo: era falso, solo lo activa el script de arranque).
+14. **Documento que otro reenvía (contador, proveedor): escríbelo para quien lo reenvía.**
+    Abre con lo que ya miramos de su negocio; cada pregunta con casilla, espacio para
+    responder y una línea gris con el porqué; resalta las dos que más mueven el
+    trabajo; cierra con el cuadro «el sistema registra y transmite · el contador decide
+    y firma · el dueño responde por el mostrador» y «no es asesoría tributaria». En esta
+    Mac se genera con Chrome headless (`--print-to-pdf --no-pdf-header-footer`): no hay
+    `pip` (entorno protegido) ni `pdftoppm`; cuenta páginas con
+    `mdls -name kMDItemNumberOfPages` y mira la 1 con `qlmanage -t -s 1400`. Copia en
+    `~/Desktop/<Cliente>/<Tema>/` ([[TEMA-como-entregar-al-dueno]]).
+15. **Guiones para que el dueño grabe:** reales (sin gastar la animación), claros,
+    graciosos, interactivos (comentar o etiquetar) y que muestren el punto, no solo
+    vendan; un reel por día. PDF carta detallado (~18 págs.): reglas de celular, luz y
+    sonido, frase para pedir permiso a clientes, utilería con el reel donde se usa,
+    orden de grabación por bloques de luz y lugar (6 bloques ≈ 3 h), una página por reel
+    (tomas con plano, segundos, qué se dice, texto en pantalla, plan B, texto para
+    publicar) y cómo devolver las tomas. Sin el evento secreto en cámara ni teléfonos a
+    la vista. Revisa página por página que nada se desborde: el PDF salió con 24 págs.
+    y bajó a 18 al corregir dos desbordadas.
+
 ## Cuándo NO aplica
 
 - **Si el lector es una máquina, todo se invierte.** `CLAUDE.md`, `AGENTS.md`,
@@ -139,6 +166,17 @@ Presupuesta la relectura desde el principio; no es un extra.
   *Ready* —falta invitar al equipo a los repos—, así que **todo el veredicto
   registrado es del dueño, ninguno del trabajador**. La primera vez que un
   empleado lea uno, hay que escribir aquí qué le falló.
+
+- **Guía de a un paso (13):** no si el dueño es técnico o ya trae el procedimiento; en
+  cambios de bajo riesgo pueden darse varios pasos juntos. Un «ya quedó» puede ser
+  prematuro («quedé antes del comando, espérame los 5 min»): compruébalo, no lo asumas.
+- **PDF para reenviar (14):** el recorrido con Chrome es el de la Mac; en el PC Windows
+  se usa Edge headless con otras rutas. No aplica a documentos que no pasan por
+  intermediario.
+- **Guiones para grabar (15):** no para el contenido animado de campaña. Las ideas
+  concretas de reels (el teclado que ya sabe, «los dos de Duo») son propuestas de
+  Claude, **no validadas**: no las cuentes como lo que funciona. Dentro de la ventana
+  no hay veredicto del dueño sobre el PDF.
 
 ## Evidencia
 
@@ -164,9 +202,9 @@ Presupuesta la relectura desde el principio; no es un extra.
 - `landings/POL-001` — tensión de registro (calma adentro, venta afuera).
 - `infrapilot/DEC-007` — ceremonia proporcional: 168k tokens para un README de
   91 líneas.
-- Archivos: `prommter/proyectos/placita/MANUAL-DE-USO.md` (:16, :19-27, :28,
+- Archivos: `prommter/placita/MANUAL-DE-USO.md` (:16, :19-27, :28,
   :37-45) y `.../manual/01..18-*.md`;
-  `prommter/proyectos/villa-broaster/docs/plan-equipo.html` (149 KB) y
+  `prommter/Equipo-villa-broaster/docs/plan-equipo.html` (149 KB) y
   `docs/planes/plan-{desarrollador-senior,disenador-landing,disenadora,marketing}.pdf`;
   `docs/semanal/README.md` + `avance.json` + `generar.mjs`;
   `fable 5/wrd/setup/INSTRUCCIONES.md:11-18`;
@@ -175,6 +213,28 @@ Presupuesta la relectura desde el principio; no es un extra.
   `plan-equipo-tres-repos`, `planes-v2-marketing`, `relectura-planes`) y
   `placita/metrics.json` (`manual-pantalla-completa`).
 
+**Refuerzo 2026-11-02 (cosecha de ventanas del dueño).**
+
+Guiar de a un paso (L-A2-08):
+- «lo que va el pc para el sistema es suficiente para funcionar ya?» — ventana [[2026-09-09-duo-burger|duo burger]] (transcrito `51184930`, 2026-09-25)
+- «okey vamos al paso uno detallado» — ventana [[2026-09-09-duo-burger|duo burger]] (transcrito `51184930`, 2026-09-28)
+- «comprueba vamos al paso 5» — ventana [[2026-09-09-duo-burger|duo burger]] (transcrito `51184930`, 2026-09-28)
+- «mentira quede antes del comando esperame los 5 m=in» — ventana [[2026-09-09-duo-burger|duo burger]] (transcrito `51184930`, 2026-09-28)
+- «Reiniciar el sistema no activa el PIN nuevo.» — ventana [[2026-09-09-duo-burger|duo burger]] (transcrito `51184930`, 2026-09-28)
+
+PDF para quien lo reenvía (L-E-18):
+- «quiero que me dejes en un pdf lo que necesitamos de el para empezar» — ventana [[2026-09-09-la-villa-sistema|la villa sistema]] (transcrito `129e1026`, 2026-10-28)
+- «quiero que me des un pdf explicando lo que necesitamos de el contador» — ventana [[2026-09-09-la-villa-sistema|la villa sistema]] (transcrito `129e1026`, 2026-10-31)
+- «lo reenvía sin tener que traducir nada» — ventana [[2026-09-09-la-villa-sistema|la villa sistema]] (transcrito `129e1026`, 2026-10-31)
+- «pdftoppm is not installed» — ventana [[2026-09-09-la-villa-sistema|la villa sistema]] (transcrito `129e1026`, 2026-10-28)
+
+Guiones para grabar (L-B-15):
+- «no quiero quemar los videos de animacion» — ventana [[2026-10-14-aqui-en-esta-ventana-de-contexto|aqui en esta ventana de contexto]] (transcrito `940655a9`, 2026-10-14)
+- «unos que no sean solo ventas» — ventana [[2026-10-14-aqui-en-esta-ventana-de-contexto|aqui en esta ventana de contexto]] (transcrito `940655a9`, 2026-10-14)
+- «quiero que grabemos el contenido de la semana hoy» — ventana [[2026-10-14-aqui-en-esta-ventana-de-contexto|aqui en esta ventana de contexto]] (transcrito `940655a9`, 2026-10-14)
+- «quiero que sea bien detallado» — ventana [[2026-10-14-aqui-en-esta-ventana-de-contexto|aqui en esta ventana de contexto]] (transcrito `940655a9`, 2026-10-15)
+- «Revisé cada página y nada queda cortado ni se pasa a la hoja siguiente.» — ventana [[2026-10-14-aqui-en-esta-ventana-de-contexto|aqui en esta ventana de contexto]] (transcrito `940655a9`, 2026-10-15)
+
 ## Enlaces
 
 - [[TEMA-verificar-con-evidencia]] — cómo se imprime el PDF y cómo se captura para revisarlo.
@@ -182,3 +242,5 @@ Presupuesta la relectura desde el principio; no es un extra.
 - [[TEMA-acceso-roles-y-puestos]] — qué ve cada persona en el sistema; el documento por rol es su espejo en papel.
 - [[TEMA-generadores-de-diseno]] — cuando la pieza la construye un generador de diseño.
 - [[TEMA-memoria-y-cierre]] — el documento que se escribe para máquinas, no para personas.
+- [[TEMA-como-entregar-al-dueno]] — dónde y cómo se le deja el documento al dueño.
+- [[TEMA-huecos-del-dueno]] — el PDF de lo que falta y cómo pedirlo.

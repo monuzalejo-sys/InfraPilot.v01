@@ -1,11 +1,11 @@
 {
   "projectId": "orion",
-  "sessionCount": 9,
+  "sessionCount": 10,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-11-03T04:39:07.000Z",
+  "lastUpdated": "2026-11-03T05:32:25.049Z",
   "sessions": [
     {
       "sessionId": "session-2026-08-26-orion-v4",
@@ -377,6 +377,72 @@
       "tokensReales": 0,
       "notes": "Curacion por tope (27 > 25). Sin fusiones: no hay duplicados reales. Sin archivos: no hay terminales sin dependientes. KN-002 pasa a Deprecated + impact Low (R9: lo referencian KN-005, KN-024, PEND-002; no archivable hasta reapuntar o waiver). Resultado: 27 objetos (26 no terminales), umbral 25 sin cumplir.",
       "modelOutcomes": []
+    },
+    {
+      "sessionId": "cosecha-ventanas-2026-11-02",
+      "runId": "orion-278748af",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-11-03T03:00:15.430Z",
+      "completedAt": "2026-11-03T05:32:18.528Z",
+      "objectsCreated": 2,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "outcome": "DONE",
+      "fixCycles": 1,
+      "tokensReales": 134200000,
+      "notes": "Cosecha de las 58 transcripciones (54 ventanas): 170 lecciones candidatas (614/627 citas literales), 13 temas nuevos, 24 reforzados, 8 contradicciones resueltas, 54+1 fichas en cerebro/ventanas, tools/ventanas.mjs y sección Ventanas del baúl. Verificación adversarial: 76 defectos (4 altos, 30 medios), 25 arreglos. probar 76/80 → 154/156 (79/80 en la suite vieja) tras medir B_TEMA=0,3 (KN-028). Gasto real ≈ US$ 84-97 a precio de API (costos.mjs real --sesion 278748af). Otra ventana curó memory/orion a mitad de la cosecha (commit 7fe4d35).",
+      "modelOutcomes": [
+        {
+          "phase": "analysis",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 33600000,
+          "agentes": 8,
+          "nota": "extractores de ventanas, 130-200 KB de resumen cada uno; US$ 38; contexto 230-360k: partir en ≤100 KB"
+        },
+        {
+          "phase": "reflection",
+          "model": "sonnet",
+          "verdict": "fail",
+          "tokens": 10900000,
+          "agentes": 11,
+          "nota": "escritores de temas (orion-harvester); los 11 lotes con defectos alta/media en la verificación (4 altos, 30 medios); US$ 7,9"
+        },
+        {
+          "phase": "verification",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 26900000,
+          "agentes": 12,
+          "nota": "11 verificadores adversariales + crítico de completitud; US$ 12,1"
+        },
+        {
+          "phase": "fixing",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 5000000,
+          "agentes": 11,
+          "nota": "correctores; 25 arreglos y 5 rechazos justificados; US$ 2,9"
+        },
+        {
+          "phase": "reflection",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 2000000,
+          "agentes": 1,
+          "nota": "apretar la respuesta corta de 13 temas nuevos; US$ 4,75"
+        },
+        {
+          "phase": "orchestration",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 55900000,
+          "agentes": 1,
+          "nota": "orquestador; US$ 29-31"
+        }
+      ]
     }
   ]
 }

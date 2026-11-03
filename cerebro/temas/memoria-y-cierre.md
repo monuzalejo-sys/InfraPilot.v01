@@ -1,19 +1,29 @@
 ---
 slug: memoria-y-cierre
 titulo: Cómo se cierra una sesión y qué merece quedar guardado
-alias: [cerrar sesion, cerrar la sesion, cierre de sesion, cierre, cerrar, close session, session close, terminar de trabajar, acabar de trabajar, fin de sesion, memoria, memoria del proyecto, memorias, guardar, donde guardo, que guardo, guardado, apuntar, anotar, notas, apuntes, bitacora, aprendi, aprendizaje, aprendizajes, leccion, lecciones, reflexionar, reflexion, reflector, curacion, curar, curador, curator, archivar, archivado, deduplicar, duplicados, brief, state, metrics, amm, validar memoria, validador, tier, lifetime, permanente, cerebro, boveda, tema, temas, cosechar, cosecha, harvester, vault, obsidian, commit de memoria, promocion, promover, promover una leccion, subir a permanent, sube a permanent, cuando sube a permanent, tier permanent, ascender, leccion repetida, la misma leccion, misma leccion dos veces, pagar dos veces, volver a pagar, ya lo aprendi, ya lo sabia en otro proyecto, ya me paso en otro proyecto, en otro proyecto, otro proyecto, entre proyectos, cruzar memorias, cruce de memorias, once memorias, segunda factura, regla vs coordenada, regla y coordenada, coordenada, coordenadas, ruta absoluta, rutas absolutas, ruta muerta, la ruta ya no existe, se movio el archivo, numero de linea, archivo y linea, cita caducada, caduca, caducar, envejece, memoria desactualizada, memoria mintiendo, memoria que miente, re-verificar, reverificar, corregir sin borrar, dejar constancia]
-preguntas: ["como se cierra una sesion de trabajo", "donde guardo lo que aprendi", "que hago al terminar de trabajar", "que merece quedar guardado en la memoria del proyecto", "por que la memoria crece y nadie la limpia", "donde va una leccion que sirve en otro proyecto", "esta leccion ya la habia aprendido en otro proyecto, que hago con ella", "cuando una leccion sube a permanent", "por que cada proyecto vuelve a pagar la misma leccion", "puedo poner la ruta de un archivo en la memoria", "por que la memoria apunta a un archivo que ya no existe", "como corrijo algo que la memoria dice mal sin borrarlo"]
-proyectos: [infrapilot, _permanent, prommter, placita, villa-broaster, estanco-contable, pollo-landing, arroces]
+alias: [cerrar sesion, cerrar la sesion, cierre de sesion, cierre, cerrar, close session, session close, terminar de trabajar, acabar de trabajar, fin de sesion, memoria, memoria del proyecto, memorias, guardar, donde guardo, que guardo, guardado, apuntar, anotar, notas, apuntes, bitacora, aprendi, aprendizaje, aprendizajes, leccion, lecciones, reflexionar, reflexion, reflector, curacion, curar, curador, curator, archivar, archivado, deduplicar, duplicados, brief, state, metrics, amm, validar memoria, validador, tier, lifetime, permanente, cerebro, boveda, tema, temas, cosechar, cosecha, harvester, vault, obsidian, commit de memoria, promocion, promover, promover una leccion, subir a permanent, sube a permanent, cuando sube a permanent, tier permanent, ascender, leccion repetida, la misma leccion, misma leccion dos veces, pagar dos veces, volver a pagar, ya lo aprendi, ya lo sabia en otro proyecto, ya me paso en otro proyecto, en otro proyecto, otro proyecto, entre proyectos, cruzar memorias, cruce de memorias, once memorias, segunda factura, regla vs coordenada, regla y coordenada, coordenada, coordenadas, ruta absoluta, rutas absolutas, ruta muerta, la ruta ya no existe, se movio el archivo, numero de linea, archivo y linea, cita caducada, caduca, caducar, envejece, memoria desactualizada, memoria mintiendo, memoria que miente, re-verificar, reverificar, corregir sin borrar, dejar constancia, push, pushear, push automatico, publicar al terminar, publicar sin push, no hago push, github desktop, force push, nunca forzar, sincronizar.mjs, sincronizar mac y pc, pc y mac, dos maquinas, fetch, pull rebase, el remoto va adelante, push rechazado, fetch first, poner el pc al dia, out-of-place publication, push bloqueado, clasificador, merge without review, fusionar mi propio pr, autoaprobar un pr, self-merge, listo y limpio en local, no publiques, arregla y haz el commit, no me preguntes, arnes, coste fijo del arnes, cuanto cuesta el arnes, simorgh, bidar, khatam, bazbin, punto de equilibrio, secciones vacias, plantilla vacia, memoria equivocada, memoria falsa, stack real, groq o anthropic, el curador se contradijo, dos reportes del curador, orion-curator, KN-001, verificar el disco, como se cierra una sesion de trabajo, cerrar la sesion de trabajo, cierre de la sesion, simorgh encendido, cuanto cuesta tener simorgh encendido, deja de valer la pena, a partir de cuando vale la pena el arnes, tokens del arnes]
+preguntas: ["como se cierra una sesion de trabajo", "donde guardo lo que aprendi", "que hago al terminar de trabajar", "que merece quedar guardado en la memoria del proyecto", "por que la memoria crece y nadie la limpia", "donde va una leccion que sirve en otro proyecto", "esta leccion ya la habia aprendido en otro proyecto, que hago con ella", "cuando una leccion sube a permanent", "por que cada proyecto vuelve a pagar la misma leccion", "puedo poner la ruta de un archivo en la memoria", "por que la memoria apunta a un archivo que ya no existe", "como corrijo algo que la memoria dice mal sin borrarlo", "por que tengo que pushear yo si el pc y la mac pueden publicar solos", "como hago para que el pc se entere de lo que se hizo en la mac sin pisarnos", "el sistema de permisos me bloquea el push, lo fuerzo o que hago", "por que no me dejo fusionar el pr que acababa de hacer", "cuando arreglo yo mismo y cuando le pregunto al dueno", "cuantos tokens me cuesta tener simorgh encendido", "cuantos tokens me cuesta tener simorgh encendido y a partir de cuando deja de valer la pena", "como se si lo que dice la memoria del stack sigue siendo cierto", "el curador me dio dos informes distintos, a cual le creo"]
+proyectos: [infrapilot, _permanent, prommter, placita, villa-broaster, estanco-contable, pollo-landing, arroces, orion, duo-burguer, la-villa, cerebro-3d]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-11-02
 ---
 
 # Cómo se cierra una sesión y qué merece quedar guardado
 
 ## Respuesta corta
 
+**⚠ Corrección 2026-11-02:** este tema decía «commit local, nunca push» y «no hagas push
+desde la terminal». **Está superado.** Desde el 2026-09-01 publicar es parte de terminar
+(el dueño lo decidió; regla en su memoria «El push es automático») y desde el 2026-09-22 las
+dos máquinas publican solas con un hook. Hoy el cierre termina en **commit + push normal**
+(sube también memoria, cerebro y `brief.md`, para que la otra máquina se entere). Lo que
+SIGUE pidiendo permiso del dueño: `--force`, reescribir historia, borrar ramas o etiquetas
+remotas, fusionar un PR propio sin un «fusiona» explícito, y todo push cuando dijo «déjalo
+en local». La historia de por qué se escribió «nunca push» sigue abajo; ver la sección
+«Publicar también es cerrar».
+
 Cerrar no es despedirse: son **cuatro pasos en orden — persistir, curar, validar,
-alimentar el cerebro —** y solo entonces **commit local, nunca push**. Guarda
+alimentar el cerebro —** y solo entonces **commit y publicación (push normal, jamás forzado)**. Guarda
 únicamente lo que pasa el filtro: **no obvio + reusable + citable**; si no puedes
 citarlo con `proyecto/ID`, `archivo:línea` o un número medido, no es lección, es
 opinión, y contamina. Y guárdalo en **el cajón que le toca por alcance**:
@@ -192,6 +202,101 @@ en esta maquina' es FALSA — ver KN-035 y estanco-contable/KN-008. El riesgo si
 abierto porque la migracion no se ha ejecutado, no porque no se pueda.]"*. La
 premisa muerta queda visible, con fecha y con el puntero a lo que la mató.
 
+## Publicar también es cerrar: lo que dice hoy, y dónde frena
+
+**Qué lo pagó.** La regla vieja («ningún agente hace push») era la cicatriz del PC
+Windows, donde el Credential Manager no abría su diálogo. El dueño preguntó: *«si no
+estoy para pushear no puedo hacer nada?»* y pidió *«que el pc deje todo lo que haga
+publicado sin yo pushear»* para *«tener todo en tiempo real en los dos dispositivos»*.
+Medido el 2026-09-22: el PC ya había subido **74 cambios en la semana sin él**. Las dos
+máquinas publican solas con `sincronizar.mjs` en un hook (`traer` al abrir sesión y en cada
+mensaje; `publicar` al terminar cada turno). Se probó en **cuatro casos con un repo de
+ensayo**; la prueba cazó un fallo real —el `--autostash` metía marcas de conflicto dentro
+del archivo— y después funcionó en vivo: hizo el rebase contra lo que acababa de subir el
+PC y publicó solo (esa corrida fue en la Mac). En el PC el script está configurado para
+publicar con `-c credential.helper=manager` y `GIT_TERMINAL_PROMPT=0`, sin ventanas de
+credenciales; ese camino del PC todavía no tiene medición propia (lo que sí consta: el PC ya
+había subido 74 cambios esa semana).
+
+**Con dos máquinas, el remoto va por delante.** El 2026-09-08 pasó dos veces en un día
+(sistema y vitrina de Villa): `! [rejected] main -> main (fetch first)`, con 4 commits
+nuevos —la carta real del cliente entre ellos— y el PC había fusionado además 16
+hallazgos. Regla: `git fetch` antes de construir y antes de publicar; si el push se
+rechaza, `pull --rebase`, conserva lo del otro lado y repite la puerta completa (build,
+pruebas) sobre el árbol integrado. **La otra máquina solo se entera de lo PUBLICADO**: por
+eso el cierre sube también memoria y cerebro y deja el `brief.md` al día, y un repo por
+máquina cuando se puede (PC: la vitrina; Mac: el sistema).
+
+**Dónde SÍ frena (cada uno pagado):**
+
+- **Nunca forzar.** `--force`, `reset --hard`, borrar ramas y `filter-branch` están
+  prohibidos en los ajustes. Si lo que llega toca un archivo que estás editando, no lo
+  traigas y avisa.
+- **No fusiones tu propio PR sin un sí explícito.** Al intentar fusionar los 2 PR de
+  Villa recién creados (2026-09-25 05:42) el clasificador lo bloqueó con
+  `[Merge Without Review]`; al cierre de la revisión (17:59) quedaron 4 PR sin fusionar por el mismo motivo: un agente no aprueba su propio trabajo aunque pase todo. Camino:
+  rama, push, PR con la evidencia, y esperar el «fusiona» / «déjalo publicado».
+- **Push bloqueado por el clasificador: no lo rodees.** La noche del 2→3 de noviembre el
+  commit `1ad2a3b` (salida de datos de Delta y pedido para La Villa) quedó sin publicar
+  porque el clasificador negó el push con `[Out-of-Place Publication]`; ya había pasado el
+  24-sep con el v4 de la landing de Prommter. Deja el commit local, **di su hash y pregunta**.
+  El remoto de ORION es público y está en la cuenta vieja: lo que lleva datos de un cliente
+  (pedidos concretos, precios, contrato) va al repo del cliente o de Prommter, no a
+  `investigacion/` de ORION. La causa exacta del bloqueo no consta (texto truncado):
+  confírmala con el dueño.
+- **«Listo y limpio en local» es no publicar.** En cerebro-3d el dueño pidió dejar todo
+  *«listo y limpio en local para que despues de las modificaciones que hagamos se
+  publique»*: se entregó árbol limpio, build verde y la lista de cuatro decisiones
+  pendientes (revisor médico, licencia, canal de errores, dominio) sin publicar.
+- **Si el push a la rama principal despliega solo a producción, publica en una rama.** En WRD
+  cada push a `master` sale a la tienda real: la vitrina interactiva se publicó en la rama
+  `vitrina-dulce` *«y no en `master`, porque cada push a `master` sale solo a producción»*
+  (ventana [[2026-10-26-vitrina-interactiva-y-visual|Vitrina interactiva y visual]], transcrito
+  `16d8eb66`, 2026-10-26), hasta que el dueño la vea en su celular. Publicar sigue siendo
+  parte de terminar; lo que espera su visto bueno es el despliegue.
+- **El defecto propio se arregla, no se pregunta.** Dos veces cerró Claude un RECAP con
+  *«¿Arreglo la barra que tapa el título…?»* sobre un defecto de su propia entrega, y las
+  dos el dueño contestó *«Sí, arregla… y haz el commit»*. Arregla, prueba, commitea y
+  cuéntalo en el RECAP. Pregunta solo lo que es decisión suya: licencia, dominio, revisor,
+  precio, gasto grande.
+
+**Dos textos que no se contradicen si se lee la condición:** «commit local» vale cuando el
+dueño lo pidió o cuando el clasificador frena; «publica» vale cuando el trabajo no lleva
+datos de clientes y nadie dijo «en local». El push de este cierre sigue la skill vigente
+(`orion-close` paso 4: *publishing is part of closing*).
+
+## Tres cosas que se comprueban en el cierre (cosecha 2026-11-02)
+
+**Tras curar, cuenta el disco.** El 2026-09-09 el curador (haiku) entregó dos informes
+contradictorios: uno decía 28→23 objetos con 5 archivados (entre ellos `KN-001`, «obsoleto
+de Windows»), otro 28→26 con 2. El disco tenía 26, y `KN-001` seguía activo porque es la
+lección de que el repo y `~/.claude` derivan en ambas direcciones: archivarlo habría
+perdido una lección vigente. Después de `orion-curator`: cuenta los objetos en disco, lista
+qué se archivó y **pregunta por cada archivado qué lo reemplazó**; si dos informes del
+mismo agente se contradicen, **el disco manda**. No lances dos escrituras de memoria a la
+vez (reflector y cosechador se esperan).
+
+**Antes de apoyarte en una memoria sobre el stack, contrástala con el código.** La memoria
+de InfraPilot afirmó **34 días** que usaba Claude API con `ANTHROPIC_API_KEY`; el código
+usa Groq (llama-3.3-70b). Se descubrió por casualidad, al verificar el stack para montar el
+arnés, y el error se propagaba a cada sesión. `package.json` y un `grep` del SDK o de la
+variable de entorno cuestan segundos; si la contradices, corrige la memoria **en el mismo
+turno** y deja la fecha de la comprobación. (Las decisiones del dueño y las reglas de
+negocio no viven en el código: no se contrastan con él.)
+
+**Mide lo que el arnés carga SIEMPRE y no cargues secciones vacías.** El coste fijo de
+Simorgh (descripciones de skills + hook de arranque) se midió el 2026-08-01 a 4 car/token
+(±15 %): **470→300 tok (−36 %)** acortando descripciones y poniendo techo al hook; el
+arranque inyecta solo un puntero (~30 tok). `/bidar` (1.148), `/bazbin` (976), `/khatam`
+(828) y `vazir` (997) se pagan solo al usarlos; redescubrir el contexto sin arnés costó
+2.312 tok. **Punto de equilibrio: 26 % de sesiones** que retoman trabajo (antes de optimizar
+era 40 %); por debajo, el arnés cuesta más de lo que ahorra. Y *«una sección vacía es peor
+que ausente»*: ocupa contexto en cada arranque. Ni plantillas ni estados con secciones
+vacías: lee los manifiestos reales (`package.json`, `go.mod`…) y escribe hechos. Son
+estimaciones por caracteres, no tokens facturados: el gasto de agentes se mide con
+`costos.mjs` ([[TEMA-modelos-y-costos]]), y si casi todas las sesiones son preguntas sueltas
+sin continuidad, un arnés de continuidad no se paga.
+
 ## Cómo se aplica
 
 1. **¿Quedó trabajo sin reflexionar?** Lanza `orion-reflector` (haiku; sonnet solo
@@ -250,10 +355,14 @@ premisa muerta queda visible, con fecha y con el puntero a lo que la mató.
    (tiene que salir **cero rotas**), `cerebro.mjs probar` (**no puede bajar**;
    si bajó, tu tema nuevo le está robando preguntas a otro y hay que separar los
    alias) y `cerebro.mjs exportar`.
-9. **Commit local** en el repo que guarda esa memoria, mensaje
-   `orion: session close — memory curation (vN)`. **No hagas push** desde la
-   terminal: deja escrita la lista de commits pendientes para GitHub Desktop
-   (ver [[TEMA-entorno-de-la-maquina]]).
+9. **Commit y publica** en el repo que guarda esa memoria, mensaje
+   `orion: session close — memory curation (vN)`. *(Reescrito el 2026-11-02: antes
+   decía «no hagas push; deja la lista para GitHub Desktop».)* Antes del push,
+   `git fetch`; si el remoto va por delante, `pull --rebase` y repite la puerta sobre el
+   árbol integrado. El push normal sube también memoria y cerebro. **Excepciones que
+   frenan:** el chequeo de secretos encuentra algo, el dueño pidió «en local», el
+   clasificador bloquea el push (no lo rodees: commit local, di el hash y pregunta), o es
+   un PR propio (no lo fusiones tú). Detalle en «Publicar también es cerrar».
 10. **Reporta ≤15 líneas**: fusionados/archivados, activos antes → después, nueva
     versión, resultado de validación, commits hechos y los Pending abiertos que
     encabezan la próxima sesión.
@@ -375,12 +484,26 @@ escríbelo aquí.**
   no existe como proyecto). Detalle que vale la ley 2: **el verificador es
   literal**, así que ni siquiera se puede citar de ejemplo una cita rota.
 
+- **Cosecha de las ventanas, 2026-11-02 (publicar, curar, arnés):**
+  - «si no estoy para pushear no puedo hacer nada?» y «que el pc deje todo lo que haga publicado sin yo pushear» — ventana [[2026-09-09-duo-burger|Duo Burger]] (transcrito `51184930`, 2026-09-22); «El PC subió 74 cambios esta semana sin ti» (2026-09-22); «La prueba encontró un fallo real —el `--autostash` metía marcas de conflicto dentro del archivo—» y «En el PC publica con `-c credential.helper=manager`, que es justo lo que esa máquina midió que funciona» (2026-09-22; lo afirmó Claude desde la Mac: la corrida en vivo fue en la Mac y la medición del PC no está en los transcritos de la Mac). Memorias del dueño: `feedback_push_automatico`, `project_publicacion_automatica_mac_pc`.
+  - «! [rejected] main -> main (fetch first)», «Hay 4 commits nuevos en el remoto — incluida la carta real del cliente.» y «hoy el remoto iba por delante del clon dos veces, y eso pasa justo por trabajar en dos máquinas» — ventana [[2026-09-08-sistema-de-villa-orion|Sistema de Villa]] (transcrito `f7689b06`, 2026-09-08/09).
+  - «Reason: [Merge Without Review]» (al fusionar «los dos PR de Villa», 2026-09-25 05:42; a las 17:59 «Quedan listos 4 pull requests, pero no los pude fusionar») — ventana [[2026-09-24-revision-de-trabajo-prommter|Revisión de trabajo Prommter]] (transcrito `cbb92e83`, 2026-09-25).
+  - «Permission for this action was denied by the Claude Code auto mode classifier. Reason: [Out-of-Place Publication].» y «¿Publico el commit 1ad2a3b en GitHub?» — ventana [[2026-11-03-investigacion-prommter-mercado-y-competencia|Investigación Prommter]] (transcrito `8a27a2bb`, 2026-11-03).
+  - «quiero que dejes todo listo y limpio en local para que despues de las modificaciones que hagamos se publique» y «Sí, arregla la barra de herramientas que tapa el título en pantallas medianas y haz el commit.» — ventana [[2026-10-19-prototipo-web-de-cerebro-3d-interactivo-con-enferm|Cerebro 3D]] (transcrito `71c5f9e6`, 2026-10-19/20).
+  - «Dos reportes contradictorios del mismo agente (uno dice 23 objetos, otro 26)» y «KN-001 no era obsoleto» — ventana [[2026-09-09-la-villa-sistema|La Villa sistema]] (transcrito `129e1026`, 2026-09-09).
+  - «Tu memoria llevaba 34 días afirmando que InfraPilot usaba Claude API con ANTHROPIC_API_KEY. Es falso: usa Groq» y «el coste fijo de 470 tok que se paga aunque no uses nada» y «Punto de equilibrio: 26 %» y «una sección vacía es peor que ausente» — ventana [[2026-07-28-estructura-anthropic-para-arnes-y-flujo-de-trabajo|Estructura Anthropic para arnés]] (transcrito `0f0c7084`, 2026-07-29 / 2026-08-01 / 2026-08-03).
+  - Skill vigente: `~/.claude/skills/orion-close/SKILL.md:72-73` («publishing is part of closing (owner's decision, 2026-09-01)»).
+
 ## Enlaces
 
 - [[TEMA-modelos-y-costos]] — qué modelo lanzar en cada fase y por qué el cierre
   con haiku es barato pero necesita la guarda de `check-r8.mjs`.
 - [[TEMA-verificar-con-evidencia]] — la disciplina de medir antes de afirmar, que
   es la misma que exige una cita por afirmación guardada.
-- [[TEMA-entorno-de-la-maquina]] — por qué el cierre termina en commit local y el
-  push se hace por GitHub Desktop.
+- [[TEMA-entorno-de-la-maquina]] — límites de la máquina. OJO: su fila «el `git push` por
+  terminal en el PC no funciona» describe el push interactivo; el sincronizador está
+  configurado para publicar desde el PC con `-c credential.helper=manager`, sin medición
+  propia todavía (ver «Publicar también es cerrar»).
+- [[TEMA-como-pide-el-dueno]] — por qué un defecto propio se arregla sin preguntar y la
+  decisión del dueño sí se pregunta.
 - [[TEMA-caja-y-turnos]] — el otro "cierre", el del dinero del negocio.

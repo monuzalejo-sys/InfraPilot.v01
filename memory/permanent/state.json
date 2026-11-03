@@ -1,6 +1,6 @@
 {
   "projectId": "_permanent",
-  "snapshotDate": "2026-10-01T00:00:00.000Z",
+  "snapshotDate": "2026-11-02T22:00:00.000Z",
   "objects": [
     {
       "id": "KN-001",
@@ -376,9 +376,89 @@
       "reason": "Pedido del dueño el 2026-11-02 («que este tipo de errores no pasen, vamos a organizarlo bien»). Medido con costos.mjs real: desde septiembre 6.362 M tokens ≈ US$ 3.600–4.060 a precio de API, 97 % Opus; Escuadra 2.340 M en 99 agentes (98 en Opus por herencia), constructores de 150–236 pasos con 600k de contexto, crítico por paquete de 35–45 M, sesiones principales de 200–666 M. Nada saltó porque se medía el contexto final.",
       "description": "Skill orion §1e + bloque «Disciplina de gasto» en orion-builder/verifier/fixer: (1) presupuesto en US$ antes de lanzar; > US$ 100 espera el sí del dueño; (2) modelo explícito en cada spawn y cada agent() de Workflow; (3) agentType orion-builder/verifier/fixer en Workflows; (4) encargos de ≤ 90 pasos; (5) sin crítico por paquete, un verificador sonnet al final; (6) lo determinista por Bash del orquestador; (7) disparador costos.mjs vigilar en segundo plano en cada ola; (8) sesión principal > ~300k de contexto → /orion-close y sesión nueva; (9) cierre con costos.mjs real; (10) Ultracode no anula nada de esto.",
       "source": "sesión 2026-11-02 (Escuadra, b5eb380b)"
+    },
+    {
+      "id": "KN-020",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-11-02T22:00:00.000Z",
+      "updated": "2026-11-02T22:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-018"
+      ],
+      "fact": "TAREA PROGRAMADA QUE PUBLICA: SE ATASCA ESPERANDO UN PERMISO QUE NADIE VE (cosecha 2026-11-02). La publicacion diaria de duo-burguer corrio el 5-oct y no volvio: la del 19-oct quedo parada en 'Tool permission request failed: AbortError: Tool permission stream closed before response received', los dias secretos 19 y 20 no salieron y el 21-oct hubo que publicar a mano. La tarea de la revelacion (pedida a las 06:02 de Bogota) arranco a las 09:39. La hora es 'a partir de': la app la mueve (pedida 12:10, quedo distinta; pedida 00:10, quedo 00:23) y con la Mac dormida corre al despertar. REGLA: antes de llamar 'automatica' a una tarea que publica, correrla una vez y aprobar 'Permitir siempre' para cada herramienta (git, publicar.sh, curl); lo que debe estar a las 6:00 va con horas de margen; comprobar al dia siguiente en el sitio real; darle condicion de fin y autoridad minima (sin commits ni redes). Tema: entorno-de-la-maquina.",
+      "context": "Ventanas 2cc930f8, 51184930 y d6a3781b (duo-burguer, oct-2026). Cerebro: cerebro/temas/entorno-de-la-maquina.md."
+    },
+    {
+      "id": "KN-021",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-11-02T22:00:00.000Z",
+      "updated": "2026-11-02T22:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "High",
+      "priority": "High",
+      "status": "Current",
+      "dependencies": [
+        "KN-018"
+      ],
+      "fact": "CERRAR EL PANEL DEL NAVEGADOR DE LA APP APAGA LOS SERVIDORES DE preview_start (cosecha 2026-11-02). 23-oct: el dueno cerro el panel y se apagaron los servidores del escenario (3300) y del diseno (4610) que usaban los agentes; en otra ventana la app apago los dos servidores 28 min antes y el dueno escribio 'no me deja abrir'. REGLA: lo que el dueno va a abrir se arranca como proceso independiente (no desde el panel) y se comprueba con una peticion real a cada puerto; antes de una ola, avisarle 'no cierres el panel' y dejar un vigilante que reinicie. En modo produccion el sistema exige https: en local se corre en modo desarrollo. Si preview_start dice 'Maximum 5 dev servers per folder', no detener los de otras ventanas: python3 -m http.server en un puerto libre. Una app con localStorage no se prueba como file://. Tema: entorno-de-la-maquina.",
+      "context": "Ventanas b5eb380b, 7f456016, 72ffaa4c y 6f3a4ef7 (oct/nov-2026)."
+    },
+    {
+      "id": "KN-022",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-11-02T22:00:00.000Z",
+      "updated": "2026-11-02T22:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "KN-018"
+      ],
+      "fact": "MAC DORMIDA MATA LOS PROCESOS LARGOS (cosecha 2026-11-02). 24-oct: una puerta de pruebas se colgo 50 min (proceso de cobertura quieto, sin hijos ni CPU) y la Mac se durmio 80 min a mitad de corrida: 7 pruebas canceladas que pasaron al repetirlas despierta. 09-10: un bloqueo de reposo con limite de tiempo caduco 20 min antes de que se notara. REGLA: antes de una corrida larga pedir keep-awake (request_keep_awake o caffeinate sin limite de tiempo, atado al proceso), confirmar al retomar que sigue activo y soltarlo al terminar; un proceso quieto 50 min sin CPU es un cuelgue, no un fallo de prueba: matarlo y repetir (que la causa fuera el sueno es sospecha, no hecho: la Mac durmio 80 min en esa corrida, pero la fuente solo dice 'cuelgue'). Tema: entorno-de-la-maquina.",
+      "context": "Ventanas 7f456016 y 51184930 (sep/oct-2026)."
+    },
+    {
+      "id": "KN-023",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-11-02T22:00:00.000Z",
+      "updated": "2026-11-02T22:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "KN-018"
+      ],
+      "fact": "CHROME HEADLESS EN LA MAC USA LA GPU SOLO: NO FORZAR SWIFTSHADER (cosecha 2026-11-02). Playwright 1.63 ya no trae Chromium para macOS 13; con channel 'chrome' y el arg --use-angle=swiftshader el 3D iba por software a ~1 fps (paginas de 20-40 s). Sin forzar nada Chrome elige ANGLE-Metal sobre la Intel Iris y rinde a 60 fps: suite de 58 pruebas de 16,6 min a 3,6 min (30 min en serie). Si dudas, correr el mismo script con 3 variantes de args y leer renderer, fps y tiempo de carga. En el PC o contenedor sin GPU si cae a SwiftShader. Tema: entorno-de-la-maquina.",
+      "context": "Ventana 71c5f9e6 (prototipo cerebro 3D, 2026-10-19)."
+    },
+    {
+      "id": "KN-024",
+      "type": "Knowledge",
+      "tier": "Permanent",
+      "created": "2026-11-02T22:00:00.000Z",
+      "updated": "2026-11-02T22:00:00.000Z",
+      "lifetime": "Permanent",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [
+        "KN-018"
+      ],
+      "fact": "EL CLASIFICADOR DEL MODO AUTOMATICO NO DEJA QUE CLAUDE ESCRIBA SUS AJUSTES (cosecha 2026-11-02). 22-sep: tres intentos de instalar hooks en .claude/settings.json fueron bloqueados con razones distintas (Self-Modification, Instruction Poisoning, Auto-Mode Bypass); el 22-sep Claude se detuvo tras un rechazo de herramienta a las 17:07 y el dueno tuvo que escribir 'continua con mi peticion' (17:12, tras un /compact); despues el clasificador bloqueo la escritura con Self-Modification (17:16). REGLA: no insistir ni rodearlo por otra ruta; dejar la plantilla versionada en el repo (docs/publicacion-automatica/settings.json) y darle al dueno el cp de una linea mas git add/commit/push para cada maquina; no leer el bloqueo como un no del dueno sin confirmarlo. RELACIONADO: el push interactivo del PC falla (Credential Manager sin /dev/tty); el sincronizador esta configurado en Windows con '-c credential.helper=manager' + GIT_TERMINAL_PROMPT=0 y se reporto que funciona (22-sep), sin medicion directa en el PC. Tema: entorno-de-la-maquina.",
+      "context": "Ventana 51184930 (duo-burguer, 2026-09-22)."
     }
   ],
   "archives": [],
   "lastAmmRun": "2026-10-01T00:00:00.000Z",
-  "version": 18
+  "version": 19
 }

@@ -1,9 +1,9 @@
 ---
 slug: modelos-y-costos
 titulo: Qué modelo usar para cada tipo de trabajo, y cuánto cuesta de verdad
-alias: [modelo, modelos, que modelo, elegir modelo, seleccion de modelo, calibracion, calibrar, haiku, sonnet, opus, tier, tiers, nivel, niveles, modelo barato, modelo caro, economico, costo, costos, coste, precio, gasto, gastar, presupuesto, tokens, token, cuanto cuesta, cuanto gasta, cuanto vale, cuanto cuesta una ola, costo de una ola, costo de la ola, cuanto cuesta una ola de agentes, presupuesto de una ola, presupuestar la ola, gasto de una ola, ola, olas, oleada, ola de agentes, builder, builders, builder visual, build visual, buildvisual, constructor, spawn, spawns, subagente, subagentes, agente, agentes, panel de agentes, modeloutcomes, subagent tokens, metrics, metricas, medicion, medido, inline, pipeline, ceremonia, ciclo de vida, escalar, escalada, escalate, infra death, muerte de sesion, limite de sesion, limite diario, verdict, veredicto, fallo, falla, adversarial, juez, verificador, analista, reflector, fase, fases, taxonomia, taxonomía, inventar estructura, inventar la taxonomia, categoria nueva, esquema fijo, seguir un patron, seguir un patron con ejemplos, ambiguedad de estructura]
-preguntas: ["que modelo uso para un builder visual", "cuando uso haiku y cuando opus", "cuanto cuesta una ola de agentes", "cual es el modelo mas barato que aguanta esta tarea", "cuantos tokens gasta un builder", "vale la pena pagar opus para esto"]
-proyectos: [infrapilot, placita, villa-broaster, estanco-contable, wrd, arroces, landings, orion, _permanent]
+alias: [modelo, modelos, que modelo, elegir modelo, seleccion de modelo, calibracion, calibrar, haiku, sonnet, opus, tier, tiers, nivel, niveles, modelo barato, modelo caro, economico, costo, costos, coste, precio, gasto, gastar, presupuesto, tokens, token, cuanto cuesta, cuanto gasta, cuanto vale, cuanto cuesta una ola, costo de una ola, costo de la ola, cuanto cuesta una ola de agentes, presupuesto de una ola, presupuestar la ola, gasto de una ola, ola, olas, oleada, ola de agentes, builder, builders, builder visual, build visual, buildvisual, constructor, spawn, spawns, subagente, subagentes, agente, agentes, panel de agentes, modeloutcomes, subagent tokens, metrics, metricas, medicion, medido, inline, pipeline, ceremonia, ciclo de vida, escalar, escalada, escalate, infra death, muerte de sesion, limite de sesion, limite diario, verdict, veredicto, fallo, falla, adversarial, juez, verificador, analista, reflector, fase, fases, taxonomia, taxonomía, inventar estructura, inventar la taxonomia, categoria nueva, esquema fijo, seguir un patron, seguir un patron con ejemplos, ambiguedad de estructura, escuadra, 1300 dolares, agentes gigantes, opus por defecto, hereda opus, 90 pasos, tope de pasos, critico por paquete, costos.mjs vigilar, vigilar, presupuesto en dolares, gasto de mas, ola de agentes cara, reiniciar claude code, 721338, 721.338 tokens, cuanto costo la ola del 9 de septiembre, ola del 9 de septiembre, metrics.json de la villa, tokens de la ola, subagent_tokens no es gasto, como lanzo agentes sin que se dispare el gasto]
+preguntas: ["que modelo uso para un builder visual", "cuando uso haiku y cuando opus", "cuanto cuesta una ola de agentes", "cual es el modelo mas barato que aguanta esta tarea", "cuantos tokens gasta un builder", "vale la pena pagar opus para esto", "como lanzo agentes sin que se me dispare el gasto como paso en Escuadra", "cuanto costo de verdad la ola del 9 de septiembre", "cuantos tokens llevamos gastados de verdad", "cuantos pasos le pongo de tope a un agente", "para que sirve el critico por paquete y por que lo quitamos"]
+proyectos: [infrapilot, placita, villa-broaster, estanco-contable, wrd, arroces, landings, orion, _permanent, escuadra, la-villa]
 confianza: alta
 actualizado: 2026-11-02
 ---
@@ -18,7 +18,14 @@ gasto**. El gasto real es ~70–110× mayor y se mide con `node tools/costos.mjs
 constructor largo en Opus cuesta **20–100 M tokens reales (US$ 12–50)**, un agente sonnet
 medio ~4 M. Usa las cifras de abajo para ORDENAR tiers; para presupuestar, `costos.mjs real`.
 Las reglas que salieron de esto (presupuesto en US$, modelo explícito, encargos ≤ 90 pasos,
-sin crítico por paquete, disparador `vigilar`) están en el skill `orion` §1e.
+sin crítico por paquete, disparador `vigilar`) están en el skill `orion` §1e. **Antes de
+lanzar una ola:** presupuesto en dólares (si pasa de **US$ 100**, espera el sí del dueño) y
+`costos.mjs vigilar`; modelo escrito a mano en cada agente (Sonnet, salvo lo que se presume
+en público); tope de **90 pasos** (verificador 60, corrector 40), máx. 8 capturas, archivos
+por partes, salidas recortadas; **sin crítico por paquete**. Caso que lo pagó: Escuadra,
+≈US$ 1.300 con todo en Opus (ver «Escuadra» abajo). **No presupuestes con el «total 721.338
+tokens» del run del 2026-09-09** ni con el `metrics.json` de La Villa: son contexto final,
+no gasto.
 
 **Antes de elegir modelo, elige ceremonia**: una tarea de 1 archivo se hace inline con
 cero spawns — el pipeline completo cuesta ~10x (168k tokens de subagente para un README
@@ -39,6 +46,28 @@ Esto no es criterio: son **298 spawns medidos y 39.372.000 tokens** (corte 2026-
 wrd, arroces). Ojo: esa «medición» es `subagent_tokens`, el contexto final de cada spawn, no su gasto
 (`_permanent/KN-002`, corregido 2026-11-02). El gasto real —incluido el del orquestador— sale
 de las transcripciones con `costos.mjs real`.
+
+**Escuadra, el diagnóstico de los ≈US$ 1.300 (2026-11-02).** El dueño pidió *«necesito que
+mires todo el panorama, que este tipo de errores no pasen»*. Hallazgos: todo corrió en
+Opus; los agentes daban **entre 120 y 236 pasos** y llegaban a **contextos de hasta 670 mil
+tokens** que se releían en cada paso (**97 % del gasto**); había **~1.600 capturas**, páginas
+HTML enteras y salidas largas de pruebas dentro del contexto; y **un crítico por paquete
+rehacía lo del constructor, a 35–45 M tokens cada uno (~US$ 20)**. Con las reglas nuevas:
+un verificador costó **US$ 0,32**, los constructores de rangos **US$ 0,62** y de insignias
+**US$ 4,23**, el paquete del VPS **US$ 3,15**, y la progresión pasó de 7–11 agentes en Opus
+a **5 chicos (4 en Sonnet, el arte de las insignias en Opus)** con presupuesto de US$ 15–25.
+Detalle operativo: los agentes editados se cargan **al reiniciar Claude Code**, y existe una
+copia `orion:` del plugin con las reglas viejas: mientras tanto, pega las reglas en el
+encargo.
+
+**El run del 2026-09-09 tampoco es gasto.** `orion/KN-024` y la sesión
+`session-2026-09-09-enfoque-web-real` de `memory/orion/metrics.json` suman **721.338
+tokens en 7 spawns** (opus×3, sonnet×4: el traductor y 6 constructores `build:lib`); el `metrics.json` de La Villa del 2026-10-28 se
+escribió con la misma métrica. Ambos usan `subagent_tokens` (contexto final); el gasto real
+es unas 70–110 veces mayor y **no consta en ninguna parte** (el run usó además reflector,
+cosechador y curador, que no figuran en el total). Re-mide o rotula esos registros. Lo que sobrevive: la
+**calibración por calidad** (sonnet limpio en refuerzos con esquema fijo; opus al inventar
+taxonomía) y las proporciones entre agentes del mismo run, porque comparten unidad.
 
 **Lo que la medición contradice.** Si se cuentan los veredictos crudos, los tres tiers
 fallan casi igual: haiku 1 de 24, sonnet 6 de 149, opus 3 de 101. Eso **no** significa que
@@ -184,6 +213,12 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
 
 ## Cuándo NO aplica
 
+- **Las reglas de agentes chicos no son para todo.** Un trabajo realmente grande y acoplado
+  que no se puede partir (una migración de datos) puede pedir un agente largo con puntos de
+  control; y no aplican al orquestador interactivo (la conversación con el dueño).
+- **Comparar tamaños relativos de contexto entre agentes del mismo run**, sin hablar de
+  dinero, sigue siendo válido con `subagent_tokens`; la calidad (defectos por agente) no
+  depende de esa métrica.
 - **Un `fail` en una fila `verification` es una buena noticia, no un fallo del modelo.**
   Significa que el verificador encontró cosas. No lo uses para calibrar hacia arriba.
 - **Subir de tier NO sustituye la verificación e2e.** El bug de cierre de arroces lo
@@ -245,6 +280,8 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
   opus (52 y 54 arquetipos, también limpias, 145.270 y 167.453 tokens, ~1,7× por
   unidad de trabajo). La variable que separa los dos grupos es si había taxonomía
   previa que copiar, no el volumen ni la importancia del texto.
+- Cosecha de las ventanas, 2026-11-02 — ventana [[2026-10-22-orion-app-de-rutina-sincronizada|ORION, app de rutina sincronizada]] (transcrito `b5eb380b`): «necesito que mires todo el panorama, que este tipo de errores no pasen» (2026-11-03); «Daban entre 120 y 236 pasos y llegaban a contextos de hasta 670 mil tokens.»; «unas 1.600 capturas, páginas HTML enteras y salidas largas de pruebas»; «un crítico por paquete rehacía lo del constructor, a 35–45 M cada uno»; «un verificador con las reglas nuevas costó US$ 0,32; los críticos anteriores costaban unos US$ 20 cada uno»; «los constructores de rangos (US$ 0,62) e insignias (US$ 4,23) ya terminaron»; «Los agentes nuevos se cargan al reiniciar Claude Code.» (todas 2026-11-03).
+- Ventana [[2026-09-09-la-villa-sistema|La Villa sistema]] (transcrito `129e1026`): «total 721.338 tokens, sin fixCycles» (2026-09-09) y «Creo el metrics.json con las mediciones de este run» (2026-10-28). Objeto: `orion/KN-024` (anotado 2026-11-02) y `memory/orion/metrics.json`, sesión `session-2026-09-09-enfoque-web-real`.
 - `arroces/KN-001` — el bug de supuesto temporal no fue de capacidad del modelo; lo reveló
   el e2e, no lo habría evitado opus.
 - `infrapilot/RSK-003` — 8 agentes con memoria propia en paralelo corrompen el state.json
@@ -278,3 +315,4 @@ baratos escribieron género gramatical equivocado en documentos públicos del eq
 - [[TEMA-cero-datos-inventados]] — la regla que hace inaceptable el tier barato en
   cualquier texto que tenga que ser verdad.
 - [[TEMA-verificar-con-evidencia]] — el e2e que atrapa lo que ningún tier evita.
+- [[TEMA-planes-de-ejecucion]] — de dónde sale el presupuesto de un plan y por qué hoy sale de `costos.mjs real` (el caso del plan de Escuadra, que decía 27,6 M y fueron ≈2.330 M).

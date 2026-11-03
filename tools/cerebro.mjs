@@ -31,12 +31,13 @@ const TEMAS_DIR = join(CEREBRO, "temas")
 const INDICE = join(CEREBRO, "indice.json")
 
 /* Dónde viven las memorias. Se listan las RAÍCES y se descubren los proyectos
-   dentro: así un proyecto nuevo entra al cerebro sin tocar este archivo. */
+   dentro: así un proyecto nuevo entra al cerebro sin tocar este archivo. La fija
+   es memory/ del propio ORION; la otra es prommter/ completo — cada repo con un
+   <repo>/memory/<id> real entra solo (caso B más abajo), sin listar repos a mano
+   y sin ninguna ruta absoluta de plataforma. Si prommter/ no existe, se ignora. */
 const RAICES = [
   join(ORION, "memory"),
-  "C:\\Users\\Kalel\\prommter\\proyectos",
-  "C:\\Users\\Kalel\\prommter\\memory", // la agencia guarda su memoria en la raíz, no bajo proyectos\
-  "C:\\Users\\Kalel\\fable 5",
+  join(ORION, "prommter"),
 ]
 
 /* ─────────────────────────────── normalización de texto ─────────────────── */
@@ -96,12 +97,15 @@ const PESO_ESTADO = { Superseded: 0.5, Done: 0.6, Archived: 0.45, Deprecated: 0.
 function descubrirMemorias() {
   const out = []
   const mirar = (dirMem, proyectoHint) => {
-    if (!existsSync(join(dirMem, "state.json"))) return
+    const f = join(dirMem, "state.json")
+    if (!existsSync(f)) return
     try {
-      const s = JSON.parse(readFileSync(join(dirMem, "state.json"), "utf8"))
-      out.push({ proyecto: s.projectId || proyectoHint, dir: dirMem, state: s })
+      const s = JSON.parse(readFileSync(f, "utf8"))
+      let mtime = 0
+      try { mtime = statSync(f).mtimeMs } catch {}
+      out.push({ proyecto: s.projectId || proyectoHint, dir: dirMem, state: s, mtime })
     } catch (e) {
-      console.error(`  aviso: ${dirMem}\\state.json no se pudo leer (${e.message})`)
+      console.error(`  aviso: ${dirMem}/state.json no se pudo leer (${e.message})`)
     }
   }
   for (const raiz of RAICES) {
@@ -120,9 +124,32 @@ function descubrirMemorias() {
       }
     }
   }
-  // dedupe por proyecto+dir
+  // dedupe por proyecto+dir (la misma carpeta vista dos veces por rutas distintas)
   const vistos = new Set()
-  return out.filter((m) => { const k = m.proyecto + "|" + m.dir; if (vistos.has(k)) return false; vistos.add(k); return true })
+  const unicos = out.filter((m) => { const k = m.proyecto + "|" + m.dir; if (vistos.has(k)) return false; vistos.add(k); return true })
+
+  /* projectId duplicado en DOS memorias de verdad distintas (mismo id, dir
+     distinto) — pasa hoy con "placita" (prommter/placita y prommter/mercaplazarepo).
+     Un duplicado silencioso es justo la clase de fallo que esta migración ya pagó,
+     así que se resuelve y se anuncia. GANA LA QUE MÁS SABE: objetos activos +
+     archivados. La primera versión de esto desempataba por mtime y salió mal —
+     ganó una copia de 38 ids sobre la memoria real de 115 porque su archivo era
+     cinco minutos más nuevo, y dejó 124 citas rotas apuntando a objetos que sí
+     existían. Un archivo recién tocado no es un archivo más completo. El mtime
+     queda solo para deshacer empates exactos. */
+  const riqueza = (m) => (m.state.objects || []).length + (m.state.archives || []).length
+  const porProyecto = new Map()
+  for (const m of unicos) {
+    const previo = porProyecto.get(m.proyecto)
+    if (!previo) { porProyecto.set(m.proyecto, m); continue }
+    const mejor = riqueza(m) !== riqueza(previo)
+      ? (riqueza(m) > riqueza(previo) ? m : previo)
+      : (m.mtime >= previo.mtime ? m : previo)
+    const pierde = mejor === m ? previo : m
+    mejor.duplicadoIgnorado = `${pierde.dir} (${riqueza(pierde)} ids frente a ${riqueza(mejor)})`
+    porProyecto.set(m.proyecto, mejor)
+  }
+  return [...porProyecto.values()]
 }
 
 /* Frontmatter mínimo: los temas los escriben agentes y personas, así que el
@@ -353,7 +380,7 @@ function construirIndice() {
   }
   return {
     generado: new Date().toISOString(),
-    proyectos: memorias.map((m) => ({ proyecto: m.proyecto, dir: m.dir, objetos: (m.state.objects || []).length, version: m.state.version })),
+    proyectos: memorias.map((m) => ({ proyecto: m.proyecto, dir: m.dir, objetos: (m.state.objects || []).length, version: m.state.version, duplicadoIgnorado: m.duplicadoIgnorado || null })),
     temas: temas.map((t) => ({ slug: t.slug, titulo: t.titulo, alias: t.alias, preguntas: t.preguntas, proyectos: t.proyectos, confianza: t.confianza })),
     docs: docs.map((d) => ({ ...d, tf: Object.fromEntries(d.tf), tokens: undefined })),
     df: Object.fromEntries(df),
@@ -404,6 +431,17 @@ function buscar(pregunta, { n = 8, proyecto = null, soloTemas = false } = {}) {
   const q = tokenizar(pregunta)
   if (!q.length) return { pregunta, resultados: [], idx }
   const k1 = 1.5, b = 0.75
+  /* Los temas se normalizan por largo mucho menos que los objetos. Un tema es
+     largo porque acumuló lecciones pagadas, no porque tenga ruido — y con b=0.75
+     cada refuerzo lo volvía MENOS encontrable: en la cosecha de las ventanas
+     (2026-11-02) donde-vive-el-dato pasó de 6.308 a 7.870 palabras y dejó de
+     ganar una pregunta que tiene escrita literal, y los temas nuevos y cortos se
+     llevaron preguntas ajenas (la prueba bajó de 76/80 a 71/80). Barrido medido:
+     b de temas 0.75 → 140/156 · 0.3 → 153/156 (con alias limpios, 154/156 y 79/80
+     en la suite vieja) · 0.2 y 0.1 no ganan más y esconden los objetos puntuales
+     (placita/KN-034 del 3.º al 5.º, duo-burger/KN-027 del 1.º al 4.º). CEREBRO_B_TEMA
+     permite repetir el barrido cuando cambie el corpus. */
+  const B_TEMA = Number(process.env.CEREBRO_B_TEMA ?? 0.3)
   const N = idx.N || 1
   const res = []
   for (const d of idx.docs) {
@@ -420,7 +458,8 @@ function buscar(pregunta, { n = 8, proyecto = null, soloTemas = false } = {}) {
         const f = tf[dt] * sim
         const dfT = idx.df[dt] || 1
         const idf = Math.log(1 + (N - dfT + 0.5) / (dfT + 0.5))
-        const norm = (f * (k1 + 1)) / (f + k1 * (1 - b + b * (d.largo / (idx.largoPromedio || 1))))
+        const bd = d.clase === "tema" ? B_TEMA : b
+        const norm = (f * (k1 + 1)) / (f + k1 * (1 - bd + bd * (d.largo / (idx.largoPromedio || 1))))
         mejor = Math.max(mejor, idf * norm)
       }
       score += mejor
@@ -480,6 +519,9 @@ if (cmd === "indexar") {
   console.log(`CEREBRO ORION — ${idx.N} documentos`)
   console.log(`  temas curados: ${temas.length}`)
   console.log(`  objetos de memoria: ${objetos.length} en ${idx.proyectos.length} proyectos`)
+  // projectId duplicado en dos memorias distintas: nunca en silencio (ver descubrirMemorias).
+  const duplicados = idx.proyectos.filter((p) => p.duplicadoIgnorado)
+  for (const d of duplicados) console.log(`  ⚠ projectId duplicado "${d.proyecto}": gana ${d.dir} (la que más sabe) — se ignora ${d.duplicadoIgnorado}`)
   /* Un Pending o un Roadmap corto es correcto ("Definir el costo de domicilio
      por zona" no necesita más). Solo se señalan como pobres los tipos que
      PROMETEN sustancia: si una Knowledge cabe en dos líneas, o no se entendió
@@ -571,7 +613,7 @@ if (cmd === "indexar") {
   process.exitCode = rotas ? 1 : 0
 } else if (cmd === "exportar") {
   const idx = construirIndiceYGuardar()
-  const destino = flag("destino", "C:\\Users\\Kalel\\ORION-Vault\\Cerebro")
+  const destino = flag("destino", join(ORION, "..", "ORION-Vault", "Cerebro"))
   mkdirSync(destino, { recursive: true })
   for (const f of readdirSync(destino).filter((x) => x.endsWith(".md"))) unlinkSync(join(destino, f))
   const temas = existsSync(TEMAS_DIR) ? readdirSync(TEMAS_DIR).filter((x) => x.endsWith(".md")).map((f) => leerTema(join(TEMAS_DIR, f))) : []
@@ -615,7 +657,7 @@ if (cmd === "indexar") {
 
   lineas.push("## Memorias que alimentan el cerebro", "")
   for (const p of idx.proyectos.sort((a, b) => b.objetos - a.objetos)) lineas.push(`- **${p.proyecto}** — ${p.objetos} objetos (v${p.version}) → \`Proyectos/${p.proyecto}/_INDEX.md\``)
-  lineas.push("", "## Cómo se consulta", "", "```bash", 'node C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs buscar "tu pregunta"', "```", "")
+  lineas.push("", "## Cómo se consulta", "", "```bash", `node "${join(ORION, "tools", "cerebro.mjs")}" buscar "tu pregunta"`, "```", "")
   writeFileSync(join(destino, "_CEREBRO.md"), lineas.join("\n"))
   console.log(`exportados ${temas.length} temas + _CEREBRO.md a ${destino}`)
 } else if (cmd === "ruta") {
@@ -685,7 +727,7 @@ if (cmd === "indexar") {
      veces disfrazado de hallazgo, y ahogaría lo único que este barrido aporta:
      lo que escribió una persona a mano y no está en ninguna memoria.
      Es la trampa del espejo — consultar un espejo no ahorra ninguna lectura. */
-  const GENERADAS = new Set(["Cerebro", "Proyectos", "Sistema", "Planes", "Sesiones", "Encargos"])
+  const GENERADAS = new Set(["Cerebro", "Proyectos", "Sistema", "Planes", "Sesiones", "Encargos", "Ventanas"])
   const barrer = (dir, prof = 0) => {
     if (prof > 4 || !existsSync(dir)) return
     let entradas = []

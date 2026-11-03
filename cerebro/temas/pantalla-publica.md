@@ -1,16 +1,18 @@
 ---
 slug: pantalla-publica
 titulo: Qué tiene que lograr una pantalla que mira un cliente
-alias: [landing, landings, lending, landin, pagina publica, pagina publica de ventas, pagina del cliente, la pagina que ve el cliente, pagina web, pagina, web, sitio, sitio web, portada, portadas, home, inicio, hero, heroe, encabezado, pliegue, above the fold, primera pantalla, lo primero que se ve, vitrina, vitrinas, escaparate, catalogo publico, tienda, tienda en linea, ecommerce, carrito, menu publico, carta, demo comercial, maqueta de venta, cara al cliente, cliente afuera, publico, de cara al publico, vender, venta, vende, que venda, conversion, convertir, captacion, captar, leads, registro, formulario, formularios, campos, cuantos campos, cta, boton, boton principal, llamado a la accion, accion principal, whatsapp, remate, movil, movil primero, mobile first, celular, en el celular, pantalla del celular, desde el celular, telefono, responsive, 390, 390px, 480, canal principal, canal real, que va primero, que va arriba, arriba del todo, orden de las secciones, orden de la pagina, jerarquia, apagado, apagada, generico, generica, minimalista, muy minimalista, vacia, pobre, sosa, llamativa, llamativo, divertido, colorido, mas color, subirle el color, que de gusto verlo, registro visual, tono, direccion de arte, manifiesto, estudio del ingeniero moderno, calma, rechazo, rechazado, me la rechazaron, no le gusto, rehacer, sobrecorregir, referencias, fichas, mecanismo, tokens compartidos, globals css, grep consumidores, cambiar un color, paleta, app vs landing, diferencia entre la app y la pagina, adentro y afuera, interior de la app, pos, dashboard]
-preguntas: ["que debe tener la pagina que ve el cliente", "como hago que la landing venda", "que pongo en la portada", "cual es la diferencia entre la app y la pagina publica", "el dueño dice que la landing esta muy apagada y generica, que le cambio?", "la landing puede usar el mismo estilo del sistema por dentro?", "cuantos campos le pido en el formulario de captacion?", "puedo subirle el color a los tokens pa que la portada venda mas?", "el cliente rechazo el diseño, rehago todo o solo lo que critico?", "que va primero en el celular", "en que orden pongo las secciones de la pagina", "cuantos botones pongo en la portada"]
-proyectos: [landings, villa-broaster, placita, pollo-landing, infrapilot, orama]
+alias: [landing, landings, lending, landin, pagina publica, pagina publica de ventas, pagina del cliente, la pagina que ve el cliente, pagina web, pagina, web, sitio, sitio web, portada, portadas, home, inicio, hero, heroe, encabezado, pliegue, above the fold, primera pantalla, lo primero que se ve, vitrina, vitrinas, escaparate, catalogo publico, tienda, tienda en linea, ecommerce, carrito, menu publico, carta, demo comercial, maqueta de venta, cara al cliente, cliente afuera, publico, de cara al publico, vender, venta, vende, que venda, conversion, convertir, captacion, captar, leads, registro, formulario, formularios, campos, cuantos campos, cta, boton, boton principal, llamado a la accion, accion principal, whatsapp, remate, movil, movil primero, mobile first, celular, en el celular, pantalla del celular, desde el celular, telefono, responsive, 390, 390px, 480, canal principal, canal real, que va primero, que va arriba, arriba del todo, orden de las secciones, orden de la pagina, jerarquia, apagado, apagada, generico, generica, minimalista, muy minimalista, vacia, pobre, sosa, llamativa, llamativo, divertido, colorido, mas color, subirle el color, que de gusto verlo, registro visual, tono, direccion de arte, manifiesto, estudio del ingeniero moderno, calma, rechazo, rechazado, me la rechazaron, no le gusto, rehacer, sobrecorregir, referencias, fichas, mecanismo, tokens compartidos, globals css, grep consumidores, cambiar un color, paleta, app vs landing, diferencia entre la app y la pagina, adentro y afuera, interior de la app, pos, dashboard, fondo oscuro, fondo negro, modo oscuro, dark mode, tema claro, colores claros, demo para el cliente, no fondos negros, premium, mas elegante]
+preguntas: ["que debe tener la pagina que ve el cliente", "como hago que la landing venda", "que pongo en la portada", "cual es la diferencia entre la app y la pagina publica", "el dueño dice que la landing esta muy apagada y generica, que le cambio?", "la landing puede usar el mismo estilo del sistema por dentro?", "cuantos campos le pido en el formulario de captacion?", "puedo subirle el color a los tokens pa que la portada venda mas?", "el cliente rechazo el diseño, rehago todo o solo lo que critico?", "que va primero en el celular", "en que orden pongo las secciones de la pagina", "cuantos botones pongo en la portada", "la demo para el cliente la hago oscura o clara?", "en comida siempre va fondo oscuro?"]
+proyectos: [landings, villa-broaster, placita, pollo-landing, infrapilot, orama, la-villa, cerebro-3d, escuadra]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-11-02
 ---
 
 # Qué tiene que lograr una pantalla que mira un cliente
 
 ## Respuesta corta
+
+**⚠ Corrección 2026-11-02:** la frase «al que va a pedir comida se le vende con… fondo oscuro» quedó **acotada, no es regla de comida en general**. El fondo oscuro sigue valiendo solo para la pantalla de pedido de un restaurante con veredicto propio (la carta de Villa Broaster, 2026-08-23) y para anuncios puntuales. En octubre el dueño rechazó lo oscuro en las demos de venta (La Villa, un minimarket: «no fondos negros… colorido, interactivo») y en los videos de línea principal, y pidió o aprobó lo claro y cálido en La Villa, los videos de línea principal y cerebro-3d (sin queja posterior). Regla de decisión: sin veredicto previo de ese tipo de pantalla, parte de **un solo tema claro cálido, vivo y con algo que se toque**; lo que se repite en todos los veredictos es «llamativo y vivo», no «oscuro». Libro completo: [[TEMA-gusto-visual-del-dueno]]. El texto original sigue abajo porque el veredicto de agosto sigue vigente para su caso.
 
 Pregúntate **quién mira**, y no lo contestes con "público vs privado" sino con **qué
 necesita SENTIR esa persona para comprar**: al que va a pedir comida se le vende con
@@ -148,7 +150,7 @@ número**.
     justificado en términos de venta, y el veredicto anotado **por canal** —móvil y
     escritorio por separado— para que la siguiente combinación parta de lo que funcionó
     (`landings/POL-003`; biblioteca en
-    `C:/Users/Kalel/ORION/prompts-landing/referencias/_INDEX.md`). Ya hay resultados
+    `$ORION_HOME/prompts-landing/referencias/_INDEX.md`). Ya hay resultados
     sembrados ahí: el mecanismo más resistente de la biblioteca es el **"dato grande +
     línea"**, *"porque no depende de gesto ni de tiempo, se ve en una captura"*; el
     spotlight por gesto **"ni apareció"** en el veredicto porque el dueño revisa capturas
@@ -180,10 +182,12 @@ número**.
   `globals.css` (849→316). El dominio quedó alojando **solo el sistema**, y lo que
   sobrevivió fueron las **APIs** como puerta del futuro canal (`placita/DEC-017`). La
   página de ventas estilo Rappi quedó **aparcada, lista y funcional, en un repo
-  separado** (`C:\Users\Kalel\placita-tienda`), a la espera de una decisión de negocio
+  separado** (`$HOME/placita-tienda`), a la espera de una decisión de negocio
   (`placita/KN-035`). Mantener dos superficies públicas en el mismo código es un costo
   que hay que querer pagar.
-- **El fondo oscuro es de comida, no de todo rubro.** No lo extrapoles sin veredicto: una
+- **Demos y páginas de venta que ve un cliente (desde 2026-10-28):** un solo tema claro, color de marca, animación al entrar y algo que se toque; sin bloque `prefers-color-scheme: dark` aunque el contrato del artifact lo pida («para que nunca aparezca un fondo negro, ni aunque el celular del cliente lo tenga puesto»). Aun si es comida, no uses fondo oscuro sin veredicto del dueño. Si pide «más elegante/premium», sube el acabado (papel crema, filetes dorados, íconos SVG, números en serif) sin quitar color ni movimiento. Cuándo sí oscuro: lo que él pida de forma expresa y los anuncios de gancho dramático.
+- **Para el dueño: llamativo = fondo claro cálido con tinta oscura, sin azul eléctrico, neón ni morado**; lo llamativo sale de materiales (hierro, bronce, jade, brasa, oro), movimiento y algo que se toque (`cerebro-3d` 2026-10-19; `Escuadra` 2026-10-22 es solo un diseño propuesto con metales, el dueño aceptó el nombre, no el estilo).
+- **El fondo oscuro es de comida, no de todo rubro (y ni siquiera de toda la comida).** No lo extrapoles sin veredicto: una
   inmobiliaria o un SaaS pueden querer claro —en Orama el propio dueño eligió tinta
   profunda `#0F2E36` con superficies de papel `#F4EDDF`— (`landings/KN-009`,
   `orama/DEC-001`). Y sigue **sin veredicto** la frontera entre "divertido" y
@@ -259,9 +263,13 @@ número**.
   `pollo-landing/index.html:486-537, 508-514, 640-651, 697-700` ·
   `pollo-landing/memory/pollo-landing/brief.md`.
 - Biblioteca de referencias con Resultados por canal ya poblados:
-  `C:/Users/Kalel/ORION/prompts-landing/referencias/_INDEX.md` + fichas `01-`, `02-`, `03-`.
+  `$ORION_HOME/prompts-landing/referencias/_INDEX.md` + fichas `01-`, `02-`, `03-`.
+
+- Octubre 2026 (ventanas del dueño): «no fondos negros, bonitas animaciones, llamativo, intuitivo, colorido, interactivo» — ventana [[2026-09-09-la-villa-sistema|La Villa sistema]] (transcrito `129e1026`, 2026-10-28) y «mas brillante y con diseño premium» (2026-10-31); «para la linea principal colores claros» — ventana [[2026-10-05-plan-de-anuncios-profesionales|Plan de anuncios profesionales]] (transcrito `3d75e606`, 2026-10-07); «no blue background, cleaner and eye-catching…» — ventana [[2026-10-19-prototipo-web-de-cerebro-3d-interactivo-con-enferm|Cerebro 3D]] (transcrito `71c5f9e6`, 2026-10-19). Detalle en [[TEMA-gusto-visual-del-dueno]].
 
 ## Enlaces
+
+- [[TEMA-gusto-visual-del-dueno]] — el libro de veredictos del dueño (claro vs oscuro, vector vs real, imprenta llena); acota la regla del fondo oscuro de este tema.
 
 - [[TEMA-generadores-de-diseno]] — **el tema hermano**: éste habla de la PANTALLA, ése del
   EJECUTOR que la dibuja (armadura contra su design system, movimiento congelado, anexo de

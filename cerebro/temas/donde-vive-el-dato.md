@@ -1,11 +1,11 @@
 ---
 slug: donde-vive-el-dato
 titulo: "Dónde vive el dato: fuente única, derivados y duplicación deliberada"
-alias: [cuantas fuentes de verdad, cuantas fuentes de verdad debe haber, numero de fuentes de verdad, fuentes de verdad, dos fuentes de verdad, una sola fuente de verdad, donde vive el dato, donde vive, donde se guarda, donde lo guardo, donde guardo, donde guardar, guardar, guardado, guardo, almacenar, almacenamiento, almacen, almacenes, store, stores, persistir, persistencia, persistido, persistidos, base de datos, bd, db, tabla, tablas, columna, campo, campos, fuente de verdad, fuente unica, fuente unica de verdad, unica fuente, una sola fuente, dos fuentes, dos fuentes de verdad, source of truth, single source of truth, verdad, la verdad, quien manda, dueno del dato, dueño del dato, hecho, hechos, derivado, derivados, derivar, se calcula, se guarda o se calcula, calculado, saldo, saldos, stock, el stock, stok, stoc, dnde, dnde guardo, inventario, existencias, cuantas quedan, cuanto queda, total, totales, total guardado, contador, contadores, kardex, movimiento, movimientos, lote, lotes, dato, datos, el mismo dato, dato repetido, repetido, repetir, repetida, duplicar, duplicado, duplicacion, duplicar datos, duplicar el dato, dos tablas, en dos tablas, dos sitios, en dos sitios, dos lados, en dos lados, guardarlo dos veces, dos veces, copia, copias, copiar, replica, replicar, cache, cachear, cacheado, denormalizar, desnormalizar, redundancia, redundante, offline, sin internet, sin senal, sin señal, offline first, outbox, cola, cola de subida, cola local, sincronizar, sincronizacion, sync, merge, conflicto, conflictos, pisar, se pisa, se pisan, me pisa, pisa el catalogo, la landing pisa, se sobreescriben, se borran solos, sobreescribir, sobrescribir, catalogo, catalogos, catalogo publicado, producto, productos, precio, precios, localstorage, local storage, navegador, supabase, backend, backends, monto backend, monto el backend, monto backend de una, backend de una, arranco con localstorage, arranco, arrancar, arranque, empiezo con localstorage, empiezo, empezar, necesito backend, hace falta backend, cuando monto el backend, vale la pena backend, api, nube, servidor, seed, semilla, sembrar, datos demo, demo, cuenta nueva, empresa nueva, onboarding, registro, alta, no aparece, no sale, no hay nada, listas vacias, lista vacia, aparece vacio, sale vacio, se borro, se perdio, se perdieron los datos, recargar, f5, version de datos, VERSION_DATOS, migracion, migraciones, migrar, esquema, contrato, tipos, types, helpers, capa de datos, repositorio, interfaz, almacen tras interfaz, multi sede, multisede, sucursal, sucursales, sucursalId, localId, empresaId, multi tenant, multitenant, aislamiento, tenant, escritor, escritores, un solo escritor, quien escribe, quien lee, lectora, solo lectura, read only, landing, panel, back office, backoffice, kiosko, kiosco, mostrador, concurrencia, carrera, condicion de carrera, lock, bloqueo, for update, trigger, idempotencia, idempotente, sobreventa, sobrevender, choque de codigo, choque de identificador, codigo unico, codigo repetido, unique constraint, restriccion unica, SQLSTATE, 23505, unique_violation, rechazo silencioso, lote rechazado, falla el lote entero, fila por fila, reintento por fila, degradar a fila, codigo libre, renombrar producto, renombrado, converger, convergencia, cola gira para siempre, sube el valor viejo, rearma la respuesta, rearmar la respuesta, contrato de respuesta, campos nuevos se pierden, dos equipos offline mismo codigo]
-preguntas: ["donde guardo el stock", "puedo tener el total guardado en la tabla", "cuantas fuentes de verdad debe haber", "cuando esta bien duplicar datos", "¿el stock se guarda o se calcula?", "cree la empresa y me dice que no hay locales, donde esta el bug", "¿por qué la app dice que no hay nada si acabo de crearlo?", "puedo tener una copia local para que funcione sin internet", "arranco con localStorage o monto backend de una", "dos cajas offline le dieron el mismo codigo a productos distintos, como lo resuelvo", "una fila mala tumba todo el lote de sincronizacion, que hago", "como detecto un choque de unique en postgres sin depender del texto del error", "el servidor cambio un dato al aceptarlo, como evito que el cliente lo vuelva a subir viejo"]
-proyectos: [placita, estanco-contable, wrd, villa-broaster, pollo-landing, arroces, _permanent]
+alias: [cuantas fuentes de verdad, cuantas fuentes de verdad debe haber, numero de fuentes de verdad, fuentes de verdad, dos fuentes de verdad, una sola fuente de verdad, donde vive el dato, donde vive, donde se guarda, donde lo guardo, donde guardo, donde guardar, guardar, guardado, guardo, almacenar, almacenamiento, almacen, almacenes, store, stores, persistir, persistencia, persistido, persistidos, base de datos, bd, db, tabla, tablas, columna, campo, campos, fuente de verdad, fuente unica, fuente unica de verdad, unica fuente, una sola fuente, dos fuentes, dos fuentes de verdad, source of truth, single source of truth, verdad, la verdad, quien manda, dueno del dato, dueño del dato, hecho, hechos, derivado, derivados, derivar, se calcula, se guarda o se calcula, calculado, saldo, saldos, stock, el stock, stok, stoc, dnde, dnde guardo, inventario, existencias, cuantas quedan, cuanto queda, total, totales, total guardado, contador, contadores, kardex, movimiento, movimientos, lote, lotes, dato, datos, el mismo dato, dato repetido, repetido, repetir, repetida, duplicar, duplicado, duplicacion, duplicar datos, duplicar el dato, dos tablas, en dos tablas, dos sitios, en dos sitios, dos lados, en dos lados, guardarlo dos veces, dos veces, copia, copias, copiar, replica, replicar, cache, cachear, cacheado, denormalizar, desnormalizar, redundancia, redundante, offline, sin internet, sin senal, sin señal, offline first, outbox, cola, cola de subida, cola local, sincronizar, sincronizacion, sync, merge, conflicto, conflictos, pisar, se pisa, se pisan, me pisa, pisa el catalogo, la landing pisa, se sobreescriben, se borran solos, sobreescribir, sobrescribir, catalogo, catalogos, catalogo publicado, producto, productos, precio, precios, localstorage, local storage, navegador, supabase, backend, backends, monto backend, monto el backend, monto backend de una, backend de una, arranco con localstorage, arranco, arrancar, arranque, empiezo con localstorage, empiezo, empezar, necesito backend, hace falta backend, cuando monto el backend, vale la pena backend, api, nube, servidor, seed, semilla, sembrar, datos demo, demo, cuenta nueva, empresa nueva, onboarding, registro, alta, no aparece, no sale, no hay nada, listas vacias, lista vacia, aparece vacio, sale vacio, se borro, se perdio, se perdieron los datos, recargar, f5, version de datos, VERSION_DATOS, migracion, migraciones, migrar, esquema, contrato, tipos, types, helpers, capa de datos, repositorio, interfaz, almacen tras interfaz, multi sede, multisede, sucursal, sucursales, sucursalId, localId, empresaId, multi tenant, multitenant, aislamiento, tenant, escritor, escritores, un solo escritor, quien escribe, quien lee, lectora, solo lectura, read only, landing, panel, back office, backoffice, kiosko, kiosco, mostrador, concurrencia, carrera, condicion de carrera, lock, bloqueo, for update, trigger, idempotencia, idempotente, sobreventa, sobrevender, choque de codigo, choque de identificador, codigo unico, codigo repetido, unique constraint, restriccion unica, SQLSTATE, 23505, unique_violation, rechazo silencioso, lote rechazado, falla el lote entero, fila por fila, reintento por fila, degradar a fila, codigo libre, renombrar producto, renombrado, converger, convergencia, cola gira para siempre, sube el valor viejo, rearma la respuesta, rearmar la respuesta, contrato de respuesta, campos nuevos se pierden, dos equipos offline mismo codigo, datos.ts, calendario.ts, comprobar, carta negra, cual carta manda, precio oficial, cheddar duplicado, duda numerada, hora de publicacion, CAMPANA.hora, 6 am, programar a las 6, plan conectado, perfectamente conectado, evento desde hasta, fecha de inicio y fin, desaparece solo, se quita sola, cuenta regresiva, seccion temporal, temporada, TEMPORADAS, halloween, navidad, paquete de temporada, vestir la pagina, cifras que no coinciden, 91 tareas, 104 tareas, 108 tareas, README desactualizado, brief desactualizado, desincronizado, docs/propuestas, propuesta no aprobada, documentos congelados, modelo de datos aprobado]
+preguntas: ["donde guardo el stock", "puedo tener el total guardado en la tabla", "cuantas fuentes de verdad debe haber", "cuando esta bien duplicar datos", "¿el stock se guarda o se calcula?", "cree la empresa y me dice que no hay locales, donde esta el bug", "¿por qué la app dice que no hay nada si acabo de crearlo?", "puedo tener una copia local para que funcione sin internet", "arranco con localStorage o monto backend de una", "dos cajas offline le dieron el mismo codigo a productos distintos, como lo resuelvo", "una fila mala tumba todo el lote de sincronizacion, que hago", "como detecto un choque de unique en postgres sin depender del texto del error", "el servidor cambio un dato al aceptarlo, como evito que el cliente lo vuelva a subir viejo", "tengo varias versiones de la carta con precios distintos: ¿cuál manda y qué hago con lo que no cuadra?", "¿a qué hora sale lo de Duo Burguer y dónde se cambia esa hora?", "¿cómo organizo el plan de videos y la página para que no se contradigan si el dueño cambia una regla?", "¿cómo dejo una sección que aparezca unos días y se quite sola?", "para diciembre quiero lo mismo que hicimos en Halloween, ¿cómo se copia?", "¿por qué el README dice 91 tareas y el plan 108, y cómo evito que pase?", "esta idea choca con lo que ya dejamos aprobado: ¿la meto o la dejo como propuesta?"]
+proyectos: [placita, estanco-contable, wrd, villa-broaster, pollo-landing, arroces, _permanent, duo-burger, la-villa, prommter]
 confianza: alta
-actualizado: 2026-08-29
+actualizado: 2026-11-02
 ---
 
 # Dónde vive el dato: fuente única, derivados y duplicación deliberada
@@ -22,6 +22,12 @@ fuentes. **Toda la persistencia pasa por funciones con nombre** (`leer`/`crear`/
 más. **Duplicar es DISEÑO —no deuda— solo si la copia es de lectura, se deja
 pisar por el dueño, y lo que escribes mientras tanto viaja aparte en una cola de
 subida.** Si dos lados pueden editar la misma copia, es deuda: ponle un dueño.
+
+**Lo que se repite en varios entregables vive en UN archivo del que salen los demás**: la carta
+(`datos.ts`), la hora de publicación (`CAMPANA.hora`), el calendario (`calendario.ts`), las
+fechas de un evento o temporada (desde/hasta) y hasta las cifras de un plan (nº de tareas, de
+huecos). Se cambia ahí y se regenera; lo que se contradiga dentro de la fuente se anota como DUDA
+numerada para el dueño, no se resuelve a ojo.
 
 ## Por qué (qué lo pagó)
 
@@ -301,7 +307,75 @@ bajo demanda es el caso completo de [[TEMA-invertir-formulas-redondeadas]]).
     en el servidor**, no en el navegador (`pollo-landing/serve.mjs:33-34` y
     `:37`); en el cliente, botón deshabilitado y mensaje de error visible.
 
+## Siete casos más: el dato único cuando hay varias piezas (ventanas del dueño, sep–nov 2026)
+
+1. **Varias cartas, una manda en precios.** El 11-sep el dueño dijo que «la carta negra es la que
+   cambia los precios de las otras» y que las demás quedaran en el estilo de Duo. Todo se puso en
+   `src/carta/datos.ts` (precios, descripciones, dirección) de donde salen carta, landing y
+   exportación al sistema: sencilla 16→13, cheddar 17→15, especial 18→15, pollo 19→17, doble
+   23→20. Lo que se contradice dentro de la fuente (dos cheddar a 14.000 y 15.000, dos
+   salchipapas de jamón y queso, combos con precios viejos) no se resolvió a ojo: se dejó la
+   versión más razonable y se anotaron **cinco dudas numeradas** en el mismo archivo para que el
+   dueño decida. Si el dueño no ha dicho cuál versión manda, la pregunta va primero. No aplica a
+   datos que cambian por turno o por sede.
+2. **La hora, en un solo campo.** El 4-oct el dueño ordenó publicar todo a las 6:00 a. m. (salía a
+   las 11:00; cierre 10 p. m.). La hora vive en `CAMPANA.hora`, que leen la página, los textos y
+   las órdenes al sistema; hubo que regenerar 21 textos y **rehacer dos videos que pintaban la
+   hora en los píxeles** (un despertador y «Mañana a las 11:00»). Regla: no pintes un dato que
+   puede cambiar dentro de un video o flyer. Otra marca o cliente tiene su propia hora.
+3. **Un calendario, un `comprobar()`.** Cuando el dueño pidió «todo perfectamente conectado»
+   (videos + página + dinámicas), el calendario se escribió como UN archivo (`calendario.ts`) del
+   que salen el plan legible, los textos para publicar y lo que lee la vitrina, con un
+   `comprobar()` que **se niega a guardar** si se rompe una regla dura del dueño (descuento > 10 %,
+   mencionar el evento secreto antes del 24, seis letras, 50 tarjetas). La ventana de la landing
+   se avisa con lo urgente de hoy; tú no la tocas. Con una sola fuente, el cambio a las 6 a. m.
+   regeneró calendario, plan, página y los 21 textos. Lo único que costó renders fue lo horneado
+   en los videos.
+4. **El evento es una ventana desde-hasta que el dueño decide.** Todo evento, promo de temporada
+   o sección que aparece y desaparece lleva su propia ventana (desde/hasta, editable) y se apaga
+   sola: cuenta regresiva al inicio, «¡Ya empezó!» durante, oculta al terminar. Se pagó dos veces
+   el mismo error: el sancocho del domingo se hizo como sección semanal fija y el dueño aclaró que
+   es un evento que ellos deciden («que aparezca desde hoy y el lunes se va»); y «Halloween y
+   reapertura» quedó modelado como un solo día (el 31) cuando era la semana lun 26–sáb 31. Si
+   cambia la forma del evento (de un día a una semana), actualiza **en la misma pasada** fecha,
+   rango, cuenta, bajada, imagen de compartir y la orden al sistema. La misma ventana se reutilizó
+   el 24-oct para el flyer de la bandeja paisa (sáb 24 a dom 25, 4 p. m.). Las rutinas
+   semanales fijas (menú por día, horario de atención) van como horario recurrente, no como
+   evento.
+5. **Cada temporada es un paquete copiable que se activa por fecha.** Una entrada en
+   `TEMPORADAS` (id, tema, desde, hasta) más `landing/temporadas/<tema>.mjs` (css, fuentes,
+   decoración, mascotas, flyers, js, archivos): la página se viste y desviste sola por fecha y
+   abre con un carrusel de flyers. El 21-oct el dueño: «eso recuérdalo para más temporadas porque
+   para diciembre lo podemos copiar». Para Navidad: copiar el paquete y cambiar el arte, **sin
+   CSS de temporada suelto en la plantilla y con el texto en HTML, no dentro de la imagen**. La
+   paleta de Halloween (caricatura de terror en azul oscuro, verde, vinotinto —«no es rojo»— y
+   dorado, ni apagada ni negra) es de Duo; otra marca decide la suya. Si la temporada cambia datos
+   del sistema (un combo con fechas), el sistema también necesita su ventana.
+6. **Las cifras repetidas se desincronizan: genéralas o reconcílialas.** El 2-nov, al abrir «La
+   Villa · estado y plan»: README y brief decían 91 tareas, `PLAN.md` 104 en el resumen y 108 en
+   el avance; el resumen hablaba de seis huecos y `HUECOS.md` de nueve; y la demo de vitrina
+   aprobada asumía domicilios = sí mientras el README lo da como «no» sin confirmar. Después de
+   cambiar un plan o aprobar una demo, haz `grep` de las cifras y supuestos viejos en README,
+   brief, PLAN, HUECOS y demos; mejor, genéralas desde `plan.json` con un comando o escríbelas en
+   un solo sitio y enlázalas. Si solo leíste parte de un archivo, dilo. Las cifras históricas que
+   deben quedar fechadas (actas, mediciones de un día) no se actualizan.
+7. **Lo que choca con lo aprobado entra como propuesta, no como edición.** Si una idea del dueño
+   choca con los documentos aprobados (en Prommter, las cinco fuentes de verdad), no los edites:
+   escribe la propuesta en `docs/propuestas/` marcada «no aprobada, no es fuente de verdad» y
+   lista lo que necesita aprobación (el 24-oct: «escribe la propuesta del bot recolector en docs/
+   […] sin tocar las cinco fuentes de verdad»; git solo mostró la carpeta nueva). Si al
+   implementar una librería real contradice el modelo aprobado (Better Auth 1.7.1 exige `issuer`;
+   el modelo dice `providerId` + `accountId`), **detente y pregunta con opciones y una
+   recomendación**; no desvíes en silencio. Las paradas con opciones se contestaron con
+   aprobaciones de una línea («Acota tsconfig y ESLint…», «Sí, reescríbela», «Commit y sigue
+   0.5»). En proyectos sin fuentes congeladas se decide, se justifica y se sigue; y las
+   correcciones sin efecto en la fuente (typos) no piden permiso.
+
 ## Cuándo NO aplica
+- **Un documento fiscal ya timbrado o enviado se conserva tal cual**: guardar solo hechos y
+  rearmar sirve para el recibo interno (ver [[TEMA-recibos-comprobantes-y-dian]]).
+- **Eventos fijos y recurrentes** no son «ventana»: el horario de atención y el menú por día
+  son datos recurrentes.
 
 - **El stock persistido: WRD lo guarda, la placita y el estanco lo derivan. La
   contradicción es real y no se fusiona.** En **placita/estanco** el saldo es
@@ -456,63 +530,71 @@ bajo demanda es el caso completo de [[TEMA-invertir-formulas-redondeadas]]).
 - `infrapilot/RSK-003` (Open) — la misma clase, medida en el ecosistema: 8
   agentes en paralelo sobre el mismo `state.json` lo corrompen; mitigación,
   serializar o un solo escritor (ver [[TEMA-olas-de-agentes]]).
-- Código (rutas absolutas bajo `C:\Users\Kalel\`):
-  - `prommter\proyectos\placita\lib\types.ts:17-31` (tabla hechos↔derivados) y
+- Código (rutas absolutas bajo `$HOME\`):
+  - `prommter/placita/lib/types.ts:17-31` (tabla hechos↔derivados) y
     `:40-43` (`empresaId` frontera, `localId` en todo objeto operativo).
-  - `prommter\proyectos\placita\lib\persistencia.ts:1-45` (la cabecera que
+  - `prommter/placita/lib/persistencia.ts:1-45` (la cabecera que
     declara la caché), `:158-181` (`soloLosHechos`), `:190-210` (por qué NO se
     migra el blob local tras el corte a Supabase: *"sería fabricar una segunda
     verdad"*), `:494-507` (`empaquetar`/`guardar`, *"una foto, no un diario"*),
     `:525-539` (la caché de arranque, sin `empresaId` en la clave).
-  - `prommter\proyectos\placita\lib\outbox.ts:1-53` (escritura optimista, differ
+  - `prommter/placita/lib/outbox.ts:1-53` (escritura optimista, differ
     por identidad de referencia, sin borrados, append-only y FIFO) y `:174-220`
     (`delta`/`calcularDelta`, 12 colecciones).
-  - `prommter\proyectos\placita\app\api\sincronizar\route.ts:84-92` (lista blanca
+  - `prommter/placita/app/api/sincronizar/route.ts:84-92` (lista blanca
     y las tres tablas que quedan fuera a propósito).
-  - `prommter\proyectos\placita\lib\servidor\reintento-filas.ts` (orquestación
+  - `prommter/placita/lib/servidor/reintento-filas.ts` (orquestación
     fila-por-fila, `esChoqueUnico` por SQLSTATE `23505` + nombre de
     restricción, cabecera con el bug de producción documentado) y
-    `lib\servidor\codigo-libre.ts` (reparto del siguiente código libre,
+    `lib/servidor/codigo-libre.ts` (reparto del siguiente código libre,
     acumulando los ya repartidos dentro del mismo envío).
-  - `prommter\proyectos\placita\lib\nube.ts` (el rearmado a mano que tiraba
-    campos nuevos) y `lib\outbox.ts:380` (`restanteTrasEnviar`, no recibe
+  - `prommter/placita/lib/nube.ts` (el rearmado a mano que tiraba
+    campos nuevos) y `lib/outbox.ts:380` (`restanteTrasEnviar`, no recibe
     `renombradas`).
-  - `prommter\proyectos\placita\components\store.tsx:1592`
+  - `prommter/placita/components/store.tsx:1592`
     (`reemplazar`, no encola), `:1916` (`adoptarCodigosRenombrados`).
-  - `prommter\proyectos\placita\lib\dominio\precios.ts:47-65` (la LEY del
+  - `prommter/placita/lib/dominio/precios.ts:47-65` (la LEY del
     margen en una sola constante, con su alcance declarado: gobierna
-    nacimiento y recálculo, no congela el campo) y `lib\dominio\surtido.ts:1-61`
+    nacimiento y recálculo, no congela el campo) y `lib/dominio/surtido.ts:1-61`
     (cabecera: *"SE GUARDA EL PRECIO DE VENTA, NO LA COMPRA... guardar aquí una
     compra ya calculada sería congelar una cuenta que este archivo no tiene
     por qué hacer"*, `:11-18`).
-  - `prommter\proyectos\placita\lib\types.ts:292-303` — lo que NUNCA se borra
+  - `prommter/placita/lib/types.ts:292-303` — lo que NUNCA se borra
     al eliminar un producto (`Movimiento`, `Lote`, `Venta` referencian por
     `productoId`, no por código), la base de por qué renombrar un código
     retenido por una fila eliminada no rompe nada.
-  - `ORION\estancorepo\lib\auth.ts:46` (`CLAVE_ALMACEN`), `:305-321`
+  - `ORION/estancorepo/lib/auth.ts:46` (`CLAVE_ALMACEN`), `:305-321`
     (`listarLocalesEmpresa`, el bug documentado dentro del arreglo y *"al migrar
     a Supabase… la firma no cambia"*), `:323-332` (mismo patrón en
     `actualizarActivoUsuario`).
-  - `prommter\proyectos\pollo-landing\index.html:573-594` (los tres helpers) y
+  - `prommter/pollo-landing/index.html:573-594` (los tres helpers) y
     `serve.mjs:10-17`, `:26-52` (API + persistencia en `data/registros.json`);
     `.gitignore:1-2`.
-  - `prommter\proyectos\arroces\lib\types.ts:1-24` (multi-sucursal sí,
-    multi-tenant no) y `lib\dominio\cierre.ts:157`.
-  - `prommter\proyectos\villa-broaster\broaster-app\lib\servidor\almacen.ts:1-27`
+  - `prommter/arroces/lib/types.ts:1-24` (multi-sucursal sí,
+    multi-tenant no) y `lib/dominio/cierre.ts:157`.
+  - `prommter/broaster-app-repo/lib/servidor/almacen.ts:1-27`
     (por qué una interfaz; la decisión viaja hacia adentro), `:76-84`
     (`anexarProducto`, *"el catálogo es uno solo, con precio por sede"*);
     `almacen-disco.ts:203-231` (la cola de un carril y su límite).
-  - `fable 5\wrd\setup\schema.sql` — las **cinco** y únicas `create table` del
+  - `fable 5\wrd/setup/schema.sql` — las **cinco** y únicas `create table` del
     esquema: `:49` ajustes, `:96` usuarios, `:173` productos, `:207` pedidos,
     `:376` gastos (ninguna de movimientos ni de lotes); `:192-197` la columna
     `stock` con su comentario (*"descontarla y devolverla por una venta es cosa
     de los triggers… no de un UPDATE a mano"*); `:260-302` la reserva con
-    `for update` y los dos mensajes. `fable 5\wrd\js\pedido-store.js:180-191`
+    `for update` y los dos mensajes. `fable 5\wrd/js/pedido-store.js:180-191`
     (los mismos dos mensajes en el lado demo);
-    `fable 5\wrd\sistema\js\contable.js:18-36` (el patrón contable completo, sin
+    `fable 5\wrd/sistema/js/contable.js:18-36` (el patrón contable completo, sin
     una sola mención de costo, lote, kardex ni margen).
-  - `fable 5\wrd\docs\LANDING-PROMPT.md:146-160` y `:537` (el grep negativo que
+  - `fable 5\wrd/docs/LANDING-PROMPT.md:146-160` y `:537` (el grep negativo que
     hace cumplir "la lectora no siembra").
+
+- Casos de 2026-09/11 (ventanas del dueño):
+  - «la carta negrab es la que cambia los precios de las otras cartas», «Precios, descripciones, dirección, WhatsApp y Nequi viven en `src/carta/datos.ts`.», «Cinco cosas que no resolví inventando» — ventana [[2026-09-09-duo-burger|Duo Burger]] (transcrito `51184930`, 2026-09-11 y 09-12).
+  - «quiero que se publique a las 6 am todo, en general los eventos de la pagina y los cortometrajes», «Los dos videos que mostraban la hora están rehechos» — misma ventana (transcrito `51184930`, 2026-10-04 y 10-05); «que sea como un evento que decidimos, no es fijo, que aparezca desde hoy y el lunes se va» (2026-10-01).
+  - «quiero que todo este perfectamente conectado, tu no trabajas en la landing», «El plan se niega a guardarse si algo rompe una regla» — ventana [[2026-10-01-mejora-de-video-en-artefactos|Mejora de video en artefactos]] (transcrito `5f2b61e1`, 2026-10-03).
+  - «el evento de reapertura empieza desde el lunes hasta el sabado 31 recuerda», «eso rcuerdalo para mas temporadas por que para diciembre lo podmos copiar», «se quita sola el domingo a las 4 p.m.» — ventana [[2026-09-09-duo-burger|Duo Burger]] (transcrito `7f456016`, 2026-10-21 a 10-25).
+  - «dicen 91 tareas, mientras que PLAN.md dice 104 en el resumen y 108 en el avance» — ventana [[2026-11-02-la-villa-estado-y-plan|La Villa: estado y plan]] (transcrito `62b767fc`, 2026-11-02); «La demo asume que sí, pero el README lo da como asunción» — ventana [[2026-11-02-la-villa-vitrina|La Villa: vitrina]] (transcrito `74eade2c`, 2026-11-02).
+  - «escribe la propuesta del bot recolector en docs/ [...] sin tocar las cinco fuentes de verdad», «Acota tsconfig y ESLint a los archivos de la plataforma (cambio mínimo)» — ventana [[2026-10-24-bot-recolector-de-informacion-prommter-fork|Bot recolector (fork)]] (transcrito `34a80c58`, 2026-10-24); «el modelo aprobado dice (providerId, accountId) sin issuer. ¿Cómo lo resuelvo?» — ventana [[2026-10-24-bot-recolector-de-informacion-prommter|Bot recolector de información]] (transcrito `645b5881`, 2026-11-03).
 
 ### Huecos (lo que el corpus NO respalda todavía)
 
@@ -566,3 +648,5 @@ bajo demanda es el caso completo de [[TEMA-invertir-formulas-redondeadas]]).
   uso que toca identificadores en producción (en seco por defecto, escritura
   con flag explícito, autorización del dueño): el mecanismo con el que se
   liberó un código retenido por una fila eliminada.
+- [[TEMA-pedidos-y-dinamicas-de-un-local]] — las dinámicas, eventos y temporadas de un local desde el lado del pedido y la promoción.
+- [[TEMA-recibos-comprobantes-y-dian]] — guardar hechos y rearmar el recibo; cuándo no.

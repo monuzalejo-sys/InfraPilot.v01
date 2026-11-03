@@ -1,14 +1,26 @@
 ---
 slug: cortometraje-sobre-ilustracion
 titulo: "Dirigir un cortometraje sobre ilustraciones reales, no redibujarlo en código (Remotion)"
-alias: [corto, cortometraje, video, vídeo, video corto, comercial animado, spot, anuncio animado, animacion, animación, animar, remotion, render de video, renderizar video, camara, cámara, movimiento de camara, empuje de camara, empuje de cámara, paneo, panoramica, panorámica, dolly, travelling, zoom, plano, planos, encuadre, encuadres, foco, foco de camara, centro de la camara, corte, cortes, salto de continuidad, salto de eje, dos planos iguales, mismo encuadre, continuidad visual, ilustracion, ilustración, ilustraciones, pintura, pinturas, arte generado, arte del dueno, arte del dueño, dibujos del dueno, gemini, imagenes generadas, generado con ia, redibujar, redibujar en codigo, redibujar en código, svg, personaje en svg, vectores planos, se ve infantil, se ve feo, muy infantil y feo, rechazo del video, rechazo del corto, fotograma, fotogramas, still, stills, frame, frames, nitidez, varianza laplaciana, laplaciano, se ve borroso, se ve pixelado, se ve estirado, ablandado, borde negro, banda negra, descubre el borde, grano, vineta, viñeta, textura de pelicula, textura comun, mp4, encoder, encoder de video, avassetwriter, swift, swiftc, ffmpeg, remotion render, --sequence, secuencia de imagenes, numeracion de fotogramas, verificar animacion, verificar animación, verificador de fotogramas, ola de verificadores, olas de escenas, director, veredicto del director, cuanto puedo acercar la camara, hasta donde puedo hacer zoom, guia de marca, guía de marca, referencias de arte, resolucion nativa, resolución nativa, macos 13, macos 15, ventura, sequoia, compositor de remotion, sigabrt, continuitycamera, titere, títere, titere svg, rig, rig de personaje, muneco articulado, muñeco articulado, mascota animada, mascotas animadas, animar personaje en codigo, animar personaje en código, vectores fieles a la guia, vectores fieles a la guía, estilo inventado, vuelve duo burguer, juntos otra vez, choque de puños, blanco y negro a color, byn, bn a color, telon de pan, telón de pan, ajonjoli, ajonjolí, mono a estereo, mono a estéreo, audio medido, medir audio, dbfs, curva cuadratica, curva cuadrática, manguera svg, guante de cuatro dedos, guante de 4 dedos, ia de google, titere sobre material real, titere sobre tomas reales, mascotas sobre video real, mascotas sobre fotos reales, compuesto sobre material real, ya prendimos las luces, anuncio en vector, a01, igual que los cortometrajes, se ve artificial, rechazo del 18 de octubre]
-preguntas: ["¿cómo hago un corto animado a partir de las ilustraciones del dueño sin que se vea infantil?", "¿hasta dónde puedo acercar la cámara a una pintura sin que se vea borrosa?", "dos escenas me quedaron con el mismo encuadre, ¿cómo las diferencio?", "¿por qué me sale una banda negra cuando empujo la cámara hacia el borde de la pintura?", "¿cómo verifico que una animación quedó bien sin solo leer el código?", "el dueño rechazó el video por infantil, ¿qué hago distinto la próxima vez?", "¿cómo saco el mp4 si Remotion no codifica en esta máquina?", "¿le pido al generador de imágenes que anime, o construyo la animación yo encima de su arte?", "¿por qué el render terminó en verde y no hay ningún archivo de video?", "¿puedo animar un personaje en código (SVG) o eso también se ve infantil?", "el dueño rechazó un video en vectores pero le gustó otro también en vectores, ¿cuál es la diferencia real?", "¿cómo verifico que un personaje animado en código es fiel a la guía de marca?", "¿cómo verifico un efecto de sonido que cambia de mono a estéreo en un fotograma exacto?", "¿puedo meter el títere SVG encima de las tomas reales del local?"]
-proyectos: [duo-burger]
+alias: [corto, cortometraje, video, vídeo, video corto, comercial animado, spot, anuncio animado, animacion, animación, animar, remotion, render de video, renderizar video, camara, cámara, movimiento de camara, empuje de camara, empuje de cámara, paneo, panoramica, panorámica, dolly, travelling, zoom, plano, planos, encuadre, encuadres, foco, foco de camara, centro de la camara, corte, cortes, salto de continuidad, salto de eje, dos planos iguales, mismo encuadre, continuidad visual, ilustracion, ilustración, ilustraciones, pintura, pinturas, arte generado, arte del dueno, arte del dueño, dibujos del dueno, gemini, imagenes generadas, generado con ia, redibujar, redibujar en codigo, redibujar en código, svg, personaje en svg, vectores planos, se ve infantil, se ve feo, muy infantil y feo, rechazo del video, rechazo del corto, fotograma, fotogramas, still, stills, frame, frames, nitidez, varianza laplaciana, laplaciano, se ve borroso, se ve pixelado, se ve estirado, ablandado, borde negro, banda negra, descubre el borde, grano, vineta, viñeta, textura de pelicula, textura comun, mp4, encoder, encoder de video, avassetwriter, swift, swiftc, ffmpeg, remotion render, --sequence, secuencia de imagenes, numeracion de fotogramas, verificar animacion, verificar animación, verificador de fotogramas, ola de verificadores, olas de escenas, director, veredicto del director, cuanto puedo acercar la camara, hasta donde puedo hacer zoom, guia de marca, guía de marca, referencias de arte, resolucion nativa, resolución nativa, macos 13, macos 15, ventura, sequoia, compositor de remotion, sigabrt, continuitycamera, titere, títere, titere svg, rig, rig de personaje, muneco articulado, muñeco articulado, mascota animada, mascotas animadas, animar personaje en codigo, animar personaje en código, vectores fieles a la guia, vectores fieles a la guía, estilo inventado, vuelve duo burguer, juntos otra vez, choque de puños, blanco y negro a color, byn, bn a color, telon de pan, telón de pan, ajonjoli, ajonjolí, mono a estereo, mono a estéreo, audio medido, medir audio, dbfs, curva cuadratica, curva cuadrática, manguera svg, guante de cuatro dedos, guante de 4 dedos, ia de google, titere sobre material real, titere sobre tomas reales, mascotas sobre video real, mascotas sobre fotos reales, compuesto sobre material real, ya prendimos las luces, anuncio en vector, a01, igual que los cortometrajes, se ve artificial, rechazo del 18 de octubre, hoja de personaje, hoja de personajes, entintado a mano, estilo cuphead, cuphead, cup head, trazo de pincel, proporciones de bebe, ojos enormes, paleta de caramelo, movimiento rigido, logo para redes, foto de perfil, portada de facebook, 1640x624, 1080x1080, recortar mascotas, redibujar mascotas, flood fill, stickers, resolucion real, resolución real, media escala, prueba barata, render maestro, master, máster, puños no se tocan, tarjeta final, cierre del video, link en la bio, tiktok sin link, hora horneada, redibujar solo un tramo, re-renderizar, texto para publicar, render largo, script de empaque, syntax error, bash -n, ffmpeg corrupto, archivo corrupto, pgrep, decodifica entero, remotion licencia, licencia de remotion, hyperframes, remotion vs hyperframes, motor de video, html a video, el esfuerzo influye, nivel de esfuerzo, quiero mas real, fotorrealista, filtro de color, usa la ia]
+preguntas: ["¿cómo hago un corto animado a partir de las ilustraciones del dueño sin que se vea infantil?", "¿hasta dónde puedo acercar la cámara a una pintura sin que se vea borrosa?", "dos escenas me quedaron con el mismo encuadre, ¿cómo las diferencio?", "¿por qué me sale una banda negra cuando empujo la cámara hacia el borde de la pintura?", "¿cómo verifico que una animación quedó bien sin solo leer el código?", "el dueño rechazó el video por infantil, ¿qué hago distinto la próxima vez?", "¿cómo saco el mp4 si Remotion no codifica en esta máquina?", "¿le pido al generador de imágenes que anime, o construyo la animación yo encima de su arte?", "¿por qué el render terminó en verde y no hay ningún archivo de video?", "¿puedo animar un personaje en código (SVG) o eso también se ve infantil?", "el dueño rechazó un video en vectores pero le gustó otro también en vectores, ¿cuál es la diferencia real?", "¿cómo verifico que un personaje animado en código es fiel a la guía de marca?", "¿cómo verifico un efecto de sonido que cambia de mono a estéreo en un fotograma exacto?", "¿puedo meter el títere SVG encima de las tomas reales del local?", "el anuncio le quedó igual a los cortos y el dueño lo quiere más real, ¿le subo el esfuerzo o cambio algo?", "¿cómo le hago el logo y la portada para las redes si ya me dio las mascotas dibujadas en 3D?", "el dueño cambió la hora y el link de todos los videos, ¿renderizo todo otra vez?", "se me dañó el mp4 después de relanzar ffmpeg, ¿qué hice mal?", "¿los videos de Prommter los monto con Remotion o con HyperFrames?", "¿por qué algo que se veía bien en la prueba chiquita salió mal en el video final?"]
+proyectos: [duo-burger, prommter]
 confianza: alta
-actualizado: 2026-10-18
+actualizado: 2026-11-02
 ---
 
 # Dirigir un cortometraje sobre ilustraciones reales, no redibujarlo en código
+
+**⚠ Corrección 2026-11-02:** el contra-matiz del 18-oct (más abajo) quedó corto: dice
+que con material real «el techo está en la edición». El mismo 18-oct el dueño rechazó
+también «la edicion de los colores» y, ante dos caminos de mejor edición, no eligió
+ninguno: pidió IA. Y el 4-oct, al rechazar A01, preguntó si el esfuerzo influía; la
+respuesta fue que pule el acabado pero no cambia el registro. Regla vigente: si
+rechaza por «igual que los cortos» o «se ve artificial», **cambia la fuente de imagen,
+no el esfuerzo** (sus tomas con el color real y sin filtros de ambiente; imágenes o
+video generados por API) y deja al código cámara, ritmo, tipografía y cierre de marca.
+La edición pura solo vale cuando la fuente ya es la toma real sin filtro. La v2 con IA
+no tiene veredicto del dueño (`duo-burger/PEND-030`). El contra-matiz queda abajo como
+historia.
 
 ## Respuesta corta
 
@@ -135,6 +147,60 @@ esté bien hecha, y que lo confundiera con IA dice que el montaje se ve artifici
 [[TEMA-veo-clips-de-ia-para-componer]] (veredicto de la v2 aún pendiente,
 `duo-burger/PEND-030`).
 
+**Y lo pagó, el 4-oct, una pregunta del dueño sobre el esfuerzo.** A01 («La Cheddar», 12 s,
+vectores fieles a la guía, revisado fotograma a fotograma) se rechazó a la primera vista:
+*«ese anuncio es igual que el resto de cortometrajes, quiero algo llamativo»*. El dueño
+preguntó si subir el nivel de esfuerzo cambiaba algo; la respuesta de Claude: *«Lo que
+decide que se vea real es la fuente de las imágenes.»* El 18-oct el reel del local
+(sus tomas con cielo azul y tonos cálidos añadidos + títere SVG) cayó entero, filtro de
+color incluido, y se pasó a IA generada por API (prueba de 10 s, US$3,45, «me agradó un
+poco más»; v2 sin veredicto). El 19-oct Claude lo resumió: el cielo azul y los tonos
+cálidos puestos a la foto del local tampoco gustaron.
+
+**La causa del «muy infantil» tiene cuatro señales chequeables** (diagnóstico propio del
+09-10, tras el rechazo del teaser de 18 s): relleno plano con contorno negro uniforme
+(lenguaje de sticker y emoji); ojos enormes y redondos sobre un cuerpo pequeño y redondo
+(proporciones de bebé); paleta de caramelo; movimiento rígido sin arrastre ni desfase.
+Detrás está el techo del código: sin trazo de pincel de grosor variable, sin temblor de
+línea, sin textura de papel. Con la guía real del dueño (1312×1199) ampliada a 900 px
+el arte aguantó, y el corto de 45,2 s a 1376×768 se entregó sin otro rechazo.
+
+**El logo y la portada pagaron lo mismo en pequeño.** La primera entrega, con las
+mascotas redibujadas en vectores planos, fue «muy malo… pesimo»: el dueño ya había dado
+una hoja con las mascotas a color, en 3D y desde varios ángulos (*«no esos stikers, yo te
+di material donde se veian colores…»*). Rehecho recortando SU arte, quedó aprobado
+(*«me gusto lo que hiciste»*). El primer recorte falló: dos rayos rojos oscuros pasaban
+por contorno negro; la muralla se definió como «todos los canales bajos» (umbral sobre el
+máximo de R, G, B), no solo oscuro.
+
+**Un máster pasó la prueba a media escala con dos defectos.** El 09-10 las revisiones
+se hacían a media escala (el grano a resolución completa ponía de rodillas a un i5 de 4
+hilos). Con el máster vertical de 540 fotogramas ya renderizado, un solo fotograma a
+resolución real mostró que los puños no llegaban a tocarse y que la boca a medio abrir
+era pura dentadura. Hubo que corregir y relanzar el máster completo.
+
+**Cuatro cambios del dueño en 18 días tocaron píxeles ya horneados.** La cuenta de TikTok
+no tiene enlace en la bio (tarjeta final de los 21 videos rehecha); la regla de las 6 a.m.
+(V04 y V21 completos: el despertador marcaba las 11); el evento renombrado «Halloween y
+reapertura» (2 escenas del corto, fotogramas 1308–1715 de 1872, cuando el máster entero
+había tardado 25 min 46 s); y la dinámica retirada de la página (la tarjeta pasó de
+«la dinámica se va a las 10 p.m.» a «mira la carta y pide en la página»). Todo lo demás
+salió del calendario sin render.
+
+**Un render largo se dañó dos veces.** El máster de «Juntos otra vez» (1872 fotogramas a
+1080×1920, 25 min 46 s) terminó con error de sintaxis en la línea 29 del script de
+empaque. Al relanzar, el ffmpeg que se había detenido seguía cerrando el mismo archivo
+mientras el nuevo escribía encima: archivo corrupto. Rehecho con otro nombre: 71,5 MB,
+1872 fotogramas, 62,4 s, decodificado sin errores.
+
+**La licencia decidió el motor del video nuevo de Prommter.** El 6-oct, preguntado por
+HyperFrames, Claude explicó que Remotion «exige licencia paga a empresas de más de tres
+personas, y Prommter ya tiene equipo», y que HyperFrames no cobra. En esta Mac
+HyperFrames corrió con el Chrome del sistema (3 s en 41 s; 15 s ≈ 2 min) y los dos
+videos de marca de 15 s hechos con él se entregaron; el títere aprobado ya corrió
+dentro de HyperFrames. La condición de la licencia salió de una búsqueda web de Claude,
+no de la página oficial de Remotion.
+
 ## Cómo se aplica
 
 1. **Antes que nada, arte y referencias**, no un prompt de animación: guía de
@@ -204,6 +270,40 @@ esté bien hecha, y que lo confundiera con IA dice que el montaje se ve artifici
     "Se ve bien" y "se escucha bien" son afirmaciones sin evidencia hasta que
     midas ambos.
 
+15. **Si el estilo pedido es de ilustración entintada a mano (tipo Cuphead), no lo
+    fabriques con formas planas.** Antes de animar pide guía de marca con códigos de
+    color, hoja de personaje, escenarios y guion gráfico, y anima ESOS recortes con un
+    único componente de personaje (así no hay deriva entre escenas). Antes de entregar
+    revisa las cuatro señales de «infantil» de la sección «Por qué».
+16. **Rechazo por «igual que los cortos» o «se ve artificial»: no ofrezcas «las mismas
+    tomas mejor editadas» ni subas el esfuerzo.** Cambia la fuente (tomas del dueño con
+    el color real, sin cielo azul ni tonos cálidos añadidos; o imágenes y video de IA por
+    API) y consigue el material ANTES de construir. Ver
+    [[TEMA-veo-clips-de-ia-para-componer]].
+17. **Logo, foto de perfil y portada: recorta el arte que el dueño dio, no lo redibujes.**
+    Recorte por flood fill desde el borde con umbral sobre el canal máximo (R, G, B).
+    Medidas entregadas: perfil 1080×1080 igual para Instagram, TikTok y Facebook (todo
+    dentro del círculo) y portada de Facebook 1640×624 con lo importante al centro. Pon el
+    resultado al lado de la hoja antes de entregar y avisa si el arte fuente (1376×768)
+    se ve blando: pide la versión grande.
+18. **Antes del máster, abre al menos un fotograma a la resolución final.** Las pruebas a
+    media escala sirven para iterar barato; el detalle fino (guantes que se tocan, bocas
+    a medio abrir) solo se ve a resolución real. Corrige y recién entonces lanza el máster.
+19. **Separa cada video en cuerpo estable + tarjeta final** (los últimos ~54 fotogramas,
+    1,8 s) y deja fuera de los píxeles lo que el dueño cambia: hora de publicación,
+    «link en la bio», nombre del evento, qué dinámica está activa. El CTA propio de cada
+    red va en el «Texto para publicar» (versión IG/FB/WhatsApp y versión TikTok con la URL
+    escrita). Si algo cambia, redibuja solo ese tramo y re-empaca.
+20. **Render de 20+ minutos: pasa el script de empaque por `bash -n` (o `zsh -n`) antes de
+    lanzar.** Si falla al final, los fotogramas ya existen: codifica aparte. Si relanzas
+    una codificación detenida, confirma con `pgrep` que el proceso viejo murió, escribe a
+    un nombre NUEVO y comprueba que decodifica entero (`ffmpeg -v error -i f -f null -`),
+    su duración y su tamaño.
+21. **Video nuevo de una empresa de más de tres personas (Prommter): HyperFrames**, que no
+    exige licencia; Remotion queda para lo ya hecho o hasta comprar la licencia. Verifica
+    la condición en la página oficial de Remotion antes de decidir. Lo del Chrome de
+    HyperFrames en esta Mac vive en [[TEMA-montar-video-con-material-real-del-celular]].
+
 ## Cuándo NO aplica
 
 - **"No redibujes con código" no significa "nunca uses código para
@@ -238,6 +338,30 @@ esté bien hecha, y que lo confundiera con IA dice que el montaje se ve artifici
   encargo de diseño.** Para pedirle ilustraciones o piezas estáticas a un
   generador, la regla de "prohibir y rellenar" vive en
   [[TEMA-generadores-de-diseno]]; este tema empieza donde el arte ya existe.
+
+- **El rechazo de A01 y del reel NO prueba que los vectores sean el problema:** el
+  corto «Juntos otra vez» (vectores fieles a la guía, historia animada de punta a punta)
+  se aprobó, y el 10-01 el dueño aprobó un corto todo en vectores con sus mascotas
+  exactas. La regla «cambia la fuente» aplica a anuncios de producto y a piezas sobre
+  material real; no a una historia dibujada entera ni cuando él pide expresamente estilo
+  ilustrado. Tampoco des por aprobada la v2 con IA.
+- **«Pide el arte al dueño» (paso 15) no aplica a estilos tipográficos, geométricos,
+  fotográficos o 3D**, que el código sí hace bien; ni a un títere vectorial FIEL a la
+  guía (ver el matiz del 2026-10-01). Si el dueño no entregó material, se construye y se
+  compara contra un recorte de la guía.
+- **Recortar su arte (paso 17) no aplica si no entregó material**, ni si el arte fuente es
+  demasiado pequeño para el formato: pide el original en alta.
+- **El fotograma a resolución real (paso 18) no hace falta** en pruebas de lógica o de
+  temporización que no dependen del detalle fino.
+- **Tarjeta final redibujable (paso 19):** no aplica a una pieza única y eterna sin CTA ni
+  fecha (un corto de marca), ni cuando el cambio afecta a toda la historia y no solo al
+  cierre.
+- **`bash -n` y nombre nuevo (paso 20):** no vale la pena en codificaciones de pocos
+  segundos, donde repetir cuesta menos que validar.
+- **HyperFrames sobre Remotion (paso 21):** no aplica a piezas personales o de equipos de
+  hasta tres personas si se compra la licencia, ni a piezas hechas en Remotion que solo se
+  re-renderizan. Confianza media: la condición de licencia no se verificó en la fuente
+  oficial.
 
 ## Evidencia
 
@@ -306,6 +430,41 @@ esté bien hecha, y que lo confundiera con IA dice que el montaje se ve artifici
   registra (solo `feedback_anuncios_mas_real.md`). Vale la regla posterior: no más
   anuncios en vector. No se tocó la memoria del proyecto.
 
+- Ventana [[2026-10-05-plan-de-anuncios-profesionales|Plan de anuncios profesionales]]
+  (transcrito `3d75e606`): «ese anuncio es igual que el resto de cortometrajes, quiero
+  algo llamativo» y «Lo que decide que se vea real es la fuente de las imágenes.»
+  (2026-10-05); sobre licencias: «exige licencia paga a empresas de más de tres personas, y
+  Prommter ya tiene equipo» y «HyperFrames no cobra nada» (2026-10-06); «3 segundos
+  salieron en 41 segundos, así que uno de 15 tardará unos 2 minutos» y «la técnica de
+  meter el títere aprobado dentro de HyperFrames funcionó» (2026-10-06).
+- Ventana [[2026-10-01-mejora-de-video-en-artefactos|Mejora de video en artefactos]]
+  (transcrito `5f2b61e1`): «esto lo hiciste con la ia de google? no me gusto para nada el
+  resultado» y «no me gusto ni la edicion de los colores de la imagen ni nada en general»
+  (2026-10-18); «el diseño se separa mucho del material que te he dado» (2026-10-01);
+  «no esos stikers, yo te di material donde se veian colores, el logo de distintos
+  angulos tipo 3d» (2026-10-15); «la muralla es solo el negro de verdad (todos los canales
+  bajos), no el rojo oscuro» (2026-10-01); «me gusto lo que hiciste» (2026-10-03);
+  «vuelvo a dibujar solo la tarjeta final de cada video (los últimos 54 fotogramas), no el
+  video entero» (2026-10-03); «La tarjeta final de los videos ya no dice «link en la bio»»
+  (2026-10-03); «en el del día 4, el despertador marca las 11» (2026-10-05); «25:46.09
+  total», «scripts/render-corto.sh: line 29: syntax error near unexpected token» y «el
+  ffmpeg que detuve seguía cerrando el mismo archivo mientras el nuevo escribía encima»
+  (2026-10-01); «71,5 MB, 1080×1920, 1872 fotogramas, 62,4 s, se decodifica entero sin
+  errores» (2026-10-01).
+- Ventana [[2026-10-01-mejora-de-video-en-artefactos|Mejora de video en artefactos]]
+  (transcrito `fc142d00`): «El cielo azul y los tonos cálidos que le puse a la foto del
+  local no te gustaron» (2026-10-19); «I redraw only the two scenes with the banner
+  (frames 1308–1715).» y «decía «la dinámica se va a las 10 p.m.» y ahora dice «mira la
+  carta y pide en la página»» (2026-10-21).
+- Ventana [[2026-09-09-duo-burger|Duo Burger]] (transcrito `51184930`): «no me gusto para
+  nada, muy infantil y feo»; «Relleno plano con contorno negro uniforme. Eso es lenguaje
+  de sticker y de emoji.»; «Proporciones de bebé. Ojos enormes y redondos sobre un cuerpo
+  pequeño y redondo» (2026-09-10); «ampliado a 900 píxeles el arte aguanta» (2026-09-10);
+  «A resolución real veo dos cosas que a media escala se perdían: los puños no llegan a
+  tocarse» y «Ahora los puños se tocan y la boca sonríe. Relanzo el máster con las
+  correcciones.» (2026-09-10); «El grano de película a resolución completa la habría
+  puesto de rodillas» (2026-09-09).
+
 ## Enlaces
 
 - [[TEMA-generadores-de-diseno]] — el mismo principio de "dale materia prima
@@ -321,3 +480,6 @@ esté bien hecha, y que lo confundiera con IA dice que el montaje se ve artifici
 - [[TEMA-veo-clips-de-ia-para-componer]] — lo que se hizo después del rechazo del
   18-oct: personajes generados por IA (Veo) compuestos sobre el material real, con su
   color de fondo, recorte, zoom, costo y voces medidos.
+- [[TEMA-gusto-visual-del-dueno]] — lo que a este dueño le parece infantil, artificial o
+  profesional, visto en todas las piezas.
+- [[TEMA-como-pide-el-dueno]] — pedir muestra primero y dar material real antes de construir.

@@ -1,11 +1,11 @@
 ---
 slug: cobro-a-clientes
 titulo: Cómo se le cobra un sistema a un cliente
-alias: [cobro, cobrar, cuanto cobro, cuanto le cobro, cuanto vale, cuanto cuesta, precio, precios, cotizar, cotizacion, presupuesto, tarifa, tarifas, honorarios, mensualidad, mensualidades, cuota, permanencia, pago unico, instalacion, arranque, suscripcion, plan, planes, niveles, presencia, operacion, automatizacion, propuesta, propuestas, plan de servicio, oferta, contrato, alcance, rebaja, descuento, margen, plata, ingreso, facturar, cliente, clientes, sistema, sistemas, web, pagina, comision, domicilios, prommter, agencia, venta, vender, cerrar cliente, piloto, prueba]
-preguntas: ["cuanto le cobro a un cliente por un sistema", "¿cuánto cobro por una página o un sistema?", "¿cobro pago único o mensualidad?", "¿cómo estructuro el precio de una propuesta?", "¿qué le pongo de precio al cliente del asadero?", "¿cuánto me cuesta a mí sostener un cliente?"]
-proyectos: [prommter, orama, villa-broaster, pollo-landing]
+alias: [cobro, cobrar, cuanto cobro, cuanto le cobro, cuanto vale, cuanto cuesta, precio, precios, cotizar, cotizacion, presupuesto, tarifa, tarifas, honorarios, mensualidad, mensualidades, cuota, permanencia, pago unico, instalacion, arranque, suscripcion, plan, planes, niveles, presencia, operacion, automatizacion, propuesta, propuestas, plan de servicio, oferta, contrato, alcance, rebaja, descuento, margen, plata, ingreso, facturar, cliente, clientes, sistema, sistemas, web, pagina, comision, domicilios, prommter, agencia, venta, vender, cerrar cliente, piloto, prueba, paquete integral, paquete completo, solo la vitrina, pagar solo por la vitrina, pagar solo una parte, pedir solo una parte, renunciar a un servicio, quitar un servicio, no fraccionar, cobro completo, contrato integral, un millon, 1.000.000, tin pos, scrampi, comparables, precio del nicho, cuanto cobran los pos, ingreso constante, ingreso recurrente, barato de mantener, piloto gratis, caso de exito, no cobrar aun, ingreso propio]
+preguntas: ["cuanto le cobro a un cliente por un sistema", "¿cuánto cobro por una página o un sistema?", "¿cobro pago único o mensualidad?", "¿cómo estructuro el precio de una propuesta?", "¿qué le pongo de precio al cliente del asadero?", "¿cuánto me cuesta a mí sostener un cliente?", "¿cuánto le cobro a un minimarket y cómo defiendo el millón si otros POS cobran $40.000?", "¿el cliente puede pagar solo por la vitrina y no por el sistema?", "quiero una plata que entre todos los meses sin que me cueste mantenerla: ¿qué montamos y cómo arrancamos con el primer cliente?"]
+proyectos: [prommter, orama, villa-broaster, pollo-landing, la-villa, copiloto-drop]
 confianza: media
-actualizado: 2026-08-24
+actualizado: 2026-11-02
 ---
 
 # Cómo se le cobra un sistema a un cliente
@@ -23,6 +23,14 @@ Orama— la **permanencia mínima por escrito no es opcional**, o le estás pres
 al cliente. **Antes de escribir la primera cifra, confirma el modelo de cobro con el
 cliente**: esa es la que ya se pagó. Y siempre: dos o tres opciones, tope escrito al
 consumo variable, y si piden rebaja **quitas alcance, no bajas el precio**.
+
+**Tres reglas más (nov 2026):** el millón de Prommter es *paquete*, no caja: antes de dar
+precio a un comercio anota qué cobran los POS del nicho y qué incluye tu paquete más allá
+de la caja, y deja esa advertencia escrita en el plan. Si el negocio vende un paquete
+integral, el contrato prohíbe fraccionarlo (renunciar a una parte por menos precio) y cobrar
+completo un servicio que no se presta. Y para ingreso propio
+del dueño prioriza lo recurrente y chico, con el primer cliente como piloto gratis
+([[TEMA-piloto-con-cliente-real]]).
 
 ## Por qué (qué lo pagó)
 
@@ -105,6 +113,42 @@ y tiempo, no hosting (`precios-v2.html:295-296`).
     (`orama/PEND-003`), gastando casi nada salvo pauta. Y **no delegues al equipo hasta
     cerrar al cliente** (`orama/KN-005`).
 
+## Tres reglas de octubre-noviembre 2026
+
+**1. El millón es paquete, no caja: el nicho cobra $39.900–153.000 al mes (La Villa, 28-oct).**
+El dueño decidió ofrecer a La Villa el paquete completo de $1.000.000/mes («le vamos a
+ofrecer el paquete co pleto de un millon»). El estratega halló que el nicho publica
+$39.900–153.000/mes (Tin Pos cobra $39.900; Scrampi también está en la comparación), o sea
+que «el millón es 6 a 25 veces el precio del nicho», y la advertencia quedó en el plan.
+- Antes de dar precio a un comercio, anota qué cobran los POS del nicho.
+- Escribe qué incluye tu paquete más allá de la caja: vitrina, marketing, archivos del
+  contador, proveedores, control desde el celular, métricas. La caja suelta no se sostiene
+  a un millón.
+- Escribe el precio decidido JUNTO con la advertencia y no la quites. Confianza media: las
+  cifras de competidores son lo que citó el estratega, verifícalas antes de repetirlas al cliente.
+
+**2. Un contrato de paquete integral prohíbe fraccionarlo (renunciar a una parte por menos precio) y cobrar completo un servicio que no se presta.**
+Si vendes varios servicios como un solo paquete (sistema + vitrina + marketing), escribe
+en el contrato que los servicios son una sola unidad: el cliente no puede renunciar a uno para
+pedir una rebaja, ni tú dejar de prestar uno y seguir cobrando todo, para que el cliente no
+pida solo una parte por menos precio. El contrato de
+Prommter lo deja explícito (cláusulas 3.1-3.2 y 5.1 de `contrato-servicio-integral-v1.md`):
+el cliente no puede renunciar a uno de los tres servicios para pedir una reducción del valor
+mensual, ni Prommter dejar de prestar uno y seguir cobrando el millón completo ($1.000.000/mes). Solo vale para paquetes decididos
+como bloque único.
+
+**3. Ingreso propio del dueño: constante, barato de mantener y piloto gratis.**
+Al evaluar ideas de ingreso para el dueño, prioriza lo recurrente y chico sobre lo grande
+y esporádico (el dueño pidió «algo que entre de forma constante» porque mantener Prommter es
+caro), con costo de mantenimiento bajo («barato de mantener») y que aproveche lo que ya paga
+(el plan Claude Max). El primer cliente entra como **piloto gratis que paga
+con acceso a sus números (antes y después), permiso de mostrar el caso y feedback sincero**;
+sin porcentaje de ventas al inicio; se perfecciona antes de cobrar y el caso vende a los
+demás. Lo pagó el pedido del dueño de «algo que entre de forma constante» porque mantener
+Prommter es caro; días después el encargo del servidor repite «presupuesto ajustado». Eligió
+la forma híbrida (herramienta + acompañamiento) y «que no cobremos aun»; el piloto entregó
+sus reportes y su entrevista (ver [[TEMA-piloto-con-cliente-real]]).
+
 ## Cuándo NO aplica
 
 - **Sistemas de la propia casa** (placita, wrd): ahí no hay precio a un cliente. Su costo
@@ -125,6 +169,15 @@ y tiempo, no hosting (`precios-v2.html:295-296`).
   sistema promete beneficios por volumen, esos umbrales los aprueba el dueño antes de
   publicar, porque solo él conoce márgenes y capacidad (`pollo-landing/PEND-003`).
 
+- **Paquete (regla 2 de nov 2026):** no aplica a servicios que de verdad se venden sueltos
+  o a la carta.
+- **Precio contra el nicho (regla 1):** si el cliente compra solo la caja, el precio se pone
+  contra el nicho o se cambia el alcance; y si el ahorro medido del cliente justifica otro
+  precio, manda ese.
+- **Piloto gratis (regla 3):** no aplica a los sistemas que se cobran a clientes de Prommter
+  (ahí manda lo de arriba) ni si el dueño pide expresamente una apuesta grande. El piloto es
+  para validar con un caso real, no para trabajo sin límite: ponle fecha de cierre.
+
 ## Evidencia
 
 - `prommter/KN-003` — el modelo comercial: mensualidades con permanencia, no pago único;
@@ -140,13 +193,30 @@ y tiempo, no hosting (`precios-v2.html:295-296`).
 - `pollo-landing/PEND-003` — los incentivos por volumen son compromiso comercial: los aprueba
   el dueño.
 - Doctrina de precios escrita por el dueño (documento interno, **no compartir con clientes**):
-  `C:/Users/Kalel/prommter/documentos/agencia/precios-v2.html` (345 líneas: costo fijo 75-87,
+  `$ORION_HOME/prommter/documentos/agencia/precios-v2.html` (345 líneas: costo fijo 75-87,
   niveles 140-141 / 202-203 / 272-274, trampa del consumo variable 259-266, resumen 288-296,
-  6 reglas para cotizar 313-325) y `C:/Users/Kalel/prommter/documentos/agencia/precios.html`
+  6 reglas para cotizar 313-325) y `$ORION_HOME/prommter/documentos/agencia/precios.html`
   (364 líneas: costo vs valor 164-188, modalidades A/B/C 266-302, qué justifica la mensualidad
   304-314, errores que cuestan caro 334-343). PDF equivalentes en la misma carpeta.
-- Propuestas reales: `C:/Users/Kalel/prommter/proyectos/orama/plan-servicio-orama.html:1091-1116`
-  y `C:/Users/Kalel/prommter/proyectos/orama/propuesta-orama.html:566,766`.
+- Propuestas reales: `$ORION_HOME/prommter/orama/plan-servicio-orama.html:1091-1116`
+  y `$ORION_HOME/prommter/orama/propuesta-orama.html:566,766`.
+
+- Regla 1, La Villa: «le vamos a ofrecer el paquete co pleto de un millon» (pedido del
+  dueño), «el nicho publica precios de $39.900–153.000/mes» y «El millón es 6 a 25 veces el
+  precio del nicho.» — ventana [[2026-09-09-la-villa-sistema|La Villa: el sistema]]
+  (transcrito `129e1026`, 2026-10-28).
+- Regla 2: cláusula 3.1-3.2 «no puede renunciar a uno... ni PROMMTER puede dejar de prestar
+  uno... manteniendo el cobro completo» (`contrato-servicio-integral-v1.md:163-165`, también
+  `:48`, `:95`, `:195`) — ventana
+  [[2026-09-10-contrato-empresa-prommter|Contrato de la empresa Prommter]] (transcrito
+  `07cd6105`, 2026-09-10).
+- Regla 3: «sacar dinero no en grandes cantidades si no algo que entre de forma constante» y
+  «me gusta la numero 3 y que no cobremos aun si no que lo perfeccionemos» — ventana
+  [[2026-10-19-dropshipping-con-flujo-n8n|Dropshipping con flujo n8n]] (transcrito
+  `00af789e`, 2026-10-19); «Presupuesto ajustado: el proyecto busca ingreso constante y
+  barato de mantener.» — ventana
+  [[2026-10-23-plan-para-pasar-el-bot-a-un-servidor-barato|Plan para pasar el bot a un servidor barato]]
+  (transcrito `690265d7`, 2026-10-23).
 
 ### Huecos (lo que el corpus NO tiene y hay que saber que falta)
 
@@ -177,3 +247,6 @@ y tiempo, no hosting (`precios-v2.html:295-296`).
 - [[TEMA-invariantes-contables]] — cómo se congela lo cobrado dentro del sistema que vendes.
 - [[TEMA-generadores-de-diseno]] — la propuesta también se vende con la vista: cómo se
   encarga la pieza visual que la acompaña.
+- [[TEMA-piloto-con-cliente-real]] — cómo se corre el piloto gratis una vez aceptado.
+- [[TEMA-caza-de-huecos-de-mercado]] — el hueco local y el incumbente contra el que se cotiza.
+- [[TEMA-ventanas-por-cliente]] — el paquete incluye ventanas por cliente.

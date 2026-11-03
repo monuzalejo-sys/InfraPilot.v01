@@ -1,7 +1,7 @@
 {
   "projectId": "orion",
-  "snapshotDate": "2026-11-03T04:39:07.000Z",
-  "version": 17,
+  "snapshotDate": "2026-11-03T05:15:00.000Z",
+  "version": 18,
   "lastAmmRun": "2026-11-03T04:39:07.000Z",
   "objects": [
     {
@@ -456,6 +456,36 @@
       "fact": "INVESTIGACION EN UN RUN DE ORION (2026-11-02, Delta de Popayan para Prommter): el reparto que funciono fue orquestador hace el inventario de la fuente primaria que ya tiene a mano + 2 agentes sonnet de busqueda en paralelo (evidencia local; competidores con precio) con la ley cero-datos-inventados en el brief y salida <=60 lineas. Costaron 3 M y 1,4 M reales (US$ 1,34 y 0,84; costos.mjs real), 28 y 15 pasos. El orquestador ABRIO las fuentes clave antes de escribir (tesis PDF via PDFKit, aviso de empleo, 2 precios) y todas cuadraron; el resumen de buscador fallo 3 veces ese mismo dia (ver tema cero-datos-inventados).",
       "context": "Para la proxima investigacion: agentes de busqueda en sonnet, nunca opus; verificar en persona solo las 3-5 fuentes en que descansa la conclusion; marcar lo demas como reportado por el agente.",
       "source": "investigacion/2026-11-02-que-tiene-delta-y-por-que-lo-eligen/ y costos.mjs real --sesion 8a27a2bb"
+    },
+    {
+      "id": "KN-027",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-11-03T05:15:00.000Z",
+      "updated": "2026-11-03T05:15:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "COSECHA DE VENTANAS (2026-11-02): las sesiones de la app se cosechan con tools/ventanas.mjs. `estado` dice qué transcritos aún no tienen ficha; `extraer --desde <fecha> --excluir <sesión actual>` deja solo la señal (palabras del dueño, prosa, recaps, informes de agentes, errores; dedupe por uuid para las bifurcaciones): 58 transcritos, 680 MB → 1,2 MB. Después: extractores por grupo de ventanas (sonnet) → lotes de escritura con archivos DISJUNTOS (orion-harvester) → verificador adversarial por lote, corrector solo con defectos alta/media y crítico de completitud contra los rechazos del dueño → `ventanas.mjs escribir` (fichas en cerebro/ventanas: FUENTE local, fuera de git porque el remoto de ORION es público y cuentan decisiones de clientes y del equipo) → `baul.mjs empujar` (sección Ventanas de la bóveda). Medido: extractores que leen 130-200 KB de resumen cuestan US$ 3,7-6,1 cada uno (contexto 230-360k): partir en grupos de ≤100 KB; escritores con lote estrecho ≈ US$ 0,7 cada uno. La verificación halló 76 defectos (4 altos) en lo que los escritores dieron por bueno, incluida una afirmación falsa que se propagó a 3 archivos (que el PC había medido el push con credential.helper=manager; la corrida fue en la Mac).",
+      "context": "Cuando el dueño pida «alimenta la bóveda» o «saca los aprendizajes de las ventanas»: no se relee todo; se cosecha lo que `ventanas.mjs estado` marca como pendiente y se verifica adversarialmente antes de empujar.",
+      "source": "ventana «Alimentar vault de Obsidian» (transcrito 278748af, 2026-11-02/03): costos.mjs real --sesion 278748af; verificación del flujo wf_e30ffd8c"
+    },
+    {
+      "id": "KN-028",
+      "type": "Knowledge",
+      "tier": "Project",
+      "created": "2026-11-03T05:15:00.000Z",
+      "updated": "2026-11-03T05:15:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "Medium",
+      "status": "Current",
+      "dependencies": [],
+      "fact": "REFORZAR UN TEMA LO VOLVÍA MENOS ENCONTRABLE: cerebro.mjs puntúa con BM25 (k1=1.5, b=0.75) y los temas largos perdían contra temas nuevos y cortos que comparten vocabulario. En la cosecha del 2026-11-02, donde-vive-el-dato pasó de 6.308 a 7.870 palabras y dejó de ganar una pregunta que tiene escrita literal; probar cayó de 76/80 a 71/80. Barrido de b solo para temas: 0,75 → 140/156; 0,3 → 153/156; 0,1 → 151/156, pero esconde objetos puntuales (placita/KN-034 del 3.º al 5.º, duo-burger/KN-027 del 1.º al 4.º). Quedó B_TEMA=0,3 (CEREBRO_B_TEMA permite repetir el barrido) más el recorte de alias de temas nuevos que robaban preguntas (varias-ventanas-mismo-repo repetía «sesión» seis veces): 154/156, y 79/80 en la suite vieja. Regla: tras toda cosecha corre probar con las preguntas nuevas Y con la suite vieja; si un tema nuevo gana preguntas ajenas, recorta sus alias genéricos antes de tocar el puntaje.",
+      "context": "Al cosechar o curar el cerebro y al tocar el puntaje de cerebro.mjs.",
+      "source": "tools/cerebro.mjs (comentario de B_TEMA); ventana «Alimentar vault de Obsidian» (transcrito 278748af, 2026-11-03)"
     }
   ],
   "archives": [

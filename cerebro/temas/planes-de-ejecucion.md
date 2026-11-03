@@ -1,16 +1,26 @@
 ---
 slug: planes-de-ejecucion
 titulo: Cómo se planea el trabajo de un proyecto para ejecutarlo con agentes
-alias: [plan, planes, plan de trabajo, plan de ejecucion, plan del proyecto, planear, planificar, planeacion, planificacion, hacer un plan, armar el plan, hazme un plan, necesito un plan, quiero un plan, por donde empiezo, por donde arranco, que hago primero, que sigue, que sigue ahora, cual es la siguiente tarea, siguiente tarea, proxima tarea, tareas, lista de tareas, cuantas tareas, numero de tareas, cuantas tareas hay, en cuantas tareas, backlog, roadmap, hoja de ruta, hoja de trabajo, etapas, fases del proyecto, niveles, nivel de madurez, madurez, N0, N1, N2, N3, N4, cimientos, escalar, escalabilidad, mejoras despues, que sigue despues de terminar, terminar el proyecto, cuando esta terminado, plan.json, planmjs, plan mjs, registro de tareas, catalogo, arquetipo, arquetipos, que se me olvida, que me falta, que falta por hacer, checklist del proyecto, ceremonia, presupuesto de tareas, cuanto va a costar el proyecto, construir de cero, genesis, modificar lo que existe, evolucion, brownfield, greenfield, plan para el cliente, plan para nosotros, plan de equipo, posee, propiedad de archivos, criterios de aceptacion, criterio que cuantifica, ninguna ruta, todo componente, cada modulo, glob en posee, dos tareas se pisan, ola disjunta, plan.mjs ola]
-preguntas: ["hazme un plan para este proyecto", "por donde empiezo con este proyecto", "cuantas tareas hace falta para terminar esto", "que hago primero y que despues", "que se me esta olvidando en este proyecto", "que sigue ahora", "como se cuando el proyecto esta terminado", "que hacemos despues de entregarlo"]
-proyectos: [orion, infrapilot, villa-broaster, placita, orama]
+alias: [plan, planes, plan de trabajo, plan de ejecucion, plan del proyecto, planear, planificar, planeacion, planificacion, hacer un plan, armar el plan, hazme un plan, necesito un plan, quiero un plan, por donde empiezo, por donde arranco, que hago primero, que sigue, que sigue ahora, cual es la siguiente tarea, siguiente tarea, proxima tarea, tareas, lista de tareas, cuantas tareas, numero de tareas, cuantas tareas hay, en cuantas tareas, backlog, roadmap, hoja de ruta, hoja de trabajo, etapas, fases del proyecto, niveles, nivel de madurez, madurez, N0, N1, N2, N3, N4, cimientos, escalar, escalabilidad, mejoras despues, que sigue despues de terminar, terminar el proyecto, cuando esta terminado, plan.json, planmjs, plan mjs, registro de tareas, catalogo, arquetipo, arquetipos, que se me olvida, que me falta, que falta por hacer, checklist del proyecto, ceremonia, presupuesto de tareas, cuanto va a costar el proyecto, construir de cero, genesis, modificar lo que existe, evolucion, brownfield, greenfield, plan para el cliente, plan para nosotros, plan de equipo, posee, propiedad de archivos, criterios de aceptacion, criterio que cuantifica, ninguna ruta, todo componente, cada modulo, glob en posee, dos tareas se pisan, ola disjunta, plan.mjs ola, tarh, plan de escalamiento, escalamiento, primer paso de un proyecto nuevo, cuello de botella, que se rompe al x10, hito defendible, sin plan de escalamiento, init.sh, subagent_tokens, tokens reales, gasto real del plan, presupuesto del plan, cuanto hemos gastado, medidor de gasto, unidad vieja, decision pendiente, el plan quiere construir antes de que firme, bloquear tareas, dependencia de decision, ids de tareas, plan.mjs siguiente, primera ola, camino A B C, el plan propone construir]
+preguntas: ["hazme un plan para este proyecto", "por donde empiezo con este proyecto", "cuantas tareas hace falta para terminar esto", "que hago primero y que despues", "que se me esta olvidando en este proyecto", "que sigue ahora", "como se cuando el proyecto esta terminado", "que hacemos despues de entregarlo", "vamos a empezar un proyecto nuevo, cual es el primer paso antes de construir", "cuantos tokens gastamos de verdad y por que el plan decia otra cosa", "el plan me propone construir antes de que el dueno firme el camino, como lo freno", "cuanto gasto el plan de escalamiento o de ejecucion de verdad"]
+proyectos: [orion, infrapilot, villa-broaster, placita, orama, escuadra, la-villa]
 confianza: alta
-actualizado: 2026-08-27
+actualizado: 2026-11-02
 ---
 
 # Cómo se planea el trabajo de un proyecto para ejecutarlo con agentes
 
 ## Respuesta corta
+
+**⚠ Corrección 2026-11-02:** este tema presupuestaba con las medias de `orion/KN-002`
+(«análisis 64k, planeación 19k», «83k por tarea», «3,3 M en 40 tareas»). Eran
+`subagent_tokens` = tamaño del contexto FINAL del agente, **no gasto**; el gasto real es
+~70–110× mayor. Hoy todo presupuesto sale de `node tools/costos.mjs real` (lee el
+transcrito) y `plan.mjs` ya presupuesta con tokens reales medidos (`tools/plan.mjs:36-44`).
+La idea de fondo no cambia —servir la tarea desde el registro en vez de re-derivarla es la
+palanca más barata—, pero **no cites las cifras de abajo como dinero**: sirven para ordenar,
+no para presupuestar. Y antes de todo plan de ejecución, un proyecto nuevo pasa por `/tarh`
+(plan de escalamiento): ver «Cómo se aplica», paso 0.
 
 **El plan no es un documento: es un registro al que se le pregunta.** Vive en
 `<memoria>/plan.json`, y cualquier prosa (`PLAN.md`) se GENERA desde él. Nunca
@@ -36,8 +46,7 @@ que necesita otra cosa: qué archivo toca cada tarea, qué comando la comprueba,
 y qué se puede lanzar en paralelo. Faltaba el plan **de ejecución**, y sin él
 esa decisión se re-tomaba en conversación en cada sesión.
 
-**Porque re-derivar cuesta 83k por tarea, medidos.** Análisis 64k + planeación
-19k, promedio sobre 24 y 6 spawns respectivamente (`orion/KN-002`). Si la tarea
+**Porque re-derivar cuesta caro** *(cifra original, SUPERADA: «83k por tarea» = análisis 64k + planeación 19k, promedio sobre 24 y 6 spawns de `orion/KN-002`, que eran contexto final y no gasto; ver el siguiente párrafo)*. Si la tarea
 ya está especificada en el registro, `plan.mjs brief` la sirve por cero: en un
 proyecto de 40 tareas son **3,3 M de tokens** que dejan de gastarse sin tocar
 la calidad de nada (`orion/KN-003`). Es la palanca de gasto más grande del
@@ -70,8 +79,40 @@ en cada nivel) y las **tareas propias** que solo se saben leyendo este repo. El
 catálogo trajo, la primera vez que se cruzó con un proyecto real, tareas de
 respaldo ensayado y de habeas data que nadie había puesto en ninguna lista.
 
+**Lo que lo desmintió, medido.** El plan de Escuadra presupuestó **27,6 M tokens (US$
+37–133)** y su tanda 0 figuraba **78 % por debajo** de lo previsto; la medición real dio
+**≈2.330 M tokens y US$ 1.300–1.450** (97 % relecturas de caché), y desde septiembre
+**6.362 M y US$ 3.600–4.060** en todos los proyectos, mientras el tablero decía ~18 M para
+Escuadra. El número del agente era el tamaño de su contexto final; el gasto real es 70–110
+veces mayor. El medidor real coincidió **al 0,03 %** con una suma independiente, y un
+verificador independiente halló **6 restos de la unidad vieja** (el más serio, el
+presupuesto de `plan.mjs`). Reglas: toda cifra de gasto sale de `costos.mjs real`, nunca del
+`subagent_tokens` que devuelve el agente; contrasta un medidor nuevo con una suma
+independiente (menos de 1 %); si una tanda «gastó 78 % menos de lo previsto», sospecha de la
+unidad antes de celebrar; y tras corregir la unidad, que un verificador independiente cace
+los restos.
+
+**El plan de escalamiento es el primer paso, y se implementó donde se ejecuta.** El dueño
+pidió *«guardes como escencial para el primer paso de cada nuevo proyecto, el plan de
+escalamieno»*; en vez de dejarlo como recomendación en un README, Claude lo hizo exigible
+en **cuatro sitios independientes** (`init.sh` al enganchar, el hook de arranque, `/bidar` y
+`/khatam` reclaman «SIN PLAN DE ESCALAMIENTO» hasta que exista) y comprobó que el aviso sale
+en InfraPilot, que no tenía plan.
+
+**Una decisión sin firmar hay que volverla dependencia.** La Villa, 2026-10-28: la primera
+ola proponía construir módulos antes de que el dueño firmara el camino, porque las 79
+tareas del catálogo no sabían de la decisión. Reordenar con ids supuestos dejó tareas
+equivocadas («Error mío: asumí los ids y ordené tareas equivocadas»), y un criterio falló por
+una palabra («vuelve el internet» en vez de «sin internet»): se corrigió el texto, no el
+criterio.
+
 ## Cómo se aplica
 
+0. **Proyecto nuevo: `/tarh` primero.** Plan de escalamiento antes de construir: cuello de
+   botella, hito defendible, qué se rompe al ×10, dependencias y qué NO hacer todavía. No
+   sustituye a este plan (tareas, orden, costo) ni aplica a trabajos sueltos sin proyecto.
+   Ojo: la «Receta de proyecto nuevo» posterior (repo, huecos, memoria, correo, sección, 6
+   ventanas) no lista `/tarh`; confirma con el dueño si sigue siendo el primer paso.
 1. **Traduce antes de planear.** Si la idea vino dictada, pásala por
    `orion-traductor`: separa las correcciones que hiciste a mitad, los ejemplos
    que no son requisitos, el énfasis («mil tareas») de la lectura operativa, y
@@ -95,6 +136,10 @@ respaldo ensayado y de habeas data que nadie había puesto en ninguna lista.
    de cada nivel, los hitos que le importan al dueño, y la escalabilidad —cada
    mejora con su **disparador observable** («cuando pasen 500 pedidos al día»),
    porque una mejora sin disparador es un deseo y no se agenda (N8-R6).
+6b. **Si hay una decisión del dueño sin firmar, haz que sea dependencia de TODAS las
+   tareas de construcción** y comprueba con `plan.mjs siguiente` que la primera ola no
+   construye nada. Lee la firma real del comando y los **ids reales** del registro; no los
+   asumas. Si un criterio falla, corrige el texto de la tarea, no el criterio.
 7. **Valida antes de enseñarlo.** `plan.mjs validar` es la forma ejecutable de
    la norma. Los tres errores que más salen dicen algo grave: «ninguna
    aceptación es un hecho observable» = esa tarea no se puede terminar, solo
@@ -105,7 +150,8 @@ respaldo ensayado y de habeas data que nadie había puesto en ninguna lista.
    --evidencia "<lo que se OBSERVÓ>" --tokens <medidos>`. Sin la escritura de
    vuelta el plan es un documento; con ella es un lazo de control, y es el lazo
    lo que hace que el presupuesto converja en vez de seguir siendo una
-   estimación prestada (N8-R10).
+   estimación prestada (N8-R10). **`--tokens` va en tokens REALES de
+   `costos.mjs real`**, no el `subagent_tokens` del agente.
 
 ## Cuándo NO aplica
 
@@ -120,6 +166,10 @@ respaldo ensayado y de habeas data que nadie había puesto en ninguna lista.
   una persona con nombre (ver [[TEMA-documentos-para-personas]]). Enseñarle a
   un cliente un registro de 400 tareas es la forma más rápida de que deje de
   leer.
+- **Proyectos con encargo ya firmado y sin decisiones abiertas:** ahí la primera ola sí
+  debe construir; el bloqueo por decisión (paso 6b) es solo para lo que el dueño no firmó.
+- **Comparar tamaños relativos de tareas o agentes sin números absolutos** puede seguir
+  usando las medias viejas; la regla de `costos.mjs real` es para cifras de tokens y dólares.
 - **Un plan viejo con tareas hechas no se rehace.** Eso borra historia medida.
   Se lee con `estado` y se sigue.
 
@@ -134,8 +184,13 @@ respaldo ensayado y de habeas data que nadie había puesto en ninguna lista.
   se ahorran), `orion/KN-006` (`porCada`: cómo un catálogo acotado produce
   cientos de tareas sin inventar ninguna), `orion/KN-007` (`ola` vuelve
   computable la no-colisión).
-- `orion/KN-002` — las medias medidas de las que sale el presupuesto: análisis
-  sonnet 64k sobre 24 spawns, planeación 19k sobre 6.
+- `orion/KN-002` — **SUPERADO 2026-11-02**: las medias (análisis 64k sobre 24 spawns,
+  planeación 19k sobre 6) eran contexto final, no gasto; el objeto lo dice en su `fact`.
+  Gasto real desde 2026-09-01 con `costos.mjs real`: 6.362 M tokens ≈ US$ 3.600–4.060.
+- Cosecha de las ventanas, 2026-11-02 — ventana [[2026-10-22-orion-app-de-rutina-sincronizada|ORION, app de rutina sincronizada]] (transcrito `b5eb380b`): «el techo del presupuesto es de 27,6 M tokens, unos US$37–133 en API» (2026-10-23); «esta tanda gastó 78 % menos de lo previsto» (2026-10-23); «El tablero decía que Escuadra iba en unos 18 M de tokens y en realidad iban unos 2.340 M.» (2026-11-03); «el gasto real es entre 70 y 110 veces mayor» (2026-11-03); «El medidor real coincide al 0,03 % con una suma independiente» y «Quedaron 6 restos de la unidad vieja.» (2026-11-03).
+- Ventana [[2026-07-28-estructura-anthropic-para-arnes-y-flujo-de-trabajo|Estructura Anthropic para arnés]] (transcrito `0f0c7084`): «quiero que guardes como escencial para el primer paso de cada nuevo proyecto, el plan de escalamieno» (2026-08-01) y «Lo hice obligatorio de verdad, no con una recomendación en un README.» (2026-08-03).
+- Ventana [[2026-09-09-la-villa-sistema|La Villa sistema]] (transcrito `129e1026`): «La ola propone construir módulos antes de que el dueño firme nada» (2026-10-28), «Error mío: asumí los ids y ordené tareas equivocadas.» (2026-10-28), «Lo corrijo en el texto, no en el criterio» (2026-10-28).
+- `tools/plan.mjs:36-44` — la tabla de costo por tarea ya en tokens reales (commit `46937c8`).
 - `villa-broaster/DEC-010` y `prommter/KN-001` — el plan **para personas**, que
   es el otro artefacto y no se mezcla con éste.
 
@@ -144,7 +199,7 @@ respaldo ensayado y de habeas data que nadie había puesto en ninguna lista.
 [[TEMA-encargos-verificables]] (cada tarea del plan es un encargo: las mismas
 reglas de criterio comprobable) · [[TEMA-olas-de-agentes]] (`posee` y `ola` son
 la versión computable de su doctrina) · [[TEMA-modelos-y-costos]] (de dónde
-sale el presupuesto y la ceremonia de cada tarea) ·
+sale el presupuesto —ahora con `costos.mjs real`— y la ceremonia de cada tarea) ·
 [[TEMA-que-es-estar-verificado]] (qué cuenta como evidencia para marcar una
 tarea hecha) · [[TEMA-documentos-para-personas]] (el plan del cliente, que es
 otro documento) · [[TEMA-cero-datos-inventados]] (N8-R9 es esa misma regla

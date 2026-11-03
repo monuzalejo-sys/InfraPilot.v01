@@ -1,11 +1,11 @@
 ---
 slug: encargos-verificables
 titulo: Escribir un encargo que otro pueda ejecutar y cualquiera pueda verificar
-alias: [encargo, encargos, brief, briefs, briefing, prompt, prompts, promt, promps, escribir el prompt, armar el prompt, prompt para el agente, prompt de construccion, prompt de diseno, instrucciones al agente, orden al agente, tarea al agente, spec, especificacion, requisitos, criterios de aceptacion, criterio de aceptacion, criterios verificables, definicion de terminado, definicion de hecho, DoD, done, checklist, chequeo, chequeos, autochequeo, autochequeos, grep negativo, greps negativos, grep que de 0, copy congelado, texto congelado, frase congelada, congelar copy, no toques, intocable, prohibiciones, prohibido, lista de prohibido, delegar, delegacion, encargar, mandar a hacer, subagente, subagentes, builder, builders, agente barato, haiku, haiku barato, modelo barato, ejecutor, generador, tercero, freelance, el del equipo, auditar salida, auditar el entregable, revisar lo que entrego, rubrica, rubricas, porcentaje de avance, avance, juez, juez externo, calificar, numeros en el prompt, medible, medibles, adjetivos, se ve bien, hizo otra cosa, no hizo caso, no me hizo caso, se invento, invento datos, relleno, se lo salto, ignoro la instruccion, quedo mal el brief, brief flojo, el grep no lo vio, el grep dio 0 y estaba mal, grep en 0, grep de 0 lineas no basta, grep insuficiente, criterio que solo greppea, verificar con grep, comprobar con grep, valor calculado, valor computado, clamp, calc, variable css, escala de espaciado, tokens de espaciado, espaciado fuera de escala, padding raro, padding que no esta en la escala, arbitrary value, valor arbitrario de tailwind, contraejemplo, contraejemplo en un comentario, la regla se marco a si misma, el comentario salio como infraccion, falso positivo del grep, regla que se autoincumple]
-preguntas: ["como le escribo el encargo a un agente", "como hago un brief que no falle", "por que el agente hizo otra cosa", "como cierro un brief para que no invente", "que le pongo al final del prompt para poder verificarlo despues", "le dije que no tocara admin y lo toco igual, que hago", "como le encargo algo a alguien del equipo sin que cada quien se ponga su propia nota", "como se si el subagente si cumplio lo que le pedi", "el grep dio 0 pero igual estaba mal, que me falto", "como verifico un criterio de espaciado o de color", "por que el grep marca mi propio comentario como error"]
-proyectos: [wrd, orama, landings, villa-broaster, infrapilot, _permanent]
+alias: [encargo, encargos, brief, briefs, briefing, prompt, prompts, promt, promps, escribir el prompt, armar el prompt, prompt para el agente, prompt de construccion, prompt de diseno, instrucciones al agente, orden al agente, tarea al agente, spec, especificacion, requisitos, criterios de aceptacion, criterio de aceptacion, criterios verificables, definicion de terminado, definicion de hecho, DoD, done, checklist, chequeo, chequeos, autochequeo, autochequeos, grep negativo, greps negativos, grep que de 0, copy congelado, texto congelado, frase congelada, congelar copy, no toques, intocable, prohibiciones, prohibido, lista de prohibido, delegar, delegacion, encargar, mandar a hacer, subagente, subagentes, builder, builders, agente barato, haiku, haiku barato, modelo barato, ejecutor, generador, tercero, freelance, el del equipo, auditar salida, auditar el entregable, revisar lo que entrego, rubrica, rubricas, porcentaje de avance, avance, juez, juez externo, calificar, numeros en el prompt, medible, medibles, adjetivos, se ve bien, hizo otra cosa, no hizo caso, no me hizo caso, se invento, invento datos, relleno, se lo salto, ignoro la instruccion, quedo mal el brief, brief flojo, el grep no lo vio, el grep dio 0 y estaba mal, grep en 0, grep de 0 lineas no basta, grep insuficiente, criterio que solo greppea, verificar con grep, comprobar con grep, valor calculado, valor computado, clamp, calc, variable css, escala de espaciado, tokens de espaciado, espaciado fuera de escala, padding raro, padding que no esta en la escala, arbitrary value, valor arbitrario de tailwind, contraejemplo, contraejemplo en un comentario, la regla se marco a si misma, el comentario salio como infraccion, falso positivo del grep, regla que se autoincumple, producto secreto, revelacion, sorpresa, evento escondido, no filtrar, og image, imagen para compartir, spoiler, anuncio secreto, grep negativo, verificar un contrato, qa de documentos legales, eslint, no-restricted-imports, fronteras de arquitectura, regla de lint que no bloquea, import relativo, control positivo y negativo]
+preguntas: ["como le escribo el encargo a un agente", "como hago un brief que no falle", "por que el agente hizo otra cosa", "como cierro un brief para que no invente", "que le pongo al final del prompt para poder verificarlo despues", "le dije que no tocara admin y lo toco igual, que hago", "como le encargo algo a alguien del equipo sin que cada quien se ponga su propia nota", "como se si el subagente si cumplio lo que le pedi", "el grep dio 0 pero igual estaba mal, que me falto", "como verifico un criterio de espaciado o de color", "por que el grep marca mi propio comentario como error", "como hago para que la sorpresa del evento no se vea antes de la fecha en la pagina", "como compruebo que el contrato dice exactamente lo que pedi", "como se que la regla que prohibe tocar la base desde cualquier lado de verdad bloquea"]
+proyectos: [wrd, orama, landings, villa-broaster, infrapilot, _permanent, duo-burger, prommter, escuadra]
 confianza: alta
-actualizado: 2026-08-27
+actualizado: 2026-11-02
 ---
 
 # Escribir un encargo que otro pueda ejecutar y cualquiera pueda verificar
@@ -30,7 +30,7 @@ razona: *"una prohibición declarada no basta para que un LLM no rellene huecos 
 verosimilitud"* — y por eso el "sin inventar nada" del dueño se implementó como
 checklist obligatorio, no como intención. El apartado 2 del agente se llama, textual,
 **«Sin inventar nada» es un procedimiento, no una intención**
-(`C:\Users\Kalel\.claude\agents\orion-landing.md:46`), y termina en la regla que
+(`~/.claude/agents/orion-landing.md:46`), y termina en la regla que
 gobierna todo: *"Un prompt que no se puede verificar no sirve"* (`:124-126`). Se
 escribió después de encontrar copy inventado en 3 proyectos distintos —horario falso
 confesado en un comentario de código, producto/precio que no existía en el catálogo
@@ -164,6 +164,31 @@ en vez de la niebla optimista de preguntarle a cada quien cómo va.
     cada pieza con su modelo, su alcance y sus congelados. Un pendiente escrito así se
     relanza; uno escrito como intención se vuelve a pensar desde cero.
 
+13. **Un secreto de campaña no se esconde: no existe hasta su fecha.** Si algo debe ser secreto
+    hasta una fecha, no lo escondas con CSS o JS: que el build no lo incluya hasta esa hora (HTML,
+    imagen de compartir/`og:image` y respuesta de la API del sistema) y vuelve a construir y
+    publicar en la fecha de la revelación (el estado se decide AL CONSTRUIR). Comprueba cada
+    publicación con un **grep negativo sobre el sitio real (0 coincidencias)** y que ningún campo del
+    modelo (proteína, precio, descripción) insinúe el secreto. En Duo Burger el evento del 31
+    «Halloween y reapertura» era secreto hasta el 24-oct y la API del sistema todavía lo anunciaba
+    aunque la página no (se pidió al PC callarla). Contenido que solo tiene horario y no es secreto
+    (la dinámica del día que abre a las 6:00) sí puede viajar en el HTML con el reloj del cliente.
+14. **Verifica un contrato citando archivo:línea contra cada condición pedida.** Convierte cada
+    condición en una búsqueda puntual: grep de la cifra exacta, de la frase prohibida que NO debe
+    aparecer (`grep -n "1601" contrato-servicio-integral-v1.md` → sin resultados) y de la cláusula
+    que SÍ debe estar; cita archivo y línea. En el contrato de Prommter se comprobó así: ninguna
+    tasa de interés fija ni referencia al artículo 1601. Un documento corto de una sola condición se
+    lee completo y ya.
+15. **Cada frontera de lint se prueba con un archivo que la viole.** Si una regla de capas se
+    impone con ESLint (quién importa la base, qué carpetas no tocan `fetch`/`Date.now`/`process.env`),
+    la verificación crea archivos temporales que la violen (deben salir con código distinto de 0) y
+    un control legítimo (debe pasar). Cierra los rodeos: imports relativos de varios niveles, alias
+    e `import *`. En la tanda 0 de Escuadra el verificador probó las 11 fronteras y halló la única
+    fallida: `import db` por ruta relativa de varios niveles no se bloqueaba; arreglado y
+    comprobado, con los controles legítimos (`datos.ts`, `db.ts`, `new Date(ms)`) intactos. Si la
+    regla la impone el sistema de tipos o la base (RLS, CHECK), la prueba es intentar el acceso
+    prohibido contra la base.
+
 ## Cuándo NO aplica
 
 - **En exploración y prototipos desechables.** Congelar copy y superficies mata la
@@ -200,7 +225,7 @@ en vez de la niebla optimista de preguntarle a cada quien cómo va.
 - **Tensión medida sobre la LONGITUD del encargo.** El estándar dice *"un brief de
   agente = objetivo + insumos de su fase + extractos relevantes + qué significa
   «terminado»; si pasa de ~60 líneas, estás pegando en vez de extractando"*
-  (`.claude\skills\orion\SKILL.md:139-141`). Y sin embargo los encargos que sí
+  (`.claude\skills/orion/SKILL.md:139-141`). Y sin embargo los encargos que sí
   aterrizaron miden 501 (`orama-demo.md`), 656 (`LANDING-PROMPT.md`) y 1270 líneas
   (`villa-app-villa-broaster-v3.md`). No se contradicen si separas las dos cosas:
   el cap de 60 líneas gobierna el **contexto que pegas** —eso se extracta— y no la
@@ -216,14 +241,14 @@ en vez de la niebla optimista de preguntarle a cada quien cómo va.
 
 ## Evidencia
 
-- `C:\Users\Kalel\fable 5\wrd\docs\LANDING-PROMPT.md` — el encargo modelo, 656 líneas:
+- `(fable 5 — carpeta del PC, no existe en la Mac)\wrd/docs/LANDING-PROMPT.md` — el encargo modelo, 656 líneas:
   `:11-23` (regla de oro y archivos que obligan a pararse), `:457-483` (11
   prohibiciones con su cita), `:531-558` (7 bloques de grep negativo, meta 0 líneas),
   `:560-582` (13 frases congeladas + 1 constante nueva que aparece una sola vez),
   `:584-593` (6 estados forzables a mano), `:595-610` (7 flujos de regresión),
   `:612-640` (8 medidas con su meta y método + 12 capturas), `:644-656` (Definición de
   terminado como suma + cómo se reporta + regla de confesar lo congelado).
-- `C:\Users\Kalel\ORION\prompts-landing\orama-demo.md:473-501` — 23 criterios de
+- `$ORION_HOME/prompts-landing/orama-demo.md:473-501` — 23 criterios de
   aceptación numerados, todos con número duro (ver 3, 4, 9, 14, 22).
 - `orama/KN-002` — PASS 12/12, 0 fix cycles; costos medidos en `source`: opus 84.925
   tokens escribiendo + sonnet 73.949 verificando. `orama/KN-003` — 12/12 en el plan de
@@ -241,7 +266,7 @@ en vez de la niebla optimista de preguntarle a cada quien cómo va.
   procedimiento verificable es lo que la hace cumplible run tras run".
   `infrapilot/KN-033` — el copy de relleno que llega a producción (3 proyectos).
   `infrapilot/DEC-007` — ceremonia proporcional: el pipeline completo ~10x lo inline.
-- `C:\Users\Kalel\.claude\agents\orion-landing.md:46` (título del apartado 2),
+- `~/.claude/agents/orion-landing.md:46` (título del apartado 2),
   `:50-70` (los 6 pasos del procedimiento; `:65` "verosímil es exactamente la forma que
   tiene una mentira útil"), `:124-126` ("Un prompt que no se puede verificar no
   sirve"), `:158-162` (qué debe traer el reporte del ejecutor).
@@ -249,27 +274,39 @@ en vez de la niebla optimista de preguntarle a cada quien cómo va.
   líneas de grep para detectarlo. `villa-broaster/KN-014` punto 4 y
   `villa-broaster/DEC-010` — género femenino al diseñador de landing y residuo `$name`
   sin expandir.
-- `C:\Users\Kalel\prommter\proyectos\villa-broaster\memory\villa-broaster\metrics.json`,
+- `$ORION_HOME/prommter/villa-broaster/memory/villa-broaster/metrics.json`,
   `session-2026-08-24-prompt-v3-landing` — literal: *"mandaba dibujar 23 productos
   citando solo 10 → el medio habría inventado 13 nombres y precios"*; 11 agentes,
   1.083.934 tokens, fixCycles 1.
-- `C:\Users\Kalel\ORION\prompts-landing\villa-app-villa-broaster-v3.md:1174-1204`
+- `$ORION_HOME/prompts-landing/villa-app-villa-broaster-v3.md:1174-1204`
   (8 prohibiciones de la armadura), `:1205-1236` (10 autochequeos de sí/no),
   `:1211-1212` (el criterio imposible, corregido), `:1240-1257` (ANEXO B: coreografía
   B1-B10 con ms y curva, rotulada "no es para ti, lienzo").
 - `villa-broaster/DEC-011` — rúbrica del juez externo y semana 1 (E1 0 · E2 50 · E3 12
   · E4 0 · E5 40 · E6 0 · E7 0 · E8 15), commit `76af678` verificado.
-  `C:\Users\Kalel\prommter\proyectos\villa-broaster\docs\semanal\avance.json:13,23,121`
+  `$ORION_HOME/prommter/villa-broaster/docs/semanal/avance.json:13,23,121`
   — criterios por entrega y el texto de la rúbrica.
-- `C:\Users\Kalel\prommter\proyectos\villa-broaster\PLAN-EQUIPO.md:60-63` (definición
+- `$ORION_HOME/prommter/villa-broaster/PLAN-EQUIPO.md:60-63` (definición
   de hecho para personas) y `:65-69` (checklist de revisión del senior en cada PR).
 - `_permanent/KN-016` — `verdict: ok` mide que el spawn aterrizó, no que acertó; los
   tres desastres de haiku figuran como `ok`.
 - `wrd/PEND-006` — el pendiente escrito como encargo relanzable ("contenido exacto para
   relanzar sin arqueología"). `wrd/KN-004` — la ronda adversarial que encontró 16
   hallazgos reales y que el encargo de la landing declara intocable.
-- `C:\Users\Kalel\.claude\skills\orion\SKILL.md:139-141` — el cap de ~60 líneas por
+- `~/.claude/skills/orion/SKILL.md:139-141` — el cap de ~60 líneas por
   brief de agente, la otra mitad de la tensión de longitud.
+
+### Cosecha de ventanas 2026-11-02
+- Secreto: «producto privado para que sea llamativo y nosotros podamos preparar algo bien» (2026-09-25),
+  «Hoy su API todavía lo dice, aunque la página ya no lo muestra.» (2026-10-03) y «Revisé que no dice
+  nada del 31 ni de la inauguración.» (2026-10-21) — ventana [[2026-09-09-duo-burger|Duo Burger]]
+  (transcrito `51184930`).
+- Contrato: «grep -n "1601" contrato-servicio-integral-v1.md → sin resultados. OK» — ventana
+  [[2026-09-10-contrato-empresa-prommter|Contrato de la empresa Prommter]] (`07cd6105`, 2026-09-10).
+- Lint: «También se probó con archivos temporales que las 11 fronteras de ESLint cortan», «Solo queda una
+  condición fallida: ESLint no bloquea `import db` por una ruta relativa de varios niveles.» y «La regla ya
+  bloquea las importaciones relativas y `verificar` pasa completo.» — ventana
+  [[2026-10-22-orion-app-de-rutina-sincronizada|Orion app de rutina]] (`b5eb380b`, 2026-10-23).
 
 ## Enlaces
 

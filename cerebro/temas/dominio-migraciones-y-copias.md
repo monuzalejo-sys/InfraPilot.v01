@@ -1,11 +1,11 @@
 ---
 slug: dominio-migraciones-y-copias
 titulo: Cambiar la forma de datos que ya existen sin romperle el sistema a nadie
-alias: [migracion, migraciones, migrar, migrarlo, migro, migracion de datos, migracion sql, script sql, correr el sql, pegar el sql, sql editor, sql, supabase, esquema, schema, esquema nuevo, tabla, tabla nueva, columna, columna nueva, add column, campo, campo nuevo, campo obligatorio, agregar un campo, anadir un campo, agregar una columna, quitar un campo, borrar un campo, renombrar, renombrar campo, cambiar la forma, cambiar el formato, formato de datos, contrato de tipos, types.ts, version de datos, VERSION_DATOS, subir la version, bump, bump de version, v6, v7, v4 v5, sobre, datos viejos, datos guardados, datos persistidos, datos del navegador, localstorage, local storage, cache, cache vieja, respaldo, respaldo-v3, claveRespaldo, backup, embedded-postgres, postgres embebido, postgres, postgresql, psql, docker, supabase cli, probar una migracion, probar el sql, como pruebo el sql, sql sin ejecutar, revisado no es ejecutado, idempotente, idempotencia, correr dos veces, reaplicar, 42P01, 42703, PGRST204, does not exist, schema cache, 503, MIGRATION_REQUIRED, MIGRATION_002_REQUIRED, banner, aviso de migracion, degradar, degradacion, rls, policy, politica, trigger, security definer, constraint, backfill, orden, orden de las migraciones, orden de aplicacion, en que orden, en que orden se aplican, se aplican, aplican, aplicar, aplicarla, aplicarlas, aplicar la migracion, aplicadas, aplique, secuencia, cual primero, cual va primero, primero cual, encadenar, se rompio la pagina, se cayo la pagina, pagina caida, pantalla en blanco, undefined toFixed, arranco en blanco, se borraron los datos, portar modulo, portar un modulo, copiar modulo, copiar un modulo, proyecto hermano, hermano, calcar, calcado, clonar, reusar, reusar codigo, supuestos temporales, unidades, unidad, kilos, gramos, peso, segundo eje, costo por unidad, costo de ventas en cero, ganancia inflada, outbox, cola, reintenta, seed, semilla, resembrar]
-preguntas: ["como agrego un campo a algo que ya esta guardado", "como pruebo una migracion sql", "se me rompio la pagina con los datos viejos", "en que orden se aplican las migraciones", "en que orden aplico las migraciones y cual va primero", "se puede probar sql aca si no hay docker ni psql", "puedo desplegar si el cliente todavia no ha corrido la migracion", "el sql lo revise y se ve bien - ya cuenta como probado?", "voy a copiar el modulo de caja de otro proyecto: que le reviso antes?", "empezamos a vender por unidad ademas de por peso - que se me rompe?"]
-proyectos: [placita, infrapilot, estanco-contable, arroces, villa-broaster]
+alias: [migracion, migraciones, migrar, migrarlo, migro, migracion de datos, migracion sql, script sql, correr el sql, pegar el sql, sql editor, sql, supabase, esquema, schema, esquema nuevo, tabla, tabla nueva, columna, columna nueva, add column, campo, campo nuevo, campo obligatorio, agregar un campo, anadir un campo, agregar una columna, quitar un campo, borrar un campo, renombrar, renombrar campo, cambiar la forma, cambiar el formato, formato de datos, contrato de tipos, types.ts, version de datos, VERSION_DATOS, subir la version, bump, bump de version, v6, v7, v4 v5, sobre, datos viejos, datos guardados, datos persistidos, datos del navegador, localstorage, local storage, cache, cache vieja, respaldo, respaldo-v3, claveRespaldo, backup, embedded-postgres, postgres embebido, postgres, postgresql, psql, docker, supabase cli, probar una migracion, probar el sql, como pruebo el sql, sql sin ejecutar, revisado no es ejecutado, idempotente, idempotencia, correr dos veces, reaplicar, 42P01, 42703, PGRST204, does not exist, schema cache, 503, MIGRATION_REQUIRED, MIGRATION_002_REQUIRED, banner, aviso de migracion, degradar, degradacion, rls, policy, politica, trigger, security definer, constraint, backfill, orden, orden de las migraciones, orden de aplicacion, en que orden, en que orden se aplican, se aplican, aplican, aplicar, aplicarla, aplicarlas, aplicar la migracion, aplicadas, aplique, secuencia, cual primero, cual va primero, primero cual, encadenar, se rompio la pagina, se cayo la pagina, pagina caida, pantalla en blanco, undefined toFixed, arranco en blanco, se borraron los datos, portar modulo, portar un modulo, copiar modulo, copiar un modulo, proyecto hermano, hermano, calcar, calcado, clonar, reusar, reusar codigo, supuestos temporales, unidades, unidad, kilos, gramos, peso, segundo eje, costo por unidad, costo de ventas en cero, ganancia inflada, outbox, cola, reintenta, seed, semilla, resembrar, cambio de dominio de la caja, localStorage se pierde, migrar dominio sin perder ventas, dominio viejo y nuevo en paralelo, redirigir el dominio, sqlite, wal, -wal, copiar la base, mudar el bot, vacuum into, respaldo de sqlite, node:sqlite, dos bots con el mismo token, marca de ya reporte, prisma, migrate diff, check constraint, indice parcial, unique parcial, migration.sql a mano, shadow database, deriva del esquema, init_dominio]
+preguntas: ["como agrego un campo a algo que ya esta guardado", "como pruebo una migracion sql", "se me rompio la pagina con los datos viejos", "en que orden se aplican las migraciones", "en que orden aplico las migraciones y cual va primero", "se puede probar sql aca si no hay docker ni psql", "puedo desplegar si el cliente todavia no ha corrido la migracion", "el sql lo revise y se ve bien - ya cuenta como probado?", "voy a copiar el modulo de caja de otro proyecto: que le reviso antes?", "empezamos a vender por unidad ademas de por peso - que se me rompe?", "que pasa con las ventas pendientes si cambio el dominio de la caja", "voy a pasar el bot a otro computador, basta con copiar el archivo de la base", "le meti un check a mano a la migracion de prisma, como se que no me lo va a borrar despues"]
+proyectos: [placita, infrapilot, estanco-contable, arroces, villa-broaster, copiloto, bot-recolector, mercaplaza]
 confianza: alta
-actualizado: 2026-08-24
+actualizado: 2026-11-02
 ---
 
 # Cambiar la forma de datos que ya existen sin romperle el sistema a nadie
@@ -209,6 +209,41 @@ reconstruir un mes después (`placita lib/persistencia.ts:242-270`).
    viejo, hay que decidir por cada uno si absorbe el caso nuevo o lo declara
    explícitamente fuera de su dominio (commit `1b0475c`, 2026-08-24).
 
+## Tres casos nuevos (2026-11-02)
+
+**1. Cambiar el dominio de una caja que guarda en el navegador.** Si la caja guarda
+ventas sin subir, la clave del local y el puerto de la báscula en el `localStorage`,
+ese almacén está **atado al dominio**: con un dominio nuevo el navegador arranca
+vacío. Nunca redirijas el dominio viejo de una sola vez: **sirve los dos dominios en
+paralelo, espera a que no queden ventas pendientes (cola en 0) en el viejo y solo
+entonces activa la redirección.** Si todo está en un servidor/base de datos y no en el
+navegador, un cambio de dominio no arriesga datos locales.
+
+**2. Mudar un bot con SQLite.** Antes de copiar, compara el tamaño del `.db` y del
+`-wal`: en el bot `copiloto.db` pesaba 4 KB y el `-wal` 2,3 MB, así que copiar solo el
+`.db` habría perdido los pedidos. Saca una copia consistente (`VACUUM INTO`), revisa
+`integrity_check` y **cuenta filas antes y después**, probándolo sobre una copia
+temporal (salió íntegra: 712 pedidos, 12 productos y 483 gastos). En el corte, apaga
+primero el servicio viejo —quitarlo, no matar el proceso: launchd lo levanta— y espera
+a que quede quieto: **con un mismo token de Telegram solo puede haber un consumidor**,
+o los mensajes se reparten entre dos bases. Las marcas de «ya reporté hoy» y «ya
+respaldé» viajan dentro de la base: guárdalas por tarea y por día (una marca única
+habría impedido el reporte de las 8 p. m. porque el de las 7 a. m. ya había salido).
+El comando exacto está en `copiloto-drop/docs/servidor.md`; **el plan no se ha
+ejecutado**, la lección es del plan y de la prueba sobre copia. Con Postgres va
+`pg_dump`, no esto.
+
+**3. Migración de Prisma con SQL escrito a mano** (UNIQUE parciales, CHECK). Pruébala
+desde una base vacía y comprueba (1) que cada CHECK y UNIQUE rechace lo prohibido y
+acepte los reemplazos legítimos, (2) con `prisma migrate diff` que Prisma no ve deriva
+ni intentará borrar en la siguiente migración lo que no conoce, y (3) pasa un
+verificador independiente contra el modelo de datos. Anota que los `id` sin default
+exigen traer su id en un INSERT por SQL directo. El bloque 0.5 dejó 9 tablas, 15
+enums, 5 CHECK y 2 UNIQUE parciales a mano; el riesgo era justamente que Prisma los
+borrara. Resultado: esquema idéntico desde base vacía, `migrate diff` sin deriva y
+verificador PASS 7/7. No aplica a migraciones generadas íntegras por Prisma ni a otros
+ORMs.
+
 ## Cuándo NO aplica
 
 - **Antes del primer usuario real, la migración es ceremonia.** Si borrar y
@@ -295,34 +330,34 @@ reconstruir un mes después (`placita lib/persistencia.ts:242-270`).
 - `estanco-contable/PEND-008` — clave de idempotencia **por dispositivo** para que
   la cola offline no duplique facturas al volver la señal. `placita/KN-038` — con
   cola pendiente de subir no se baja nada.
-- Código y SQL (rutas absolutas bajo `C:\Users\Kalel\`):
-  - `prommter\proyectos\placita\lib\types.ts:1370-1387` — la nota de la v7 (campos
+- Código y SQL (rutas absolutas bajo `$HOME\`):
+  - `prommter/placita/lib/types.ts:1370-1387` — la nota de la v7 (campos
     opcionales que igual necesitan migración) y la **REGLA DURA** con
     `VERSION_DATOS = 7`.
-  - `prommter\proyectos\placita\lib\persistencia.ts` — cabecera `:11-46` (caché, no
+  - `prommter/placita/lib/persistencia.ts` — cabecera `:11-46` (caché, no
     verdad; nada se pierde en silencio; nada lanza), `claveRespaldo` con marca
     `:69-74`, tabla `MIGRACIONES` y su historia `:190-240`, `migrarUnidades`
     `:242-335` (incluido *"eso no es un hecho, es la ausencia del dato"* en
     `:327-330`), encadenado y revalidación `:342-378`. Pruebas:
-    `lib\persistencia.test.ts:9`, `:234-242`, `:609-617`.
-  - `prommter\proyectos\placita\supabase\migraciones\2026-08-21-gastos-y-cierre.sql:1-30`
+    `lib/persistencia.test.ts:9`, `:234-242`, `:609-617`.
+  - `prommter/placita/supabase/migraciones/2026-08-21-gastos-y-cierre.sql:1-30`
     (128 líneas) y `2026-08-22-unidades.sql:1-36` (77 líneas) — una sola
     transacción, idempotentes, y qué pasa **mientras** no se apliquen.
-  - `prommter\proyectos\placita\app\api\sincronizar\route.ts:132-142` (`faltaEsquema`)
+  - `prommter/placita/app/api/sincronizar/route.ts:132-142` (`faltaEsquema`)
     y `:148-152` (`MIGRACION_PENDIENTE`); banner en
     `app\(app)\ventas\page.tsx:1473`.
-  - `prommter\proyectos\estanco-contable\supabase\migrations\001_rol_actual.sql`
+  - `prommter/estanco-contable/supabase/migrations/001_rol_actual.sql`
     (340 líneas): bloque **Idempotencia** `:36-40`, `create or replace` `:134`,
     `revoke execute` `:241`, `drop trigger if exists` + `create trigger` `:258-260`.
     `supabase\README.md` — *"El archivo no es idempotente"* + bloque de limpieza
     para reaplicar 000.
-  - `ORION\infrapilot-app\supabase\migrations\003_organizations.sql` — **233
-    líneas**, sin ejecutar. `app\api\organizations\route.ts:5`,
-    `app\api\profile\route.ts:8` (y las otras seis rutas con el mismo guard),
-    `components\migration-notice.tsx`.
-  - `prommter\proyectos\arroces\lib\types.ts:15-24` (contrato heredado + 3
-    adaptaciones) y `lib\dominio\cierre.ts:29-43` y `:55-61`.
-  - `prommter\proyectos\villa-broaster\docs\BASES-CAJA.md:7-19`, `:21-31`, `:33-40`.
+  - `ORION/infrapilot-app/supabase/migrations/003_organizations.sql` — **233
+    líneas**, sin ejecutar. `app/api/organizations/route.ts:5`,
+    `app/api/profile/route.ts:8` (y las otras seis rutas con el mismo guard),
+    `components/migration-notice.tsx`.
+  - `prommter/arroces/lib/types.ts:15-24` (contrato heredado + 3
+    adaptaciones) y `lib/dominio/cierre.ts:29-43` y `:55-61`.
+  - `prommter/Equipo-villa-broaster/docs/BASES-CAJA.md:7-19`, `:21-31`, `:33-40`.
 
 ### Huecos (lo que el corpus NO respalda todavía)
 
@@ -351,6 +386,24 @@ reconstruir un mes después (`placita lib/persistencia.ts:242-270`).
   filas, ventanas, escritura por lotes). Todo lo migrado hasta hoy cabe en una
   transacción. Si un cliente crece, eso es diseño nuevo, no copia.
 
+- (2026-11-02) «La caja guarda todo en el navegador, atado al dominio... Con un dominio
+  nuevo, el navegador arranca vacío» — ventana
+  [[2026-09-28-placita-estado-y-plan|Placita, estado y plan]] (transcrito `cab39c76`,
+  2026-10-15).
+- (2026-11-02) «El copiloto.db pesa 4 KB y el -wal, 2,3 MB, así que copiar solo el .db
+  perdería los pedidos», «la base salió íntegra, con 712 pedidos, 12 productos y 483
+  gastos» y «El bot nunca puede correr en dos lados a la vez con el mismo token.» —
+  ventana [[2026-10-23-plan-para-pasar-el-bot-a-un-servidor-barato|Plan del servidor
+  barato]] (transcrito `690265d7`, 2026-10-23); «así que esta noche no mandaría el de
+  las 8» — ventana [[2026-10-19-dropshipping-con-flujo-n8n|Bot del dropshipping]]
+  (transcrito `00af789e`, 2026-10-23).
+- (2026-11-02) «Prisma no conoce los índices parciales escritos a mano» — ventana
+  [[2026-10-24-bot-recolector-de-informacion-prommter-fork|Bot recolector (fork)]]
+  (transcrito `34a80c58`, 2026-11-03); «no ve deriva ni intenta borrar nada» y «El
+  verificador dio PASS en las 7 condiciones, sin desviaciones.» — ventana
+  [[2026-10-24-bot-recolector-de-informacion-prommter|Bot recolector]] (transcrito
+  `645b5881`, 2026-11-03).
+
 ## Enlaces
 
 - [[TEMA-entorno-de-la-maquina]] — qué hay y qué no hay instalado aquí; es donde
@@ -367,3 +420,7 @@ reconstruir un mes después (`placita lib/persistencia.ts:242-270`).
   diseñar desde cero.
 - [[TEMA-memoria-y-cierre]] — por qué esto se guarda: `infrapilot/KN-035` no nació
   de trabajo nuevo, nació de cruzar dos memorias que llevaban un mes sin hablarse.
+- [[TEMA-un-vps-varios-negocios]] — adónde se muda el bot y cómo se sirven dos
+  dominios a la vez en Caddy.
+- [[TEMA-la-caja-no-puede-parar]] — por qué las ventas pendientes en el navegador son
+  plata real y no se huérfanan.

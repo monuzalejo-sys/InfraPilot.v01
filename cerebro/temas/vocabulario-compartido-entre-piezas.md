@@ -1,11 +1,11 @@
 ---
 slug: vocabulario-compartido-entre-piezas
 titulo: Cuando dos piezas hablan por igualdad de cadenas, el vocabulario vive en un solo sitio
-alias: [sinonimo, sinónimo, sinonimos, sinónimos, vocabulario, vocabulario cerrado, vocabulario compartido, enum, enums, valores permitidos, lista cerrada, lista de valores validos, aplicaSi, filtro contra perfil, perfil vs filtro, columna, enum contra columna, rol, roles, tabla de permisos, permiso que nunca se dispara, permiso no se aplica, condicion que nunca aplica, aplica siempre, nunca aplica, plan corto, el plan salio corto, arquetipo inalcanzable, inalcanzable, desajuste silencioso, fallo silencioso, error silencioso, sin error, no da error, no truena, no explota, coincidencia exacta, igualdad de cadena, comparacion de cadenas, string exacto, texto exacto, alias de vocabulario, mapa de alias, normalizar, normalizacion, dos vocabularios, dos listas de valores, dos catalogos, dos diccionarios, contrato por texto, contrato de texto libre, JSON suelto sin tipos, enum vs columna, rol vs tabla, permiso vs rol, filtro vs enum, quien declara el vocabulario, un solo sitio, fuente unica de vocabulario, superficies, web-publica, publico, catalogo de arquetipos, orion-arquitecto, plan.mjs, aplicaSi booleano, dos archivos que deberian coincidir]
-preguntas: ["por que este arquetipo dice que aplica siempre y nunca entro al plan", "por que el plan me salio mas corto de lo que esperaba", "escribi un permiso pero nunca se dispara, que reviso primero", "tengo un filtro y un perfil que deberian coincidir y no coinciden, por que no me da error", "como evito que un sinonimo apague un filtro en silencio", "donde deberia vivir el vocabulario cerrado de un enum que usan dos archivos distintos", "un rol y una tabla de permisos dejaron de coincidir, como lo detecto"]
+alias: [sinonimo, sinónimo, sinonimos, sinónimos, vocabulario, vocabulario cerrado, vocabulario compartido, enum, enums, valores permitidos, lista cerrada, lista de valores validos, aplicaSi, filtro contra perfil, perfil vs filtro, columna, enum contra columna, rol, roles, tabla de permisos, permiso que nunca se dispara, permiso no se aplica, condicion que nunca aplica, aplica siempre, nunca aplica, plan corto, el plan salio corto, arquetipo inalcanzable, inalcanzable, desajuste silencioso, fallo silencioso, error silencioso, sin error, no da error, no truena, no explota, coincidencia exacta, igualdad de cadena, comparacion de cadenas, string exacto, texto exacto, alias de vocabulario, mapa de alias, normalizar, normalizacion, dos vocabularios, dos listas de valores, dos catalogos, dos diccionarios, contrato por texto, contrato de texto libre, JSON suelto sin tipos, enum vs columna, rol vs tabla, permiso vs rol, filtro vs enum, quien declara el vocabulario, un solo sitio, fuente unica de vocabulario, superficies, web-publica, publico, catalogo de arquetipos, orion-arquitecto, plan.mjs, aplicaSi booleano, dos archivos que deberian coincidir, perfil con prosa, el arquitecto reincidio, prosa en el perfil, validar el perfil, superficies, web-publica, publico, trece interruptores, orion-arquitecto, espejo del agente, runtime/agents, deriva del espejo, instalador distribuye el bug, sed amplio, sed demasiado amplio, reemplazo masivo, contar coincidencias, tres sitios del vocabulario, perfil del proyecto, perfil de la villa]
+preguntas: ["por que este arquetipo dice que aplica siempre y nunca entro al plan", "por que el plan me salio mas corto de lo que esperaba", "escribi un permiso pero nunca se dispara, que reviso primero", "tengo un filtro y un perfil que deberian coincidir y no coinciden, por que no me da error", "como evito que un sinonimo apague un filtro en silencio", "donde deberia vivir el vocabulario cerrado de un enum que usan dos archivos distintos", "un rol y una tabla de permisos dejaron de coincidir, como lo detecto", "el arquitecto volvio a escribir el perfil con palabras que el catalogo no reconoce, como lo evito", "arregle un vocabulario y el instalador sigue distribuyendo el bug, que me falto", "un sed me rompio dos arquetipos, como hago un reemplazo masivo sin romper nada"]
 proyectos: [orion]
 confianza: alta
-actualizado: 2026-09-09
+actualizado: 2026-11-02
 ---
 
 # Cuando dos piezas hablan por igualdad de cadenas, el vocabulario vive en un solo sitio
@@ -41,6 +41,19 @@ nadie se entere"— y era su propia lista la que incumplía su propia advertenci
 cerró el hueco; la comprobación tenía que ser un valor comparado contra otro,
 no un recordatorio.
 
+**Reincidió, y la advertencia en el agente no bastó (2026-10-28).** El perfil de La Villa
+volvió a traer **prosa dentro de los valores** de `superficies`/interruptores, «exactamente
+el fallo del vocabulario que arreglé hoy» (el arreglo fue en la sesión iniciada el 09-09). El aviso escrito dentro del agente
+`orion-arquitecto` no impide que un modelo lo ignore: **todo perfil que produzca el
+arquitecto pasa por una validación mecánica contra el vocabulario cerrado** (las superficies
+y los trece interruptores) antes de aplicarse. Y el arreglo de aquel 09-09 enseñó dos
+cosas más: (a) un arreglo de vocabulario se aplica en **tres sitios** (el mapa de alias en
+`plan.mjs`, el vocabulario en `_ESQUEMA.md`, el agente) **y en el espejo del agente dentro
+del repo** (`runtime/agents/`): «si no lo actualizo, el instalador seguiría distribuyendo el
+bug»; comprueba con `diff` que no queda deriva. (b) En reemplazos masivos **cuenta las
+coincidencias antes**: «Mi sed anterior fue demasiado amplio y rompió dos arquetipos
+legítimos» (corregido en el acto, 09-09 20:25); minutos después, «Un solo defecto, y es mío — de la reparación anterior» (20:37); y tras sincronizar el espejo, la comprobación dio «Cero deriva en los agentes» (20:57).
+
 ## Cómo se aplica
 
 1. **Antes de escribir un segundo archivo que declare el mismo vocabulario que
@@ -54,6 +67,9 @@ no un recordatorio.
    del punto 3. Un script de 10 líneas que extrae los valores usados en uno y
    los compara contra los aceptados en el otro habría cazado esto sin esperar
    a un plan real.
+2b. **Si lo que produce el valor es un modelo (un agente), la comprobación mecánica no es
+   opcional:** valida su salida contra la lista cerrada antes de aplicarla; el recordatorio
+   en el prompt ya falló dos veces (09-09 y 10-28).
 3. **Cuando ya encuentres el desajuste, no borres de golpe el término viejo.**
    Añade un alias que normalice el sinónimo hacia el valor real, para no
    invalidar lo que ya está escrito con el término equivocado, y deja
@@ -91,6 +107,9 @@ no un recordatorio.
   coincidir porque nadie los comparó nunca. El síntoma también es distinto:
   allá es "no hay X" después de crearlo; acá es "esto nunca se dispara" o "el
   plan salió corto".
+- **Campos de texto libre** (descripciones, brief) que ningún componente compara por
+  igualdad: ahí la prosa es legítima; la validación cerrada es solo para los campos que
+  otra pieza filtra por cadena exacta.
 - **Un alias no es la corrección definitiva.** Sirve para no romper lo que ya
   está escrito con el término viejo mientras se corrige el emisor; si se deja
   para siempre sin revisar quién sigue produciendo el sinónimo, el problema
@@ -119,6 +138,7 @@ no un recordatorio.
   misma familia de bug silencioso: un arquetipo "que aplica siempre" casi
   nunca existe; ahí faltaba la condición entera, aquí la condición existía
   pero comparaba contra el vocabulario equivocado.
+- Cosecha de las ventanas, 2026-11-02 — ventana [[2026-09-09-la-villa-sistema|La Villa sistema]] (transcrito `129e1026`): «dictaba superficies: web-publica, pero los 535 arquetipos del catálogo filtran por publico. Nunca coincidieron.» (2026-09-09); «si no lo actualizo, el instalador seguiría distribuyendo el bug» (2026-09-09); «Mi sed anterior fue demasiado amplio y rompió dos arquetipos legítimos.» (2026-09-09); «su perfil trae prosa dentro de los valores — exactamente el fallo del vocabulario que arreglé hoy» (2026-10-28).
 
 ## Enlaces
 

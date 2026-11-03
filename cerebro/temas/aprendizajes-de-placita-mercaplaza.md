@@ -1,14 +1,44 @@
 ---
 slug: aprendizajes-de-placita-mercaplaza
 titulo: Lo que placita/Mercaplaza enseñó pagando — lecciones del POS y la vitrina de la frutería
-alias: [placita, mercaplaza, mercaplaza nariñense, mercaplaza nariñense familiar, fruteria, frutería, vitrina de frutas, landing de frutas, landing minimalista rechazada, la landing es una basura, POL-001, minimalismo rechazado, portada que vende, dar antojo, vender antojo, no inventar numeros, nunca se inventa un numero, precio en tienda, evidencia comprobable, prompt con adjetivos, prompt con numeros, encargo interpretable, medir el build, medicion de terreno, pliegue, primera tarjeta, prohibido partir de cero, html suelto, rediseño desde cero, mejorar archivo por archivo, bascula, báscula, web serial, ACS-TAE-30, venta por peso, venta al gramo, kardex, dias de surtido, surtido martes y viernes, pulpas, sla de pulpas, un solo cta, cta unico, android gama media, 390px, dropshoping.com.co, repo placita, C:\Users\Kalel\placita, fotos mercaplaza, fotos heic]
-preguntas: ["¿qué se aprendió con placita/mercaplaza?", "¿por qué el dueño rechazó la landing minimalista?", "¿cuándo aplica el manifiesto minimalista y cuándo no?", "¿cómo se escribe un prompt de diseño que sí cambie la página?", "¿por qué está prohibido rehacer la portada desde cero?", "¿qué números puede afirmar una landing sin inventar?", "¿dónde vive el repo de placita y dónde están las fotos de mercaplaza?", "¿cómo se mide una landing antes de opinar sobre ella?"]
-proyectos: [placita]
+alias: [placita, mercaplaza, mercaplaza nariñense, mercaplaza nariñense familiar, fruteria, frutería, vitrina de frutas, landing de frutas, landing minimalista rechazada, la landing es una basura, POL-001, minimalismo rechazado, portada que vende, dar antojo, vender antojo, no inventar numeros, nunca se inventa un numero, precio en tienda, evidencia comprobable, prompt con adjetivos, prompt con numeros, encargo interpretable, medir el build, medicion de terreno, pliegue, primera tarjeta, prohibido partir de cero, html suelto, rediseño desde cero, mejorar archivo por archivo, bascula, báscula, web serial, ACS-TAE-30, venta por peso, venta al gramo, kardex, dias de surtido, surtido martes y viernes, pulpas, sla de pulpas, un solo cta, cta unico, android gama media, 390px, dropshoping.com.co, repo placita, $HOME/placita, fotos mercaplaza, fotos heic, mercaplaza.prommter.pro, caja.mercaplaza.prommter.pro, placita-repo, placita-tienda, recibo de mercaplaza, vps publica master, rama master, dominio nuevo de mercaplaza, donde esta el repo de placita]
+preguntas: ["¿qué se aprendió con placita/mercaplaza?", "¿por qué el dueño rechazó la landing minimalista?", "¿cuándo aplica el manifiesto minimalista y cuándo no?", "¿cómo se escribe un prompt de diseño que sí cambie la página?", "¿por qué está prohibido rehacer la portada desde cero?", "¿qué números puede afirmar una landing sin inventar?", "¿dónde vive el repo de placita y dónde están las fotos de mercaplaza?", "¿cómo se mide una landing antes de opinar sobre ella?", "¿dónde está hoy el repo de mercaplaza y en qué dominio vive?", "¿qué rama publica el VPS de mercaplaza, main o master?", "¿qué reglas dejó el recibo de mercaplaza?"]
+proyectos: [placita, mercaplaza]
+confianza: alta
+actualizado: 2026-11-02
 ---
+
+# Lo que placita/Mercaplaza enseñó pagando
+
+**⚠ Corrección 2026-11-02:** la sede de abajo (repo en el PC Windows, producción en
+`dropshoping.com.co`) quedó vieja. Hoy: el dominio es **`mercaplaza.prommter.pro`** (la caja, en
+`caja.mercaplaza.prommter.pro`; los dos `dropshoping` redirigen con 301 desde el 28-oct). El
+código vive en dos repos de GitHub: **`placita-repo`** (la caja/sistema) y **`placita-tienda`**
+(la vitrina), con clon también en la Mac. **El VPS publica desde la rama `master`, no `main`**: un
+merge a `main` sin llevar `master` no sale nunca; `publicar.sh` aplica solo las migraciones
+pendientes, y desde la Mac no hay SSH (lo corre el PC o el dueño). La caja guarda su estado local
+en `localStorage` del origen, así que un cambio de dominio se hace al cierre y con la cola de
+ventas en 0. Lo de abajo se conserva como historia.
+
+## Respuesta corta
+
+Cinco reglas pagadas en la frutería, más una de papel: **(1)** el minimalismo gobierna el
+interior de la app, no la portada: la portada da antojo y recibe el pedido (el dueño rechazó la
+minimalista el 2026-08-05). **(2)** Un encargo con adjetivos deja la página igual; uno con
+números (inventario cerrado de animaciones, contraste medido, pliegue medido sobre el build real
+a 390×844) la cambia: mide antes de opinar. **(3)** Prohibido partir de cero: se mejora archivo
+por archivo sobre el flujo vivo (carrito → `/api/pedidos` → caja). **(4)** Nunca se inventa un
+número: sin catálogo publicado la tarjeta dice «Precio en tienda»; sin testimonios, estrellas ni
+«años de experiencia». **(5)** Una acción, una audiencia: un solo CTA y diseño para Android de
+gama media a 390 px. **(6)** El recibo: ancho imprimible real (48 mm en rollo de 58), sin
+resolución DIAN que no puedas confirmar, y papel a pedido, no por venta: ver
+[[TEMA-recibos-comprobantes-y-dian]].
+
+## Contexto histórico del negocio (sede original, ago-2026)
 
 Placita es el sistema real de "Mercaplaza Nariñense Familiar": frutería que vende
 por peso (gramos enteros, báscula ACS-TAE-30 leída por Web Serial), con catálogo
-web, pedidos desde el celular y caja. **Repo autoritativo: `C:\Users\Kalel\placita`
+web, pedidos desde el celular y caja. **Repo autoritativo: `$HOME/placita`
 (PC Windows) · producción: https://dropshoping.com.co/catalogo**. No hay repo git
 de placita en la Mac; aquí solo están los prompts (`ORION/prompts-landing/placita-mercaplaza.md`
 y `-v2.md`), 111 fotos HEIC del negocio en `~/Downloads/mercaplaza docs` (con copia
@@ -61,3 +91,13 @@ enlace discreto para quien atiende, nunca un botón que compita. Se diseña prim
 para el vecino real: Android de gama media, datos limitados, 390 px, una mano y
 sol en la pantalla. El activo diferencial son las 20 siluetas SVG propias de los
 productos — ninguna competencia local tiene una vitrina ilustrada así.
+
+## Lección 6 — El recibo de caja se diseña para el papel y no se llama factura (28-oct-2026)
+
+El recibo de Mercaplaza se cortaba porque se armaba a 80 mm en una impresora de rollo de 58 mm que
+solo imprime 48 mm; el recibo del POS anterior imprimía una «Res.» de 2020 que no era una
+autorización vigente. Se rehízo como «Recibo de venta», «No responsable de IVA», sin resolución,
+con total en banda negra, y el dueño decidió «por ahora sin factura electrónica» y papel solo a
+pedido (`placita/DEC-037`). El detalle y las cifras (con su confianza media) están en
+[[TEMA-recibos-comprobantes-y-dian]]; la regla de no imprimir lo que no puedes confirmar, en
+[[TEMA-cero-datos-inventados]].

@@ -1,11 +1,11 @@
 ---
 slug: verificar-con-evidencia
 titulo: Cómo se comprueba un resultado en esta máquina (y por qué no se confía en la vista)
-alias: [captura, capturas, captura de pantalla, capturas de pantalla, pantallazo, pantallazos, screenshot, screenshots, sacar una captura, tomar una foto de la pagina, imagen de la pagina, captura del sitio, pantallazo del sitio, captura de la web, captura de la landing, foto del sitio, png, pdf, pdfs, generar pdf, generar un pdf, genero un pdf, genero pdf, generacion de pdf, hacer un pdf, sacar un pdf, saco un pdf, armar un pdf, pasar a pdf, paso a pdf, convertir a pdf, html a pdf, de html a pdf, exportar a pdf, imprimir a pdf, imprimir en pdf, print-to-pdf, edge headless, edge, msedge, headless, cdp, edge-cdp, edge-cdp.mjs, navegador, navegador embebido, pane, browser, poppler, pdftoppm, python, verificar, verificacion, comprobar, comprobacion, evidencia, prueba, probar, medir, medicion, mediciones, qa, qa visual, calidad, veredicto, pass, fail, movil, celular, 390, viewport, overflow, desborde, desbordamiento, bamboleo, scroll lateral, animacion, animaciones, getanimations, reduced motion, tap target, scrollwidth, clientwidth, papel, impresora, imprimir, factura, comprobante, caja, cajero, mostrador, arqueo, bascula, en esta maquina, cortada, cortado, recortada, recortado, captura recortada, captura cortada, screenshot cortado, se ve cortado a la derecha, corrido a la derecha, se sale a la derecha, ancho equivocado, se ve mal en celular, getcomputedstyle, css calculado, estilo calculado, valor calculado, clamp, calc, var css, variable css, escala de espaciado, espaciado, padding, paddings, margenes, token de diseno, tokens de diseno, valor arbitrario, arbitrary value, tailwind, el grep no lo vio, grep en 0, grep no basta, buscar con grep el valor, medir el padding, medir espaciados, medir colores, contraste calculado]
-preguntas: ["como saco una captura de una pagina en esta maquina", "como genero un pdf", "¿cómo verifico que esto de verdad quedó bien?", "¿por qué la captura se ve cortada a la derecha?", "¿cómo pruebo cómo se ve en celular?", "¿cómo compruebo que el PDF no salió corrupto?", "¿cómo saco un pantallazo del sitio?", "¿cómo tomo un screenshot de la landing?", "el grep no encontró nada pero el diseño está mal, ¿cómo lo compruebo?", "¿cómo mido los paddings o colores reales de una pantalla?"]
-proyectos: [_permanent, landings, wrd, placita, villa-broaster, estanco-contable]
+alias: [captura, capturas, captura de pantalla, capturas de pantalla, pantallazo, pantallazos, screenshot, screenshots, sacar una captura, tomar una foto de la pagina, imagen de la pagina, captura del sitio, pantallazo del sitio, captura de la web, captura de la landing, foto del sitio, png, pdf, pdfs, generar pdf, generar un pdf, genero un pdf, genero pdf, generacion de pdf, hacer un pdf, sacar un pdf, saco un pdf, armar un pdf, pasar a pdf, paso a pdf, convertir a pdf, html a pdf, de html a pdf, exportar a pdf, imprimir a pdf, imprimir en pdf, print-to-pdf, edge headless, edge, msedge, headless, cdp, edge-cdp, edge-cdp.mjs, navegador, navegador embebido, pane, browser, poppler, pdftoppm, python, verificar, verificacion, comprobar, comprobacion, evidencia, prueba, probar, medir, medicion, mediciones, qa, qa visual, calidad, veredicto, pass, fail, movil, celular, 390, viewport, overflow, desborde, desbordamiento, bamboleo, scroll lateral, animacion, animaciones, getanimations, reduced motion, tap target, scrollwidth, clientwidth, papel, impresora, imprimir, factura, comprobante, caja, cajero, mostrador, arqueo, bascula, en esta maquina, cortada, cortado, recortada, recortado, captura recortada, captura cortada, screenshot cortado, se ve cortado a la derecha, corrido a la derecha, se sale a la derecha, ancho equivocado, se ve mal en celular, getcomputedstyle, css calculado, estilo calculado, valor calculado, clamp, calc, var css, variable css, escala de espaciado, espaciado, padding, paddings, margenes, token de diseno, tokens de diseno, valor arbitrario, arbitrary value, tailwind, el grep no lo vio, grep en 0, grep no basta, buscar con grep el valor, medir el padding, medir espaciados, medir colores, contraste calculado, captura mentirosa, pantallazo viejo, fotograma viejo, captura a medio cargar, cargando cerebro, animacion a medio camino, pestana en segundo plano, panel oculto, panel oculto no pinta, screenshot engana, no se pinta, chrome headless, capas animadas, responsive, se solapa el titulo, barra tapa el titulo, tableta vertical, encuadre de camara, three.js, bounding sphere, barrido de anchos, se sale de la pantalla, zona horaria, utc, bogota, America/Bogota, recordatorio en calendar, hora local, serial de excel, dia de la semana, fecha corrida cinco horas, hora de colombia, el recordatorio quedo a las 3 de la manana]
+preguntas: ["como saco una captura de una pagina en esta maquina", "como genero un pdf", "¿cómo verifico que esto de verdad quedó bien?", "¿por qué la captura se ve cortada a la derecha?", "¿cómo pruebo cómo se ve en celular?", "¿cómo compruebo que el PDF no salió corrupto?", "¿cómo saco un pantallazo del sitio?", "¿cómo tomo un screenshot de la landing?", "el grep no encontró nada pero el diseño está mal, ¿cómo lo compruebo?", "¿cómo mido los paddings o colores reales de una pantalla?", "por que la captura me muestra algo distinto de lo que de verdad pasa en la pagina", "como compruebo que no se tapen cosas en todos los tamanos de pantalla y que el 3D no salga cortado", "el recordatorio me quedo a las 3 de la manana, por que las horas me salen corridas"]
+proyectos: [_permanent, landings, wrd, placita, villa-broaster, estanco-contable, cerebro-3d, escuadra, dropshipping, orion-app]
 confianza: alta
-actualizado: 2026-08-27
+actualizado: 2026-11-02
 ---
 
 # Cómo se comprueba un resultado en esta máquina
@@ -13,7 +13,7 @@ actualizado: 2026-08-27
 ## Respuesta corta
 
 **Captura + medición de cualquier página, en un solo comando:**
-`node C:/Users/Kalel/ORION/tools/edge-cdp.mjs --url <archivo|url> --width 390 --height 844 --mobile --shot salida.png`
+`node $ORION_HOME/tools/edge-cdp.mjs --url <archivo|url> --width 390 --height 844 --mobile --shot salida.png`
 — y después **abre el PNG con Read**: la captura es la evidencia, no el recuerdo.
 **PDF:** escribe el documento en HTML con `@page`, imprímelo con Edge headless
 (`--headless --disable-gpu --no-pdf-header-footer --print-to-pdf=<salida.pdf> <file:///entrada.html>`)
@@ -21,6 +21,12 @@ y **valídalo contando `/Type /Page` con node** — aquí no hay Python ni poppl
 **Nunca** uses `msedge --screenshot` a secas para juzgar móvil (miente el ancho y apaga
 las animaciones) ni el navegador embebido para juzgar CSS. **Todo veredicto lleva un
 número medido**; si no puedes escribir el número, todavía no verificaste.
+
+**Cuatro añadidos de la cosecha 2026-11-02:** una captura no es prueba hasta que esté quieta y
+confirmada con un número (el panel oculto pinta el último cuadro); el responsive se barre por
+código de 768 a 2560 px con los títulos más largos; en 3D, el encuadre sale de la silueta
+proyectada y no de una esfera envolvente; y toda fecha o hora se calcula con código y se declara
+en `America/Bogota`. Ver pasos 9 a 12.
 
 ## Por qué (qué lo pagó)
 
@@ -66,7 +72,7 @@ que un screenshot del pane no es evidencia de cómo se ve la pantalla.
 ## Cómo se aplica
 
 1. **Captura y medición de una página — el caso del 90 %.**
-   `node C:/Users/Kalel/ORION/tools/edge-cdp.mjs --url <archivo|url> --width 390 --height 844 --mobile --shot out.png`
+   `node $ORION_HOME/tools/edge-cdp.mjs --url <archivo|url> --width 390 --height 844 --mobile --shot out.png`
    Devuelve JSON con `innerWidth/innerHeight`, `scrollWidth`, `clientWidth`, `overflowX`,
    `scrollHeight`, `getAnimations().length`, `reducedMotion`, fuentes cargadas, título,
    consola y excepciones, más el PNG. Flags útiles: `--full` (página entera), `--eval "<js>"`
@@ -74,14 +80,14 @@ que un screenshot del pane no es evidencia de cómo se ve la pantalla.
    `--width 1440` sin `--mobile` para escritorio.
 2. **Abre el PNG con la herramienta Read.** Un PNG que nadie miró no es evidencia.
 3. **PDF.** Documento en HTML con `@page`/`@media print`, y:
-   `"/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf="C:\ruta\salida.pdf" "file:///C:/ruta/entrada.html"`
+   `"/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf="/ruta/salida.pdf" "file:////ruta/entrada.html"`
    (`_permanent/KN-004`). Para celular, tamaño de página propio: `@page 110mm x 195mm`
    más `print-color-adjust` para que las barras de color impriman
    (`villa-broaster/DEC-011`).
 4. **Valida el PDF con node**, porque no hay renderizador: que empiece por `%PDF-`,
    contenga `%%EOF` y tenga páginas contando `/Type\s*\/Page(?!s)`
    (`_permanent/KN-005`; implementación real en
-   `C:\Users\Kalel\prommter\proyectos\villa-broaster\docs\semanal\generar.mjs:114-125`).
+   `$ORION_HOME/prommter/villa-broaster/docs/semanal/generar.mjs:114-125`).
    Comprobado el 2026-08-24 sobre un PDF recién generado: `%PDF- true`, `%%EOF true`,
    1 página, 18 300 bytes.
 5. **Mide, no mires.** El repertorio que ya se pagó:
@@ -124,6 +130,37 @@ que un screenshot del pane no es evidencia de cómo se ve la pantalla.
    (`placita/KN-028`) — pero ese mismo navegador quedó con facturas de prueba en
    `localStorage`, y eso hoy es un riesgo abierto (`placita/RSK-004`).
 
+9. **La captura puede mentir: confírmala con un número.** Antes de usar una captura como prueba,
+   espera a que la escena esté quieta y cargada y confirma con una medición sacada de la página
+   (posición, tamaño, texto del DOM). Con una pestaña oculta o en segundo plano, el panel pinta el
+   último cuadro y no recibe el aviso de cambio de tamaño: forzar el redimensionado o medir por
+   consola. En cerebro-3d la captura engañó cuatro veces (cargando, fotograma viejo, cámara a
+   medio camino y pestaña en segundo plano que repetía la primera medida); en Escuadra unas
+   tildes «faltantes» (MISION, DIAS) eran solo la resolución de la captura. Para comprobar una capa
+   con animación, máscara o estado que cambia con el tiempo, usa Chrome headless con captura real
+   sobre el DOM (`edge-cdp.mjs`), no el panel.
+10. **Barre anchos por código, con los textos más largos reales.** Para dar por responsive una UI,
+    mide los solapes en anchos de 768 a 2560 px y en ambas orientaciones, con los títulos más
+    largos de los datos. En el cerebro 3D la barra de herramientas tapó el título en anchos
+    medianos y, ya corregido, el panel de corte lo tapó en tableta: solo el barrido lo mostró
+    (sin solapes de 768 a 2560 px con 4 títulos).
+11. **En visores 3D, encuadra con la silueta proyectada** (vértices a pantalla), no con una esfera
+    envolvente, y valida el peor ángulo si la cámara gira. La vista inicial se salía casi el doble
+    del ancho en tableta vertical porque la distancia salía de una esfera aproximada; con la
+    silueta real: 7 tamaños × 8 enfoques sin recorte y 60 de 60 pruebas, incluida una que gira
+    la tableta.
+12. **Fechas y horas: calcúlalas con código, declara `America/Bogota` y léelas de vuelta.** No
+    hagas aritmética de fechas a mano: genera con código los días esperados de las pruebas
+    (semana, «ayer», serial de Excel) y, si una prueba de fechas falla, sospecha primero de la
+    prueba. Toda hora que escribas para Colombia (calendario, cron, filtro de logs, base) se
+    declara con zona `America/Bogota` y se lee de vuelta en hora local. Los digests y logs vienen
+    en UTC (−5 h). Seis fallos en cuatro días, todos de Claude: el 10-oct-2026 es sábado y su semana
+    arranca el lunes 5, no el 6; el serial 46301 de Excel es el 6 de octubre, no el 5; el
+    recordatorio de las 8 a. m. quedó en UTC (3:00 a. m. en Colombia); el filtro de logs se puso a
+    las 9:30 cuando eran las 9:26 locales; y un servidor en UTC habría corrido 5 horas las 18
+    fechas que SQLite guarda en hora local. Ver también la jornada contable en
+    [[TEMA-caja-y-turnos]].
+
 ## Cuándo NO aplica
 
 - **Escritorio, sin movimiento y sin dudas de ancho**: `--screenshot` a secas basta y es más
@@ -154,6 +191,13 @@ que un screenshot del pane no es evidencia de cómo se ve la pantalla.
 - **Ruido que no es falla**: Edge headless escupe líneas `ERROR:` en stderr (task_manager,
   `LoadEnclaveImageW error 577`) y aun así escribe el PNG/PDF. Si de verdad no escribió el
   archivo, reintenta con `--user-data-dir` fresco (`_permanent/KN-009`).
+
+- **Páginas estáticas** sin animación ni carga diferida y con el panel en primer plano: la captura
+  abierta con Read basta; la espera y la medición son para escenas que cambian.
+- **Pantallas de ancho fijo** (kiosko, TV) o vistas sin texto variable: una resolución alcanza. En
+  modelos casi esféricos la esfera envolvente sí encaja.
+- **Fechas guardadas en UTC con zona explícita** (ISO con offset): ahí solo hay que convertir al
+  mostrar.
 
 ## Evidencia
 
@@ -187,16 +231,38 @@ que un screenshot del pane no es evidencia de cómo se ve la pantalla.
 - `villa-broaster/KN-015` — barrido QA 2026-08-23 con sus costos medidos.
 - `villa-broaster/KN-013` — no hay renderizador PDF interno; usar CDP y no `--screenshot`.
 - `villa-broaster/DEC-011` — el porcentaje solo sube con evidencia verificada; PDF de celular.
-- Código: `C:\Users\Kalel\ORION\tools\edge-cdp.mjs:108-117` (emulación de viewport y de
+- Código: `$ORION_HOME/tools/edge-cdp.mjs:108-117` (emulación de viewport y de
   `prefers-reduced-motion`, y el bloque de métricas) y
-  `C:\Users\Kalel\prommter\proyectos\villa-broaster\docs\semanal\generar.mjs:105-125`
+  `$ORION_HOME/prommter/villa-broaster/docs/semanal/generar.mjs:105-125`
   (impresión con Edge + `validarPdf`).
 - **Medición propia 2026-08-24** (página sonda que imprime `innerWidth`, Edge en
-  `C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`):
+  `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`):
   `--screenshot --window-size=390,844` → PNG 390×844 con `innerWidth=492`;
   `488 → 492`; `600 → 576`; `800 → 776`. Es cromo fijo (24 px) + piso, **no** escala 125 %.
   `edge-cdp.mjs --width 390 --mobile` → `innerWidth=390`, `reducedMotion=false`.
   PDF generado y validado: `%PDF-` sí, `%%EOF` sí, 1 página.
+
+### Cosecha de ventanas 2026-11-02
+- Captura: «Sí había cargado: la captura se tomó antes de que terminara.» (2026-10-19), «Recargo para ver si
+  la captura anterior era un fotograma viejo» (2026-10-19), «La pestaña en segundo plano no recibe los
+  avisos de cambio de tamaño» y «Esa captura se tomó con la animación de la cámara a medio camino.»
+  (2026-10-20) — ventana [[2026-10-19-prototipo-web-de-cerebro-3d-interactivo-con-enferm|Prototipo web de cerebro 3D]]
+  (transcrito `71c5f9e6`). «Las tildes están bien en el texto; era la resolución de la captura.» —
+  ventana [[2026-10-22-orion-app-de-rutina-sincronizada|Orion app de rutina]] (`b5eb380b`, 2026-10-23).
+- Capas animadas: «Las capturas del panel siguen sin ser confiables para capas animadas. Busco un Chrome
+  headless en la Mac para medir sobre píxeles reales» — ventana
+  [[2026-10-26-vitrina-interactiva-y-visual|Vitrina interactiva y visual]] (`16d8eb66`, 2026-10-26).
+- Anchos y encuadre: «Sin solapes en ningún ancho (de 768 a 2560 px) con los cuatro títulos.», «En tableta
+  el panel de corte, al abrirse, tapa el final del título.» y «la distancia de la cámara salía de una esfera
+  aproximada, mucho más grande que la silueta real» — ventana
+  [[2026-10-19-prototipo-web-de-cerebro-3d-interactivo-con-enferm|Prototipo web de cerebro 3D]] (`71c5f9e6`, 2026-10-20).
+- Fechas: «el 10 de octubre de 2026 es sábado, así que su semana arranca el lunes 5, no el 6» (2026-10-20),
+  «el serial 46301 de Excel es el 6 de octubre. El 5 es el 46300» (2026-10-21), «El evento quedó creado, pero
+  en hora UTC: las 8:00 UTC son las 3:00 a. m. en Colombia.» (2026-10-23) y «lo puse desde las 9:30 y apenas
+  son las 9:26» (2026-10-23) — ventana [[2026-10-19-dropshipping-con-flujo-n8n|Dropshipping con flujo n8n]]
+  (`00af789e`); «SQLite guarda 18 fechas con la hora local del equipo; en UTC quedarían corridas 5 horas» —
+  ventana [[2026-10-23-plan-para-pasar-el-bot-a-un-servidor-barato|Plan para pasar el bot a un servidor barato]]
+  (`690265d7`, 2026-10-23).
 
 ## Enlaces
 

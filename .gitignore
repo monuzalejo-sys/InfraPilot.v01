@@ -34,3 +34,8 @@ agenda/
 
 # Correos de cada empresa: el PDF lleva claves en claro, nunca al remoto publico
 correos/
+
+# Fichas de las ventanas (sesiones de la app): cuentan decisiones de clientes, del equipo y
+# finanzas del dueño. El remoto de ORION es PÚBLICO: se quedan en esta máquina y llegan a la
+# bóveda (local) con baul.mjs. Ver tools/ventanas.mjs.
+cerebro/ventanas/

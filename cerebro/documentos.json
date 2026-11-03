@@ -3,81 +3,88 @@
   "_como_se_amplia": "Agrega una entrada con su ruta (archivo o carpeta), qué extensiones tomar y qué ROL cumple. El rol entra al texto indexado, así que descríbelo como lo buscaría alguien.",
   "documentos": [
     {
-      "ruta": "C:\\Users\\Kalel\\ORION\\cerebro\\diagnostico-del-ecosistema.md",
+      "ruta": "/Users/g/orion/cerebro/diagnostico-del-ecosistema.md",
       "extensiones": [
         ".md"
       ],
       "rol": "diagnostico transversal del ecosistema: contradicciones entre proyectos, lecciones que se pagaron varias veces, huecos donde hay trabajo real y cero conocimiento, y la doctrina que nadie escribio como tal"
     },
     {
-      "ruta": "C:\\Users\\Kalel\\ORION\\RFC",
+      "ruta": "/Users/g/orion/RFC",
       "extensiones": [
         ".md"
       ],
       "rol": "RFC normativo del estándar ORION: define formalmente el modelo de objetos, los contratos de comportamiento, el protocolo del ciclo de vida, la economía de contexto, la escalabilidad y el cumplimiento"
     },
     {
-      "ruta": "C:\\Users\\Kalel\\ORION\\ORION_STANDARD.md",
+      "ruta": "/Users/g/orion/ORION_STANDARD.md",
       "extensiones": [
         ".md"
       ],
       "rol": "el estándar ORION completo, documento maestro del runtime cognitivo"
     },
     {
-      "ruta": "C:\\Users\\Kalel\\ORION\\prompts-landing",
+      "ruta": "/Users/g/orion/prompts-landing",
       "extensiones": [
         ".md"
       ],
       "rol": "prompt de diseño entregable: el encargo con el que un generador construye la página pública de un proyecto, con sus datos citados, su dirección de arte y sus criterios de aceptación"
     },
     {
-      "ruta": "C:\\Users\\Kalel\\ORION\\prompts-landing\\referencias",
+      "ruta": "/Users/g/orion/prompts-landing/referencias",
       "extensiones": [
         ".md"
       ],
       "rol": "ficha de referencia visual: el mecanismo reutilizable de una referencia, qué no se copia de ella, su traducción al negocio y el veredicto que recibió"
     },
     {
-      "ruta": "C:\\Users\\Kalel\\prommter\\proyectos\\villa-broaster\\docs\\BASES-CAJA.md",
+      "ruta": "/Users/g/orion/prommter/Equipo-villa-broaster/docs/BASES-CAJA.md",
       "extensiones": [
         ".md"
       ],
       "rol": "bases aprobadas del módulo de caja: qué se adopta de Mercaplaza, qué no y por qué, y el hallazgo de que el turno de caja se diseña desde cero"
     },
     {
-      "ruta": "C:\\Users\\Kalel\\prommter\\proyectos\\villa-broaster\\tareas",
+      "ruta": "/Users/g/orion/prommter/Equipo-villa-broaster/tareas",
       "extensiones": [
         ".md"
       ],
       "rol": "tarjeta de trabajo de un equipo humano: objetivo, archivos que se tocan y cuáles no, criterios de aceptación verificables y qué se aprende con ella"
     },
     {
-      "ruta": "C:\\Users\\Kalel\\prommter\\proyectos\\villa-broaster\\PLAN-EQUIPO.md",
+      "ruta": "/Users/g/orion/prommter/Equipo-villa-broaster/PLAN-EQUIPO.md",
       "extensiones": [
         ".md"
       ],
       "rol": "plan de trabajo de un equipo: qué falta para entregar, quién responde por cada entrega, cómo se trabaja y el camino de cada persona"
     },
     {
-      "ruta": "C:/Users/Kalel/ORION/ECONOMIA-DE-TOKENS.md",
+      "ruta": "/Users/g/orion/ECONOMIA-DE-TOKENS.md",
       "extensiones": [
         ".md"
       ],
       "rol": "analisis medido de en que se van los tokens del ecosistema y las palancas para bajar el gasto: donde esta la fuga, cuanto cuesta cada fase por modelo y por spawn, cuando conviene bajar de tier y cuando no, y que hay que arreglar para que los numeros sigan sirviendo"
     },
     {
-      "ruta": "C:/Users/Kalel/ORION/catalogo/_ESQUEMA.md",
+      "ruta": "/Users/g/orion/catalogo/_ESQUEMA.md",
       "extensiones": [
         ".md"
       ],
       "rol": "formato del catalogo de arquetipos de tarea: como se escribe una tarea reutilizable con su porque, sus pasos, su aceptacion comprobable, y la condicion que decide si aplica a un proyecto concreto"
     },
     {
-      "ruta": "C:/Users/Kalel/ORION/runtime/README.md",
+      "ruta": "/Users/g/orion/runtime/README.md",
       "extensiones": [
         ".md"
       ],
       "rol": "mapa del runtime: que agentes y skills existen, para que sirve cada uno, y como se mantienen sincronizadas las tres copias del runtime sin perder trabajo"
+    },
+    {
+      "ruta": "/Users/g/orion/cerebro/ventanas",
+      "extensiones": [
+        ".md"
+      ],
+      "rol": "ficha de cada ventana (sesion de Claude en la app): para que fue, que rechazo el dueno, que decidio y que leccion dejo al cerebro; sirve para preguntar en que ventana se hizo o se decidio algo"
     }
   ]
 }

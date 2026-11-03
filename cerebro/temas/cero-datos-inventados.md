@@ -1,9 +1,9 @@
 ---
 slug: cero-datos-inventados
 titulo: "Qué se puede escribir como dato y qué es mentira verosímil"
-alias: [datos, dato, poner datos, que datos, inventar, inventado, inventados, inventarme, no inventar, sin inventar nada, mentira, mentiras, verosimil, verosimiles, relleno, copy de relleno, rellenar, placeholder, placeholders, marcador, marcadores, hueco, huecos, hueco explicito, faltante, faltantes, falta el dato, dato falso, datos falsos, precio, precios, precio inventado, precios inventados, precios de ejemplo, precio de maniqui, maniqui, catalogo, catalogo de ejemplo, carta, menu, semilla, seed, demo, demos, datos demo, datos ficticios, ficticio, ficticios, maqueta, maquetas, mockup, prototipo, prototipos, ejemplo, ejemplos, muestra, pagina publica, pagina, publica, publico, publicar, publicacion, web publica, sitio publico, landing, landings, portada, vitrina, mostrador, cara al cliente, cliente final, testimonio, testimonios, resenas, opiniones, cifras, cifras sociales, anos de experiencia, numero de clientes, premios, horario, horarios, telefono, telefonos, whatsapp, direccion, direcciones, sede, sedes, ciudad, barrio, marca, marca real, nombre provisional, logo, stock, disponibilidad, agotado, promo, promos, cupon, cupones, codigo, descuento, descuentos, rebaja, rebajas, antes y ahora, foto, fotos, foto de stock, imagenes, seo, keywords, metadata, pronostico, prediccion, predicciones, auditar copy, revisar copy, se puede inventar, puedo inventar, que puedo publicar, autorizacion, autorizado, frontera, parquear, parquearlo, parqueado, aparcar, bloqueante, pendiente bloqueante, compuerta, compuerta de publicacion, declarado, placeholder declarado, sin declarar, cosmetico, cosmetica, identitario, identidad, afirmacion, afirmacion de hecho, cambia el comportamiento, umbral, umbrales, blocked, ready, sigo construyendo, puedo seguir, me falta el nombre, nombre pendiente, promesa comercial, compromiso comercial, incentivos, niveles, nivel, buscador, resumen del buscador, extracto del buscador, resumen automatico, resumidor, resumen de ia, snippet, snippets, citar, citar una fuente, fuente, fuentes, fuente primaria, no verificado, sin verificar, verificar una cita, abrir el documento, investigacion, investigar, informe de investigacion, pdf, extraer texto de un pdf, pdfkit, pdftotext, 404, aviso de empleo, atribucion, atribuyo, la fuente dice]
-preguntas: ["que datos puedo poner en una pagina publica", "puedo inventar precios para una demo", "¿qué pongo donde todavía no tengo el dato real?", "¿puedo poner un horario o un teléfono de ejemplo mientras el cliente me pasa el bueno?", "¿puedo poner testimonios o años de experiencia si no me los han dado?", "¿cómo marco lo que es de mentiras en una demo para que el cliente no crea que ya funciona?", "me falta el nombre de la marca, ¿paro o sigo construyendo?", "¿qué placeholder puedo dejar vivo mientras construyo y cuál no?", "¿un pendiente bloqueante alcanza para tapar un dato inventado?", "el buscador me dio un dato con su fuente, ¿ya lo puedo meter al informe?", "¿puedo citar lo que me resumió el buscador sin abrir la página?", "¿cómo marco un dato que solo vi en el extracto de google?", "¿cómo saco el texto de un PDF en esta Mac si no hay pdftotext?"]
-proyectos: [landings, villa-broaster, infrapilot, orama, wrd, pollo-landing, placita]
+alias: [datos, dato, poner datos, que datos, inventar, inventado, inventados, inventarme, no inventar, sin inventar nada, mentira, mentiras, verosimil, verosimiles, relleno, copy de relleno, rellenar, placeholder, placeholders, marcador, marcadores, hueco, huecos, hueco explicito, faltante, faltantes, falta el dato, dato falso, datos falsos, precio, precios, precio inventado, precios inventados, precios de ejemplo, precio de maniqui, maniqui, catalogo, catalogo de ejemplo, carta, menu, semilla, seed, demo, demos, datos demo, datos ficticios, ficticio, ficticios, maqueta, maquetas, mockup, prototipo, prototipos, ejemplo, ejemplos, muestra, pagina publica, pagina, publica, publico, publicar, publicacion, web publica, sitio publico, landing, landings, portada, vitrina, mostrador, cara al cliente, cliente final, testimonio, testimonios, resenas, opiniones, cifras, cifras sociales, anos de experiencia, numero de clientes, premios, horario, horarios, telefono, telefonos, whatsapp, direccion, direcciones, sede, sedes, ciudad, barrio, marca, marca real, nombre provisional, logo, stock, disponibilidad, agotado, promo, promos, cupon, cupones, codigo, descuento, descuentos, rebaja, rebajas, antes y ahora, foto, fotos, foto de stock, imagenes, seo, keywords, metadata, pronostico, prediccion, predicciones, auditar copy, revisar copy, se puede inventar, puedo inventar, que puedo publicar, autorizacion, autorizado, frontera, parquear, parquearlo, parqueado, aparcar, bloqueante, pendiente bloqueante, compuerta, compuerta de publicacion, declarado, placeholder declarado, sin declarar, cosmetico, cosmetica, identitario, identidad, afirmacion, afirmacion de hecho, cambia el comportamiento, umbral, umbrales, blocked, ready, sigo construyendo, puedo seguir, me falta el nombre, nombre pendiente, promesa comercial, compromiso comercial, incentivos, niveles, nivel, buscador, resumen del buscador, extracto del buscador, resumen automatico, resumidor, resumen de ia, snippet, snippets, citar, citar una fuente, fuente, fuentes, fuente primaria, no verificado, sin verificar, verificar una cita, abrir el documento, investigacion, investigar, informe de investigacion, pdf, extraer texto de un pdf, pdfkit, pdftotext, 404, aviso de empleo, atribucion, atribuyo, la fuente dice, abre muy pronto, pedidos en linea abren pronto, funcion apagada, boton que no hace nada, proximamente, coming soon, aviso honesto, quitar whatsapp, nota vieja, pendiente viejo, memoria desactualizada, hueco cerrado, grep en la memoria, direccion confirmada, quitar numero de todo, quita el numero de todo, nequi, medios de pago, pagar en caja, capturas del sistema, pantallazos del sistema, sistema actual del cliente, fotos del sistema del cliente, 0 bytes, descargas vacias, heic, sips, existencias negativas, datos reales en la demo]
+preguntas: ["que datos puedo poner en una pagina publica", "puedo inventar precios para una demo", "¿qué pongo donde todavía no tengo el dato real?", "¿puedo poner un horario o un teléfono de ejemplo mientras el cliente me pasa el bueno?", "¿puedo poner testimonios o años de experiencia si no me los han dado?", "¿cómo marco lo que es de mentiras en una demo para que el cliente no crea que ya funciona?", "me falta el nombre de la marca, ¿paro o sigo construyendo?", "¿qué placeholder puedo dejar vivo mientras construyo y cuál no?", "¿un pendiente bloqueante alcanza para tapar un dato inventado?", "el buscador me dio un dato con su fuente, ¿ya lo puedo meter al informe?", "¿puedo citar lo que me resumió el buscador sin abrir la página?", "¿cómo marco un dato que solo vi en el extracto de google?", "¿cómo saco el texto de un PDF en esta Mac si no hay pdftotext?", "el sistema de pedidos todavía no funciona: ¿qué le pongo a la página en vez del botón?", "la memoria dice que la dirección no está confirmada, ¿la pongo en el video o le pregunto al dueño?", "te dije que quitaras el número, ¿por qué sigue saliendo en otros lados?", "el cliente me dejó pantallazos de su sistema actual, ¿qué hago con eso antes de armar la demo?"]
+proyectos: [landings, villa-broaster, infrapilot, orama, wrd, pollo-landing, placita, duo-burger, la-villa]
 confianza: alta
 actualizado: 2026-11-02
 ---
@@ -262,6 +262,11 @@ la primera publicación.
 
 ## Cuándo NO aplica
 
+- **Alcance limitado por el dueño** (p. ej. si acota el encargo a una sola superficie, como la
+  imprenta o la web): se respeta, pero reporta qué superficies quedaron sin tocar.
+- **Cliente sin sistema previo** (no hay pantallas que leer): la demo usa huecos visibles, no
+  ejemplos sacados de capturas.
+
 - **Demo comercial con autorización explícita del dueño: ahí SÍ se inventa, y completo.**
   El 2026-08-21, para la demo de Orama, el dueño autorizó inventar casas, precios,
   ubicaciones y fotos. Ese contenido **no se entrega como hueco: se especifica concreto,
@@ -295,6 +300,45 @@ la primera publicación.
 - **Cuando no hay página pública, no hay problema que resolver.** Placita eliminó su
   catálogo público completo el 2026-08-20 (`placita/DEC-017`, commit `8705f06`): el dominio
   aloja solo el sistema.
+
+## Cuatro casos más de la misma regla (ventanas del dueño, sep–nov 2026)
+
+**1. Función apagada: se anuncia, no se oculta ni se finge.** El 12-sep el dueño pidió quitar el
+pedir por WhatsApp porque el pedido debe entrar por el sistema que construye el PC. La landing de
+Duo Burguer quedó con el aviso «Los pedidos en línea abren muy pronto» y un solo botón, «Ver la
+carta»; el dueño: «eso es exactamente lo que queria, una carta y que por debajo trabajemos
+nosotros». Un botón que no hace nada es relleno; ocultarla también miente por omisión. El aviso va
+en tono de marca y con una sola acción útil.
+
+**2. Un «sin confirmar» ya resuelto deja fuera datos reales.** Una nota de la memoria decía que la
+dirección del local no estaba confirmada; el reel y la imagen del local (16-oct) y «Cómo llegar»
+(18-oct) salieron sin dirección, y el 21-oct Claude le preguntó al dueño si era la correcta: **ya
+estaba confirmada desde el 11 de septiembre**. Antes de omitir un dato por «sin confirmar», o de
+preguntárselo al dueño, haz `grep` por el dato en la memoria del proyecto y en la landing. Al
+confirmarse un dato, borra la nota de pendiente en todos lados y agrégalo a las piezas ya hechas
+si es gratis (el cierre de «Cómo llegar» no obligó a regenerar nada con IA). Si el dato sigue sin
+fuente citable (`archivo:línea`), sigue siendo un hueco visible: no se rellena.
+
+**3. «Quita X de todo» se cumple con un inventario por superficie.** El número de contacto y
+Nequi publicado desde el 12-sep (según la memoria) no era del negocio. El 28-sep Claude lo quitó
+solo de la página y dejó el resto «al PC»; el dueño: «te pedi que quitaras numeros de todo».
+Recién entonces se auditó lo impreso (limpio) y aparecieron una carpeta del 23-sep con cartel de
+Nequi, un caballete con número y piezas viejas del kit del PC. Cuando pida quitar un dato
+(número, precio, nombre), búscalo en **todas** las superficies —página, piezas impresas ya
+enviadas, ZIPs y carpetas de Descargas, kits viejos del repo, sistema— y entrega la lista con el
+estado de cada una. Un contacto o medio de pago que el dueño no confirmó es un hueco: la página
+dice «para pagar, acércate a la caja» hasta que él dé el correcto, y la imprenta nunca lleva
+teléfono ni Nequi.
+
+**4. Lee las capturas del sistema del cliente antes de tocar la demo.** Las diez fotos del POS de
+La Villa llegaron primero en 0 bytes («llegaron vacías — el envío no terminó») y luego completas.
+Si están en 0 bytes, pídelas de nuevo y avanza con lo que no dependa de ellas; conviértelas
+(`sips -s format jpeg -Z 1400`), léelas **todas** y saca hallazgos con cifras. Mostraron que el
+minimarket ya facturaba electrónico (489 documentos en 29 días), IVA 0/5/19 %, existencias en
+-20, -133 y -474 y un mismo producto a $2.500 y a $2.400 en una factura: el pitch pasó de
+«empezar a facturar» a «no romperle lo que ya cumple y heredarle la numeración», y la demo dejó
+de usar ejemplos (la caja arranca en el documento siguiente al último de las fotos; lo que no se
+ve se marca como hueco).
 
 ## Huecos de este tema (lo que el corpus NO respalda)
 
@@ -370,6 +414,14 @@ la primera publicación.
 - `investigacion/2026-11-02-que-tiene-delta-y-por-que-lo-eligen/fuentes.md:19, :21, :39-40`
   e `INFORME.md:206` — tesis Comfacauca extraída con PDFKit y citada por página; aviso de
   ACOPI Cauca abierto por URL directa (5-oct-2026); curso de Comfacauca con 404, no contado.
+- Casos de 2026-09/11 (ventanas del dueño): «quita el pedir por whasapp», «Sale el aviso «Los
+  pedidos en línea abren muy pronto» y un solo botón, «Ver la carta».» y «eso es exactamente lo que
+  queria, una carta y que por debajo trabajemos nosotros» — ventana [[2026-09-09-duo-burger|Duo Burger]] (transcrito `51184930`, 2026-09-12).
+- «No puse la dirección en ninguna pieza» — ventana [[2026-10-01-mejora-de-video-en-artefactos|Mejora de video en artefactos]] (transcrito `5f2b61e1`, 2026-10-16); «Me equivoqué con la dirección» y «sí está confirmada desde el 11 de septiembre» (transcrito `fc142d00`, 2026-10-21).
+- «te pedi que quitaras numeros de todo», «no pongas nequi, pon que para los pagos se acerquen a
+  caja» — ventana [[2026-09-09-duo-burger|Duo Burger]] (transcrito `51184930`, 2026-09-28).
+- «quiero que utilices esa informacion para llevar las demo», «llegaron vacías, 0 bytes — el envío
+  no terminó», «489 documentos en 29 días» — ventana [[2026-09-09-la-villa-sistema|La Villa: sistema]] (transcrito `129e1026`, 2026-10-31).
 
 ## Enlaces
 
@@ -381,3 +433,7 @@ la primera publicación.
   documento lo que se cobró, y la UI no promete un número que el servidor no honre.
 - [[TEMA-documentos-para-personas]] — cuando el entregable es un documento y no una página,
   el hueco también va visible y con nombre de quien lo llena.
+- [[TEMA-fuente-primaria-y-normas]] — el mismo principio con normas, salud y precios: cita la
+  fuente primaria y rotula el nivel de cada fuente.
+- [[TEMA-recibos-comprobantes-y-dian]] — una resolución que no puedes confirmar es un dato
+  inventado; el recibo no es factura.
