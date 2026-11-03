@@ -383,7 +383,7 @@
       "runId": "orion-278748af",
       "triggeredBy": "TASK_COMPLETED",
       "startedAt": "2026-11-03T03:00:15.430Z",
-      "completedAt": "2026-11-03T05:32:18.528Z",
+      "completedAt": "2026-11-03T05:38:12.058Z",
       "objectsCreated": 2,
       "objectsMerged": 0,
       "objectsArchived": 0,
@@ -391,8 +391,8 @@
       "objectsDemoted": 0,
       "outcome": "DONE",
       "fixCycles": 1,
-      "tokensReales": 134200000,
-      "notes": "Cosecha de las 58 transcripciones (54 ventanas): 170 lecciones candidatas (614/627 citas literales), 13 temas nuevos, 24 reforzados, 8 contradicciones resueltas, 54+1 fichas en cerebro/ventanas, tools/ventanas.mjs y sección Ventanas del baúl. Verificación adversarial: 76 defectos (4 altos, 30 medios), 25 arreglos. probar 76/80 → 154/156 (79/80 en la suite vieja) tras medir B_TEMA=0,3 (KN-028). Gasto real ≈ US$ 84-97 a precio de API (costos.mjs real --sesion 278748af). Otra ventana curó memory/orion a mitad de la cosecha (commit 7fe4d35).",
+      "tokensReales": 149600000,
+      "notes": "Cosecha de las 58 transcripciones (54 ventanas): 170 lecciones candidatas (614/627 citas literales), 13 temas nuevos, 24 reforzados, 8 contradicciones resueltas, 54+1 fichas en cerebro/ventanas, tools/ventanas.mjs y sección Ventanas del baúl. Verificación adversarial: 76 defectos (4 altos, 30 medios), 25 arreglos. probar 76/80 → 154/156 (79/80 en la suite vieja) tras medir B_TEMA=0,3 (KN-028). Gasto real final 149,6 M tokens ≈ US$ 91-104 a precio de API (costos.mjs real --sesion 278748af). Otra ventana curó memory/orion a mitad de la cosecha (commit 7fe4d35).",
       "modelOutcomes": [
         {
           "phase": "analysis",
@@ -438,9 +438,9 @@
           "phase": "orchestration",
           "model": "opus",
           "verdict": "ok",
-          "tokens": 55900000,
+          "tokens": 71200000,
           "agentes": 1,
-          "nota": "orquestador; US$ 29-31"
+          "nota": "orquestador; US$ 37-40"
         }
       ]
     }
