@@ -18,9 +18,10 @@
  *        GASTO REAL leído de las transcripciones de Claude Code (~/.claude/projects): el
  *        `usage` de cada mensaje (entrada, escritura y lectura de caché, salida) por sesión,
  *        flujo y agente, con US$ a precio de API y las marcas de agente inflado.
- *   node tools/costos.mjs vigilar <carpeta> [--agente 40] [--total 400] [--cada 30]
+ *   node tools/costos.mjs vigilar <carpeta> [--agente 40] [--total 400] [--usd-agente 15] [--usd-total 100] [--cada 30]
  *        DISPARADOR en vivo para una ola: relee la carpeta del flujo o de la sesión y sale con
- *        código 3 en cuanto un agente pasa de --agente M tokens reales o la carpeta de --total M.
+ *        código 3 en cuanto un agente pasa de --agente M tokens reales o la carpeta de --total M
+ *        (o de --usd-agente / --usd-total en dólares: mejor, porque un token de opus cuesta 2× uno de sonnet).
  *        Se lanza en segundo plano junto con la ola; cuando salta, el orquestador decide parar.
  *
  * ⚠ CORRECCIÓN 2026-11-02: `subagent_tokens` (lo que guardan los metrics.json y suman los
@@ -229,24 +230,25 @@ async function vigilar() {
   const dir = ARGV[1]
   if (!dir || !existsSync(dir)) { console.log("uso: costos.mjs vigilar <carpeta de flujo o de sesión> [--agente 40] [--total 400] [--cada 30]"); process.exit(1) }
   const limAg = Number(val("agente", "40")) * 1e6, limTot = Number(val("total", "400")) * 1e6, cada = Number(val("cada", "30")) * 1000
+  const usdAg = Number(val("usd-agente", "Infinity")), usdTot = Number(val("usd-total", "Infinity"))
   const acum = new Map()
   const archivos = () => {
     const out = []
     const rec = (d) => { for (const x of listar(d)) { try { if (statSync(x).isDirectory()) rec(x); else if (x.endsWith(".jsonl")) out.push(x) } catch {} } }
     rec(dir); return out
   }
-  console.log(`vigilando ${dir} · agente > ${M(limAg)} o total > ${M(limTot)} · cada ${cada / 1000} s`)
+  console.log(`vigilando ${dir} · agente > ${M(limAg)}${usdAg < Infinity ? ` o ${usd(usdAg)}` : ""} · total > ${M(limTot)}${usdTot < Infinity ? ` o ${usd(usdTot)}` : ""} · cada ${cada / 1000} s`)
   for (;;) {
-    let total = 0
+    let total = 0, totalUsd = 0
     for (const f of archivos()) {
       const a = leerIncremental(f, acum.get(f) ?? nuevoAcumulado()); acum.set(f, a)
-      const r = resumirAcumulado(a); total += r.total
-      if (r.total > limAg) {
-        console.log(`⚠ DISPARADOR: «${etiqueta(f)}» (${familia(r.modelo)}) va en ${M(r.total)} tokens reales (≈ ${usd(r.usdMax)}), ${r.pasos} pasos, contexto ${Math.round(r.ctx / 1000)}k, ${r.imgs} imágenes. Límite por agente ${M(limAg)}.`)
+      const r = resumirAcumulado(a); total += r.total; totalUsd += r.usdMax
+      if (r.total > limAg || r.usdMax > usdAg) {
+        console.log(`⚠ DISPARADOR: «${etiqueta(f)}» (${familia(r.modelo)}) va en ${M(r.total)} tokens reales (≈ ${usd(r.usdMax)}), ${r.pasos} pasos, contexto ${Math.round(r.ctx / 1000)}k, ${r.imgs} imágenes. Límites por agente: ${M(limAg)} o ${usd(usdAg)}.`)
         process.exit(3)
       }
     }
-    if (total > limTot) { console.log(`⚠ DISPARADOR: la carpeta va en ${M(total)} tokens reales. Límite total ${M(limTot)}.`); process.exit(3) }
+    if (total > limTot || totalUsd > usdTot) { console.log(`⚠ DISPARADOR: la carpeta va en ${M(total)} tokens reales (≈ ${usd(totalUsd)}). Límites: ${M(limTot)} o ${usd(usdTot)}.`); process.exit(3) }
     await new Promise((r) => setTimeout(r, cada))
   }
 }

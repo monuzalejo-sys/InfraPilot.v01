@@ -276,7 +276,8 @@ porque se medía el contexto final, no el gasto. Desde ahora:
    build, migraciones, curl + grep): casi gratis. El verificador agente solo
    observa lo que no se puede comprobar con un comando.
 7. **Disparador en vivo**: al lanzar una ola, en segundo plano
-   `node $ORION_HOME/tools/costos.mjs vigilar <carpeta de la ola> --agente 40 --total <presupuesto×1,3>`.
+   `node $ORION_HOME/tools/costos.mjs vigilar <carpeta de la ola> --usd-agente 15 --usd-total <presupuesto US$×1,3>`
+   (en dólares, no en tokens: un token de opus cuesta el doble que uno de sonnet).
    Si sale con código 3: parar, partir o seguir con la razón escrita.
 8. **El orquestador también gasta.** Con más de ~300k de contexto, cada turno
    relee todo: al cerrar un bloque grande, `/orion-close` y sesión nueva desde
