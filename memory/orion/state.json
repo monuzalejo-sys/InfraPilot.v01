@@ -1,7 +1,7 @@
 {
   "projectId": "orion",
-  "snapshotDate": "2026-11-03T05:15:00.000Z",
-  "version": 18,
+  "snapshotDate": "2026-11-04T03:32:00.000Z",
+  "version": 19,
   "lastAmmRun": "2026-11-03T04:39:07.000Z",
   "objects": [
     {
@@ -486,6 +486,20 @@
       "fact": "REFORZAR UN TEMA LO VOLVÍA MENOS ENCONTRABLE: cerebro.mjs puntúa con BM25 (k1=1.5, b=0.75) y los temas largos perdían contra temas nuevos y cortos que comparten vocabulario. En la cosecha del 2026-11-02, donde-vive-el-dato pasó de 6.308 a 7.870 palabras y dejó de ganar una pregunta que tiene escrita literal; probar cayó de 76/80 a 71/80. Barrido de b solo para temas: 0,75 → 140/156; 0,3 → 153/156; 0,1 → 151/156, pero esconde objetos puntuales (placita/KN-034 del 3.º al 5.º, duo-burger/KN-027 del 1.º al 4.º). Quedó B_TEMA=0,3 (CEREBRO_B_TEMA permite repetir el barrido) más el recorte de alias de temas nuevos que robaban preguntas (varias-ventanas-mismo-repo repetía «sesión» seis veces): 154/156, y 79/80 en la suite vieja. Regla: tras toda cosecha corre probar con las preguntas nuevas Y con la suite vieja; si un tema nuevo gana preguntas ajenas, recorta sus alias genéricos antes de tocar el puntaje.",
       "context": "Al cosechar o curar el cerebro y al tocar el puntaje de cerebro.mjs.",
       "source": "tools/cerebro.mjs (comentario de B_TEMA); ventana «Alimentar vault de Obsidian» (transcrito 278748af, 2026-11-03)"
+    },
+    {
+      "id": "PEND-005",
+      "type": "Pending",
+      "tier": "Project",
+      "created": "2026-11-04T03:32:00.000Z",
+      "updated": "2026-11-04T03:32:00.000Z",
+      "lifetime": "Sprint",
+      "impact": "High",
+      "priority": "High",
+      "status": "Blocked",
+      "dependencies": [],
+      "task": "DECIDE EL DUEÑO: ¿el remoto de ORION (monuzalejo-sys/InfraPilot.v01) pasa a privado? Hoy es público, sin GitHub Pages, 0 forks y 0 estrellas (medido 2026-11-03). En la punta siguen datos de clientes que ningún commit puede limpiar del historial: los teléfonos de Super Arroz del Norte en prompts-landing/arroces-super-arroz-del-norte.md, el número que el dueño dijo que NO es de Duo en memory/duo-burger (brief, state, metrics), y el encargo v4 interno de la agencia en el historial desde 77f13b1. Con un sí: gh repo edit monuzalejo-sys/InfraPilot.v01 --visibility private --accept-visibility-change-consequences.",
+      "reason": "Cada ventana trabaja alrededor de «el remoto es público» (fichas fuera de git, cifras abstraídas, v4 fuera) y aun así se filtró; tapar en la punta no borra el historial, y reescribirlo exige un force push que solo el dueño autoriza. Privado lo resuelve de raíz, incluido el historial."
     }
   ],
   "archives": [

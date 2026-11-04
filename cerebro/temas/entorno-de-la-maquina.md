@@ -1,11 +1,11 @@
 ---
 slug: entorno-de-la-maquina
 titulo: Lo que cada máquina puede y no puede hacer (son DOS)
-alias: [push, git push, subir el codigo, subir a github, publicar el repo, credential, credential manager, github desktop, desktop, commit, rama, remoto, terminal, consola, maquina, entorno, esta maquina, mi pc, computador, dos computadores, dos maquinas, mac, macos, darwin, windows, en cual maquina estoy, instalado, no esta instalado, falta instalar, python, python3, pip, docker, brew, homebrew, node, npm, powershell, ps 5.1, bash, heredoc, comando largo, se corta, truncado, utf8, tildes, acentos, mojibake, encoding, json corrupto, puerto, puertos, localhost, launch.json, servidor local, dev server, arrancar el servidor, wifi, wifi del local, firewall, red local, red publica, lan, celular, telefono, escala de windows, permisos del agente, sandbox, scratchpad, limite de sesion, edge, chrome, chrome headless, pdf, orion_home, uptime, carga, carga del sistema, load average, hilos, nucleos, cuantos nucleos tiene esta mac, cuantos hilos, i5, cpu al limite, se cayo el dns, dns caido, ENOTFOUND, resolucion de dns, compilando en segundo plano, compilar mientras corren agentes, brew compilando, kill -STOP, kill -CONT, suspender un proceso, pausar una compilacion, cuantos agentes en paralelo aguanta esta maquina, timeout, gtimeout, limite de tiempo, comando colgado, perl alarm, tarea programada, scheduled task, permitir siempre, permiso pendiente, AbortError, la pagina no se actualizo, no corrio sola, keep awake, request_keep_awake, caffeinate, mac dormida, se durmio la mac, no dejes apagar, panel del navegador, se cayo el localhost, no me deja abrir, preview_start, Maximum 5 dev servers, http.server, storage is disabled, file://, bsd sed, swiftshader, webgl lento, playwright lento, pruebas tardan 30 minutos, iris plus 640, whisper-cpp, brew install whisper, large-v3-turbo, no hay excel, libreoffice, xlsx, gh auth login, device flow, login/device, dos cuentas github, self-modification, settings.json, settings.local.json, modo automatico, auto mode, clasificador, donde clono, prommter/proyectos, gitlink, typecheck con miles de errores, eslint no termina, carpeta compartida]
+alias: [push, mudar rutas del pc a la mac, migrar rutas, rutas de windows, git push, subir el codigo, subir a github, publicar el repo, credential, credential manager, github desktop, desktop, commit, rama, remoto, terminal, consola, maquina, entorno, esta maquina, mi pc, computador, dos computadores, dos maquinas, mac, macos, darwin, windows, en cual maquina estoy, instalado, no esta instalado, falta instalar, python, python3, pip, docker, brew, homebrew, node, npm, powershell, ps 5.1, bash, heredoc, comando largo, se corta, truncado, utf8, tildes, acentos, mojibake, encoding, json corrupto, puerto, puertos, localhost, launch.json, servidor local, dev server, arrancar el servidor, wifi, wifi del local, firewall, red local, red publica, lan, celular, telefono, escala de windows, permisos del agente, sandbox, scratchpad, limite de sesion, edge, chrome, chrome headless, pdf, orion_home, uptime, carga, carga del sistema, load average, hilos, nucleos, cuantos nucleos tiene esta mac, cuantos hilos, i5, cpu al limite, se cayo el dns, dns caido, ENOTFOUND, resolucion de dns, compilando en segundo plano, compilar mientras corren agentes, brew compilando, kill -STOP, kill -CONT, suspender un proceso, pausar una compilacion, cuantos agentes en paralelo aguanta esta maquina, timeout, gtimeout, limite de tiempo, comando colgado, perl alarm, tarea programada, scheduled task, permitir siempre, permiso pendiente, AbortError, la pagina no se actualizo, no corrio sola, keep awake, request_keep_awake, caffeinate, mac dormida, se durmio la mac, no dejes apagar, panel del navegador, se cayo el localhost, no me deja abrir, preview_start, Maximum 5 dev servers, http.server, storage is disabled, file://, bsd sed, swiftshader, webgl lento, playwright lento, pruebas tardan 30 minutos, iris plus 640, whisper-cpp, brew install whisper, large-v3-turbo, no hay excel, libreoffice, xlsx, gh auth login, device flow, login/device, dos cuentas github, self-modification, settings.json, settings.local.json, modo automatico, auto mode, clasificador, donde clono, prommter/proyectos, gitlink, typecheck con miles de errores, eslint no termina, carpeta compartida]
 preguntas: ["en que maquina estoy trabajando", "puedo hacer push desde la terminal", "que hay instalado en esta maquina y que no", "por que el comando largo se corta a la mitad", "como genero un pdf aqui", "en que puerto arranca cada proyecto", "por que no se publico sola la pagina si dejamos la tarea programada", "por que se me caen los localhost cuando cierro el panel del navegador", "por que las pruebas del 3D tardan una eternidad en la Mac", "como dejo la Mac logueada en mi GitHub", "por que Claude no me puede escribir el settings.json", "en que carpeta clono un proyecto nuevo"]
 proyectos: [_permanent, infrapilot, prommter, wrd, villa-broaster, placita, estanco-contable, pollo-landing, landings, duo-burger, que-cremoso, la-villa, cerebro-3d, mercado-de-plantillas, orion-rutina]
 confianza: alta
-actualizado: 2026-11-02
+actualizado: 2026-11-03
 ---
 
 # Lo que cada máquina puede y no puede hacer (son DOS)
@@ -201,6 +201,12 @@ skills sirvan en las dos.
     `**/*.ts`, `typecheck` daba miles de errores ajenos y `lint` no terminó en 5 minutos;
     acotado, typecheck 7 s y build 23 s. Entre acotar y mover el proyecto, el dueño
     prefirió el cambio mínimo (`prommter/DEC-001`).
+23. **Mudar rutas del PC a la Mac: por raíz, no por texto.** `C:\Users\Kalel` era el HOME
+    (→ `~`: ahí viven `~/.claude/skills` y `~/.claude/agents`) y `C:\Users\Kalel\ORION` es
+    `$ORION_HOME`; confundirlas deja rutas que no existen. No conviertas barras dentro de
+    regex ni de código: `wrd\.example\.com` no es una ruta. Antes de commitear la mudanza,
+    saca la tabla de reemplazos distintos (`git diff --word-diff=porcelain`) y lee lo que
+    no sea una ruta.
 
 ## Cuándo NO aplica
 
@@ -288,6 +294,11 @@ Cosecha de las ventanas (2026-11-02):
 - **No hay nota de impresora, báscula ni lector de barras conectados a la Mac.**
 - **El firewall y el WiFi "pública" que bloqueaban el celular (`wrd/KN-009`) son del
   PC.** En la Mac no se ha probado el acceso desde el celular por LAN.
+
+- **Mudanza de rutas revisada el 2026-11-03** (commits `238860e` y `33742b0`): la del 03-09 había
+  convertido `wrd\.example\.com` en `wrd/.example/.com` dentro del grep de fugas de `prompts-landing/wrd.md`
+  y mandado `C:\Users\Kalel\.claude` a `$ORION_HOME/.claude` en la memoria de infrapilot, que en la Mac no
+  existe. Las dos salieron de leer los 424 reemplazos distintos, no los 43 archivos.
 
 ## Enlaces
 

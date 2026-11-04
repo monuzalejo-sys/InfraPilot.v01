@@ -1,11 +1,11 @@
 {
   "projectId": "orion",
-  "sessionCount": 10,
+  "sessionCount": 11,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-11-03T05:32:25.049Z",
+  "lastUpdated": "2026-11-04T03:32:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-08-26-orion-v4",
@@ -441,6 +441,32 @@
           "tokens": 71200000,
           "agentes": 1,
           "nota": "orquestador; US$ 37-40"
+        }
+      ]
+    },
+    {
+      "sessionId": "migracion-rutas-2026-11-03",
+      "runId": "orion-278748af",
+      "triggeredBy": "TASK_COMPLETED",
+      "startedAt": "2026-11-04T03:15:29.327Z",
+      "completedAt": "2026-11-04T03:32:00.000Z",
+      "objectsCreated": 1,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "outcome": "DONE",
+      "fixCycles": 0,
+      "tokensReales": 17900000,
+      "notes": "Revisión y publicación de lo que quedó sin commitear de la mudanza a la Mac del 2026-09-03 (183 entradas; la tarjeta decía 9-sep): 5 commits 238860e..27b5f44. 3 de 118 modificados salían de una versión vieja (v2/v3 de la agencia y export-vault); la v4 faltaba porque vive a propósito en el repo privado de Prommter. Arreglados 2 errores de la migración (regex wrd\\.example\\.com y C:\\Users\\Kalel\\.claude → $ORION_HOME/.claude) y tapado el WhatsApp de un cliente. memory/*/vault/, .DS_Store y cerebro-3d/ quedan fuera de git. Gasto real ≈ 17,9 M tokens ≈ US$ 9-10 (orquestador solo, sin subagentes; costos.mjs real --sesion 278748af da 167,5 M acumulados contra 149,6 M al cerrar la cosecha). Queda PEND-005: decidir si el remoto pasa a privado.",
+      "modelOutcomes": [
+        {
+          "phase": "orchestration",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 17900000,
+          "agentes": 1,
+          "nota": "revisión inline, sin spawns: lo determinista (diffs, escaneo, validate-memory, probar) por Bash"
         }
       ]
     }

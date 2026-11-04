@@ -179,3 +179,5 @@ puedes publicar tú solo los videos en mis redes todos los días con mi chrome a
 me rechazaron el comando que editaba y aplicaba la migración, qué reviso antes de repetirlo => rechazado-no-es-no-ejecutado
 cancelé la herramienta a la mitad, cómo sé si alcanzó a escribir => rechazado-no-es-no-ejecutado
 después de reintentar quedó el bloque duplicado en el sql => rechazado-no-es-no-ejecutado
+tengo cambios sin commitear de hace dos meses, los publico tal cual => varias-ventanas-mismo-repo
+voy a pasar las rutas de windows a la mac, qué cuidado tengo => entorno-de-la-maquina

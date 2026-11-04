@@ -1,11 +1,11 @@
 ---
 slug: varias-ventanas-mismo-repo
 titulo: Varias ventanas (o dos máquinas) sobre el mismo repo — commits con rutas, ramas, PID y órdenes escritas
-alias: [varias ventanas mismo repo, otra sesion, otra ventana, ventanas paralelas, nos pisamos, pisar archivos, staging compartido, commit con rutas explicitas, git commit -- ruta, git add -A, git add -a, commitear solo lo mio, no toques sus archivos, orion compartido, arbol compartido, pkill, matar por pid, kill por pid, fork de la conversacion, copia de la conversacion, arranca el bloque, ya estaba hecho, bloque ya hecho, orden al pc, orden para el pc, mensaje al pc, ORDEN-PC, ventana del pc, issue de github, coordinar mac y pc, archivos sin commitear, sin commitear, git status sucio, trabajo ajeno en el arbol, dos ventanas a la vez, archivos preparados de otra ventana]
+alias: [varias ventanas mismo repo, trabajo sin commitear, cambios viejos sin commitear, de que version salio, commit que arrastro archivos, otra sesion, otra ventana, ventanas paralelas, nos pisamos, pisar archivos, staging compartido, commit con rutas explicitas, git commit -- ruta, git add -A, git add -a, commitear solo lo mio, no toques sus archivos, orion compartido, arbol compartido, pkill, matar por pid, kill por pid, fork de la conversacion, copia de la conversacion, arranca el bloque, ya estaba hecho, bloque ya hecho, orden al pc, orden para el pc, mensaje al pc, ORDEN-PC, ventana del pc, issue de github, coordinar mac y pc, archivos sin commitear, sin commitear, git status sucio, trabajo ajeno en el arbol, dos ventanas a la vez, archivos preparados de otra ventana]
 preguntas: ["hay otra ventana trabajando en este repo: ¿cómo hago commit sin llevarme sus archivos?", "¿puedo matar lo que está corriendo sin tumbar la otra ventana?", "me pidieron arrancar un bloque: ¿cómo sé que no está ya hecho o que otra ventana no lo está haciendo ahora?", "¿cómo le mando una orden clara a la ventana del PC si desde la Mac no puedo escribirle?", "el repo tiene un montón de archivos sin commitear, ¿hago git add -A?", "¿cómo coordino dos ventanas que tocan un proyecto a la vez?"]
 proyectos: [orion, duo-burguer, mercaplaza, wrd, bot-recolector-prommter]
 confianza: alta
-actualizado: 2026-11-02
+actualizado: 2026-11-03
 ---
 
 # Varias ventanas (o dos máquinas) sobre el mismo repo — commits con rutas, ramas, PID y órdenes escritas
@@ -60,6 +60,11 @@ actualizado: 2026-11-02
    un issue de GitHub que lo enlace y un mensaje corto para que el dueño lo pegue allá. **Mide su avance en su plan (tareas
    hechas sobre total), no en su palabra.**
 7. Para sincronizar Mac y PC sin intermediarios, ver la memoria `project_publicacion_automatica_mac_pc.md` (hook de sincronizar en Duo Burguer).
+8. **Trabajo suelto de semanas: antes de commitearlo, mira de qué versión salió cada archivo.** Compara la copia con
+   cada versión de su historia (`git diff --numstat <commit> -- archivo`) y quédate con la más parecida: si no es la de
+   HEAD, la copia deshace commits posteriores. Lee también la tabla de reemplazos distintos
+   (`git diff --word-diff=porcelain`): ahí salta lo que no es del lote. Y si falta un archivo que HEAD tiene, busca si otra
+   ventana lo movió a propósito (`find`, el otro repo) antes de restaurarlo: un commit ajeno pudo haberlo arrastrado.
 
 ## Cuándo NO aplica
 
@@ -80,6 +85,11 @@ actualizado: 2026-11-02
   métricas y resumen); la nota de curación sale del subagente de la ventana [[2026-10-22-orion-app-de-rutina-sincronizada|Orion: app de rutina sincronizada]]
   (transcrito `b5eb380b`) y el `KN-024` que commiteó ya traía la anotación de la cosecha — ventana [[2026-11-03-alimentar-vault-de-obsidian|Alimentar vault de Obsidian]] (transcrito `278748af`).
 - Hecho medido el 2026-11-02: `git status --porcelain` en `/Users/g/orion` devolvió 211 entradas (138 modificadas, 13 borradas, 60 sin seguimiento), mezcla de la migración vieja y de la cosecha en curso.
+- Revisión del 2026-11-03 (183 entradas, casi todas de la mudanza a la Mac del 03-09): 3 de 118 archivos modificados
+  salían de una versión vieja (quitaban el aviso de la v4 de la agencia y una regla de `export-vault.mjs`); la v4
+  faltaba porque su ventana la guardó a propósito en el repo privado de Prommter, y había entrado aquí arrastrada por
+  `77f13b1`, un commit cuyo mensaje hablaba de otra cosa. Quedó en 0 con `238860e`…`27b5f44` — ventana
+  [[2026-11-03-alimentar-vault-de-obsidian|Alimentar vault de Obsidian]] (transcrito `278748af`).
 
 ## Enlaces
 
