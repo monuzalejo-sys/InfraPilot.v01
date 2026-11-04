@@ -5,7 +5,7 @@ alias: [motion graphics, motion graphic, video narrado, video con voz en off, vo
 preguntas: ["mi título animado con GSAP no aparece en el video aunque el código lo sube, ¿qué pasó?", "puse transform en el CSS como estado inicial y GSAP me lo dejó pegado, ¿cómo lo dejo bien?", "los subtítulos karaoke se encienden antes de que la voz diga la palabra, ¿cómo los alineo?", "whisper me adelanta la primera palabra de cada oración cuando hay una pausa, ¿qué hago?", "¿cuántas palabras le caben a un video de 20 segundos con voz en off?", "la narración de Gemini me quedó de 25 segundos y el video es de 20, ¿qué cambio?", "¿qué miro antes de renderizar un video de HyperFrames para no perder otros 4 minutos?", "¿cuánto se demora el render de HyperFrames de un video de 20 segundos con fotos?"]
 proyectos: [prommter]
 confianza: media
-actualizado: 2026-11-03
+actualizado: 2026-11-04
 ---
 
 # Video de motion graphics con voz en HyperFrames: estado inicial de GSAP, subtítulos por oración y presupuesto de palabras
@@ -40,7 +40,7 @@ actualizado: 2026-11-03
 - **GSAP:** si el estado inicial del CSS está en píxeles, escala o rotación, GSAP lo lee bien (medido: `translateX(-300px)` → x −300; `scaleX(0)` → 0; `rotate(-8deg)` → −8). Solo se midió la versión 3.14.2: con otra, repite la prueba de dos líneas (`gsap.getProperty`). **No cites `.linea { transform: translateX(-50%) }` como falla:** según el orquestador se cambió a `gsap.set(linea,{xPercent:-50})` por la misma familia, pero GSAP ya leía `-50%` como `xPercent −50`; fue preventivo, no una trampa (la verificada es `115%`).
 - **Whisper por oración:** si el guion es una sola frase sin pausas, no hay nada que cortar. Se midió con una sola voz (Achird), cinco oraciones y un modelo (large-v3-turbo): no hay umbral de pausa para decidir cuándo hace falta, por eso la regla es «siempre». Sobre música o mezcla sigue valiendo lo de [[TEMA-montar-video-con-material-real-del-celular]]: la pista de voz sola.
 - **Presupuesto de voz:** son dos tandas por voz con textos distintos (56 y 47 palabras), así que no se aisló el efecto del estilo del efecto del texto; las dos voces probadas (Achird, Kore) fueron en la misma dirección. El texto exacto de la primera tanda no se conservó. **Solo se midió la duración:** no se evaluó si el ritmo rápido se entiende mejor o peor, ni lo oyó el dueño. Otra voz, otro modelo o inglés: mide.
-- **Confianza media:** una sola producción, con mediciones propias reproducidas el 2026-11-03.
+- **Confianza media:** una sola producción, con mediciones propias reproducidas el 2026-11-03 y aprobada por el dueño sin cambios el 2026-11-04 («me gusto la estetica, me gusto el video en general»).
 
 ## Evidencia
 
@@ -48,6 +48,7 @@ actualizado: 2026-11-03
 - Whisper: `.../vida-terrestre-20s/sonido/palabras-por-oracion.sh:2-5,10`; resultado por oración en `sonido/voz2-Achird.palabras.json` y última línea de `sonido/palabras-por-oracion.log` (Los 1,81 · Más 11,99 · Sin 15,45); silencios con `ffmpeg -i voz2-Achird.flac -af silencedetect=noise=-35dB:d=0.2` (voz vuelve a 1,808 / 11,993 / 15,444 s); archivo entero reproducido con `node subtitulos.mjs sonido/voz2-Achird.flac --texto "$(cat sonido/guion-voz.txt)"` → 47 palabras, 39 s de reloj; Vida 0,14 · Los 1,17 · Cada 7,02 · Más 11,54 · Sin 14,80. Dependencia de las cifras: `.../vida-terrestre-20s/tiempos.js:13-16,30-31`.
 - Voz: `.../vida-terrestre-20s/GUION.md` («tiempos de cada palabra (whisper, ~2 min)»); `.../sonido/voz.log` (25,77 s Achird, 25,49 s Kore) y `.../sonido/voz2.log` (17,65 y 17,97 s); `sonido/voz.sh:4` («Primera tanda (56 palabras) salió en ~24 s de voz») y `sonido/guion-voz.txt` (47 palabras, `wc -w`); silencios de los cuatro WAV con `silencedetect` (suma ≥ 0,2 s: 5,76 s en `voz-Achird.wav`, 2,84 s en `voz2-Achird.wav`).
 - Render: `.../vida-terrestre-20s/renders/render.log` («36.5 MB · 20.0s video · rendered in 3m 33.6s», captura 3 min 8 s) y `package.json:8-9` (`check` y `snapshot`). Salida verificada: `ffprobe` → H.264 1920×1080 30 fps, AAC 48 kHz, 20,000 s.
+- Veredicto del dueño (2026-11-04, sesión 5f47389b, tras ver el MP4 de 1080p): «me gusto la estetica, me gusto el video en general, guarda que me gusto este trabajo». Primera salida de esta receta completa (fotos por API + voz Gemini + Lyria + karaoke por oración + fuentes en pantalla) y pasó sin cambios; el gusto queda anotado en [[TEMA-gusto-visual-del-dueno]].
 
 ## Enlaces
 
