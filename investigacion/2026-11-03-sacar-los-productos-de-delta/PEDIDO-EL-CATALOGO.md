@@ -5,6 +5,9 @@ y no se cambia nada**: solo se guarda un reporte y se copia.
 
 Lo hace el cajero o el dueño, con su propio usuario. Nosotros miramos y anotamos.
 
+> **Esto es el qué.** El cómo, clic por clic y con los caminos de salida cuando
+> algo no aparece, está en [`COMO-SACARLO-PASO-A-PASO.md`](COMO-SACARLO-PASO-A-PASO.md).
+
 ---
 
 ## 1. El listado de productos (esto es lo importante)

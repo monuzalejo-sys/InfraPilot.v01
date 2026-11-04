@@ -131,6 +131,12 @@ Está en [`PEDIDO-EL-CATALOGO.md`](PEDIDO-EL-CATALOGO.md): el reporte de
 existencias guardado como salga, y —si aparecen— tres XML de factura. Con eso la
 importación deja de ser un plan y pasa a ser un archivo.
 
+Y el **cómo**, para hacerlo sentado en la caja —qué menú buscar, qué filtro NO
+dejar puesto, qué formato elegir, y qué hacer cuando el botón de guardar no
+existe— está en [`COMO-SACARLO-PASO-A-PASO.md`](COMO-SACARLO-PASO-A-PASO.md).
+Los nombres exactos de los menús siguen siendo el `HUECO 1`: la guía dice **qué
+buscar**, no finge saber dónde está el píxel.
+
 **Hasta que ese archivo no llegue, no se le promete a ningún cliente que le
 migramos el catálogo.** Se le dice lo que es verdad: que está hecha la máquina y
 que falta meterle el primer papel.
