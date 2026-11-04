@@ -176,3 +176,6 @@ cuánto me va a costar al mes tener el bot respondiendo con claude y cómo lo ba
 cómo cobro un plato que el cliente arma, si todavía no tengo el costo de cada ingrediente => pedidos-y-dinamicas-de-un-local
 puedo hacer un sorteo en instagram para el negocio sin meterme en problemas => pedidos-y-dinamicas-de-un-local
 puedes publicar tú solo los videos en mis redes todos los días con mi chrome abierto => pedidos-y-dinamicas-de-un-local
+me rechazaron el comando que editaba y aplicaba la migración, qué reviso antes de repetirlo => rechazado-no-es-no-ejecutado
+cancelé la herramienta a la mitad, cómo sé si alcanzó a escribir => rechazado-no-es-no-ejecutado
+después de reintentar quedó el bloque duplicado en el sql => rechazado-no-es-no-ejecutado
