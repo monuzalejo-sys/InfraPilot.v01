@@ -5,7 +5,7 @@ alias: [estudio de mercado, estudios de mercado, nicho, nichos, hueco de mercado
 preguntas: ["¿cómo hago un estudio de mercado para encontrar un nicho nuevo?", "necesito una idea de negocio nueva, ¿por dónde empiezo?", "¿cómo busco un hueco de mercado que google no me muestre?", "encontré un nicho que se ve perfecto, ¿ya lo construyo?", "¿quién debe matar un candidato de nicho, el mismo que lo encontró?", "voy a lanzar una ola de agentes a buscar nichos, ¿cómo la organizo?", "¿cuándo dejo de investigar un mercado y empiezo a escribir código?", "¿qué es una compuerta antes de construir un producto?", "¿cómo se hace un dossier de un candidato de nicho?", "¿en qué terrenos busco un negocio que no tenga ya cien competidores?", "aquí en Popayán todos usan Delta, ¿cómo lo mejoramos sin pedirle al cliente que lo cambie?", "¿cómo reviso si vale la pena vender plantillas o Excel en un nicho antes de armarlos?", "tengo una idea nueva, ¿cómo se evalúa si es difícil y si tiene competencia?", "acabo de investigar un tema: ¿dónde queda guardado y cómo lo encuentro después?"]
 proyectos: [huecos-2026, la-villa, prommter, cerebro-3d, orion-app-rutina]
 confianza: alta
-actualizado: 2026-11-02
+actualizado: 2026-11-03
 ---
 
 # Cómo se busca un hueco de mercado que Google no encuentra
@@ -249,6 +249,10 @@ de investigación no se construye: se manda a la ventana del cliente. Hoy hay cu
 - [[TEMA-verificar-con-evidencia]] — el mismo principio de fondo ("todo
   veredicto lleva un número, y quien mide no es quien produjo") aplicado a
   mercado en vez de a código.
+- [[TEMA-abogado-del-diablo-antes-de-recomendar]] — la misma regla de la fase 3 en otro terreno
+  (2026-11-03, canal de YouTube): la ronda adversarial bajó al ganador del borrador de 78 a 67
+  y lo dejó en empate técnico 73/73; sirve de segunda evidencia independiente de que el que
+  puntúa no puede ser quien critica.
 - [[TEMA-piloto-con-cliente-real]] — qué hacer cuando el hueco ya tiene su primer cliente
   (entrevista, medir lo entregado).
 - [[TEMA-cobro-a-clientes]] — el precio frente a los comparables del nicho.

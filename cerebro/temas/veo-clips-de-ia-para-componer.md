@@ -5,7 +5,7 @@ alias: [veo, veo 3, veo 3.1, veo3, veo 3.1 fast, veo fast, veo lite, google veo,
 preguntas: ["¿cuánto cuesta Veo por segundo y cuál modelo me conviene?", "Veo me hace zoom aunque le pida cámara fija, ¿cómo lo arreglo?", "¿cómo recorto el fondo de un clip de Veo para ponerlo encima de un video real?", "¿de qué color pido el fondo para quitarlo después?", "el chroma key me comió los ojos y las piernas del personaje, ¿qué le muevo?", "¿genero los clips de Veo con audio o sin audio?", "¿cómo hago que los personajes de IA suenen siempre con la misma voz?", "los personajes cambian de tamaño de un clip a otro, ¿cómo los empareja?", "¿cuánto me cuesta un video de 30 segundos con personajes de IA?", "¿por qué Veo me devuelve una franja negra arriba y abajo?", "ffmpeg me saltó líneas dentro de un while read, ¿qué pasó?", "¿cómo genero con Veo sin marca de agua y sin gastar plata si el dueño solo tiene 60 mil pesos?", "¿hago todo el lote de videos de una, o primero le muestro uno cortico y cuánto costó?", "¿le paso al dueño los prompts para que los pegue en Gemini o los genero yo directo?", "el dueño necesita un flyer para hoy y el modelo de imagen no responde, ¿qué hago?", "¿por qué la foto retocada con IA no sirve si solo le quité el desorden?", "¿cuánto cuesta hacer las imágenes de los flyers con la IA de Google?"]
 proyectos: [duo-burger, prommter, mercaplaza]
 confianza: media
-actualizado: 2026-11-02
+actualizado: 2026-11-03
 ---
 
 # Clips de IA (Veo) para componer sobre video real
@@ -128,6 +128,20 @@ revisiones). **La cuenta de «un quinto»** es 0,08 contra 0,40 por segundo de c
 descompone en cambiar de modelo (con audio 0,40 → 0,10, ÷4) y apagar el audio en Fast
 (0,10 → 0,08, −20 %). Apagar el audio en Fast se justifica por control de la voz, no por
 plata.
+
+**Refuerzo 2026-11-03 (contradicción de precio, según el proveedor).** Un análisis de mercado
+leyó las páginas de modelo de Runware ese día y encontró: Veo 3.1 Fast US$ 0,15/s (US$ 0,60 por
+4 s a 720p), Veo 3.1 US$ 0,40/s con audio a 1080p, Veo 3.1 Lite US$ 0,08/s a 1080p con audio y
+Kling 3.0 Pro US$ 0,168/s con audio (0,112 sin audio) (`prommter/contenido/canal-youtube/base-de-hechos.md:145`,
+F-121, primaria, confirmado por un verificador). Coinciden con la tabla de arriba el Standard
+(0,40) y el Lite a 1080p (0,08); **no coincide Fast** (0,15 en Runware frente a 0,10–0,12 con audio
+en la tarifa de la API de Gemini de benchlm.ai): el precio de un mismo modelo depende del proveedor,
+y el 0,15 es exactamente el valor de «referencia» que antes llevaba `google.mjs`. Además,
+fal.ai da de baja el endpoint `fal-ai/veo3.1` el 2026-11-17 (`base-de-hechos.md:144`, F-120).
+Y queda **sin resolver** si el proveedor activo hoy es Runware (el informe del 3-nov describe la
+fábrica con Runware) o Google Cloud (arriba, el dueño descartó Runware el 5–6 oct por un mínimo
+de recarga de US$ 50): confirma proveedor y mínimo antes de cotizar. Ver
+[[TEMA-youtube-reglas-y-plata-2026-2027]].
 
 **Las voces.** Cada línea es una llamada a `voz.mjs` (Gemini 2.5 Pro TTS, WAV 24 kHz
 mono): la duración de cada línea es la del WAV, exacta (`ffprobe`); `voces.mjs` las
