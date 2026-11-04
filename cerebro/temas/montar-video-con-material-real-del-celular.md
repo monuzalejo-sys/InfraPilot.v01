@@ -88,4 +88,4 @@ actualizado: 2026-11-02
 
 ## Enlaces
 
-[[TEMA-cortometraje-sobre-ilustracion]] (cuando el material es arte y no cámara) · [[TEMA-veo-clips-de-ia-para-componer]] (cuando los personajes que se componen encima los genera una IA: color del fondo, recorte, zoom, costo y voces) · [[TEMA-entorno-de-la-maquina]] · [[TEMA-aprendizajes-de-placita-mercaplaza]] · [[TEMA-cero-datos-inventados]]
+[[TEMA-cortometraje-sobre-ilustracion]] (cuando el material es arte y no cámara) · [[TEMA-veo-clips-de-ia-para-componer]] (cuando los personajes que se componen encima los genera una IA: color del fondo, recorte, zoom, costo y voces) · [[TEMA-entorno-de-la-maquina]] · [[TEMA-aprendizajes-de-placita-mercaplaza]] · [[TEMA-cero-datos-inventados]] · [[TEMA-escenas-3d-en-hyperframes]] (cuando la pieza lleva un modelo 3D con three.js dentro de HyperFrames).
