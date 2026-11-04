@@ -4,9 +4,9 @@
 
 ## Hard Constraints
 - Next.js 16.2.7 breaking changes: read node_modules/next/dist/docs/ before new code.
-- Git pushes via CLI fail (no /dev/tty); use GitHub Desktop instead (KN-001).
+- Git push: automatic on verification PASS per DEC-005 (2026-09-01 enabled, verified working). Path references use $ORION_HOME envvar (Mac: /Users/g/orion/); infrapilot-app at /Users/g/orion/prommter/infrapilot-app (diverged remotes, held for review).
 - Supabase project zrogravgwhoijajzciem; anon key in .env.local (never commit).
-- Pending migrations: 002_suppliers_quotes.sql (user action, PEND-015), 003_organizations.sql (written but NOT APPLIED — blocks /organizaciones, /perfil with 503, see RSK-001).
+- Pending migrations: 002_suppliers_quotes.sql (user action, PEND-015), 003_organizations.sql (written, reviewed, NOT APPLIED — blocks /organizaciones, /perfil with 503, see RSK-001).
 - GROQ_API_KEY missing in .env.local (currently empty); blocks /api/lector end-to-end test (PEND-013).
 - xlsx npm has vulns; requires tarball from cdn.sheetjs.com (security gate, no agent npm-CDN).
 - Agent permission classifier blocks: (1) npm install from external URLs, (2) DB INSERT/UPDATE/DELETE without explicit user approval (KN-019).
@@ -28,15 +28,13 @@
 - **Supabase migrations**: 000_initial_schema + 001_prices_apus applied (6 tables, RLS active). 002_suppliers_quotes pending user apply (PEND-015). 003_organizations.sql written, reviewed, but NOT APPLIED (blocks orgs/perfil with 503, RSK-001).
 - **Presupuestos "origen" field**: new `origen` field added to budgets, tracking source of estimation (informática, topografía, etc.). Integrations live and verified.
 
-## Open Work (8 Pending)
+## Open Work (6 Pending)
 1. **PEND-002** (In-Progress, High): Supabase local creds verified; Vercel deployment vars + production write test pending.
-2. **PEND-004** (Ready, Low): Push via GitHub Desktop (pending manual action; 7 commits on app submodule, 5+ on parent).
-3. **PEND-009** (Ready, Low): Stray C:\Users\Kalel\package-lock.json (housekeeping, ask user first).
-4. **PEND-013** (Blocked, Medium): /api/lector end-to-end test blocked on GROQ_API_KEY from user.
-5. **PEND-014** (Blocked, Low): Manual xlsx tarball upgrade (0.20.3, security vuln, no agent CDN access).
-6. **PEND-015** (Blocked, High): User: apply migration 002_suppliers_quotes.sql + test /proveedores flow.
-7. **PEND-016** (Ready, Medium): Personalizar hub por profesión — bloqueado por RSK-001 (migración 003 sin aplicar, /perfil devuelve 503).
-8. **PEND-017** (Ready, Low): Validar body en app/api/budgets (falta description → 500 sin validación).
+2. **PEND-013** (Blocked, Medium): /api/lector end-to-end test blocked on GROQ_API_KEY from user.
+3. **PEND-015** (Blocked, High): User: apply migration 002_suppliers_quotes.sql + test /proveedores flow.
+4. **PEND-016** (Ready, Medium): Personalizar hub por profesión — bloqueado por RSK-001 (migración 003 sin aplicar, /perfil devuelve 503).
+5. **PEND-018** (Ready, High): Replace/remove fabricated testimonial and unverified claims in infrapilot-app login page (Carlos Quispe, CAPECO prices, PDF export).
+6. **PEND-019** (Blocked, Medium): Await owner's verdict on 8 landing prompts delivered 2026-08-16; landing-prompter learning mechanism pending.
 
 ## Decisions (10 active: 2 Project, 8 Permanent)
 DEC-001 (ORION in repo), DEC-002 (submodule), DEC-003/004 (agents+models), DEC-005 (autocommit), DEC-006 (AMM schema), DEC-007 (proportional lifecycle), DEC-008 (ORION v3), DEC-009 (module nav by discipline), DEC-010 (design system).
@@ -51,6 +49,6 @@ DEC-001 (ORION in repo), DEC-002 (submodule), DEC-003/004 (agents+models), DEC-0
 - **Migration 003 caveat** (RSK-001): 003_organizations.sql (233 lines, security-definer RLS helpers, owner-bootstrap trigger) has NEVER BEEN EXECUTED — no psql, no Supabase CLI, no Docker on this machine. Code review only. Must apply to throwaway project first, verify idempotency (run twice), then apply to production.
 
 ## Memory State
-- **Active**: 46 objects (10 Decisions, 25 Knowledge, 1 Constraint, 8 Pending, 1 Architecture, 2 Roadmap [ROAD-002, ROAD-005], 2 Risk).
-- **Archived**: 18 items (PEND-001..012, PEND-010, KN-004/011/012/020/023, ROAD-001/003/004/006).
-- **Version**: 34. Last AMM: 2026-07-28 SESSION_CLOSE. Validation: PASSED (tools/validate-memory.mjs).
+- **Active**: 52 objects (11 Decisions, 28 Knowledge, 1 Constraint, 6 Pending, 1 Architecture, 2 Roadmap [ROAD-002, ROAD-005], 3 Risk [RSK-001/002/003]).
+- **Archived**: 23 items (PEND-001..012/017/009/014/004, KN-002/004/011/012/020/023, ROAD-001/003/004/006).
+- **Version**: 39. Last AMM: 2026-09-03 SESSION_CLOSE. Validation: PASSED (tools/validate-memory.mjs, 52 active objects, 1 warning: >25 threshold reached but no duplicates or terminal items remain).

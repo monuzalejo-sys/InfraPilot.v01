@@ -97,22 +97,6 @@
       "reason": "Phase A (2026-07-02): verified PASS 5/5. Phase B (2026-07-05): local creds configured (.env.local, gitignored); migrations 000+001 already applied (6 tables present); auth verified (test user exists, RLS active); write test blocked by permission classifier. PENDING user: Vercel vars (NEXT_PUBLIC_SUPABASE_URL, ANON_KEY, GROQ_API_KEY) + production verification. Core auth path 100% proven."
     },
     {
-      "id": "PEND-004",
-      "type": "Pending",
-      "tier": "Project",
-      "created": "2026-07-01T01:00:00.000Z",
-      "updated": "2026-09-02T02:54:11.000Z",
-      "lifetime": "Sprint",
-      "impact": "Low",
-      "priority": "Medium",
-      "status": "Ready",
-      "dependencies": [
-        "KN-001"
-      ],
-      "task": "[REVISAR] Esta lista de commits por subir se escribio cuando el push era manual (KN-001 viejo). Con el push automatico (DEC-005/DEC-001) ya no se lleva una lista: se publica al terminar. Falta comprobar si estos commits siguen sin subir — app {a6314fe, 131040f, 91ab9d6}; parent {2760909, d7ebca0, aaaadd8, 53fc712} — y si es asi, publicarlos. OJO con infrapilot-app: su historia DIVERGIO (dos ramas con el mismo remoto), asi que ahi NO se publica a ciegas.",
-      "reason": "La razon original ('terminal push doesn't work') dejo de ser cierta; queda comprobar el estado real."
-    },
-    {
       "id": "ARCH-001",
       "type": "Architecture",
       "tier": "Permanent",
@@ -124,7 +108,7 @@
       "status": "Implemented",
       "dependencies": [],
       "component": "ORION Task runtime invocation",
-      "description": "The ORION lifecycle (ANALYZING -> PLANNING -> BUILDING -> VERIFYING -> FIXING -> REFLECTING -> DONE/ESCALATED) is invoked as a Claude Code skill at C:\\Users\\Kalel\\.claude\\skills\\orion\\SKILL.md ('/orion <task>'), installed at user level so it works across all projects on this machine, not just InfraPilot. BUILDING delegates substantial independent work to real Agent subagents; REFLECTING writes directly to memory/<projectId>/state.json and metrics.json following the AMM schema (no live TS runtime executes the AMM source — the assistant emulates its contract by hand).",
+      "description": "The ORION lifecycle (ANALYZING -> PLANNING -> BUILDING -> VERIFYING -> FIXING -> REFLECTING -> DONE/ESCALATED) is invoked as a Claude Code skill at ~/.claude/skills/orion/SKILL.md ('/orion <task>'; on Mac: /Users/g/.claude/skills/orion/SKILL.md), installed at user level so it works across all projects on this machine, not just InfraPilot. BUILDING delegates substantial independent work to real Agent subagents; REFLECTING writes directly to memory/<projectId>/state.json and metrics.json following the AMM schema (no live TS runtime executes the AMM source — the assistant emulates its contract by hand).",
       "pattern": "Manually-operated Cognitive Runtime: the assistant itself plays the runtime role each invocation, rather than a standalone always-on process."
     },
     {
@@ -141,7 +125,7 @@
         "ARCH-001"
       ],
       "title": "Six dedicated ORION subagents created, mapped to the RFC-0002 contracts",
-      "description": "Created user-level Claude Code subagents in C:\\Users\\Kalel\\.claude\\agents\\ : orion-analyst (orion:analysis:v1, read-only), orion-planner (orion:planning:v1, read-only), orion-builder (orion:build:v1, full tools, one per plan step, parallel where independent), orion-verifier (orion:verification:v1, read+run-tests only, no edits), orion-fixer (orion:fix:v1, edits only the artifacts a QAReport names), and orion-reflector (orion:reflection:v1 + orion:memory:v1, writes to memory/*.json). Tools are restricted per contract (e.g. analyst/planner/verifier cannot modify files). The /orion SKILL.md was updated so each phase delegates to its named agent; the main conversation acts as the orchestrator/runtime. Prior to this, /orion only used the generic built-in agent types (Explore/general-purpose/Plan) — no custom ORION agents existed. Verified live 2026-07-01: agents load in-session (no restart needed) and orion-analyst returned a correct response.",
+      "description": "Created user-level Claude Code subagents in ~/.claude/agents/ (Mac: /Users/g/.claude/agents/) : orion-analyst (orion:analysis:v1, read-only), orion-planner (orion:planning:v1, read-only), orion-builder (orion:build:v1, full tools, one per plan step, parallel where independent), orion-verifier (orion:verification:v1, read+run-tests only, no edits), orion-fixer (orion:fix:v1, edits only the artifacts a QAReport names), and orion-reflector (orion:reflection:v1 + orion:memory:v1, writes to memory/*.json). Tools are restricted per contract (e.g. analyst/planner/verifier cannot modify files). The /orion SKILL.md was updated so each phase delegates to its named agent; the main conversation acts as the orchestrator/runtime. Prior to this, /orion only used the generic built-in agent types (Explore/general-purpose/Plan) — no custom ORION agents existed. Verified live 2026-07-01: agents load in-session (no restart needed) and orion-analyst returned a correct response.",
       "reason": "User asked whether the agents were created correctly; they were not (only the skill existed). User authorized creating them ('tienes acceso total'). Mapping agents 1:1 to the ORION contracts makes the system faithful to the user's own standard rather than generic."
     },
     {
@@ -568,7 +552,7 @@
         "DEC-007"
       ],
       "title": "Ecosistema ORION v3: resiliencia a muertes, calibración aplicada, vault Obsidian",
-      "description": "5 mejoras aplicadas 2026-07-06: (1) wave.json — manifiesto efímero de ola escrito antes de spawns paralelos (gitignored, se borra al completar; sesiones futuras recuperan olas muertas sin arqueología); (2) reflector atómico — orden dependency-safe en un solo write + auto-validación obligatoria antes de reportar (sessionCount==sessions.length); (3) calibración aplicada — analyst default haiku para objetivos claros, y modelOutcomes con subtipos build:visual|page|api|lib|infra para no diluir señal (infra-deaths no cuentan como señal de capacidad); (4) brief.md es el contexto primario del orquestador, state.json solo lecturas dirigidas; (5) tools/generate-vault.mjs — vista Obsidian unidireccional de la memoria (un .md por objeto con [[links]] + _INDEX), regenerada en cada close. POLÍTICA transversal nueva: los scripts deterministas los ejecuta el orquestador; los agentes solo hacen trabajo de juicio. EXPORT COMPLETO: tools/export-vault.mjs <destino> genera un vault externo con Sistema (estándar, RFCs, agents, skills, spec AMM) + todos los proyectos (permanent con prefijo PERM- para evitar colisión de links). El vault del usuario vive en C:/Users/Kalel/ORION-Vault — regenerarlo tras cada close si hubo cambios de memoria.",
+      "description": "5 mejoras aplicadas 2026-07-06: (1) wave.json — manifiesto efímero de ola escrito antes de spawns paralelos (gitignored, se borra al completar; sesiones futuras recuperan olas muertas sin arqueología); (2) reflector atómico — orden dependency-safe en un solo write + auto-validación obligatoria antes de reportar (sessionCount==sessions.length); (3) calibración aplicada — analyst default haiku para objetivos claros, y modelOutcomes con subtipos build:visual|page|api|lib|infra para no diluir señal (infra-deaths no cuentan como señal de capacidad); (4) brief.md es el contexto primario del orquestador, state.json solo lecturas dirigidas; (5) tools/generate-vault.mjs — vista Obsidian unidireccional de la memoria (un .md por objeto con [[links]] + _INDEX), regenerada en cada close. POLÍTICA transversal nueva: los scripts deterministas los ejecuta el orquestador; los agentes solo hacen trabajo de juicio. EXPORT COMPLETO: tools/export-vault.mjs <destino> genera un vault externo con Sistema (estándar, RFCs, agents, skills, spec AMM) + todos los proyectos (permanent con prefijo PERM- para evitar colisión de links). El vault del usuario vive en $ORION_HOME/../ORION-Vault — regenerarlo tras cada close si hubo cambios de memoria.",
       "reason": "Derivadas del análisis medido de 16 sesiones: 5/28 spawns muertos por infraestructura (fallo #1), una corrupción de memoria por write parcial, calibración sin aplicar, y pedido del usuario de vista navegable de la memoria (Obsidian). Skills/agents actualizados en ~/.claude y espejados en runtime/."
     },
     {
@@ -787,7 +771,7 @@
       "priority": "High",
       "status": "Current",
       "dependencies": [],
-      "fact": "C:\\Users\\Kalel\\InfraPilot.v01\\infrapilot-app\\ está VACÍO en este entorno (submódulo git sin inicializar, sin .gitmodules) al 2026-08-16. El código real y activo de infrapilot-app vive en C:\\Users\\Kalel\\ORION\\infrapilot-app\\. Quien edite en la primera ruta trabaja en el vacío.",
+      "fact": "[UNVERIFIED COORDINATE POST-MIGRATION 2026-09-03] An InfraPilot.v01 directory at the Windows-era location was observed to be empty (git submodule uninitialized, no .gitmodules entry) during cross-memory reconnaissance 2026-08-16. The real active infrapilot-app code lives in /Users/g/orion/prommter/infrapilot-app (verified: standalone repo with remotes pointing to monuzalejo-sys/InfraPilot.Ai on this Mac). Editors looking for app source in the old location will find nothing; always use /Users/g/orion/prommter/infrapilot-app.",
       "context": "Descubierto por landing-prompter buscando las fuentes reales de InfraPilot para escribir su prompt de landing sin inventar nada.",
       "source": "session 2026-08-16, landing-prompter build:visual (opus)"
     },
@@ -996,7 +980,7 @@
       "archivedType": "Pending",
       "archivedAt": "2026-08-16T00:00:00.000Z",
       "reason": "Expired",
-      "notes": "Sprint item, Ready status, Low impact, no dependencies. Stray lockfile concern (C:\\Users\\Kalel\\package-lock.json) is minor housekeeping, not a blocker. Created 2026-07-01, low priority."
+      "notes": "Sprint item, Ready status, Low impact, no dependencies. Stray lockfile concern ($HOME/package-lock.json) is minor housekeeping, not a blocker. Created 2026-07-01, low priority."
     },
     {
       "id": "ARC-20",
@@ -1021,9 +1005,17 @@
       "archivedAt": "2026-08-16T00:00:00.000Z",
       "reason": "Deprecated",
       "notes": "Project item, Low impact, no dependencies. Describes malformed path '.gitignoregit' that was already cleaned in commit 1589f8b (2026-07-01). Resolution captured; historical artifact no longer relevant."
+    },
+    {
+      "id": "ARC-23",
+      "archivedId": "PEND-004",
+      "archivedType": "Pending",
+      "archivedAt": "2026-09-03T00:00:00.000Z",
+      "reason": "Expired",
+      "notes": "Sprint item, Done status, no dependencies. Original purpose (maintain list of commits to manually push when git push fails) resolved by DEC-005 (autocommit+auto-push on verification PASS, 2026-09-01). Current status: 3 commits unpushed in infrapilot-app intentionally held pending diverged remote history review. Git push mechanism is now automatic; no manual push list required."
     }
   ],
-  "lastAmmRun": "2026-08-24T08:30:00.000Z",
-  "snapshotDate": "2026-09-02T02:54:11.000Z",
-  "version": 38
+  "lastAmmRun": "2026-09-03T00:00:00.000Z",
+  "snapshotDate": "2026-09-03T00:00:00.000Z",
+  "version": 39
 }

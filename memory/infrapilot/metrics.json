@@ -1,11 +1,11 @@
 {
   "projectId": "infrapilot",
-  "sessionCount": 29,
+  "sessionCount": 30,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0.0033,
   "trendCompressionRatio": "Stable",
-  "lastUpdated": "2026-08-16T20:00:00.000Z",
+  "lastUpdated": "2026-09-03T00:00:00.000Z",
   "sessions": [
     {
       "sessionId": "session-2026-07-01-001",
@@ -1954,6 +1954,73 @@
         }
       },
       "notes": "AMM SESSION_CLOSE curation v36: archived 4 items to reduce active object count from 56 to 52. PEND-009 (Ready, Sprint, Low impact, stray lockfile) → Expired. PEND-014 (Blocked, Sprint, Low impact, xlsx CDN vulnerability deferred) → Expired. PEND-017 (Ready, Sprint, Low impact, minor budgets API validation bug) → LowValue. KN-002 (Current, Project, Low impact, malformed path resolved in 1589f8b) → Deprecated. No duplicates found. Compacted PEND-002's reason from 327 chars to 50 words (Phase A done, Phase B local setup complete, pending Vercel vars + production verification). All objects strictly necessary for active work retained. Total id preservation: 74 before, 74 after (56 objects→52, 18 archives→22). Brief.md not regenerated (no blockers or major decisions changed)."
+    },
+    {
+      "sessionId": "session-2026-09-03-amm-curation",
+      "runId": "amm-curation-maintenance",
+      "triggeredBy": "SESSION_CLOSE",
+      "startedAt": "2026-09-03T00:00:00.000Z",
+      "completedAt": "2026-09-03T00:00:00.000Z",
+      "durationMs": 0,
+      "contextSaved": 0,
+      "compressionRatio": 1.02,
+      "knowledgePreservedPercent": 100,
+      "duplicateReduction": 0,
+      "estimatedTokenSavings": 0,
+      "knowledgeDensity": 0.0033,
+      "objectsCreated": 0,
+      "objectsMerged": 0,
+      "objectsArchived": 1,
+      "objectsPromoted": 0,
+      "objectsDemoted": 0,
+      "byTier": {
+        "working": {
+          "objectCount": 0,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "project": {
+          "objectCount": 20,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        },
+        "permanent": {
+          "objectCount": 10,
+          "totalTokens": 0,
+          "avgObjectTokens": 0
+        }
+      },
+      "byType": {
+        "Decision": {
+          "count": 11,
+          "archived": 0
+        },
+        "Knowledge": {
+          "count": 24,
+          "archived": 0
+        },
+        "Constraint": {
+          "count": 1,
+          "archived": 0
+        },
+        "Pending": {
+          "count": 7,
+          "archived": 1
+        },
+        "Architecture": {
+          "count": 1,
+          "archived": 0
+        },
+        "Roadmap": {
+          "count": 2,
+          "archived": 0
+        },
+        "Risk": {
+          "count": 3,
+          "archived": 0
+        }
+      },
+      "notes": "AMM maintenance curation 2026-09-03: (1) Fixed Windows paths: DEC-003, ARCH-001 → $ORION_HOME envvars with Mac coordinates; KN-034 marked UNVERIFIED after move (unmapped destination at /Users/g/orion/InfraPilot.v01/); ARC-19 unchanged (archived, immutable per N-AMM-R8). (2) Updated PEND-004: marked Done, original reason (manual push) resolved by DEC-005 (auto-push 2026-09-01); 3 commits in infrapilot-app held intentionally pending diverged remote review. (3) Archived PEND-004 (Sprint item, no deps). (4) No duplicates found (verified Knowledge objects 001-035). Active objects: 53→52. Archives: 22→23. Version 38→39. Brief.md: KN-001/DEC-005 verified correct; stack real (Groq, Supabase); infrapilot-app location clarified."
     }
   ]
 }
