@@ -3,7 +3,7 @@
 
 Vas a rehacer la portada pública de un producto que YA EXISTE y YA FUNCIONA. No es un
 sitio nuevo desde cero: la landing vive dentro del repo Next en
-`C:\Users\Kalel\estanco-contable\app\page.tsx` (97 líneas) + `components/landing/{factura,libro,notas}.tsx`.
+`$HOME/estanco-contable/app/page.tsx` (97 líneas) + `components/landing/{factura,libro,notas}.tsx`.
 Tu trabajo es convertir una portada bonita que NO VENDE en una portada que vende, sin
 inventar un solo dato. Todo lo que afirmes tiene que poder rastrearse a un archivo del repo.
 

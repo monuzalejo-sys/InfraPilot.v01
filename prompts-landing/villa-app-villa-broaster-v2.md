@@ -412,7 +412,7 @@ Ninguno se rellena con algo verosímil. Mientras falte, esa parte no se publica.
 La verdad de terreno es **Edge headless por CDP**, no el navegador embebido: a 390 px,
 `--screenshot` a secas devuelve un viewport de 492 px y recorta, y además reporta
 `prefers-reduced-motion: reduce` por defecto. Herramienta:
-`node C:\Users\Kalel\ORION\tools\edge-cdp.mjs --url <archivo.html> --width 390 --height 844 --mobile --shot salida.png --eval "<js>"`.
+`node $ORION_HOME/tools/edge-cdp.mjs --url <archivo.html> --width 390 --height 844 --mobile --shot salida.png --eval "<js>"`.
 
 - **C1 · Sin desborde horizontal, en las 5 pantallas:**
   `--eval "document.documentElement.scrollWidth"` → **390** exacto (y `clientWidth` 390).
@@ -449,7 +449,7 @@ La verdad de terreno es **Edge headless por CDP**, no el navegador embebido: a 3
 
 ## 11. REFERENCIAS COMBINADAS (una por zona, mecanismo y no contenido)
 
-Biblioteca: `C:\Users\Kalel\ORION\prompts-landing\referencias\`. Se copia el **mecanismo**;
+Biblioteca: `$ORION_HOME/prompts-landing/referencias\`. Se copia el **mecanismo**;
 jamás la marca, los textos, las imágenes ni la paleta ajena.
 
 **Zona HÉROE — ficha 01 (carrusel de figuras, "TOONHUB").** Se toma: los **cuatro roles

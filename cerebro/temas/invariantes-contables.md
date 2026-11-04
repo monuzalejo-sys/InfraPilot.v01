@@ -372,32 +372,32 @@ placita, donde un gasto mal digitado no tiene salida (ver Huecos).
   `prommter/PEND-002` — una curación se dejó sin hacer **a propósito** para evitar
   doble escritor. `_permanent/KN-006` — clase de bug "dos fuentes de verdad": quien
   escribe y quien lee tienen que ser el mismo sitio.
-- Código (todas las rutas absolutas bajo `C:\Users\Kalel\`):
-  - `prommter\proyectos\villa-broaster\broaster-app\lib\servidor\contabilidad.ts` —
+- Código (todas las rutas absolutas bajo `$HOME\`):
+  - `prommter/broaster-app-repo/lib/servidor/contabilidad.ts` —
     cabecera con las cuatro reglas `1-33`, consecutivo `200-219`, congelar líneas
     `224-231`, `cuadraTotal` y "cinturón y tirantes" `268-313`, máquina de estados
     `320-332`, `anularGasto` `458-467`, **el no-total** `682-691`, `netoCop`
     `718-724`, catálogo leído una vez `880-884`, `cancelarOrden` `899-905`.
-  - `...\broaster-app\lib\servidor\almacen-disco.ts` — cabecera `9-33` (nada lanza,
+  - `...\broaster-app/lib/servidor/almacen-disco.ts` — cabecera `9-33` (nada lanza,
     `.bak`, escritura atómica), cola de un carril `205-232`.
-  - `...\broaster-app\lib\servidor\almacen.ts:19-27` y `:76-84` — la decisión viaja
-    hacia adentro. `...\villa-broaster\tareas\T-05-despliegue.md:25`.
-  - `prommter\proyectos\placita\lib\types.ts:9-43` — las cuatro reglas del contrato
+  - `...\broaster-app/lib/servidor/almacen.ts:19-27` y `:76-84` — la decisión viaja
+    hacia adentro. `...\villa-broaster/tareas/T-05-despliegue.md:25`.
+  - `prommter/placita/lib/types.ts:9-43` — las cuatro reglas del contrato
     (gramos enteros y un redondeo, hechos vs derivados, la merma no es venta,
     multi-local); `:217-223` precio derivado que se persiste; `:884-908`
-    `RegistroBasurero`. `lib\dominio\contabilidad.ts:9-40`;
-    `lib\dominio\gastos.ts:6-32`; `lib\dominio\basurero.ts:1-28`;
-    `lib\auditoria.ts:1-26`.
-  - `prommter\proyectos\estanco-contable\lib\dominio\facturacion.ts:1-77` (congelado,
+    `RegistroBasurero`. `lib/dominio/contabilidad.ts:9-40`;
+    `lib/dominio/gastos.ts:6-32`; `lib/dominio/basurero.ts:1-28`;
+    `lib/auditoria.ts:1-26`.
+  - `prommter/estanco-contable/lib/dominio/facturacion.ts:1-77` (congelado,
     cuadre que lanza, anulación sellada, descuadre que grita, ids con sello `70-73`)
-    y `:215-237` `anularFactura`; `lib\dominio\devolucion.ts:1-39`.
-  - `...\estanco-contable\components\store.tsx:498` — el consecutivo se calcula
+    y `:215-237` `anularFactura`; `lib/dominio/devolucion.ts:1-39`.
+  - `...\estanco-contable/components/store.tsx:498` — el consecutivo se calcula
     contando (`filter(...).length + 1`), que es **el mecanismo exacto** por el que
     borrar reutiliza el número; `:561-573` — `eliminarFactura` destructivo, sin
     rastro, solo dueño.
-  - `fable 5\wrd\sistema\js\contable.js:18-36` (el patrón contable de la casa
+  - `fable 5\wrd/sistema/js/contable.js:18-36` (el patrón contable de la casa
     escrito en la cabecera) y `:369-375` (la API pública **no tiene** verbo de
-    borrado); `fable 5\wrd\setup\schema.sql:376-384` (columna `anulado`),
+    borrado); `fable 5\wrd/setup/schema.sql:376-384` (columna `anulado`),
     `:509-512` (sin policy de DELETE) y `:566-570` (el grant sin `delete`).
 
 ### Huecos (lo que el corpus NO respalda todavía)

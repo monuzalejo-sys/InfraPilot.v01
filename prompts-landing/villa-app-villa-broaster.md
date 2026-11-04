@@ -4,7 +4,7 @@ Vas a construir la **página pública de Villa Broaster** dentro de `villa-app`.
 es un **cliente real**: dos sedes que abren mañana. Todo lo que esta página prometa, el
 negocio lo tiene que cumplir. No hay margen para adornos verosímiles.
 
-Raíz de todas las rutas citadas: `C:\Users\Kalel\asadero\`.
+Raíz de todas las rutas citadas: `$HOME/asadero\`.
 Antes de escribir una línea de código lee `villa-app/AGENTS.md:1-9`: este Next.js **no es el
 que conoces** (16.3.0), consulta `node_modules/next/dist/docs/` para lo que uses.
 
@@ -335,7 +335,7 @@ publica o se queda sin ese dato.
 
 ## 10. CRITERIOS DE ACEPTACIÓN (verificables, no opinables)
 
-Ejecuta todo desde `C:\Users\Kalel\asadero\villa-app`.
+Ejecuta todo desde `$HOME/asadero/villa-app`.
 
 - **A1 · Compila:** `npm run typecheck` y `npm run build` terminan sin errores ni warnings
   nuevos.
@@ -362,8 +362,8 @@ Ejecuta todo desde `C:\Users\Kalel\asadero\villa-app`.
   amable de "ya estabas" (409). Verificable también con
   `curl -X POST localhost:3201/api/suscriptores -H "content-type: application/json" -d '{"nombre":"Prueba","email":"a@b.co"}'`.
 - **A8 · Verdad de terreno visual — Edge headless a PNG** (el navegador embebido no cuenta):
-  - `& "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless=new --disable-gpu --window-size=390,2400 --screenshot="$env:TEMP\inicio-movil.png" "http://localhost:3201/inicio"`
-  - `& "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless=new --disable-gpu --window-size=1280,2000 --screenshot="$env:TEMP\inicio-escritorio.png" "http://localhost:3201/inicio"`
+  - `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu --window-size=390,2400 --screenshot="$TMPDIR/inicio-movil.png" "http://localhost:3201/inicio"`
+  - `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu --window-size=1280,2000 --screenshot="$TMPDIR/inicio-escritorio.png" "http://localhost:3201/inicio"`
   - En los PNG debe cumplirse: (a) el botón "Pedir ahora" es lo más contrastado de la primera
     pantalla; (b) en escritorio el contenido está en columna centrada, no estirado; (c) no hay
     texto cortado ni desbordes horizontales; (d) el formulario de correo se ve claramente

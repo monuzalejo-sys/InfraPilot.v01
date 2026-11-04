@@ -1,7 +1,7 @@
 ═══════════════════════════════════════════════════════════════════════════
 PROMPT — MEJORAR LA VITRINA PÚBLICA DE "MERCAPLAZA NARIÑENSE FAMILIAR"
 Objetivo: que la portada /catalogo VENDA, no que se rehaga.
-Repo: C:\Users\Kalel\placita   ·   Producción pública: https://dropshoping.com.co
+Repo: $HOME/placita   ·   Producción pública: https://dropshoping.com.co
 ═══════════════════════════════════════════════════════════════════════════
 
 ANTES DE ESCRIBIR UNA LÍNEA

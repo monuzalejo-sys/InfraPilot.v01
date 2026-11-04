@@ -299,9 +299,9 @@ puede ser eso y no un bug — verificalo neutralizando la media query en una cop
   `css/`, `js/`, `setup/`, `memory/` y los iconos). Es HTML + CSS + JS vanilla en IIFE
   con namespaces `WRD*` y tokens `--wrd-` (DEC-001 en `memory/wrd/state.json`).
 - **Archivos que creás (y ningún otro):**
-  `C:\Users\Kalel\fable 5\wrd\landing.html`
-  `C:\Users\Kalel\fable 5\wrd\css\landing.css`
-  `C:\Users\Kalel\fable 5\wrd\js\landing.js` → expone únicamente `window.WRDLanding = { montar }`.
+  `(fable 5 — carpeta del PC, no existe en la Mac)\wrd/landing.html`
+  `(fable 5 — carpeta del PC, no existe en la Mac)\wrd/css/landing.css`
+  `(fable 5 — carpeta del PC, no existe en la Mac)\wrd/js/landing.js` → expone únicamente `window.WRDLanding = { montar }`.
 - **Archivos que NO tocás, ni una coma:** `index.html`, `premium.html`, `proveedor.html`,
   `data.js`, todo `js/` existente, todo `css/` existente, `setup/`, `memory/`.
 - **Orden exacto de scripts en `landing.html`** (y ninguno más):
@@ -333,7 +333,7 @@ puede ser eso y no un bug — verificalo neutralizando la media query en una cop
   (`assets/` = `logo.svg` y nada más; en la raíz solo `favicon.ico` y
   `apple-touch-icon.png`, 677 bytes).
 - **Dónde corre:** servidor local estático `http://localhost:4181` (entrada `wrd` en
-  `C:\Users\Kalel\fable 5\.claude\launch.json`, KN-001 en `memory/wrd/state.json` — que
+  `(fable 5 — carpeta del PC, no existe en la Mac)\.claude\launch.json`, KN-001 en `memory/wrd/state.json` — que
   además avisa que ese archivo es compartido: reverificá el puerto antes de levantar).
   En producción, cualquier host estático (PEND-002 sigue abierto: no hay hosting elegido,
   y `git remote -v` está vacío → el repo nunca se publicó).
@@ -425,10 +425,10 @@ admins, RSK-002) y PEND-005 (subir fotos reales).
 **La verdad visual es Edge headless a PNG. El panel de navegador embebido de esta máquina
 NO sirve** — no compone frames ("Browser pane is not displayed") y además reporta mal
 `getComputedStyle`/`checkVisibility` para `visibility` (KN-006 en
-`C:\Users\Kalel\fable 5\wrd\memory\wrd\state.json`: en la sesión 4 se perdieron varias
+`(fable 5 — carpeta del PC, no existe en la Mac)\wrd/memory/wrd/state.json`: en la sesión 4 se perdieron varias
 iteraciones creyéndole al panel). Comando exacto, con perfil fresco:
 
-    & "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless=new --disable-gpu --hide-scrollbars --window-size=390,844 --virtual-time-budget=6000 --user-data-dir="$env:TEMP\edge-wrd-lp" --screenshot="$env:TEMP\lp-movil.png" "http://localhost:4181/landing.html"
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu --hide-scrollbars --window-size=390,844 --virtual-time-budget=6000 --user-data-dir="$TMPDIR/edge-wrd-lp" --screenshot="$TMPDIR/lp-movil.png" "http://localhost:4181/landing.html"
 
 y otra igual con `--window-size=1440,900`. Después **abrí los PNG y miralos**.
 

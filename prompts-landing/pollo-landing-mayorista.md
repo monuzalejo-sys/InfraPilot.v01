@@ -1,7 +1,7 @@
 ═══════════════════════════════════════════════════════════════════════════
 PROMPT DE LANDING — proyecto "pollo-landing"
 Mayorista B2B de pollo crudo (entero y despresado) · Colombia
-Ruta del proyecto: C:\Users\Kalel\fable 5\pollo-landing
+Ruta del proyecto: (fable 5 — carpeta del PC, no existe en la Mac)\pollo-landing
 ═══════════════════════════════════════════════════════════════════════════
 
 LEE ESTO ANTES DE TOCAR NADA
@@ -245,7 +245,7 @@ Orden final de la página (móvil manda: así se lee en 390 px).
 Registro: VENDEDOR, cálido, de marca avícola colombiana — no minimalista. Es una
 portada pública y el que mira es un cliente, no un trabajador dentro de la app. El
 manifiesto "estudio del ingeniero moderno"
-(C:\Users\Kalel\.claude\skills\orion-diseno\SKILL.md) aplica al INTERIOR de las
+(~/.claude/skills/orion-diseno/SKILL.md) aplica al INTERIOR de las
 apps del dueño; aplicarlo a una landing ya costó un rechazo textual del dueño el
 2026-08-05 ("la landing que haces es una basura... muy minimalista... quiero que esta
 landing sea más interactiva, más llamativa"). Del manifiesto se mantienen SIEMPRE las
@@ -312,7 +312,7 @@ NO hay package.json. NO hay node_modules. NO hay README. NO hay carpeta de asset
     el número.
  c) JS vanilla ES5-friendly como el que ya hay (var, function, forEach) más async/await
     y fetch, que ya se usan (script :577-594). No uses sintaxis que exija transpilar.
- d) SERVIDOR: `node serve.mjs` desde C:\Users\Kalel\fable 5\pollo-landing →
+ d) SERVIDOR: `node serve.mjs` desde (fable 5 — carpeta del PC, no existe en la Mac)\pollo-landing →
     http://localhost:4173 (serve.mjs:66). Solo librería estándar de Node
     (node:http, node:fs/promises, node:path, node:url — serve.mjs:1-4).
     OJO Windows: las rutas se resuelven con fileURLToPath (serve.mjs:6) porque el
@@ -434,8 +434,8 @@ Cada uno va al bloque CONFIG. Mientras estén vacíos, la landing funciona pero 
 Entrega solo cuando los 12 pasen. Se comprueban con comandos, no con opinión.
 
 A. INTEGRIDAD DEL PROYECTO
- 1. `ls` en C:\Users\Kalel\fable 5\pollo-landing sigue mostrando exactamente
-    .gitignore, index.html, serve.mjs, data\, memory\. Sin package.json, sin
+ 1. `ls` en (fable 5 — carpeta del PC, no existe en la Mac)\pollo-landing sigue mostrando exactamente
+    .gitignore, index.html, serve.mjs, data\, memory/. Sin package.json, sin
     node_modules, sin carpeta build.
  2. Buscar en index.html `src="http` y `href="http`: 0 coincidencias, salvo un
     https://wa.me/ si el dueño dio número. Buscar `<link ` y `<script src`: 0.
@@ -455,7 +455,7 @@ B. NO INVENCIÓN (lo más importante)
 C. EL FUNNEL SIGUE VIVO (invariante KN-001, state.json:35-37)
  7. `node serve.mjs`; en http://localhost:4173 llenar los 4 campos y enviar →
     responde 201, aparece la pantalla de éxito con el nivel asignado, y
-    data\registros.json pasa de [] a un registro con las claves exactas fecha,
+    data/registros.json pasa de [] a un registro con las claves exactas fecha,
     negocio, tipo, medio, contacto, pedidos, promo.
  8. Abrir http://localhost:4173/?admin=1 → la tabla muestra esa fila; "Exportar CSV"
     baja un archivo con el nombre desde CONFIG; "Vaciar registros" lo deja en [] y la
@@ -469,13 +469,13 @@ C. EL FUNNEL SIGUE VIVO (invariante KN-001, state.json:35-37)
 
 D. VERDAD DE TERRENO VISUAL — Edge headless a PNG, no el navegador embebido
 11. Con `node serve.mjs` corriendo, generar y MIRAR los dos PNG:
-    & "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless=new `
-      --disable-gpu --hide-scrollbars --window-size=390,3200 `
-      --screenshot="$env:TEMP\pollo-movil.png" "http://localhost:4173/"
-    & "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless=new `
-      --disable-gpu --hide-scrollbars --window-size=1440,3000 `
-      --screenshot="$env:TEMP\pollo-desktop.png" "http://localhost:4173/"
-    (si esa ruta de Edge no existe, prueba C:\Program Files\Microsoft\Edge\Application\)
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
+      --disable-gpu --hide-scrollbars --window-size=390,3200 \
+      --screenshot="$TMPDIR/pollo-movil.png" "http://localhost:4173/"
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
+      --disable-gpu --hide-scrollbars --window-size=1440,3000 \
+      --screenshot="$TMPDIR/pollo-desktop.png" "http://localhost:4173/"
+    (si esa ruta de Edge no existe, prueba /Applications/Microsoft Edge.app/Contents/MacOS/)
     En el PNG de 390 px: los 3 tabs no se desbordan, el formulario cabe sin scroll
     horizontal, la barra CTA inferior se ve, ningún texto queda cortado, ningún botón
     mide menos de 44 px de alto.

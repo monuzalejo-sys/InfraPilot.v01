@@ -158,10 +158,10 @@ qué: *"en el pico de almuerzo deslizar es perder venta"*
 - `arroces/costos` (metrics.json, sesión `orion-genesis-arroces`) —
   `fixCycles: 1`, 38/38 self-tests de dominio, cierre 6/6, y la nota de
   calibración citada arriba.
-- `C:\Users\Kalel\prommter\proyectos\arroces\lib\dominio\cierre.ts` — cabecera
+- `$ORION_HOME/prommter/arroces/lib/dominio/cierre.ts` — cabecera
   18-66 (reglas selladas), `pedidosDelTurno` 148-162, `calcularArqueo` 164-190,
   self-test de la falla F1 370-378 y el "turno nocturno" 380-391.
-- `C:\Users\Kalel\prommter\proyectos\estanco-contable\lib\dominio\cierre.ts:113-129`
+- `$ORION_HOME/prommter/estanco-contable/lib/dominio/cierre.ts:113-129`
   — `facturasDelTurno`: el `turnoId` declarado manda sobre la ventana.
 - `estanco-contable/KN-005` (Permanent) — jornada contable ≠ fecha UTC (bug
   real detectado a las 11:28 p.m.); `estanco-contable/KN-007` — doble login:
@@ -172,10 +172,10 @@ qué: *"en el pico de almuerzo deslizar es perder venta"*
 - `placita/DEC-013` + `DEC-005` — tope de 3 facturas sin imprimir e impresión
   honesta confirmada por papel; `placita/KN-028` — E2E de 4 facturas reales:
   pago mixto reparte exacto (efectivo 18.700 + Nequi 4.200 = 22.900).
-- `C:\Users\Kalel\prommter\proyectos\placita\lib\dominio\caja.ts:15-24, 139-149`
+- `$ORION_HOME/prommter/placita/lib/dominio/caja.ts:15-24, 139-149`
   — un solo cierre por día y por local; `.../contabilidad.ts:42-55, 589-641` —
   el cuadre del cajón no es la ganancia y no hay base inicial.
-- `C:\Users\Kalel\prommter\proyectos\placita\app\(app)\ventas\cobro.tsx:4-42`,
+- `$ORION_HOME/prommter/placita/app\(app)\ventas\cobro.tsx:4-42`,
   `cierre-caja.tsx:5-33`, `page.tsx:30-73` y `:174`.
 - Commit `1b0475c` (2026-08-24) — la pastilla de gastos pasó de `<span>` inerte
   a botón siempre visible con la misma guarda que el atajo `[G]`:
@@ -183,7 +183,7 @@ qué: *"en el pico de almuerzo deslizar es perder venta"*
   `app\(app)\ventas\page.tsx:1031-1038`. La funcionalidad completa ya existía
   desde el commit `f718df8`; el dueño la volvió a pedir por su nombre porque su
   única puerta era un atajo de teclado invisible en pantalla táctil.
-- `C:\Users\Kalel\prommter\proyectos\villa-broaster\docs\BASES-CAJA.md` — qué se
+- `$ORION_HOME/prommter/villa-broaster/docs/BASES-CAJA.md` — qué se
   adopta de la placita (9-19), qué no (21-31), el hallazgo clave (33-39), el
   diseño de `TurnoCaja` (46-56) y las condiciones de éxito (79-81);
   `tareas/T-03-turno-caja.md` — diseño y criterios de aceptación.
@@ -199,7 +199,7 @@ qué: *"en el pico de almuerzo deslizar es perder venta"*
 - **wrd repite hoy el error que arroces pagó, y lo sabe.** Su contable fecha las
   ventas por `creado`: *"El pedido solo guarda 'creado' — no existe una columna
   'entregadoEn'… un pedido puede tardar días entre 'nuevo' y 'entregado'"*
-  (`C:\Users\Kalel\fable 5\wrd\sistema\js\contable.js:30-36`, `wrd/DEC-006`). Es
+  (`(fable 5 — carpeta del PC, no existe en la Mac)\wrd/sistema/js/contable.js:30-36`, `wrd/DEC-006`). Es
   exactamente el supuesto temporal de `arroces/KN-001` en otro negocio: si allá
   se abren turnos o cortes finos, hay que sellar la fecha del cobro primero.
 - **Nadie ha medido dos cajas físicas reales cobrando a la vez.** El E2E de

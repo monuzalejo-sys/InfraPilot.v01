@@ -77,9 +77,9 @@ su sitio.*
   `--brasa` 0 / `#f7ece1` 57). Sin ese bloque, la dirección de arte del prompt es
   una sugerencia que pierde contra un manual que el modelo se cree.
 - **Cómo se consigue:** ya escrita y reutilizable —
-  `ORION\prompts-landing\villa-app-villa-broaster-v3.md:1174-1203` (ANEXO A). Se
+  `ORION/prompts-landing/villa-app-villa-broaster-v3.md:1174-1203` (ANEXO A). Se
   copia cambiando solo los hex. Regla asociada: **POL-004** en
-  `ORION\memory\landings\state.json`.
+  `ORION/memory/landings/state.json`.
   **Ojo:** hoy vive en la línea 1174 de un documento de 1.270 líneas. Va **arriba**.
 - Esfuerzo bajo · **Impacto muy alto**
 
@@ -106,10 +106,10 @@ su sitio.*
   suya, que es exactamente donde se perdieron los valores.
 - **Cómo se consigue:** se genera del repo en una pasada, no se inventa. Los
   tokens con sus ratios AA ya están en
-  `prommter\proyectos\villa-broaster\villa-app\app\globals.css:30-51`
+  `prommter/villa-app-repo/app/globals.css:30-51`
   (`--noche #0a0a0a`, `--rojo #e01e2b` con blanco encima = 4.78, `--naranja
   #ff8a20` sobre `#141414` = 7.81, `--radio 18px`). Las clases salen de los 11
-  componentes de `villa-app\components\tienda\`. El molde de nombres está en
+  componentes de `villa-app/components/tienda\`. El molde de nombres está en
   `…\villa-review\_ds\modernist-…\_ds_manifest.json` (48 tokens) y el molde de
   redacción en su `readme.md` (secciones Direction / Color / Type / Do / Don't).
   **20 minutos.**
@@ -194,7 +194,7 @@ su sitio.*
   reservadas evita el fallo más caro: dibujar en la carta un producto que la
   cocina no tiene.
 - **Cómo se consigue:** ya existe y es buena —
-  `villa-broaster\docs\claude-design\assets\LISTA.md` (`:10-11` las 9 fotos son
+  `villa-broaster/docs/claude-design/assets/LISTA.md` (`:10-11` las 9 fotos son
   *"PNG 1254×1254, RGB sin canal alfa, 1.5–2.0 MB… con una sombra gris incrustada
   en el fondo"*; `:52-65` las 4 reservadas con su motivo). Medir alfa y
   dimensiones de un lote de PNG toma dos minutos con Node.
@@ -275,7 +275,7 @@ llamar al cliente.*
   `isolation: isolate` + cuadrado troquelado) **cuyo único propósito es esconder
   un canal alfa que no existe**. Con alfa, esa acrobacia se borra del prompt.
 - **Cómo se consigue:** partiendo de los 9 originales intactos en
-  `villa-broaster\docs\identidad\fotos-productos\`. Quitar fondo (el fondo ya es
+  `villa-broaster/docs/identidad/fotos-productos\`. Quitar fondo (el fondo ya es
   blanco liso, cualquier recorte automático sirve), **revisar a mano los bordes
   de las presas apanadas** —la costra es lo que más se come un recorte
   automático— y exportar sujeto y sombra por separado. Aviso del propio
@@ -306,7 +306,7 @@ llamar al cliente.*
   tres lecciones pagadas, y nunca se le entregaron.
 - **Cómo se consigue:** las del rechazo ya están en disco (`…\villa-review\
   cap-top.png` y `cap-carta.png`); anotarlas toma cinco minutos. Las del "antes"
-  salen de levantar `villa-app` en local y disparar `ORION\tools\edge-cdp.mjs`.
+  salen de levantar `villa-app` en local y disparar `ORION/tools/edge-cdp.mjs`.
   **NO usar `msedge --headless --window-size=390,844`**: está medido que miente
   (KN-003 — viewport real 492×752 y el PNG sale recortado). Hay que pasar por
   `Emulation.setDeviceMetricsOverride {width:390, height:844,
@@ -335,7 +335,7 @@ llamar al cliente.*
      precios son semilla.
 - **Cómo se consigue:** **no sale del repo** — es el hueco H-2/H-1 y hay que
   pedírsela al cliente. El código lo dice con todas las letras:
-  `broaster-app\lib\servidor\almacen-disco.ts:360-366` declara que esos *"NO son
+  `broaster-app/lib/servidor/almacen-disco.ts:360-366` declara que esos *"NO son
   los precios de este negocio"*. Una llamada y una foto de la carta impresa
   resuelven las columnas duras; las descripciones las escribe el dueño en una
   tarde (90 caracteres × 23).
@@ -365,11 +365,11 @@ llamar al cliente.*
   siguiente, y solo se acumula si se anota. Registrar la **palabra** del dueño es
   lo que distingue el problema real: si repite "genérico", el fallo sigue siendo
   composición; si dice otra cosa, hay lección nueva.
-- **Cómo se consigue:** el motor ya existe — `ORION\tools\edge-cdp.mjs` (Edge por
+- **Cómo se consigue:** el motor ya existe — `ORION/tools/edge-cdp.mjs` (Edge por
   CDP, sin dependencias). Falta encima una lista de asserts de ~40 líneas,
   escrita una vez y reutilizable; los criterios en prosa ya están en
   `villa-app-villa-broaster-v3.md:1020-1112`. La bitácora es una tabla markdown
-  junto a `ORION\prompts-landing\referencias\_INDEX.md`, que se llena con la
+  junto a `ORION/prompts-landing/referencias/_INDEX.md`, que se llena con la
   salida del guion. La obligación ya está escrita (**POL-003**, **POL-004**);
   falta el archivo: hoy hay **una sola fila registrada** (v2, no respetó) y vive
   enterrada dentro de la resolución de PEND-003, que además deja constancia de
@@ -404,7 +404,7 @@ ninguna instrucción de diseño puede llenar.*
   fue el que se ve QUIETO** ("dato grande + línea"). De ahí sale la regla 6 de
   `_INDEX.md`: *antes de usar una ficha, pregúntate cómo se ve congelada en una
   captura.*
-  Y falta el píxel: `ORION\prompts-landing\referencias\` tiene `_INDEX.md`,
+  Y falta el píxel: `ORION/prompts-landing/referencias\` tiene `_INDEX.md`,
   `_PLANTILLA.md` y tres `.md` — **cero archivos de imagen**. Caso exacto: de la
   ficha 01 se pidió "texto fantasma gigante detrás" y él lo pintó como
   `rgba(224,30,43,.08)` sobre crema — técnicamente presente, **visualmente
@@ -412,7 +412,7 @@ ninguna instrucción de diseño puede llenar.*
   referencia le habría enseñado en medio segundo que ese recurso **solo existe
   sobre fondo oscuro**.
 - **Cómo se consigue:** la mitad ya está montada —
-  `ORION\prompts-landing\referencias\` con `_INDEX.md` (columna Resultados) y 3
+  `ORION/prompts-landing/referencias\` con `_INDEX.md` (columna Resultados) y 3
   fichas con veredicto anotado. Las imágenes las tiene el dueño, porque él mismo
   entregó las referencias: es una captura + un recorte a la zona del mecanismo.
 - Esfuerzo alto la primera vez · **Impacto alto y creciente**
@@ -551,7 +551,7 @@ ninguna instrucción de diseño puede llenar.*
 
 # La carpeta que le entregas
 
-Hoy existe en `villa-broaster\docs\claude-design\` con cuatro piezas: `README.md`,
+Hoy existe en `villa-broaster/docs/claude-design\` con cuatro piezas: `README.md`,
 `PROMPT.md`, `MARCA.md` y `assets/` (9 fotos + `LISTA.md`). La forma es correcta.
 Lo que le falta son **los cuatro archivos que hoy no existen**, marcados abajo:
 

@@ -5,7 +5,7 @@
  * (Skills/autonomous-memory-manager/schemas/knowledge-objects.ts).
  *
  * Usage:  node validate-memory.mjs <memory-dir>
- *         node validate-memory.mjs C:\Users\Kalel\ORION\memory\infrapilot
+ *         node validate-memory.mjs $ORION_HOME/memory/infrapilot
  *
  * Exit codes: 0 = valid (warnings allowed), 1 = schema errors, 2 = unusable input.
  * Zero dependencies. This is the executable half of ORION's "compliance is

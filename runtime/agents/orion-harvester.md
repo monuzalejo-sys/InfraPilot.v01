@@ -72,13 +72,13 @@ funciona.
 
 | Qué es | Dónde va |
 |---|---|
-| Regla transversal, pagada, que sirve en varios proyectos | **tema nuevo** en `ORION\cerebro\temas\<slug>.md` |
+| Regla transversal, pagada, que sirve en varios proyectos | **tema nuevo** en `$ORION_HOME/cerebro/temas/<slug>.md` |
 | Matiz, contraindicación o evidencia nueva de algo ya sabido | **refuerzo** del tema existente |
 | Hecho que solo vive dentro de un proyecto | objeto en la memoria de ese proyecto (`state.json`) |
-| Hecho de la máquina (rutas, herramientas, límites del entorno) | `ORION\memory\permanent\state.json` |
+| Hecho de la máquina (rutas, herramientas, límites del entorno) | `$ORION_HOME/memory/permanent/state.json` |
 
-**El formato del tema es obligatorio** y está en `ORION\cerebro\_PLANTILLA-TEMA.md`;
-el ejemplar a imitar es `ORION\cerebro\temas\generadores-de-diseno.md`. Cuida
+**El formato del tema es obligatorio** y está en `$ORION_HOME/cerebro/_PLANTILLA-TEMA.md`;
+el ejemplar a imitar es `$ORION_HOME/cerebro/temas/generadores-de-diseno.md`. Cuida
 especialmente dos campos, porque son los que hacen que el tema se ENCUENTRE:
 
 - `alias`: la jerga y los sinónimos por los que alguien buscaría esto, incluidos los

@@ -92,7 +92,7 @@
    "titulo": "El build verde no cubre lo que intercepta el middleware",
    "respuestaCorta": "Después de añadir cualquier cosa que el navegador o un tercero pida SIN sesión (assets de PWA, webhooks, .well-known, callbacks de pago), haz una petición real contra el servidor corriendo y mira el código de estado. Que compile y que cada builder valide su pieza aislada no dice nada sobre las rutas que el middleware secuestra.",
    "porQue": "KN-028: proxy.ts redirigía /sw.js y /manifest.webmanifest a /login con un 307, porque ninguna de las dos estaba en PUBLIC_PATHS. El build pasó limpio, cada builder verificó lo suyo, y el fallo solo apareció haciendo curl contra el dev server — lo cazó el verificador en vivo, no tsc ni el build.",
-   "evidencia": "infrapilot/KN-028. Arreglo en C:\\Users\\Kalel\\ORION\\infrapilot-app\\proxy.ts:4-8 — el comentario explica el porqué y PUBLIC_PATHS = [\"/\", \"/login\", \"/register\", \"/sw.js\", \"/manifest.webmanifest\"]; la comprobación vive en :40 (isPublic).",
+   "evidencia": "infrapilot/KN-028. Arreglo en $ORION_HOME/infrapilot-app/proxy.ts:4-8 — el comentario explica el porqué y PUBLIC_PATHS = [\"/\", \"/login\", \"/register\", \"/sw.js\", \"/manifest.webmanifest\"]; la comprobación vive en :40 (isPublic).",
    "cuandoAplica": "PWAs, webhooks entrantes, callbacks de OAuth o de pasarela de pago, sitemaps y robots, cualquier app con middleware de autenticación delante.",
    "cuandoNO": "No lo generalices a \"todo hay que probarlo con curl\". La regla es específica de rutas que pide un tercero sin cookie de sesión; para flujos autenticados el navegador real sigue siendo el test.",
    "temaTentativo": "verificación",

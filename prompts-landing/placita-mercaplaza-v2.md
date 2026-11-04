@@ -2,7 +2,7 @@
 PROMPT v2 — LA PORTADA DE "MERCAPLAZA NARIÑENSE FAMILIAR" TIENE QUE VENDER
 Encargo textual del dueño (2026-08-19): "un prompt para un diseño de landing
 con animaciones, mejores colores, más llamativa".
-Repo AUTORITATIVO: C:\Users\Kalel\placita   ·   Ruta pública: /catalogo
+Repo AUTORITATIVO: $HOME/placita   ·   Ruta pública: /catalogo
 Reemplaza a: ORION/prompts-landing/placita-mercaplaza.md (v1, 2026-08-16)
 ═══════════════════════════════════════════════════════════════════════════
 

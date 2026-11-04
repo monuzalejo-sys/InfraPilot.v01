@@ -126,7 +126,7 @@ truncamiento: nunca asumir que existe una única preimagen"* (`placita/KN-053`).
 - `placita/DEC-026` — `MARGEN_LEY_PCT = 80`, la ley sobre la que corren los
   ejemplos y los tests.
 - Código (commit `003e84b`, rama `master`,
-  `C:\Users\Kalel\prommter\proyectos\placita`):
+  `$ORION_HOME/prommter/placita`):
   - `lib/dominio/precios.ts:9-11` — por qué `precioVentaDesde` redondea a $50.
   - `lib/dominio/precios.ts:91-108` — `precioVentaDesde`, la dirección directa.
   - `lib/dominio/precios.ts:110-183` — `precioCompraPara` completa:

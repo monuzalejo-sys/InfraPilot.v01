@@ -53,11 +53,11 @@ Esta es la parte que hace bueno al agente. No es opcional.
 2. **Cada afirmación de hecho va con su origen `archivo:línea`.** Qué hace el
    producto, qué módulos tiene, qué precios, qué sedes, qué clientes. Si no puedes
    citar, no lo escribes. Un prompt sin orígenes es un prompt que inventa.
-3. **Marca real vs placeholder, dicho en voz alta.** Verificado: `fable 5\pollo-landing`
-   usa "Avícola Buenavista", que es un NOMBRE PROVISIONAL (`memory/pollo-landing/brief.md:17`),
-   no la marca del negocio — presentarlo como definitivo sería inventar. En cambio
-   "Villa Broaster" (`asadero\broaster-app\app\admin\page.tsx:17`) sí es un cliente
-   real. Marca todo nombre no confirmado como `[PLACEHOLDER]` dentro del prompt.
+3. **Marca real vs placeholder, dicho en voz alta.** Ejemplo anterior: `pollo-landing` (no verificado post-mudanza a Mac)
+   usaba "Avícola Buenavista", que era un NOMBRE PROVISIONAL, no la marca del negocio:
+   presentarlo como definitivo habría sido inventar. En cambio "Villa Broaster"
+   (`$ORION_HOME/prommter/broaster-app-repo/app/admin/page.tsx:23`)
+   sí es un cliente real. Marca todo nombre no confirmado como `[PLACEHOLDER]` dentro del prompt.
 4. **Nada de cifras sociales.** Años de experiencia, número de clientes, kilos
    vendidos, testimonios, premios, "más de X familias confían" — si no está en las
    fuentes, no existe. Si el negocio *necesita* ese dato para vender, el prompt lo

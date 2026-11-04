@@ -27,7 +27,7 @@ la capa curada, `--json` si necesitas procesar el resultado.
 
 ## 2. Lee de verdad lo que encontraste
 
-- Si sale un **TEMA**, ábrelo completo: `node ...\cerebro.mjs tema <slug>`. El tema
+- Si sale un **TEMA**, ábrelo completo: `node $ORION_HOME/tools/cerebro.mjs tema <slug>`. El tema
   es una respuesta ya curada — su bloque "Respuesta corta" es lo que hay que
   contestar, y su bloque "Cuándo NO aplica" es lo que evita que la apliques mal.
 - Si salen **objetos de memoria** (`proyecto/ID`), ábrelos en su `state.json` cuando

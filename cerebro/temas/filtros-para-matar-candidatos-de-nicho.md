@@ -135,7 +135,7 @@ ganadores** (`huecos-2026/KN-002`):
 - [dubrink.com/pricing](https://dubrink.com/pricing) — lado exportador gratis
   en español/portugués, premium al importador; fuente primaria del filtro (3),
   junto con Cbamboo (`informe-huecos-2026.html:333`).
-- `C:\Users\Kalel\fable 5\huecos-2026\informe-huecos-2026.html` — líneas
+- `(fable 5 — carpeta del PC, no existe en la Mac)\huecos-2026\informe-huecos-2026.html` — líneas
   226 (trabajo forzoso, Sección 301), 377 (riesgo estructural PFAS/IC2), 332–333
   (Dubrink/Cbamboo), 272 (evidencia negativa doble en funerarias), 286 (multa
   vs suscripción, riesgo nº 1 de funerarias).

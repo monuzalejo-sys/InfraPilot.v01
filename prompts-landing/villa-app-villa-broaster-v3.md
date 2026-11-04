@@ -1020,7 +1020,7 @@ H-11 en la franja del cierre.
 ## 10. CRITERIOS DE ACEPTACIÓN (medibles a 390×844, no opinables)
 
 La verdad de terreno es **Edge headless por CDP**, no el navegador embebido:
-`node C:\Users\Kalel\ORION\tools\edge-cdp.mjs --url <archivo.html> --width 390 --height 844 --mobile --shot salida.png --eval "<js>"`.
+`node $ORION_HOME/tools/edge-cdp.mjs --url <archivo.html> --width 390 --height 844 --mobile --shot salida.png --eval "<js>"`.
 
 - **C1 · Sin desborde horizontal en las 5 pantallas:** `document.documentElement.scrollWidth` → **390** exacto.
 - **C2 · El héroe mide una pantalla:** el contenedor del héroe da **844 ± 4 px** y usa `100dvh`.
@@ -1112,7 +1112,7 @@ La verdad de terreno es **Edge headless por CDP**, no el navegador embebido:
 
 ## 11. REFERENCIAS COMBINADAS (mecanismo, jamás contenido)
 
-Biblioteca: `C:\Users\Kalel\ORION\prompts-landing\referencias\`. Se copia el **mecanismo**; nunca
+Biblioteca: `$ORION_HOME/prompts-landing/referencias\`. Se copia el **mecanismo**; nunca
 la marca, los textos, las imágenes ni la paleta ajena. Las tres se usan **en su estado congelado**,
 que es la lección que costó el rechazo anterior.
 

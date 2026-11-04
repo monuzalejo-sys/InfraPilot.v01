@@ -1,5 +1,5 @@
 # PROMPT — Mejora quirúrgica de la landing de Super Arroz del Norte
-# Proyecto: C:\Users\Kalel\arroces   |   Ruta: app/page.tsx   |   Fecha del brief: 2026-08-16
+# Proyecto: $HOME/arroces   |   Ruta: app/page.tsx   |   Fecha del brief: 2026-08-16
 
 ## AVISO PREVIO, LÉELO ANTES DE TOCAR NADA
 
@@ -423,11 +423,11 @@ elemento, splash screens. Ninguna vende un arroz.
 **C. Verdad de terreno visual — Edge headless a PNG (NO el navegador embebido):**
 13. Con `npm run dev` levantado, captura y REVISA los PNG:
 ```powershell
-$edge = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-& $edge --headless=new --disable-gpu --hide-scrollbars --window-size=390,3600 `
-  --screenshot="$env:TEMP\san-movil.png" http://localhost:3000/
-& $edge --headless=new --disable-gpu --hide-scrollbars --window-size=1440,3600 `
-  --screenshot="$env:TEMP\san-escritorio.png" http://localhost:3000/
+$edge = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+& $edge --headless=new --disable-gpu --hide-scrollbars --window-size=390,3600 \
+  --screenshot="$TMPDIR/san-movil.png" http://localhost:3000/
+& $edge --headless=new --disable-gpu --hide-scrollbars --window-size=1440,3600 \
+  --screenshot="$TMPDIR/san-escritorio.png" http://localhost:3000/
 ```
 14. En `san-movil.png` se debe cumplir, mirando el PNG: el titular y el CTA "Armar mi
     pedido" entran en los primeros 844px; el CTA es el elemento de mayor peso visual de esa

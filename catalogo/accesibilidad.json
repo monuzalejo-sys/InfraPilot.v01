@@ -19,7 +19,7 @@
       "aceptacion": [
         {
           "check": "Los estados llevan icono o texto propio, no solo la clase de color",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-estado]')].filter(e=>!e.textContent.trim() && !e.querySelector('svg')).length\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-estado]')].filter(e=>!e.textContent.trim() && !e.querySelector('svg')).length\"",
           "espera": "eval: 0"
         },
         {
@@ -90,7 +90,7 @@
       "aceptacion": [
         {
           "check": "Ningún elemento no nativo con onClick queda fuera del teclado",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[onclick],[data-clickable]')].filter(e=>!['BUTTON','A'].includes(e.tagName) && e.getAttribute('tabindex')===null).length\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[onclick],[data-clickable]')].filter(e=>!['BUTTON','A'].includes(e.tagName) && e.getAttribute('tabindex')===null).length\"",
           "espera": "eval: 0"
         },
         {
@@ -123,7 +123,7 @@
       "aceptacion": [
         {
           "check": "El primer elemento enfocable de la página es el enlace de salto",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 1280 --height 800 --eval \"(()=>{const f=[...document.querySelectorAll('a,button,input,[tabindex]')].find(e=>e.tabIndex>=0);return f && f.getAttribute('href')==='#contenido'})()\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/ --width 1280 --height 800 --eval \"(()=>{const f=[...document.querySelectorAll('a,button,input,[tabindex]')].find(e=>e.tabIndex>=0);return f && f.getAttribute('href')==='#contenido'})()\"",
           "espera": "eval: true"
         },
         {
@@ -161,7 +161,7 @@
       "aceptacion": [
         {
           "check": "El orden geométrico coincide con el orden de tabulación",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 1280 --height 800 --eval \"(()=>{const el=[...document.querySelectorAll('a,button,input,select,[tabindex]')].filter(e=>e.tabIndex>=0);const geo=[...el].sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top||a.getBoundingClientRect().left-b.getBoundingClientRect().left);return el.every((e,i)=>e===geo[i])})()\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 1280 --height 800 --eval \"(()=>{const el=[...document.querySelectorAll('a,button,input,select,[tabindex]')].filter(e=>e.tabIndex>=0);const geo=[...el].sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top||a.getBoundingClientRect().left-b.getBoundingClientRect().left);return el.every((e,i)=>e===geo[i])})()\"",
           "espera": "eval: true"
         },
         {
@@ -193,7 +193,7 @@
       "aceptacion": [
         {
           "check": "Escape cierra el panel no modal y devuelve el foco a quien lo abrió",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 1280 --height 800 --eval \"(async()=>{const t=document.querySelector('[data-desplegable-trigger]');if(!t)return 'sin desplegable';t.click();await new Promise(r=>setTimeout(r,150));document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));await new Promise(r=>setTimeout(r,150));return document.activeElement===t})()\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 1280 --height 800 --eval \"(async()=>{const t=document.querySelector('[data-desplegable-trigger]');if(!t)return 'sin desplegable';t.click();await new Promise(r=>setTimeout(r,150));document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));await new Promise(r=>setTimeout(r,150));return document.activeElement===t})()\"",
           "espera": "eval: true (o \"sin desplegable\" si el proyecto no tiene ninguno)"
         },
         {
@@ -273,7 +273,7 @@
       "aceptacion": [
         {
           "check": "Ningún botón de solo icono queda sin nombre",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('button')].filter(b=>!b.textContent.trim() && !b.getAttribute('aria-label')).length\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('button')].filter(b=>!b.textContent.trim() && !b.getAttribute('aria-label')).length\"",
           "espera": "eval: 0"
         },
         {
@@ -307,7 +307,7 @@
       "aceptacion": [
         {
           "check": "Ninguna imagen de producto queda sin alt descriptivo",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('img[data-producto]')].filter(i=>!i.alt || i.alt.trim().length<3).length\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('img[data-producto]')].filter(i=>!i.alt || i.alt.trim().length<3).length\"",
           "espera": "eval: 0"
         },
         {
@@ -344,12 +344,12 @@
       "aceptacion": [
         {
           "check": "{{ruta}} tiene un solo h1",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 390 --height 844 --mobile --eval \"document.querySelectorAll('h1').length\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 390 --height 844 --mobile --eval \"document.querySelectorAll('h1').length\"",
           "espera": "eval: 1"
         },
         {
           "check": "Los niveles de encabezado no saltan",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 390 --height 844 --mobile --eval \"(()=>{const n=[...document.querySelectorAll('h1,h2,h3,h4,h5,h6')].map(h=>+h.tagName[1]);return n.every((v,i)=>i===0||v-n[i-1]<=1)})()\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 390 --height 844 --mobile --eval \"(()=>{const n=[...document.querySelectorAll('h1,h2,h3,h4,h5,h6')].map(h=>+h.tagName[1]);return n.every((v,i)=>i===0||v-n[i-1]<=1)})()\"",
           "espera": "eval: true"
         },
         {
@@ -432,7 +432,7 @@
         },
         {
           "check": "El atributo cambia junto con el estilo",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/panel --width 1280 --height 800 --eval \"(()=>{const t=document.querySelector('[role=tab]');if(!t)return 'sin pestanas';t.click();return t.getAttribute('aria-selected')})()\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/panel --width 1280 --height 800 --eval \"(()=>{const t=document.querySelector('[role=tab]');if(!t)return 'sin pestanas';t.click();return t.getAttribute('aria-selected')})()\"",
           "espera": "eval: \"true\" (o \"sin pestanas\")"
         }
       ],
@@ -471,7 +471,7 @@
         },
         {
           "check": "La tabla tiene caption",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/movimientos --width 1280 --height 800 --eval \"!!document.querySelector('table caption')\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/movimientos --width 1280 --height 800 --eval \"!!document.querySelector('table caption')\"",
           "espera": "eval: true"
         }
       ],
@@ -588,12 +588,12 @@
       "aceptacion": [
         {
           "check": "El foco cae en el primer campo al abrir la tarea",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja/nueva --width 390 --height 844 --mobile --eval \"document.activeElement.tagName\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja/nueva --width 390 --height 844 --mobile --eval \"document.activeElement.tagName\"",
           "espera": "eval: \"INPUT\" o \"SELECT\""
         },
         {
           "check": "Las pantallas de solo lectura no mueven el foco",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ordenes --width 390 --height 844 --mobile --eval \"document.activeElement===document.body\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/ordenes --width 390 --height 844 --mobile --eval \"document.activeElement===document.body\"",
           "espera": "eval: true"
         }
       ],
@@ -627,7 +627,7 @@
       "aceptacion": [
         {
           "check": "Borrar una línea no manda el foco al body",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(async()=>{document.querySelector('[data-quitar-linea]')?.click();await new Promise(r=>setTimeout(r,300));return document.activeElement!==document.body})()\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(async()=>{document.querySelector('[data-quitar-linea]')?.click();await new Promise(r=>setTimeout(r,300));return document.activeElement!==document.body})()\"",
           "espera": "eval: true"
         },
         {
@@ -666,7 +666,7 @@
       "aceptacion": [
         {
           "check": "{{ruta}} tiene el orden geométrico igual al de tabulación",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 1280 --height 800 --eval \"(()=>{const el=[...document.querySelectorAll('a,button,input,select,[tabindex]')].filter(e=>e.tabIndex>=0);const geo=[...el].sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top||a.getBoundingClientRect().left-b.getBoundingClientRect().left);return el.every((e,i)=>e===geo[i])})()\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 1280 --height 800 --eval \"(()=>{const el=[...document.querySelectorAll('a,button,input,select,[tabindex]')].filter(e=>e.tabIndex>=0);const geo=[...el].sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top||a.getBoundingClientRect().left-b.getBoundingClientRect().left);return el.every((e,i)=>e===geo[i])})()\"",
           "espera": "eval: true"
         },
         {
@@ -698,7 +698,7 @@
       "aceptacion": [
         {
           "check": "Todo campo tiene nombre accesible",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('input,select,textarea')].filter(i=>!i.labels?.length && !i.getAttribute('aria-label')).length\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('input,select,textarea')].filter(i=>!i.labels?.length && !i.getAttribute('aria-label')).length\"",
           "espera": "eval: 0"
         },
         {
@@ -731,7 +731,7 @@
       "aceptacion": [
         {
           "check": "Cada obligatorio lleva las dos señales",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/contacto --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[required],[aria-required=true]')].filter(e=>!e.closest('[data-campo]')?.textContent.includes('*')).length\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/contacto --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[required],[aria-required=true]')].filter(e=>!e.closest('[data-campo]')?.textContent.includes('*')).length\"",
           "espera": "eval: 0"
         },
         {
@@ -770,7 +770,7 @@
         },
         {
           "check": "Cada legend tiene la pregunta completa",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('fieldset')].filter(f=>!f.querySelector('legend')?.textContent.trim()).length\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('fieldset')].filter(f=>!f.querySelector('legend')?.textContent.trim()).length\"",
           "espera": "eval: 0"
         }
       ],
@@ -839,12 +839,12 @@
       "aceptacion": [
         {
           "check": "Con movimiento reducido, caja no corre animaciones",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --reduce",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --reduce",
           "espera": "metrics.reducedMotion = true y metrics.animations = 0"
         },
         {
           "check": "Sin la preferencia, caja sí anima",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile",
           "espera": "metrics.animations ≥1"
         }
       ],
@@ -914,12 +914,12 @@
       "aceptacion": [
         {
           "check": "{{ruta}} no recorta texto al doble de tamaño",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 1280 --height 800 --eval \"document.documentElement.style.fontSize='32px';new Promise(r=>setTimeout(()=>r([...document.querySelectorAll('p,h1,h2,button,label')].filter(e=>e.scrollHeight>e.clientHeight+2).length),200))\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 1280 --height 800 --eval \"document.documentElement.style.fontSize='32px';new Promise(r=>setTimeout(()=>r([...document.querySelectorAll('p,h1,h2,button,label')].filter(e=>e.scrollHeight>e.clientHeight+2).length),200))\"",
           "espera": "eval: 0"
         },
         {
           "check": "No aparece scroll horizontal nuevo",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 1280 --height 800 --eval \"document.documentElement.style.fontSize='32px';new Promise(r=>setTimeout(()=>r(document.documentElement.scrollWidth<=document.documentElement.clientWidth+1),200))\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000{{ruta}} --width 1280 --height 800 --eval \"document.documentElement.style.fontSize='32px';new Promise(r=>setTimeout(()=>r(document.documentElement.scrollWidth<=document.documentElement.clientWidth+1),200))\"",
           "espera": "eval: true"
         }
       ],
@@ -952,7 +952,7 @@
         },
         {
           "check": "Un nombre largo se ve completo",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(()=>{const e=document.querySelector('[data-nombre-producto]');return e?e.scrollWidth<=e.clientWidth+1:true})()\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(()=>{const e=document.querySelector('[data-nombre-producto]');return e?e.scrollWidth<=e.clientWidth+1:true})()\"",
           "espera": "eval: true"
         }
       ],
@@ -987,7 +987,7 @@
       "aceptacion": [
         {
           "check": "El botón se deshabilita en el primer toque",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(()=>{const b=document.querySelector('[data-cobrar]');b.click();return b.disabled})()\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(()=>{const b=document.querySelector('[data-cobrar]');b.click();return b.disabled})()\"",
           "espera": "eval: true"
         },
         {
@@ -1032,7 +1032,7 @@
         },
         {
           "check": "Deslizar afuera antes de soltar cancela",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(()=>{const b=document.querySelector('[data-destructiva]');const r=b.getBoundingClientRect();b.dispatchEvent(new PointerEvent('pointerdown',{clientX:r.left+5,clientY:r.top+5,bubbles:true}));b.dispatchEvent(new PointerEvent('pointerup',{clientX:r.left-50,clientY:r.top-50,bubbles:true}));return !document.querySelector('[data-confirmado]')})()\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"(()=>{const b=document.querySelector('[data-destructiva]');const r=b.getBoundingClientRect();b.dispatchEvent(new PointerEvent('pointerdown',{clientX:r.left+5,clientY:r.top+5,bubbles:true}));b.dispatchEvent(new PointerEvent('pointerup',{clientX:r.left-50,clientY:r.top-50,bubbles:true}));return !document.querySelector('[data-confirmado]')})()\"",
           "espera": "eval: true"
         }
       ],
@@ -1065,12 +1065,12 @@
       "aceptacion": [
         {
           "check": "Cada fila con swipe-para-borrar tiene también un botón de borrar",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-swipe-borrar]')].filter(f=>!f.querySelector('[data-borrar-boton]')).length\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-swipe-borrar]')].filter(f=>!f.querySelector('[data-borrar-boton]')).length\"",
           "espera": "eval: 0"
         },
         {
           "check": "El long-press tiene alternativa de un toque",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-long-press]')].filter(e=>!e.querySelector('[data-mas-opciones]') && !e.parentElement.querySelector('[data-mas-opciones]')).length\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-long-press]')].filter(e=>!e.querySelector('[data-mas-opciones]') && !e.parentElement.querySelector('[data-mas-opciones]')).length\"",
           "espera": "eval: 0"
         }
       ],
@@ -1183,7 +1183,7 @@
       "aceptacion": [
         {
           "check": "Los controles de cobro miden 56 px o más en caja",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-accion-cobro]')].filter(e=>{const r=e.getBoundingClientRect();return r.width<56||r.height<56}).length\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/caja --width 390 --height 844 --mobile --eval \"[...document.querySelectorAll('[data-accion-cobro]')].filter(e=>{const r=e.getBoundingClientRect();return r.width<56||r.height<56}).length\"",
           "espera": "eval: 0"
         },
         {
@@ -1228,12 +1228,12 @@
       "aceptacion": [
         {
           "check": "El interruptor existe y es visible sin abrir submenús",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"!!document.querySelector('[data-modo-alto-contraste]')\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"!!document.querySelector('[data-modo-alto-contraste]')\"",
           "espera": "eval: true"
         },
         {
           "check": "La preferencia se recuerda entre visitas",
-          "comando": "node C:\\Users\\Kalel\\ORION\\tools\\edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"(()=>{document.querySelector('[data-modo-alto-contraste]').click();return localStorage.getItem('alto-contraste')})()\"",
+          "comando": "node ${ORION_HOME}/tools/edge-cdp.mjs --url http://localhost:3000/ --width 390 --height 844 --mobile --eval \"(()=>{document.querySelector('[data-modo-alto-contraste]').click();return localStorage.getItem('alto-contraste')})()\"",
           "espera": "eval: valor no vacío"
         },
         {

@@ -1,5 +1,5 @@
 ═══════════════════════════════════════════════════════════════════════
-PROMPT DE LANDING — PROYECTO "agencia"  (C:\Users\Kalel\agencia)
+PROMPT DE LANDING — PROYECTO "agencia"  ($HOME/agencia)
 Servicio propio del dueño. Entregable: UN archivo index.html autocontenido.
 Léelo entero antes de escribir una línea. Todo dato de hecho lleva su origen.
 ═══════════════════════════════════════════════════════════════════════
@@ -370,7 +370,7 @@ que no sea la mini-demo.
 
 7) RESTRICCIONES TÉCNICAS REALES (verificadas)
 ─────────────────────────────────────────────────────────────────────
- • ENTREGABLE: un solo archivo C:\Users\Kalel\agencia\index.html, con TODO el
+ • ENTREGABLE: un solo archivo $HOME/agencia/index.html, con TODO el
    CSS en <style> y TODO el JS en <script> dentro del propio archivo. Cero
    dependencias, cero CDN, cero fuentes externas, cero peticiones de red.
    Razones comprobadas: (1) la carpeta no tiene package.json, node_modules,
@@ -504,10 +504,10 @@ Funcionales:
 Visuales — la verdad de terreno es Edge en modo headless a PNG, NO el
 navegador embebido del editor:
  A10. Capturas obligatorias a 390×844 (móvil) y 1440×900 (escritorio):
-      "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" ^
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ^
         --headless --disable-gpu --window-size=390,844 ^
         --screenshot="...\movil-hero.png" ^
-        "file:///C:/Users/Kalel/agencia/index.html"
+        "file:///$HOME/agencia/index.html"
       Repetir apuntando a los anclas de cada sección
       (…/index.html#calculadora, #niveles, #demo, #trabajo) para capturar
       abajo. Revisa las PNG una por una.

@@ -26,7 +26,7 @@ Quien mira la pantalla es **un cliente afuera decidiendo si compra el servicio**
 
 | Dato | Valor | Origen |
 |---|---|---|
-| Nombre | **Orama Inmobiliaria** — fijo, no negociable | `fable 5\orama\memory\orama\brief.md:7`; `fable 5\orama\memory\orama\state.json:63` (CON-001) |
+| Nombre | **Orama Inmobiliaria** — fijo, no negociable | `fable 5\orama/memory/orama/brief.md:7`; `fable 5\orama/memory/orama/state.json:63` (CON-001) |
 | Significado | *orama* = "visión" en griego (ὅραμα) | `brief.md:7` |
 | Logo | Ventana en arco con sol en el horizonte | `brief.md:8`; SVG exacto en `propuesta-orama.html:421-425` |
 | Tinta | `#0F2E36` (oscuro, confianza) | `brief.md:10` |
@@ -65,7 +65,7 @@ Teléfono/WhatsApp real, dirección de la oficina, ciudad real de operación, ho
 
 ## 3. Arquitectura técnica (heredada de la plantilla de calidad)
 
-**Reutiliza la ARQUITECTURA de** `C:\Users\Kalel\ORION\prompts-landing\plantillas\login-video-pixel-locked.md` — es el estándar de calidad que entregó el dueño el 2026-08-21. Concretamente sus secciones 0, 2, 5, 6, 7:
+**Reutiliza la ARQUITECTURA de** `$ORION_HOME/prompts-landing/plantillas/login-video-pixel-locked.md` — es el estándar de calidad que entregó el dueño el 2026-08-21. Concretamente sus secciones 0, 2, 5, 6, 7:
 
 1. **Un solo `index.html`**, todo inline (CSS, JS, SVG, imágenes). `<!DOCTYPE html>`, `<html lang="es">`, `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">`, `<title>Orama Inmobiliaria</title>`.
 2. **Media hero con `poster`** en el login, para que el primer pintado nunca sea un hueco vacío (plantilla §2).

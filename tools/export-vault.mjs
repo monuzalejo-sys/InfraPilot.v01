@@ -5,7 +5,7 @@
  * agents, skills) + la memoria de TODOS los proyectos con sus enlaces.
  *
  * Uso: node tools/export-vault.mjs <carpeta-destino>
- * Ej.:  node tools/export-vault.mjs "C:/Users/Kalel/ORION-Vault"
+ * Ej.:  node tools/export-vault.mjs "$ORION_HOME/../ORION-Vault"
  *
  * Regenerable: cada ejecución reescribe el destino. Cero dependencias.
  */
@@ -45,7 +45,7 @@ sys += copyIf(join(root, "Skills", "autonomous-memory-manager", "README.md"),
 // ── 2. Proyectos: cada memoria con su vault enlazado ───────────────
 // Además de las memorias bajo ORION/memory/, se pueden pasar memorias de
 // proyectos que viven en OTRO repo como argumentos extra:
-//   node tools/export-vault.mjs <destino> C:/ruta/otro-repo/memory/<projectId>
+//   node tools/export-vault.mjs <destino> /ruta/otro-repo/memory/<projectId>
 // Sin esto, un proyecto fuera de ORION queda invisible en el vault.
 const memRoot = join(root, "memory")
 
@@ -55,11 +55,10 @@ const memRoot = join(root, "memory")
    villa-broaster y placita se quedó semanas atrás de su memoria real. Ahora se
    barren las raíces conocidas y entra todo lo que tenga state.json; los
    argumentos extra siguen funcionando para casos sueltos. */
-const RAICES_EXTERNAS = ["C:\\Users\\Kalel\\prommter\\proyectos", "C:\\Users\\Kalel\\fable 5"]
-/* La agencia guarda SU propia memoria en la raíz del repo (prommter\memory\),
-   no bajo proyectos\, así que el barrido de arriba no la ve. Se lista aparte
-   en vez de complicar el barrido: es un caso, no un patrón. */
-const MEMORIAS_SUELTAS = ["C:\\Users\\Kalel\\prommter\\memory\\prommter"]
+// prommter/ se escanea completo: cada repo con memory/<id>/state.json real entra,
+// sin listar repos a mano y sin ninguna ruta absoluta de plataforma. Si prommter/
+// no existe todavía, el barrido de abajo simplemente lo salta.
+const RAICES_EXTERNAS = [join(root, "prommter")]
 const descubiertas = []
 for (const raiz of RAICES_EXTERNAS) {
   if (!existsSync(raiz)) continue
@@ -72,13 +71,38 @@ for (const raiz of RAICES_EXTERNAS) {
     }
   }
 }
-const externas = [...new Set([...descubiertas, ...MEMORIAS_SUELTAS, ...process.argv.slice(3)])].filter((p) => existsSync(join(p, "state.json")))
+const externas = [...new Set([...descubiertas, ...process.argv.slice(3)])].filter((p) => existsSync(join(p, "state.json")))
 const internas = readdirSync(memRoot)
   .map((proj) => join(memRoot, proj))
   .filter((d) => statSync(d).isDirectory() && existsSync(join(d, "state.json")))
 
+/* Dos memorias distintas pueden compartir projectId — hoy pasa con "placita"
+   (prommter/placita y prommter/mercaplazarepo). Aguas abajo cada una escribe en
+   `Proyectos/<basename>/`, así que sin resolverlo la segunda pisaría en el vault
+   la carpeta de la primera en silencio. Mismo criterio que cerebro.mjs y
+   baul.mjs: gana la memoria con MÁS ids (objetos + archivados), y el mtime solo
+   deshace empates exactos — desempatar por fecha hizo ganar una vez una copia
+   de 38 ids sobre la real de 115. El resto se avisa por
+   consola en vez de pisarse sin decir nada. */
+const porNombre = new Map()
+for (const d of [...internas, ...externas]) {
+  const nombre = basename(d)
+  let mtime = 0, ids = 0
+  try { mtime = statSync(join(d, "state.json")).mtimeMs } catch {}
+  try { const j = JSON.parse(readFileSync(join(d, "state.json"), "utf8"))
+        ids = (j.objects || []).length + (j.archives || []).length } catch {}
+  const previo = porNombre.get(nombre)
+  if (!previo || ids > previo.ids || (ids === previo.ids && mtime >= previo.mtime)) {
+    if (previo) console.error(`  aviso: "${nombre}" duplicado — gana ${d} (${ids} ids), se ignora ${previo.dir} (${previo.ids})`)
+    porNombre.set(nombre, { dir: d, mtime, ids })
+  } else {
+    console.error(`  aviso: "${nombre}" duplicado — gana ${previo.dir} (${previo.ids} ids), se ignora ${d} (${ids})`)
+  }
+}
+const memoriasUnicas = [...porNombre.values()].map((x) => x.dir)
+
 const proyectos = []
-for (const mdir of [...internas, ...externas]) {
+for (const mdir of memoriasUnicas) {
   const proj = basename(mdir)
   const out = join(dest, "Proyectos", proj)
   // Prefijo por proyecto: evita que los [[links]] choquen entre memorias
@@ -119,7 +143,7 @@ const inicio = [
   "  cruzando los proyectos. Una lección pagada en un negocio sirve en los otros.",
   "- Para preguntarle en vez de navegar:", "",
   "  ```bash",
-  '  node C:\\Users\\Kalel\\ORION\\tools\\cerebro.mjs buscar "tu pregunta"',
+  `  node "${join(root, "tools", "cerebro.mjs")}" buscar "tu pregunta"`,
   "  ```", "",
   "  Devuelve el tema o los objetos que responden, con la cita de dónde salió cada uno.",
   "  El skill `orion-cerebro` hace eso mismo dentro de una conversación.", "",
