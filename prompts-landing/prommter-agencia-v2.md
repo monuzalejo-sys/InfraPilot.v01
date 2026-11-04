@@ -8,9 +8,9 @@ una vez y mensualidad"; hoy manda prommter/KN-003 — ver §1.C).
 ESTE ARCHIVO SIGUE VIGENTE. Si la landing YA está construida, la iteración de
 acabado va en `ORION/prompts-landing/prommter-agencia-v3-mejora.md` (2026-08-29),
 que opera ENCIMA del entregable y no sustituye nada de aquí.
-Y desde el 2026-09-24, `prommter-agencia-v4-cotizacion.md` DESCONGELA el precio
-(H-6 cerrado: se publica la cifra del contrato), los tres niveles (S7 pasa a ser
-la oferta integral) y «cómo empezamos» (S9). Antes de tocar S6-S9, léelo.
+Desde el 2026-09-24 hay un encargo v4 que manda sobre S6-S9 (precio, niveles y
+«cómo empezamos»). Es material interno: vive en el repo privado de Prommter
+(`prommter/sectores/principal/`), no aquí. Antes de tocar S6-S9, léelo allá.
 Léelo entero antes de escribir una línea.
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -212,7 +212,7 @@ primera cosa accionable en y=1994 —2,4 pantallas— y se leyó como "apagada"
      catálogo con precios editables, usuarios dueño/cajero, caja con turno y
      arqueo. Cobrar toma 2 toques; tomar un pedido, 6 toques sin scroll en un
      celular de 390 px.
-     (`prommter/proyectos/villa-broaster/memory/villa-broaster/brief.md:9, :11,
+     (`prommter/Equipo-villa-broaster/memory/villa-broaster/brief.md:9, :11,
      :13`; sedes en `PROYECTOS.md:14`)
  (b) **Plaza de mercado — EN PRODUCCIÓN, el cliente lo usa a diario**
      (`PROYECTOS.md:22`). Es el único que ya está en uso real todos los días.
@@ -573,12 +573,12 @@ mini-demo.
    externa permitida: el `<link>` de Google Fonts del §5.C (más los dos
    `preconnect`). Nada más: cero CDN de JS, cero imágenes externas, cero
    analíticas.
-   Razones verificadas: (1) `C:\Users\Kalel\prommter` **no tiene `package.json`**
+   Razones verificadas: (1) `$ORION_HOME/prommter` **no tiene `package.json`**
    ni toolchain en la raíz — no hay build que reutilizar; (2) es la convención de
-   la casa para landings: `prommter/proyectos/pollo-landing/index.html` es un
+   la casa para landings: `prommter/pollo-landing/index.html` es un
    único archivo de 39.093 B (`PROYECTOS.md:40-43`); (3) la única conversión es
    un enlace `wa.me`, así que no hace falta backend ni formulario.
- • DÓNDE VIVE: `C:\Users\Kalel\prommter\web\index.html` (carpeta nueva; hoy la
+ • DÓNDE VIVE: `$ORION_HOME/prommter/web/index.html` (carpeta nueva; hoy la
    raíz de `prommter` solo tiene EMPRESA.md, PLAN-MIGRACION.md, PROYECTOS.md,
    documentos/, equipo/, memory/, proyectos/, reportes/). Si el dueño prefiere
    otra ruta, es lo único de este apartado que se puede mover.
@@ -597,7 +597,7 @@ mini-demo.
    mano por GitHub Desktop (`EMPRESA.md:85-87`) — crear el repo es un paso aparte,
    no parte de este entregable.
  • MÁQUINA: Node v24.16.0 (verificado). QA visual con
-   `node C:\Users\Kalel\ORION\tools\edge-cdp.mjs` (existe, ver §10).
+   `node $ORION_HOME/tools/edge-cdp.mjs` (existe, ver §10).
 
 ╔═════════════════════════════════════════════════════════════════════════════╗
 ║ 8 · PROHIBIDO EN ESTE PROYECTO                                              ║
@@ -708,7 +708,7 @@ VISUALES — la verdad de terreno es Edge por CDP, NUNCA el navegador embebido n
 y recorta el PNG a 390, y reporta `prefers-reduced-motion: reduce` por defecto —
 `ORION/memory/landings/state.json` KN-003):
 ```
-node C:\Users\Kalel\ORION\tools\edge-cdp.mjs --url "file:///C:/Users/Kalel/prommter/web/index.html" ^
+node $ORION_HOME/tools/edge-cdp.mjs --url "file:///$ORION_HOME/prommter/web/index.html" ^
   --width 390 --height 844 --mobile --wait 2500 --shot movil-heroe.png ^
   --eval "JSON.stringify({cta:document.querySelector('[data-cta-principal]').getBoundingClientRect().bottom, calc:document.querySelector('#calculadora').getBoundingClientRect().top, sw:document.documentElement.scrollWidth, cw:document.documentElement.clientWidth, fuentes:[...document.fonts].map(f=>f.family), anim:document.getAnimations().length})"
 ```
@@ -746,7 +746,7 @@ AUTOCHEQUEOS QUE TE HACES SOLO ANTES DE ENTREGAR (contéstalos mirando el PNG):
 ╔═════════════════════════════════════════════════════════════════════════════╗
 ║ 11 · REFERENCIAS COMBINADAS (biblioteca de la casa, una por zona)           ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
-Fuente: `C:\Users\Kalel\ORION\prompts-landing\referencias\`. Se copia el
+Fuente: `$ORION_HOME/prompts-landing/referencias\`. Se copia el
 MECANISMO, jamás la marca, los textos, las imágenes ni los datos de la referencia.
 
  ZONA HÉROE — **ficha 01** (`01-hero-carrusel-figuras-toonhub.md`)

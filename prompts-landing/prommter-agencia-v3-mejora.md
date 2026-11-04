@@ -8,8 +8,8 @@ NO sustituye al v2: el v2 sigue siendo la ley del contenido. Este archivo solo
 sube el OFICIO por encima de lo que ya existe.
 Fecha: 2026-08-29 · Origen del encargo: el dueño, textual:
    «me gustó lo que veo pero quiero algo mejor, no re hagas, mejora lo que hiciste»
-Encima de este, el encargo v4 (`prommter-agencia-v4-cotizacion.md`, 2026-09-24)
-descongela S6-S9 y agrega el cotizador y los sectores. Tu armadura §0 sigue rigiendo.
+Encima de este hay un encargo v4 (2026-09-24) que descongela S6-S9; vive en el repo
+privado de Prommter (`prommter/sectores/principal/`). Tu armadura §0 sigue rigiendo.
 Léelo entero antes de tocar una línea.
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -116,7 +116,7 @@ Mejorar sin medir es cómo se sobrecorrige: se rehace lo que ya estaba bien y se
 deja intacto lo que fallaba.
 
 2.A LOCALIZAR EL ENTREGABLE
- El v2 dijo `C:\Users\Kalel\prommter\web\index.html`. **Verificado el 2026-08-29:
+ El v2 dijo `$ORION_HOME/prommter/web/index.html`. **Verificado el 2026-08-29:
  esa carpeta NO existe todavía** (la raíz de `prommter` tiene EMPRESA.md,
  PLAN-MIGRACION.md, PROYECTOS.md, documentos/, equipo/, memory/, proyectos/,
  reportes/ y `_cuarentena-borrar/`). Antes de nada: localiza el archivo real que
@@ -125,7 +125,7 @@ deja intacto lo que fallaba.
  Si no aparece, PARA (armadura 0.10).
 
 2.B HERRAMIENTAS DE MEDICIÓN (ya existen o se crean en `qa/`, que NO se publica)
- (1) `C:\Users\Kalel\ORION\tools\edge-cdp.mjs` — existe y es la verdad de
+ (1) `$ORION_HOME/tools/edge-cdp.mjs` — existe y es la verdad de
      terreno. NUNCA `msedge --screenshot` ni el navegador embebido: está medido
      que miente el ancho (piso de viewport ~492 px, PNG recortado a 390) y que
      reporta `prefers-reduced-motion: reduce` por defecto
@@ -190,12 +190,12 @@ console.log(JSON.stringify({ archivo: process.argv[2], ancho: w, alto: h, total:
 
 2.C LAS SEIS CORRIDAS DE LA AUDITORÍA (todas contra el archivo actual, SIN tocarlo)
 ```
-node C:\Users\Kalel\ORION\tools\edge-cdp.mjs --url "<RUTA_REAL>" --width 390 --height 844 --mobile --wait 2500 --shot qa/antes-390-heroe.png --eval "JSON.stringify({cta:document.querySelector('[data-cta-principal]')?.getBoundingClientRect().bottom, calc:document.querySelector('#calculadora')?.getBoundingClientRect().top, sw:document.documentElement.scrollWidth, cw:document.documentElement.clientWidth, alto:document.documentElement.scrollHeight, anim:document.getAnimations().length, fuentes:[...document.fonts].filter(f=>f.status==='loaded').map(f=>f.family), sombras:[...document.querySelectorAll('*')].filter(e=>{const s=getComputedStyle(e).boxShadow;return s&&s!=='none'&&!s.includes('), ')}).length, focos:[...document.styleSheets].flatMap(h=>{try{return [...h.cssRules]}catch(e){return []}}).filter(r=>r.selectorText&&r.selectorText.includes('focus-visible')).length})"
-node C:\Users\Kalel\ORION\tools\edge-cdp.mjs --url "<RUTA_REAL>" --width 390 --height 844 --mobile --wait 2500 --shot qa/antes-390-cierre.png --eval "document.querySelector('#cierre').scrollIntoView(); 'ok'"
-node C:\Users\Kalel\ORION\tools\edge-cdp.mjs --url "<RUTA_REAL>" --width 390 --height 844 --mobile --wait 1200 <SONDA_DE_FLUIDEZ>
-node C:\Users\Kalel\ORION\tools\edge-cdp.mjs --url "<RUTA_REAL>" --width 390 --height 844 --mobile --reduce --wait 2500 --shot qa/antes-390-reduce.png
-node C:\Users\Kalel\ORION\tools\edge-cdp.mjs --url "<RUTA_REAL>" --width 1440 --height 900 --wait 2500 --shot qa/antes-1440.png
-node C:\Users\Kalel\ORION\tools\edge-cdp.mjs --url "<RUTA_REAL>" --width 390 --height 844 --mobile --full --wait 2500 --shot qa/antes-390-completa.png
+node $ORION_HOME/tools/edge-cdp.mjs --url "<RUTA_REAL>" --width 390 --height 844 --mobile --wait 2500 --shot qa/antes-390-heroe.png --eval "JSON.stringify({cta:document.querySelector('[data-cta-principal]')?.getBoundingClientRect().bottom, calc:document.querySelector('#calculadora')?.getBoundingClientRect().top, sw:document.documentElement.scrollWidth, cw:document.documentElement.clientWidth, alto:document.documentElement.scrollHeight, anim:document.getAnimations().length, fuentes:[...document.fonts].filter(f=>f.status==='loaded').map(f=>f.family), sombras:[...document.querySelectorAll('*')].filter(e=>{const s=getComputedStyle(e).boxShadow;return s&&s!=='none'&&!s.includes('), ')}).length, focos:[...document.styleSheets].flatMap(h=>{try{return [...h.cssRules]}catch(e){return []}}).filter(r=>r.selectorText&&r.selectorText.includes('focus-visible')).length})"
+node $ORION_HOME/tools/edge-cdp.mjs --url "<RUTA_REAL>" --width 390 --height 844 --mobile --wait 2500 --shot qa/antes-390-cierre.png --eval "document.querySelector('#cierre').scrollIntoView(); 'ok'"
+node $ORION_HOME/tools/edge-cdp.mjs --url "<RUTA_REAL>" --width 390 --height 844 --mobile --wait 1200 <SONDA_DE_FLUIDEZ>
+node $ORION_HOME/tools/edge-cdp.mjs --url "<RUTA_REAL>" --width 390 --height 844 --mobile --reduce --wait 2500 --shot qa/antes-390-reduce.png
+node $ORION_HOME/tools/edge-cdp.mjs --url "<RUTA_REAL>" --width 1440 --height 900 --wait 2500 --shot qa/antes-1440.png
+node $ORION_HOME/tools/edge-cdp.mjs --url "<RUTA_REAL>" --width 390 --height 844 --mobile --full --wait 2500 --shot qa/antes-390-completa.png
 node qa/luminancia.mjs qa/antes-390-heroe.png   (y lo mismo con -cierre y -1440)
 ```
  Además, a mano: tamaño del archivo en KB, y las capturas de las anclas
@@ -604,7 +604,7 @@ CRITERIOS DE ACEPTACIÓN DE P6
  7.5 **Comparativa**: seis pares de PNG antes/después (héroe, calculadora, demo,
      niveles, trabajo, cierre) a 390 y el par de 1440. Se miran uno por uno.
  7.6 **Prueba del bochorno** (se mantiene del v2): la captura móvil al lado de
-     `prommter/proyectos/pollo-landing/index.html`. Si esta se ve más pobre, no
+     `prommter/pollo-landing/index.html`. Si esta se ve más pobre, no
      está lista.
  7.7 **ENTREGABLE FINAL**: (a) el mismo `index.html` con los seis bloques
      rotulados; (b) `qa/` con capturas, JSON de las corridas y los dos scripts;
@@ -638,7 +638,7 @@ CRITERIOS DE ACEPTACIÓN DE P6
 ╔═════════════════════════════════════════════════════════════════════════════╗
 ║ 5 · REFERENCIAS COMBINADAS EN ESTA ITERACIÓN (apartado 11)                 ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
-Biblioteca: `C:\Users\Kalel\ORION\prompts-landing\referencias\`. Se copia el
+Biblioteca: `$ORION_HOME/prompts-landing/referencias\`. Se copia el
 MECANISMO, jamás la marca, los textos, las imágenes ni los datos.
 
  ZONA HÉROE — **ficha 01** (carrusel de figuras con roles + fondo que cambia):
