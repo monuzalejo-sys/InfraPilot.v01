@@ -39,3 +39,15 @@ correos/
 # finanzas del dueño. El remoto de ORION es PÚBLICO: se quedan en esta máquina y llegan a la
 # bóveda (local) con baul.mjs. Ver tools/ventanas.mjs.
 cerebro/ventanas/
+
+# Vistas Obsidian por proyecto (memory/<p>/vault/): las genera tools/generate-vault.mjs desde
+# state.json, que es la fuente. Nadie las regenera ya al cerrar (la bóveda real es
+# ORION-Vault, vía baul.mjs/export-vault.mjs), así que en git se quedaban semanas atrás
+# (infrapilot 08-08, permanent 08-03) y duplicaban state.json. Se dejan de rastrear 2026-11-03.
+memory/*/vault/
+
+# Basura del Finder de macOS
+.DS_Store
+
+# Cerebro 3D es un repo propio (tiene su .git): no se mete dentro de ORION
+cerebro-3d/
