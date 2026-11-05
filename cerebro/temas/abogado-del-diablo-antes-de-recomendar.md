@@ -1,11 +1,11 @@
 ---
 slug: abogado-del-diablo-antes-de-recomendar
 titulo: "Antes de recomendar, un abogado del diablo sobre la base de hechos (rúbrica, sensibilidad, «lo que juega en contra» y verificador de citas)"
-alias: [abogado del diablo, abogado del diablo antes de recomendar, devils advocate, devil's advocate, critico adversarial, critico en sonnet, ronda adversarial, ronda de abogado del diablo, revision adversarial, revisar un informe, antes de entregar un informe, antes de recomendar, recomendacion, recomendar un nicho, rubrica, rubrica de puntajes, puntaje, puntajes, puntaje inflado, 78 sobre 100, sensibilidad, sensibilidad de la rubrica, analisis de sensibilidad, empate tecnico, que puntaje voltea la recomendacion, lo que juega en contra, riesgos de la recomendacion, base de hechos, hechos con id, verificador, verificador de citas, verificacion de citas, cita a hecho, cita imprecisa, citas imprecisas, cifra mal, cifras mal, ventana movil, no existe, no se hallo, no se encontro, ninguno, ausencia de evidencia, informe de mercado, analisis de mercado, hecho refutado, transparencia de cambios, que cambio y por que]
-preguntas: ["voy a entregarle al dueño una recomendación con puntajes, ¿qué reviso antes?", "¿cómo sé si mi rúbrica está inflada o si el ganador es el que yo quería?", "¿quién debe criticar mi informe, yo mismo o otro agente?", "¿cuándo escribo «no existe» y cuándo «no se halló»?", "¿cuánto cuesta una ronda de revisión de un informe de mercado?", "¿cómo muestro qué puntaje voltea la recomendación?", "¿cómo verifico que las citas de un informe sí dicen lo que afirmo?", "mi informe tiene un cálculo con una ventana de tiempo, ¿cómo lo reviso?", "el informe dice que no hay competencia, ¿cómo compruebo que de verdad no la hay?"]
+alias: [abogado del diablo, abogado del diablo antes de recomendar, devils advocate, devil's advocate, critico adversarial, critico en sonnet, ronda adversarial, ronda de abogado del diablo, revision adversarial, revisar un informe, antes de entregar un informe, antes de recomendar, recomendacion, recomendar un nicho, rubrica, rubrica de puntajes, puntaje, puntajes, puntaje inflado, 78 sobre 100, sensibilidad, sensibilidad de la rubrica, analisis de sensibilidad, empate tecnico, que puntaje voltea la recomendacion, lo que juega en contra, riesgos de la recomendacion, base de hechos, hechos con id, verificador, verificador de citas, verificacion de citas, cita a hecho, cita imprecisa, citas imprecisas, cifra mal, cifras mal, ventana movil, no existe, no se hallo, no se encontro, ninguno, ausencia de evidencia, informe de mercado, analisis de mercado, hecho refutado, transparencia de cambios, que cambio y por que, presupuesto, presupuesto de un plan, presupuesto sin medir, costo esperado, piso de costo, sumar topes, tope de tokens, tope por agente, pedir el si, aprobar un presupuesto, calibracion, calibracion pequena, calibrar antes de aprobar, regla de parada, umbral de parada, parar la produccion, horas de mac, plan de contenido, plan a 3 videos al dia]
+preguntas: ["voy a entregarle al dueño una recomendación con puntajes, ¿qué reviso antes?", "¿cómo sé si mi rúbrica está inflada o si el ganador es el que yo quería?", "¿quién debe criticar mi informe, yo mismo o otro agente?", "¿cuándo escribo «no existe» y cuándo «no se halló»?", "¿cuánto cuesta una ronda de revisión de un informe de mercado?", "¿cómo muestro qué puntaje voltea la recomendación?", "¿cómo verifico que las citas de un informe sí dicen lo que afirmo?", "mi informe tiene un cálculo con una ventana de tiempo, ¿cómo lo reviso?", "el informe dice que no hay competencia, ¿cómo compruebo que de verdad no la hay?", "armé el presupuesto sumando lo que gasta cada agente, ¿ya puedo pedirle al dueño que lo apruebe?", "¿cómo sé si la regla de parada de mi plan sirve o nunca se va a activar?", "mi cálculo de horas de máquina por día, ¿de dónde debe salir?"]
 proyectos: [prommter]
 confianza: media
-actualizado: 2026-11-03
+actualizado: 2026-11-05
 ---
 
 # Antes de recomendar, un abogado del diablo sobre la base de hechos
@@ -17,6 +17,7 @@ actualizado: 2026-11-03
 3. **Después, un verificador cita-a-hecho** (otro agente) compara cada cifra y cada `[F-nnn]` del informe con la base y repite hasta PASS.
 4. **Si el hecho es una búsqueda, escribe «no se halló», nunca «no existe» ni «ninguno».** «No existe» exige una fuente que lo afirme.
 5. Si tras el crítico el primero cae a empate, **entrega el empate** y di qué lo rompe; la decisión es del dueño.
+6. **Un presupuesto hecho sumando topes de un plan no medido es un piso, no un costo esperado:** no pidas el sí a una cifra mensual antes de medirla con una calibración pequeña y con tope, deriva las horas de máquina de las reglas del propio plan y comprueba que cada regla de parada se activaría de verdad.
 
 ## Por qué (qué lo pagó)
 
@@ -30,6 +31,12 @@ Después, el **verificador cita-a-hecho** corrió dos rondas: la primera halló 
 
 Costo reportado por el orquestador, sin cita en el informe: **≈ US$ 2 el crítico en sonnet y ≈ US$ 1,5 por ronda de verificación**. Contra eso, todo el análisis costó ≈ US$ 25–29 (23 agentes, 35,2 M de tokens) y la ronda adversarial cambió la recomendación.
 
+**Segundo caso medido (2026-11-05): el presupuesto de un plan de contenido.** El borrador del plan de 3 videos al día de Prommter fijó el costo central en **US$ 480 al mes**, sumando topes de tokens de agentes y mínimos de imagen. La revisión adversarial lo llevó a **≈ US$ 730 al mes** (+52 %) y a **≈ US$ 960 el primer mes** (el doble del borrador, con 117 videos producidos) (`plan-de-contenido.md:11`, `:224-227`, `:408`). Lo que se corrigió, fila por fila de la tabla «Qué cambió del borrador al plan final» (`plan-de-contenido.md:402-421`):
+- **Pedía el sí al presupuesto antes de medir.** El borrador pedía aprobar US$ 500 al mes; el final pide **US$ 150 para calibrar** y luego el presupuesto medido: «no se puede aprobar lo que no se ha medido» (`:409`). El estimado de US$ 730 sigue siendo estimado hasta esa calibración (`:361`).
+- **Las horas de Mac no salían de las reglas del propio kit.** Pasaron de **2,3–3,8 a 4,5–5,2 h al día**, y hacen falta 24 videos por semana; la cifra vieja (`investigacion/costos.md:144`) solo valía si la mitad o más del video eran planos pre-renderizados, lo que choca con la defensa del propio plan contra «plantilla repetida» (`:210`, `:410`).
+- **La regla de parada nunca se habría activado.** El borrador paraba al día 90 con «menos de 100 vistas y 500 suscriptores»; el final para con **menos de 329 vistas al día o menos de 250 suscriptores, con corte al día 60**. Los umbrales salen de la meta (329 vistas/día es el piso de 8.000 h con 40 % de retención; 250 = 1.000 × 90/365), no de un número redondo, y la condición pasó de «y» a «o» (`:326-330`, `:414`).
+- **Costo de hacer todo el plan** (no solo la revisión): ≈ 87 M de tokens, unos US$ 57 a 67 a precio de API, 14 agentes (13 en Sonnet y 1 en Opus para el sistema visual), más el orquestador (`:421`).
+
 ## Cómo se aplica
 
 1. **Antes de puntuar, ten la base:** cada hecho con ID, fuente, fecha, nivel (primaria o secundaria) y estado (confirmado, matizado, sin verificar). Los hechos refutados no entran; su corrección sí.
@@ -40,13 +47,16 @@ Costo reportado por el orquestador, sin cita en el informe: **≈ US$ 2 el crít
 6. **«Lo que juega en contra» con números:** aquí la conclusión honesta fue que el canal no cumple en 12 meses el objetivo de ingreso (`analisis-de-mercado.md:197-204`). Sin esa sección no se habría dicho.
 7. **Verificador cita-a-hecho:** otro agente abre la base y compara cada cifra y cada cita; clasifica en cifra mal, cita imprecisa o error de método; repite hasta PASS.
 8. **Redacción de negativos:** «no se halló» (búsqueda) frente a «no existe» (una fuente primaria lo afirma). Un cálculo se rotula «cálculo» con su aritmética a la vista.
-9. **Lo que ningún crítico puede cerrar** se vuelve lista de huecos con quién lo cierra y cómo (en este run: 15 huecos, `base-de-hechos.md:201-214` y `:221`).
+9. **Presupuesto de un plan que nadie ha corrido:** no sumes topes y lo llames costo. Separa el estimado del medido, di cuál de las dos cifras entregas, pide primero un monto de calibración con tope y deja el presupuesto grande para después de medir. Cada cifra de horas o de dinero se deriva de las reglas del propio plan (cuántos videos, de qué tipo), no de una intuición.
+10. **Reglas de parada:** antes de entregarlas, calcula con los números del peor caso razonable si se activarían. Deriva el umbral de la meta (lo mínimo que el plan necesita) y revisa el conectivo («y» exige que fallen las dos; «o», cualquiera).
+11. **Lo que ningún crítico puede cerrar** se vuelve lista de huecos con quién lo cierra y cómo (en este run: 15 huecos, `base-de-hechos.md:201-214` y `:221`).
 
 ## Cuándo NO aplica
 
 - **El crítico solo ve la base:** si el hecho clave nunca se buscó, no lo encuentra. Por eso los huecos abiertos van al dueño con instrucción exacta, y la ronda no sustituye medir con datos propios.
 - **Dos rondas no garantizan la verdad:** dejaron un empate técnico. El resultado honesto puede ser «empate» y una decisión del dueño.
 - **El autor no se critica a sí mismo** (misma regla que en [[TEMA-caza-de-huecos-de-mercado]]): crítico y verificador son agentes distintos del que puntuó.
+- **Una ronda adversarial no mide.** La corrección de US$ 480 a 730 es otro cálculo sobre los mismos supuestos, no un costo observado: lo medido llega con la calibración de US$ 150, que a 2026-11-05 no se ha corrido.
 - Criterio de uso, no medido: la ronda cuesta unos US$ 3,5 y vale para recomendaciones donde el dueño pondrá plata o meses; no para una respuesta de una línea.
 
 ## Evidencia
@@ -58,6 +68,8 @@ Costo reportado por el orquestador, sin cita en el informe: **≈ US$ 2 el crít
 - Horas de producción de un estudio (40 a más de 100 h por minuto): `base-de-hechos.md:135` (F-113) y `:161` (F-137).
 - Afirmaciones refutadas: `base-de-hechos.md:188` (C-05) y `:191` (C-08); RPM inconsistentes: `:57-58` (F-048, F-049).
 - Costos del crítico y del verificador: reportados por el orquestador del run el 2026-11-03; no constan en el informe.
+
+- Caso del presupuesto (2026-11-05, sesión f7475d08): `prommter/contenido/canal-youtube/plan-de-contenido/plan-de-contenido.md:11` (costo probable), `:210`, `:224-227` (totales y primer mes), `:326-330` (regla de parada y su fórmula), `:361` (estimado de US$ 730 frente a US$ 100 del informe), `:402-421` (tabla borrador a final y costo del plan); `investigacion/costos.md:144` (horas de Mac del borrador). Objeto del proyecto que resume el plan: prommter/KN-019.
 
 - Objetos del proyecto con la misma lección, escritos el mismo día por el cierre del run: prommter/KN-012 (abogado del diablo) y prommter/KN-013 (verificación cita-a-hecho).
 

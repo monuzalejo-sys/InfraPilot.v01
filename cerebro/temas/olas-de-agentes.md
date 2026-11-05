@@ -5,7 +5,7 @@ alias: [ola, olas, ola de agentes, tope de salida, limite de salida, output toke
 preguntas: ["¿por qué se me murieron los agentes a mitad de la ola?", "¿cómo reparto el trabajo entre varios agentes?", "¿cómo lanzo varios builders sin que se pisen los archivos?", "¿qué hago si un builder se cayó a mitad del trabajo?", "¿cómo recupero una ola que murió?", "¿cuántos agentes puedo lanzar a la vez?", "se me murió un agente, ¿qué hago?", "¿qué reviso antes de relanzar un builder muerto?", "el agente dijo que arrancó pero no veo nada en disco, ¿entregó o no?", "¿cómo anoto una muerte por límite de sesión sin que cuente como fallo del modelo?", "el conteo de tests no coincide con lo esperado, ¿lo ignoro?", "¿puede un subagente cambiar la rama del repo?", "¿por qué dos builders en paralelo construyeron sobre código viejo?", "las dos tareas tenían archivos distintos, ¿por qué se pisaron?", "¿cómo sé de verdad qué archivos va a tocar una tarea?", "¿puedo lanzar dos verificadores a la vez?", "¿por qué el archivo que estaba midiendo cambió a mitad de la medición?", "un agente reportó tsc en rojo durante la ola, ¿lo arreglo?", "¿por qué se me cae el servidor de desarrollo cuando trabajan varios agentes a la vez?", "se acabó el límite de uso a mitad de una ola de agentes, ¿cómo retomo sin perder nada?", "¿qué hago cuando se corta a mitad un flujo largo de agentes?", "¿cómo cierro un lanzamiento verificándolo bien sin gastar una fortuna en agentes?"]
 proyectos: [infrapilot, estanco-contable, villa-broaster, wrd, placita, orama, landings, duo-burger, escuadra]
 confianza: alta
-actualizado: 2026-11-02
+actualizado: 2026-11-05
 ---
 
 # Repartir trabajo entre agentes en paralelo sin colisiones ni pérdidas
@@ -156,6 +156,7 @@ subir su tier.
    trabajo** (`villa-broaster/broaster-app/package.json:20`,
    `villa-broaster/broaster-app/scripts/aislado.mjs`, `villa-broaster/docs/DESPLIEGUE.md`
    §6 «Quien mide arranca con un comando»).
+2d. **Si varios agentes de investigación numeran hechos (`F-nnn`, `C-nn`, `H-nn`), dale a cada uno un rango CERRADO (inicio y fin) o un prefijo propio**, no solo el número donde empieza, y di en cada brief quién unirá los informes y cómo. Medido el 2026-11-04/05 en el plan de contenido de Prommter: los encargos fijaron solo el comienzo de cada rango (cadencia «desde F-196», costos «desde F-248»); el borrador de cadencia siguió escribiendo hasta F-269 y los números F-248 a F-269 existieron dos veces; el agente de costos lo avisó y dejó la renumeración al que uniera los informes (`plan-de-contenido/investigacion/costos.md:7` y hueco C-13 en `:296`; `cadencia.md:5`). Los archivos finales ya no se solapan (duración F-160 a F-195, cadencia F-196 a F-247, costos F-248 a F-272), pero el cerebro no registra cuál de los dos se renumeró ni cuándo. Una cita `[F-250]` que apunta a dos hechos distintos es una cita falsa.
 3. **Donde no se puede separar por archivo, separa por namespace**: builders que solo
    escriben su prefijo de JS/CSS sobre un HTML que escribió el orquestador
    (`wrd/KN-003`).
