@@ -141,6 +141,65 @@ buscar**, no finge saber dónde está el píxel.
 migramos el catálogo.** Se le dice lo que es verdad: que está hecha la máquina y
 que falta meterle el primer papel.
 
+## 6. ¿Y si lo grabamos en video? Medido el 5-nov
+
+El dueño preguntó si sirve grabar la pantalla del inventario. **Sirve, pero es el
+cuarto camino, no el primero** — y la razón es un número, no una opinión.
+
+La Mac puede hacerlo sin ayuda de nadie: `ffmpeg` parte el video en cuadros y el
+reconocimiento de texto del sistema (Vision) los lee. No sale nada de la Mac, no
+se sube a ningún servicio, cuesta **US$0**.
+
+Se dibujó una rejilla igual a la de un POS de escritorio —con los códigos, los
+nombres y los precios reales leídos en las fotos del POS de La Villa— y se midió
+qué porcentaje de valores se lee **exactamente** bien:
+
+| Condición | código | descripción | **números** | total |
+|---|---|---|---|---|
+| Pantallazo 4K (3840×2160) | 55 % | 82 % | **25 %** | 52 % |
+| Pantallazo 1080p | 72 % | 84 % | **27 %** | 55 % |
+| Cuadro sacado de un video H.264 1080p | 68 % | 79 % | **26 %** | 53 % |
+
+Dos conclusiones, y la segunda es la que manda:
+
+1. **El video no es el problema.** Da casi lo mismo que un pantallazo en 4K. La
+   compresión no es lo que rompe la lectura.
+2. **Lo que rompe la lectura es leer la pantalla entera de un golpe**, y lo que
+   se pierde son los números cortos: la existencia, el IVA. **Uno de cada cuatro
+   números sale mal.** Casos reales de la medición: `−474` leído `−476`, el EAN
+   `7702231000011` leído `21000011`, `550` leído `5RO`, `VARIOS` leído `VARTOS`.
+
+Un precio mal leído cobra mal. **Un EAN mal leído es un producto que no vuelve a
+escanear nunca**, y nadie se entera hasta que el cliente está en la caja.
+
+**La salida existe y está probada:** recortar **un renglón** y leerlo solo. El
+mismo renglón que la pasada entera destrozaba salió perfecto —`H3 · HUEVO AA
+UNIDAD · UND · 22 · 550 · 700`— y el `−474` correcto. O sea: dos pasadas, una
+para encontrar los renglones y otra renglón por renglón.
+
+Eso es `herramientas/leer-pantalla.swift`, que **quedó a medias**: la lectura
+renglón por renglón funciona, la detección de columnas todavía se rompe. Está
+commiteado marcado como inacabado porque la medición vale aunque el programa no
+esté listo.
+
+**Si hay que grabar, cuatro cosas deciden si el video sirve:** pantalla completa
+y la letra lo más grande que deje Delta (importa el tamaño de la letra, no la
+resolución); página por página con Avanzar página y quieto ~2 segundos, nunca con
+la rueda del mouse; que en todas las pantallas se vean los títulos de las
+columnas; y **el total de productos que dice Delta**, que es lo único que delata
+una pantalla saltada.
+
+**Y la verificación que lo vuelve confiable:** los XML de las FPMV traen el código
+y el precio exactos de todo lo que se ha vendido. Contra eso se **mide** el error
+de la lectura en vez de suponerlo.
+
+> Salvedad honesta: la rejilla de la prueba la dibujé yo para que se pareciera a
+> un POS; no es una pantalla de Delta. Los datos sí son los reales del ejemplo.
+> Una pantalla de Delta de verdad puede dar mejor o peor.
+
+**Decisión del dueño (5-nov):** se hace por el camino bueno —el reporte guardado,
+y si no, impreso a PDF—, más tarde.
+
 ## Lo que no se pudo confirmar
 
 1. **En qué formatos guarda Delta un reporte.** Lo contesta el tutorial 25 de
