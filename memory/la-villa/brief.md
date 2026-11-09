@@ -23,7 +23,18 @@ respuesta fuera «sí puede», el trabajo se reduce a la mitad.
 
 ## Estado
 
-**Proyecto creado, nada construido**, y eso es deliberado: con cuatro hechos
+**Hay un sistema que funciona en un navegador; el de producción no está
+construido.** No son lo mismo y conviene no mezclarlos.
+
+`prommter/la-villa-repo/docs/sistema.html` — un solo archivo, sin internet y sin
+instalar nada: se entra por puesto y persona, **se meten productos** (uno por
+uno, o el catálogo entero desde el `catalogo.json` del importador), la caja
+cobra con ellos, baja la existencia, y de ahí salen inventario, compras,
+rotación, cierre, impuestos y el archivo del contador. Lo metido sobrevive a
+cerrar la página. Desde el 8-nov-2026.
+
+**El de producción —la derivación de placita, base propia en el VPS, dominio del
+cliente— sigue sin empezar**, y eso sigue siendo deliberado: con cuatro hechos
 cualquier pantalla saldría de negocio inventado.
 
 - Plan: `memory/la-villa/PLAN.md` — 91 tareas (12 de encuadre + 79 cimientos), modo génesis
