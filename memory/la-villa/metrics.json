@@ -1,6 +1,6 @@
 {
   "projectId": "la-villa",
-  "sessionCount": 2,
+  "sessionCount": 3,
   "totalContextSaved": 0,
   "avgCompressionRatio": 1,
   "avgKnowledgeDensity": 0,
@@ -73,6 +73,54 @@
         }
       ],
       "notes": "Pantalla Productos en docs/sistema.html: el catalogo dejo de estar clavado en el codigo (CAT -> E.cat en localStorage) y se puede meter, corregir y quitar producto, o importar el catalogo.json de herramientas/importar-catalogo.mjs. Cierra la cadena reporte de Delta -> importador -> catalogo -> caja -> cierre -> archivo del contador. Tres reglas duras: IVA adentro con el impuesto RESTADO (base+impuesto = precio exacto en los 11 de la prueba), vacio no es cero, y digito de control EAN comprobado al guardar. Cuatro fallos preexistentes encontrados y arreglados al verificar en navegador: (1) falta de doctype/charset en sistema.html y los dos demos —tildes y emojis rotos al servirlos por HTTP—; (2) el turno abierto se reabria antes de existir el mapa PINTA, asi que recargar con turno abierto dejaba el sistema EN BLANCO; (3) los contadores se quedaban en cero cuando requestAnimationFrame no disparaba; (4) un codigo de barras inventado en el demo desde octubre (Agua Brisa), delatado por la nueva comprobacion del digito de control. La pantalla del contador declara ahora que esto NO es factura electronica y quien responde de que (tema recibos-comprobantes-y-dian). Verificado en navegador de punta a punta, no solo compilado. 0 subagentes: solo orquestador. El plan.json NO se toco: sus tareas de Producto (T-038, T-046) son del sistema de produccion derivado de placita, que sigue sin empezar."
+    },
+    {
+      "sessionId": "session-2026-11-09-perfiles-y-celular",
+      "date": "2026-11-09T19:45:00.000Z",
+      "objective": "Separar el sistema por perfiles: el cajero solo factura, el dueno lo acomoda todo desde el celular, con ayuda y archivo de facturas de compra",
+      "outcome": "Completed",
+      "fixCycles": 1,
+      "objectsCreated": 7,
+      "objectsMerged": 0,
+      "objectsArchived": 0,
+      "measurement_mode": "MEASURED",
+      "subagentSpawns": 5,
+      "tokensReal": 240500000,
+      "tokensNote": "costos.mjs real sobre la sesion 129e1026 completa (acumulada de varios dias, 20 subagentes). Este run aporto 5 spawns: traductor opus, bibliotecario haiku, builder sonnet, verifier sonnet, harvester sonnet.",
+      "modelOutcomes": [
+        {
+          "phase": "traduccion",
+          "model": "opus",
+          "verdict": "ok",
+          "tokens": 43147
+        },
+        {
+          "phase": "biblioteca",
+          "model": "haiku",
+          "verdict": "ok",
+          "tokens": 49277
+        },
+        {
+          "phase": "build:page",
+          "model": "orquestador",
+          "verdict": "ok",
+          "tokens": 0
+        },
+        {
+          "phase": "build:lib",
+          "model": "sonnet",
+          "verdict": "ok",
+          "tokens": 64122
+        },
+        {
+          "phase": "adversarial",
+          "model": "sonnet",
+          "verdict": "fail",
+          "tokens": 44778
+        }
+      ],
+      "notes": "El verificador adversarial en sonnet encontro DOS fugas reales de datos (proveedor visible al cajero en El dia; cuentas completas del negocio visibles a quien recibe el pedido en Compras) y acerto tambien en un fallo latente de ir() con una pantalla fuera de MODS. Sonnet basto para la ronda adversarial de permisos: no hizo falta opus. El build de un HTML de un solo archivo se hizo inline otra vez, igual que el 8-nov, y volvio a salir bien: un solo archivo = un solo escritor.",
+      "completedAt": "2026-11-09T19:45:00.000Z"
     }
   ]
 }

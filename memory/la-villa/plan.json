@@ -1,9 +1,9 @@
 {
   "planId": "la-villa-2026-10-28",
   "projectId": "la-villa",
-  "version": 22,
+  "version": 23,
   "createdAt": "2026-10-28T05:50:49.567Z",
-  "updatedAt": "2026-10-28T16:13:47.749Z",
+  "updatedAt": "2026-11-09T19:29:50.975Z",
   "modo": "genesis",
   "objetivo": "Sistema de minimarket para La Villa, cliente de Prommter: caja que cobra sin depender de internet, inventario con surtido y proveedores, y acceso por puesto antes que por persona",
   "resumen": [
@@ -830,10 +830,10 @@
       "ceremonia": "1-builder",
       "nivel": "N0",
       "categoria": "seguridad",
-      "estado": "pendiente",
+      "estado": "hecho",
       "bloqueadoPor": null,
-      "evidencia": null,
-      "gastoReal": null,
+      "evidencia": "docs/puestos-y-personas.md, 125 lineas: las cuatro comprobaciones del plan corridas de verdad dan 1 / 1 / 4 filas de puestos con Bodega marcada pendiente / 0 PINs inventados. Los tres perfiles del documento son los mismos que ejecuta var PERFILES en docs/sistema.html, comprobados en el navegador: el cajero ve 5 pantallas y no ve costo ni proveedor; quien recibe el pedido ve 4 y no ve las sumas del negocio; el dueno ve 14.",
+      "gastoReal": 2000000,
       "titulo": "Dibujar los puestos y las personas de La Villa: dos logins, una sola caja",
       "porQue": "Si esto no está decidido por escrito antes de construir, el run siguiente monta un login de SaaS con usuario y contraseña y se pierden las dos propiedades que hacen que esto funcione en un mostrador: que la sede salga del PC y no de quien teclea, y que el PIN sea la firma de quien vendió. Rehacerlo después es tocar la autorización de un sistema que ya cobra.",
       "queHacer": [
@@ -867,7 +867,8 @@
         }
       ],
       "modelo": "sonnet",
-      "presupuesto": 221000
+      "presupuesto": 221000,
+      "gastoUnidad": "real"
     },
     {
       "id": "T-012",

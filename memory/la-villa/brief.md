@@ -33,6 +33,20 @@ cobra con ellos, baja la existencia, y de ahí salen inventario, compras,
 rotación, cierre, impuestos y el archivo del contador. Lo metido sobrevive a
 cerrar la página. Desde el 8-nov-2026.
 
+**Desde el 9-nov está separado por perfiles** (`var PERFILES`, una sola tabla —
+`DEC-006`, plano en `docs/puestos-y-personas.md`): el cajero cobra, mira el
+estante y cuenta su gaveta, sin costos ni proveedores ni cuentas; el dueño lo
+acomoda todo **desde el celular**. Ese día entraron además: la remesa completa
+en Compras (el pedido se mete de un golpe, sin ir al local), el archivo de
+facturas de compra —las que van al reporte del contador y las que no,
+`DEC-007`—, la pantalla «Lo que no se vendió» y la **Ayuda por perfil** dentro
+de la app.
+
+> **Cuidado al leerlo:** ese recorte es **cortesía, no candado** (`CON-004`), y
+> el celular del dueño y el computador del mostrador **todavía no se ven entre
+> ellos**: cada navegador guarda lo suyo. Las dos cosas están dichas en
+> pantalla; no las vendas como resueltas.
+
 **El de producción —la derivación de placita, base propia en el VPS, dominio del
 cliente— sigue sin empezar**, y eso sigue siendo deliberado: con cuatro hechos
 cualquier pantalla saldría de negocio inventado.
