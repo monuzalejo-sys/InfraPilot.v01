@@ -5,7 +5,7 @@ alias: [push, mudar rutas del pc a la mac, migrar rutas, rutas de windows, git p
 preguntas: ["en que maquina estoy trabajando", "puedo hacer push desde la terminal", "que hay instalado en esta maquina y que no", "por que el comando largo se corta a la mitad", "como genero un pdf aqui", "en que puerto arranca cada proyecto", "por que no se publico sola la pagina si dejamos la tarea programada", "por que se me caen los localhost cuando cierro el panel del navegador", "por que las pruebas del 3D tardan una eternidad en la Mac", "como dejo la Mac logueada en mi GitHub", "por que Claude no me puede escribir el settings.json", "en que carpeta clono un proyecto nuevo"]
 proyectos: [_permanent, infrapilot, prommter, wrd, villa-broaster, placita, estanco-contable, pollo-landing, landings, duo-burger, que-cremoso, la-villa, cerebro-3d, mercado-de-plantillas, orion-rutina]
 confianza: alta
-actualizado: 2026-11-03
+actualizado: 2026-11-09
 ---
 
 # Lo que cada máquina puede y no puede hacer (son DOS)
@@ -207,6 +207,16 @@ skills sirvan en las dos.
     regex ni de código: `wrd\.example\.com` no es una ruta. Antes de commitear la mudanza,
     saca la tabla de reemplazos distintos (`git diff --word-diff=porcelain`) y lee lo que
     no sea una ruta.
+24. **Procesos de horas en la Mac: `screen -dmS`, y se matan por PID, no con `screen -X quit`.** El 2026-11-07 un
+    `screen -X quit` dejó vivos al script y a su render de HyperFrames: siguió pintando y se dio por pausado lo que no lo
+    estaba. Lista el árbol con `ps -axo pid,ppid,etime,command`, mata hijos (`pkill -P`) y luego padres. Un vigilante que
+    espera a la cola **no** usa `pgrep -f`/`pkill -f` con el nombre del script: su propia línea de comando contiene ese
+    texto y se mató a sí mismo (código 144). Usa `screen -ls | grep -q '\.nombre'`. Una tarea pesada a la vez, con la tapa abierta y
+    `caffeinate -i -w $$ &` al principio de la cola: un `caffeinate` solo alrededor de cada render deja huecos. El
+    2026-11-09 la Mac durmió de 03:54 a 09:07 en los 30 s de espera entre dos intentos.
+25. **whisper-cli siempre con `-ng`, y nunca sobre recortes de ≈ 1 s.** Sin `-ng` usa Metal: lento y peligroso para el
+    WindowServer de esta Mac. Con recortes de ≈ 1 s devuelve vacío, y un recorte que empieza justo en el arranque de la voz
+    se come la primera frase: para comprobar dónde cae una palabra, corta 3–5 s que **empiecen dentro de la pausa**.
 
 ## Cuándo NO aplica
 
