@@ -1,7 +1,7 @@
 {
   "projectId": "la-villa",
-  "snapshotDate": "2026-11-11T16:10:00.000Z",
-  "version": 6,
+  "snapshotDate": "2026-11-11T17:05:00.000Z",
+  "version": 7,
   "lastAmmRun": "2026-11-09T19:31:09.747Z",
   "objects": [
     {
@@ -448,6 +448,22 @@
       "constraint": "Ninguna funcion de la pagina publicada dice que guardo un archivo: lo que se promete es la copia al portapapeles, que si funciona.",
       "description": "El visor de la publicacion nunca da permiso de descarga: un <a download> (blob: incluido) no hace nada y no hay manera de preguntarle si paso. bajarCatalogo decia \u00abCopia del catalogo guardada\u00bb aunque no se guardara nada. Ahora copia al portapapeles y lo dice; si ni eso se puede, lo dice tambien. Si algun dia hace falta la descarga de verdad, se declara la capacidad `downloads` y se guarda con window.claude.downloads.save.",
       "reason": "Decir que un archivo quedo guardado cuando no quedo es la clase de mentira que el dueno descubre el dia que lo necesita."
+    },
+    {
+      "id": "PEND-007",
+      "type": "Pending",
+      "status": "Ready",
+      "tier": "Project",
+      "created": "2026-11-11T17:05:00.000Z",
+      "updated": "2026-11-11T17:05:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "dependencies": [],
+      "title": "Decision del dueno: emitir la factura electronica nosotros, y por cual de los dos caminos",
+      "task": "Preguntarle si quiere que la caja de Prommter transmita a la DIAN, y con cual ruta: proveedor tecnologico por API (semanas) o software propio habilitado (meses).",
+      "description": "Pregunto el 2026-11-11 \u00abno hay forma de que podamos emitir la factura electronica?\u00bb. Investigado en orion/investigacion/2026-11-11-emitir-nosotros-la-factura-electronica. Si hay dos caminos. Lo que lo frena hoy NO es la norma sino la arquitectura: firmar exige una llave privada y un servidor, y el sistema actual es un HTML que se abre en el navegador, asi que emitir obliga a construir el sistema de produccion (VPS, dominio del cliente, caja local que espeja). Delta y nosotros pueden convivir: los prefijos de numeracion se asocian uno a uno a cada software, asi que se pide una resolucion nueva con prefijo propio y Delta sigue intacto hasta que el dueno se convenza. Lo del mostrador es el documento equivalente POS electronico, y NO todos los proveedores lo soportan (Factus no lo menciona; Dataico, Bilidox, Yabi y Misfacturas si). Costo $17-$50 por documento con pruebas gratis. HUECOS: cuantas ventas diarias hace La Villa, y si el tope de 5 UVT sigue aplicando al POS electronico (ninguna fuente oficial lo zanja). La habilitacion y la resolucion las pide el dueno con su clave: nosotros no entramos a la DIAN con la clave de nadie.",
+      "reason": "Es la primera cosa que pide que el sistema de navegador no puede dar, y por eso es el disparador natural del sistema de produccion. Decidirlo cambia el orden del plan entero."
     }
   ],
   "archives": [
