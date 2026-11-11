@@ -1,7 +1,7 @@
 {
   "projectId": "la-villa",
-  "snapshotDate": "2026-11-11T17:05:00.000Z",
-  "version": 7,
+  "snapshotDate": "2026-11-11T18:05:00.000Z",
+  "version": 8,
   "lastAmmRun": "2026-11-09T19:31:09.747Z",
   "objects": [
     {
@@ -373,17 +373,17 @@
     {
       "tier": "Project",
       "created": "2026-11-09T19:40:00.000Z",
-      "updated": "2026-11-09T19:40:00.000Z",
+      "updated": "2026-11-11T18:05:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
       "dependencies": [],
       "id": "PEND-005",
       "type": "Pending",
-      "status": "Ready",
+      "status": "Done",
       "title": "Preguntarle al dueno que queria decir con \u00ablas facturas que no reporta\u00bb, del lado de las VENTAS",
       "task": "Preguntarle si al decir \u00abguardar las facturas que reporta, las que no\u00bb pensaba tambien en las ventas, y que caso tenia en la cabeza.",
-      "description": "Se construyo el lado de las compras (DEC-007). Del lado de las ventas no se construyo nada y hay que decirselo: su programa actual ya transmite todas las ventas a la DIAN, asi que marcar ventas como no reportadas seria esconder ingresos. Si lo que tenia en la cabeza era otra cosa \u2014ventas a credito, fiados, ventas a empresas con datos del cliente, o cuales facturas ya le mando al contador\u2014 eso si se construye y es distinto.",
+      "description": "Se construyo el lado de las compras (DEC-007). Del lado de las ventas no se construyo nada y hay que decirselo: su programa actual ya transmite todas las ventas a la DIAN, asi que marcar ventas como no reportadas seria esconder ingresos. Si lo que tenia en la cabeza era otra cosa \u2014ventas a credito, fiados, ventas a empresas con datos del cliente, o cuales facturas ya le mando al contador\u2014 eso si se construye y es distinto. RESUELTO el 2026-11-11: el dueno aclaro que son las facturas que EL tiene que reportar, y el es quien hace el pedido, o sea las de COMPRA. Confirma DEC-007. Del lado de las ventas no pidio nada. Lo que pidio ademas es que guardarlas sea lo MAS FACIL posible, que es un problema de captura, no de pantalla.",
       "reason": "Es la unica parte del encargo que quedo sin construir, y la razon es legal, no tecnica. Tiene que saberlo por boca nuestra, no descubrirlo."
     },
     {
@@ -464,6 +464,37 @@
       "task": "Preguntarle si quiere que la caja de Prommter transmita a la DIAN, y con cual ruta: proveedor tecnologico por API (semanas) o software propio habilitado (meses).",
       "description": "Pregunto el 2026-11-11 \u00abno hay forma de que podamos emitir la factura electronica?\u00bb. Investigado en orion/investigacion/2026-11-11-emitir-nosotros-la-factura-electronica. Si hay dos caminos. Lo que lo frena hoy NO es la norma sino la arquitectura: firmar exige una llave privada y un servidor, y el sistema actual es un HTML que se abre en el navegador, asi que emitir obliga a construir el sistema de produccion (VPS, dominio del cliente, caja local que espeja). Delta y nosotros pueden convivir: los prefijos de numeracion se asocian uno a uno a cada software, asi que se pide una resolucion nueva con prefijo propio y Delta sigue intacto hasta que el dueno se convenza. Lo del mostrador es el documento equivalente POS electronico, y NO todos los proveedores lo soportan (Factus no lo menciona; Dataico, Bilidox, Yabi y Misfacturas si). Costo $17-$50 por documento con pruebas gratis. HUECOS: cuantas ventas diarias hace La Villa, y si el tope de 5 UVT sigue aplicando al POS electronico (ninguna fuente oficial lo zanja). La habilitacion y la resolucion las pide el dueno con su clave: nosotros no entramos a la DIAN con la clave de nadie.",
       "reason": "Es la primera cosa que pide que el sistema de navegador no puede dar, y por eso es el disparador natural del sistema de produccion. Decidirlo cambia el orden del plan entero."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-11-11T18:05:00.000Z",
+      "updated": "2026-11-11T18:05:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "dependencies": [],
+      "id": "DEC-009",
+      "type": "Decision",
+      "status": "Accepted",
+      "title": "El rumbo que marco el dueno: sistema completo, emision propia, convivencia con Delta, seccion del contador",
+      "description": "Dictado el 2026-11-11 \u00absolo para que estes en la misma idea que yo\u00bb: (1) el cliente tiene su sistema COMPLETO con control completo; (2) que podamos emitir facturas; (3) NO lanzarse de golpe: los dos sistemas conviven mientras, lo que coincide con lo hallado ese dia (prefijos de numeracion que se asocian uno a uno a cada software, asi que Delta sigue intacto); (4) el CONTADOR tiene su propia seccion con la informacion que necesita y nada mas: es un CUARTO PERFIL de la tabla PERFILES, no un correo con un CSV; (5) guardar las facturas de compra que debe reportar de la manera mas facil; (6) la consigna de producto: ofrecer lo que nadie ofrece.",
+      "reason": "Es el encuadre del dueno, no una tarea: fija el orden del plan (produccion antes que mas pantallas de navegador), convierte al contador en usuario del sistema y pone la emision como objetivo, no como opcion."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-11-11T18:05:00.000Z",
+      "updated": "2026-11-11T18:05:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "dependencies": [],
+      "id": "PEND-008",
+      "type": "Pending",
+      "status": "Ready",
+      "title": "Las facturas de compra sin teclearlas: recepcion por proveedor tecnologico y eventos RADIAN",
+      "task": "Confirmar con proveedores tecnologicos que ofrecen RECEPCION de facturas si entregan por API los documentos recibidos de La Villa, y disenar la pantalla donde el dueno les da acuse de un toque.",
+      "description": "Investigado el 2026-11-11: la DIAN NO publica una API oficial para bajar en lote las facturas recibidas; su portal lo hace a mano (Historico -> Documentos Recibidos). PERO varios proveedores tecnologicos venden \u00abrecepcion de facturas\u00bb y sincronizacion de eventos RADIAN por API (Matias documenta POST /send/{trackId} para el acuse 030; Pagopass y Yabi lo venden). Si eso se confirma, la factura del proveedor entra SOLA: sube existencia, actualiza costo, calcula IVA descontable y llena el archivo del contador sin teclear nada. LIMITE A DECIR: los eventos RADIAN no aplican a facturas de CONTADO ni a notas credito/debito, solo a factura electronica de venta tipo 01, y buena parte de las compras de un minimarket son de contado; ahi el documento llega igual pero no hay acuse que dar. Plazo de los eventos 030/032/033: 3 dias habiles segun una guia tecnica, sin confirmar en norma.",
+      "reason": "Es la pieza concreta detras de \u00abofrecer lo que nadie ofrece\u00bb y la respuesta a \u00abde la manera mas facil\u00bb: lo mas facil no es una pantalla mejor para teclear, es no teclear."
     }
   ],
   "archives": [
