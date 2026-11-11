@@ -1,7 +1,7 @@
 {
   "projectId": "la-villa",
-  "snapshotDate": "2026-11-09T19:31:09.747Z",
-  "version": 5,
+  "snapshotDate": "2026-11-11T16:10:00.000Z",
+  "version": 6,
   "lastAmmRun": "2026-11-09T19:31:09.747Z",
   "objects": [
     {
@@ -192,11 +192,11 @@
       "impact": "Medium",
       "priority": "High",
       "status": "Open",
-      "title": "«Colorido» choca con el manifiesto visual de la casa, y esa tension ya se pago una vez",
+      "title": "\u00abColorido\u00bb choca con el manifiesto visual de la casa, y esa tension ya se pago una vez",
       "description": "El dueno pidio que el panel sea lo mas intuitivo posible y colorido. El manifiesto el-estudio-del-ingeniero-moderno gobierna justo el interior de la app con lo contrario: sobrio, con aire. En placita el dueno rechazo una portada minimalista con las palabras la landing que haces es una basura, y la regla que quedo (POL-001) separa la PORTADA del INTERIOR; aqui pide color en el INTERIOR, asi que la frontera hay que redibujarla a proposito.",
       "mitigation": "T-098 decide el registro visual ANTES de construir el panel: estructura y tipografia sobrias para que la cifra se lea, color cargado reservado al estado y a distinguir modulos, contraste MEDIDO por par, y dos opciones en pantalla real para que elija en vez de discutirlo en palabras. La decision se escribe en el codigo para que ningun rediseno la deshaga.",
       "reason": "La leccion de placita dice que un encargo con adjetivos deja la pagina igual y que volver al registro rechazado es reincidir, no refinar. Si no se decide antes, el panel se construye dos veces.",
-      "risk": "«Colorido» choca con el manifiesto visual de la casa, y esa tension ya se pago una vez",
+      "risk": "\u00abColorido\u00bb choca con el manifiesto visual de la casa, y esa tension ya se pago una vez",
       "probability": "High"
     },
     {
@@ -210,7 +210,7 @@
       "priority": "High",
       "dependencies": [],
       "title": "El catalogo vive en el estado, no en el codigo: pantalla Productos en sistema.html",
-      "description": "El dueno pidio «un sistema funcional para meter productos para facturar, que informe todo, que quede solo para la informacion del contador». Se construyo sobre docs/sistema.html —el unico sistema que hoy existe y funciona— en vez de empezar la derivacion de placita, porque eso ultimo exige VPS, dominio y las 108 tareas del plan, y porque el catalogo real todavia no ha llegado. CAT dejo de ser un arreglo clavado en el codigo y paso a E.cat (localStorage). La pantalla Productos permite alta, correccion y baja, mas la importacion del catalogo.json que produce herramientas/importar-catalogo.mjs. Con eso queda cerrada la cadena reporte de Delta -> importador -> catalogo -> caja -> cierre -> archivo del contador. Lo que esto NO es: el sistema de produccion. Esa sigue siendo la derivacion de placita y sigue sin empezar.",
+      "description": "El dueno pidio \u00abun sistema funcional para meter productos para facturar, que informe todo, que quede solo para la informacion del contador\u00bb. Se construyo sobre docs/sistema.html \u2014el unico sistema que hoy existe y funciona\u2014 en vez de empezar la derivacion de placita, porque eso ultimo exige VPS, dominio y las 108 tareas del plan, y porque el catalogo real todavia no ha llegado. CAT dejo de ser un arreglo clavado en el codigo y paso a E.cat (localStorage). La pantalla Productos permite alta, correccion y baja, mas la importacion del catalogo.json que produce herramientas/importar-catalogo.mjs. Con eso queda cerrada la cadena reporte de Delta -> importador -> catalogo -> caja -> cierre -> archivo del contador. Lo que esto NO es: el sistema de produccion. Esa sigue siendo la derivacion de placita y sigue sin empezar.",
       "status": "Accepted",
       "reason": "docs/sistema.html es lo unico que existe y funciona hoy; la derivacion de placita exige VPS, dominio y las 108 tareas del plan, y el catalogo real todavia no ha llegado. Construir el alta de productos ahi cierra la cadena completa con el importador que ya estaba hecho, y lo construido se lleva tal cual cuando empiece la produccion."
     },
@@ -272,7 +272,7 @@
       "priority": "High",
       "dependencies": [],
       "title": "La pantalla del contador dice ella misma que esto NO es la factura electronica",
-      "description": "El dueno pidio que «quede solo para la informacion del contador». La pantalla lo declara en su primera nota: el sistema no transmite nada a la DIAN, no reemplaza al programa con el que hoy facturan, y lo que hace es dejar cada venta con su tarifa y armar el archivo del mes. Cierra con quien responde de que: el sistema registra y ordena; quien declara es el contador con el dueno. Viene del tema recibos-comprobantes-y-dian: una promesa fiscal incompleta ya costo caro en este mismo cliente (28-oct).",
+      "description": "El dueno pidio que \u00abquede solo para la informacion del contador\u00bb. La pantalla lo declara en su primera nota: el sistema no transmite nada a la DIAN, no reemplaza al programa con el que hoy facturan, y lo que hace es dejar cada venta con su tarifa y armar el archivo del mes. Cierra con quien responde de que: el sistema registra y ordena; quien declara es el contador con el dueno. Viene del tema recibos-comprobantes-y-dian: una promesa fiscal incompleta ya costo caro en este mismo cliente (28-oct).",
       "status": "Current",
       "fact": "La pantalla del contador declara que el sistema no transmite nada a la DIAN, no reemplaza al facturador actual, y que quien declara es el contador con el dueno."
     },
@@ -304,7 +304,7 @@
       "type": "Decision",
       "status": "Accepted",
       "title": "El sistema se separa por perfiles desde UNA tabla pura, y el recorte se declara como cortesia",
-      "description": "El dueno pidio el 2026-11-09: «el dueno es quien debe tener acceso a todo, el cajero tiene que tener un control muy controlado». Se construyo var PERFILES en docs/sistema.html: dueno (ve y escribe todo), cajero (ve dia, caja, pedidos, inv, cierre, ayuda; escribe caja, pedidos, cierre) y apoyo/quien recibe el pedido (ve inv, compras, salidas, ayuda; escribe compras, salidas). La consultan construirNav, el guardian de ir(id), pintarTodo y los botones que escriben; ademas hay candados de fondo en las seis funciones que tocan E. La seccion virtual «costos» la tiene solo el dueno y gobierna costo, margen, plata parada y nombre del proveedor. La lista de «pedidos» se nombra aunque en este archivo no exista: es la pantalla que anade el parche de la vitrina, y sin nombrarla el cajero se quedaba sin ella al publicar.",
+      "description": "El dueno pidio el 2026-11-09: \u00abel dueno es quien debe tener acceso a todo, el cajero tiene que tener un control muy controlado\u00bb. Se construyo var PERFILES en docs/sistema.html: dueno (ve y escribe todo), cajero (ve dia, caja, pedidos, inv, cierre, ayuda; escribe caja, pedidos, cierre) y apoyo/quien recibe el pedido (ve inv, compras, salidas, ayuda; escribe compras, salidas). La consultan construirNav, el guardian de ir(id), pintarTodo y los botones que escriben; ademas hay candados de fondo en las seis funciones que tocan E. La seccion virtual \u00abcostos\u00bb la tiene solo el dueno y gobierna costo, margen, plata parada y nombre del proveedor. La lista de \u00abpedidos\u00bb se nombra aunque en este archivo no exista: es la pantalla que anade el parche de la vitrina, y sin nombrarla el cajero se quedaba sin ella al publicar.",
       "reason": "Un permiso decidido con ifs regados por el archivo hace que la pantalla y la puerta discrepen. Con una tabla, cambiar lo que ve el cajero es cambiar una linea. Y se dice en pantalla que en un HTML de un solo archivo esconder una pantalla es cortesia y no candado, porque el programa entero viaja al navegador: el candado real es del sistema de produccion."
     },
     {
@@ -318,8 +318,8 @@
       "id": "DEC-007",
       "type": "Decision",
       "status": "Accepted",
-      "title": "«Guardar las facturas que reporta y las que no» se construyo sobre las COMPRAS, no sobre las ventas",
-      "description": "El dueno pidio «que pueda guardar las facturas que reporta, las que no». Se leyo como las facturas de COMPRA: las que trae el proveedor con papel dan IVA descontable y van al reporte del contador; las informales se registran igual, suman al costo y no van. Las dos quedan guardadas y sumadas aparte, con filtro de todas / van / no van. Sobre las VENTAS no se construyo nada equivalente, y por una razon: La Villa es responsable de IVA y su programa actual ya transmite TODAS sus ventas como FPMV, asi que una marca de «venta que no se reporta» seria una herramienta para esconder ingresos. En su lugar se construyo la pantalla «Lo que no se vendio» —dano, vencimiento, consumo de la casa, cortesia— que es la salida de mercancia legitima que hoy nadie anota y que hace que la existencia mienta.",
+      "title": "\u00abGuardar las facturas que reporta y las que no\u00bb se construyo sobre las COMPRAS, no sobre las ventas",
+      "description": "El dueno pidio \u00abque pueda guardar las facturas que reporta, las que no\u00bb. Se leyo como las facturas de COMPRA: las que trae el proveedor con papel dan IVA descontable y van al reporte del contador; las informales se registran igual, suman al costo y no van. Las dos quedan guardadas y sumadas aparte, con filtro de todas / van / no van. Sobre las VENTAS no se construyo nada equivalente, y por una razon: La Villa es responsable de IVA y su programa actual ya transmite TODAS sus ventas como FPMV, asi que una marca de \u00abventa que no se reporta\u00bb seria una herramienta para esconder ingresos. En su lugar se construyo la pantalla \u00abLo que no se vendio\u00bb \u2014dano, vencimiento, consumo de la casa, cortesia\u2014 que es la salida de mercancia legitima que hoy nadie anota y que hace que la existencia mienta.",
       "reason": "Es la lectura que encaja con un minimarket colombiano responsable de IVA cuyo POS ya factura electronicamente: lo que el dueno decide reportar o no son las facturas que RECIBE, no las que emite. Lo otro no se construye."
     },
     {
@@ -335,7 +335,7 @@
       "status": "Active",
       "title": "En el HTML de un solo archivo, esconder una pantalla es cortesia y hay que decirlo en pantalla",
       "constraint": "Todo recorte de permisos en docs/sistema.html va acompanado del aviso de que no es candado, y el candado real queda apuntado al sistema de produccion.",
-      "description": "El tema acceso-roles-y-puestos dice «esconder la pestana es cortesia, el 403 es la puerta». En un archivo que se abre en el navegador no hay 403: todo el programa llega al computador de quien entra. La pantalla Accesos lo dice con esas palabras. Lo que si se consigue es ordenar el trabajo de cada quien y que nadie vea por accidente lo que no le toca.",
+      "description": "El tema acceso-roles-y-puestos dice \u00abesconder la pestana es cortesia, el 403 es la puerta\u00bb. En un archivo que se abre en el navegador no hay 403: todo el programa llega al computador de quien entra. La pantalla Accesos lo dice con esas palabras. Lo que si se consigue es ordenar el trabajo de cada quien y que nadie vea por accidente lo que no le toca.",
       "reason": "Prometer seguridad que no existe es peor que no tener la funcion: el dueno tomaria decisiones de personal creyendo que hay un candado."
     },
     {
@@ -349,8 +349,8 @@
       "id": "KN-006",
       "type": "Knowledge",
       "status": "Current",
-      "title": "String.replace convierte «$$» en «$» y rompio los selectores del sistema",
-      "description": "Los parches a sistema.html se aplicaron con s.replace(ancla, reemplazo). En el reemplazo, «$$» es la secuencia de escape de un «$» literal, asi que $$('.hoja') quedo escrito como $('.hoja') y abrir() murio con «$(...).forEach is not a function»: el sistema arrancaba en blanco. Paso dos veces en el mismo run. El arreglo es pasar una FUNCION como reemplazo —s.replace(a, () => b)— con lo que no se interpreta nada. Comprobacion barata: grep de $( seguido de .forEach o .map que no sea sobre un arreglo conocido.",
+      "title": "String.replace convierte \u00ab$$\u00bb en \u00ab$\u00bb y rompio los selectores del sistema",
+      "description": "Los parches a sistema.html se aplicaron con s.replace(ancla, reemplazo). En el reemplazo, \u00ab$$\u00bb es la secuencia de escape de un \u00ab$\u00bb literal, asi que $$('.hoja') quedo escrito como $('.hoja') y abrir() murio con \u00ab$(...).forEach is not a function\u00bb: el sistema arrancaba en blanco. Paso dos veces en el mismo run. El arreglo es pasar una FUNCION como reemplazo \u2014s.replace(a, () => b)\u2014 con lo que no se interpreta nada. Comprobacion barata: grep de $( seguido de .forEach o .map que no sea sobre un arreglo conocido.",
       "fact": "En String.replace el reemplazo interpreta $$, $&, $1...; para texto literal se pasa una funcion: s.replace(a, () => b).",
       "reason": "Rompio el arranque del sistema de un cliente y solo se vio al abrirlo en el navegador: ni el compilador ni la comprobacion de llaves lo detectan."
     },
@@ -366,7 +366,7 @@
       "type": "Knowledge",
       "status": "Current",
       "title": "Tres fallos del sistema que solo aparecen probandolo en un telefono de verdad",
-      "description": "Medido el 2026-11-09 en 375x812. (1) «Cambiar de persona» vivia en la barra lateral, que esta en display:none por debajo de 1000 px: desde el celular no se podia salir ni entregar la caja, y el celular es el puesto principal del dueno. Arreglo: el chip del turno, que ya dice quien esta adentro, pasa a ser el boton. (2) La primera cifra de El dia caia en y=842 de una pantalla de 812, o sea fuera: la tarjeta grande de «todavia no ha cobrado nada» iba antes del pulso. Reordenado, la cifra quedo en y=519. (3) Al cambiar de persona seguia pintado lo del turno anterior: 17 KB de Productos, 5 KB de Impuestos, 1 KB del Archivo del contador. abrir() ahora limpia todas las hojas antes de pintar.",
+      "description": "Medido el 2026-11-09 en 375x812. (1) \u00abCambiar de persona\u00bb vivia en la barra lateral, que esta en display:none por debajo de 1000 px: desde el celular no se podia salir ni entregar la caja, y el celular es el puesto principal del dueno. Arreglo: el chip del turno, que ya dice quien esta adentro, pasa a ser el boton. (2) La primera cifra de El dia caia en y=842 de una pantalla de 812, o sea fuera: la tarjeta grande de \u00abtodavia no ha cobrado nada\u00bb iba antes del pulso. Reordenado, la cifra quedo en y=519. (3) Al cambiar de persona seguia pintado lo del turno anterior: 17 KB de Productos, 5 KB de Impuestos, 1 KB del Archivo del contador. abrir() ahora limpia todas las hojas antes de pintar.",
       "fact": "Un sistema que se mira desde el celular hay que probarlo a 375 px: la barra lateral desaparece y con ella sus botones, y el pliegue deja la cifra principal fuera.",
       "reason": "Los tres pasaron la compilacion y la revision de codigo. Solo salieron al abrirlo con el ancho de un telefono y tocar los botones."
     },
@@ -381,9 +381,9 @@
       "id": "PEND-005",
       "type": "Pending",
       "status": "Ready",
-      "title": "Preguntarle al dueno que queria decir con «las facturas que no reporta», del lado de las VENTAS",
-      "task": "Preguntarle si al decir «guardar las facturas que reporta, las que no» pensaba tambien en las ventas, y que caso tenia en la cabeza.",
-      "description": "Se construyo el lado de las compras (DEC-007). Del lado de las ventas no se construyo nada y hay que decirselo: su programa actual ya transmite todas las ventas a la DIAN, asi que marcar ventas como no reportadas seria esconder ingresos. Si lo que tenia en la cabeza era otra cosa —ventas a credito, fiados, ventas a empresas con datos del cliente, o cuales facturas ya le mando al contador— eso si se construye y es distinto.",
+      "title": "Preguntarle al dueno que queria decir con \u00ablas facturas que no reporta\u00bb, del lado de las VENTAS",
+      "task": "Preguntarle si al decir \u00abguardar las facturas que reporta, las que no\u00bb pensaba tambien en las ventas, y que caso tenia en la cabeza.",
+      "description": "Se construyo el lado de las compras (DEC-007). Del lado de las ventas no se construyo nada y hay que decirselo: su programa actual ya transmite todas las ventas a la DIAN, asi que marcar ventas como no reportadas seria esconder ingresos. Si lo que tenia en la cabeza era otra cosa \u2014ventas a credito, fiados, ventas a empresas con datos del cliente, o cuales facturas ya le mando al contador\u2014 eso si se construye y es distinto.",
       "reason": "Es la unica parte del encargo que quedo sin construir, y la razon es legal, no tecnica. Tiene que saberlo por boca nuestra, no descubrirlo."
     },
     {
@@ -397,10 +397,57 @@
       "id": "PEND-006",
       "type": "Pending",
       "status": "Ready",
-      "title": "Saber quien es «quien recibe el pedido» en La Villa, o si no existe",
+      "title": "Saber quien es \u00abquien recibe el pedido\u00bb en La Villa, o si no existe",
       "task": "Preguntar al dueno del minimarket si alguien distinto del dueno recibe los pedidos del proveedor, y quien.",
-      "description": "El perfil apoyo esta construido y se puede probar, pero la persona esta sin asignar: en la puerta aparece como «Quien recibe el pedido · sin asignar». Si no existe nadie, el perfil se quita y queda mas simple. Si existe, hay que saber si ademas cobra.",
+      "description": "El perfil apoyo esta construido y se puede probar, pero la persona esta sin asignar: en la puerta aparece como \u00abQuien recibe el pedido \u00b7 sin asignar\u00bb. Si no existe nadie, el perfil se quita y queda mas simple. Si existe, hay que saber si ademas cobra.",
       "reason": "Un perfil sin nadie detras es trabajo que puede sobrar; uno que falta deja a alguien usando la clave del dueno."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-11-11T16:10:00.000Z",
+      "updated": "2026-11-11T16:10:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "dependencies": [],
+      "id": "DEC-008",
+      "type": "Decision",
+      "status": "Accepted",
+      "title": "El sistema se publica ANTES del catalogo real, para que el dueno se acostumbre",
+      "description": "El dueno pidio el 2026-11-11 publicar ya y meter los productos despues, \u00abquiero que el dueno se familiarice con el sistema\u00bb. Se ACTUALIZO el enlace que el dueno ya tenia desde el 2-nov (https://claude.ai/artifact/VKTXAF9TRwWTxhWyAmC9GG), que hasta hoy mostraba el sistema viejo de 11 pantallas sin perfiles. Es distinto del de la vitrina (5Px4kStU6macSm1uMeHLo2), donde la caja va como archivo adjunto. Leccion: antes de publicar hay que BUSCAR el enlace anterior en la memoria \u2014en este run se publico primero uno nuevo (44K2S31aZ54TCiFF5bf2vv, duplicado, pendiente de borrar con permiso del dueno) y solo despues aparecio el viejo. Lo que lo hace posible ya estaba construido: el catalogo semilla se declara de ejemplo con un aviso que desaparece solo (E.catEsEjemplo), el importador de catalogo.json vive dentro de la app (los <input type=file> SI funcionan en una pagina publicada) y hay un boton que borra las pruebas. Se anadio una novedad y el tema de ayuda \u00abPracticar sin romper nada\u00bb.",
+      "reason": "Acostumbrarse al sistema y cargarle el catalogo son dos trabajos distintos y el segundo depende de un archivo que el dueno todavia no ha sacado de Delta. Esperar a tenerlo retrasaba el primero sin motivo."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-11-11T16:10:00.000Z",
+      "updated": "2026-11-11T16:10:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "High",
+      "dependencies": [],
+      "id": "KN-008",
+      "type": "Knowledge",
+      "status": "Current",
+      "title": "Un HTML servido como archivo y el mismo publicado necesitan DOS compilados, y hay que ensayar el publicado",
+      "description": "docs/sistema.html trae su propio esqueleto porque se sirve como archivo; la plataforma de publicacion pone ESE esqueleto ella misma, asi que publicarlo con el suyo queda mal. docs/publicar.mjs quita doctype, <html>, <head>, el charset y el viewport, y se para si el archivo cambia de forma. Como la publicacion no se puede abrir desde el navegador de la sesion (pide inicio de sesion), `--ensayo <dir>` escribe la misma pagina envuelta en el esqueleto EXACTO de la plataforma (incluido su reset: :root con los margenes de seguridad, body sin margen) y se sirve en local: es la unica forma de ver lo que vera el dueno. Medido asi el 2026-11-11: 375 px sin desborde, primera cifra en y=519, 14 pantallas, cero errores de consola.",
+      "fact": "La pagina publicada se ensaya en local envolviendola en el esqueleto de la plataforma; no basta con mirar el archivo fuente.",
+      "reason": "Es la version doble de la leccion que ya costo un arranque en blanco, y el ensayo es lo unico que comprueba la pagina que el cliente va a abrir."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-11-11T16:10:00.000Z",
+      "updated": "2026-11-11T16:10:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "dependencies": [],
+      "id": "CON-005",
+      "type": "Constraint",
+      "status": "Active",
+      "title": "En una pagina publicada no se puede bajar un archivo: no se puede anunciar como hecho",
+      "constraint": "Ninguna funcion de la pagina publicada dice que guardo un archivo: lo que se promete es la copia al portapapeles, que si funciona.",
+      "description": "El visor de la publicacion nunca da permiso de descarga: un <a download> (blob: incluido) no hace nada y no hay manera de preguntarle si paso. bajarCatalogo decia \u00abCopia del catalogo guardada\u00bb aunque no se guardara nada. Ahora copia al portapapeles y lo dice; si ni eso se puede, lo dice tambien. Si algun dia hace falta la descarga de verdad, se declara la capacidad `downloads` y se guarda con window.claude.downloads.save.",
+      "reason": "Decir que un archivo quedo guardado cuando no quedo es la clase de mentira que el dueno descubre el dia que lo necesita."
     }
   ],
   "archives": [
