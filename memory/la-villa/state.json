@@ -1,7 +1,7 @@
 {
   "projectId": "la-villa",
-  "snapshotDate": "2026-11-11T18:05:00.000Z",
-  "version": 8,
+  "snapshotDate": "2026-11-12T14:05:00.000Z",
+  "version": 9,
   "lastAmmRun": "2026-11-09T19:31:09.747Z",
   "objects": [
     {
@@ -495,6 +495,54 @@
       "task": "Confirmar con proveedores tecnologicos que ofrecen RECEPCION de facturas si entregan por API los documentos recibidos de La Villa, y disenar la pantalla donde el dueno les da acuse de un toque.",
       "description": "Investigado el 2026-11-11: la DIAN NO publica una API oficial para bajar en lote las facturas recibidas; su portal lo hace a mano (Historico -> Documentos Recibidos). PERO varios proveedores tecnologicos venden \u00abrecepcion de facturas\u00bb y sincronizacion de eventos RADIAN por API (Matias documenta POST /send/{trackId} para el acuse 030; Pagopass y Yabi lo venden). Si eso se confirma, la factura del proveedor entra SOLA: sube existencia, actualiza costo, calcula IVA descontable y llena el archivo del contador sin teclear nada. LIMITE A DECIR: los eventos RADIAN no aplican a facturas de CONTADO ni a notas credito/debito, solo a factura electronica de venta tipo 01, y buena parte de las compras de un minimarket son de contado; ahi el documento llega igual pero no hay acuse que dar. Plazo de los eventos 030/032/033: 3 dias habiles segun una guia tecnica, sin confirmar en norma.",
       "reason": "Es la pieza concreta detras de \u00abofrecer lo que nadie ofrece\u00bb y la respuesta a \u00abde la manera mas facil\u00bb: lo mas facil no es una pantalla mejor para teclear, es no teclear."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-11-12T14:05:00.000Z",
+      "updated": "2026-11-12T14:05:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "dependencies": [],
+      "id": "KN-009",
+      "type": "Knowledge",
+      "status": "Current",
+      "title": "Lo que La Villa paga hoy por documento electronico, y a como sale por proveedor",
+      "description": "El dueno del minimarket dijo el 2026-11-12 que cada documento electronico le sale a ~$169 y que compra paquetes de ~2.000. HUECO sin resolver: si esos 2.000 son al ANO o al MES; cambia el plan y el ahorro por un factor de 12. Precios PUBLICADOS por MATIAS (vigentes hasta 31-dic-2026, sin cotizacion formal todavia): plan PYME Emprendedor 3.000 docs/ano $365.000 = $122/doc; Paquete por NIT 15.000 $750.000 = $50/doc; 30.000 $1.140.000 = $38/doc. La bolsa Casa de Software (una bolsa compartida, exige al menos 3 clientes terceros habilitados) da 30.000 por $630.000 = $21/doc, que es la via para que Prommter revenda con margen. OJO: MATIAS opera en modo software propio, no como proveedor tecnologico, asi que el habilitado y el responsable ante la DIAN es el cliente.",
+      "fact": "A cualquier volumen realista La Villa paga hoy mas por documento que lo que cuesta un plan publicado: entre $38 y $122 contra $169.",
+      "reason": "Es el argumento comercial de la migracion y el insumo para decidir si Prommter compra la bolsa y revende."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-11-12T14:05:00.000Z",
+      "updated": "2026-11-12T14:05:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "dependencies": [],
+      "id": "PEND-009",
+      "type": "Pending",
+      "status": "Ready",
+      "title": "Turnos acomodados por el dueno y verificacion de presencia del personal",
+      "task": "Disenar el modulo de turnos (el dueno arma el turno de cada persona) y la verificacion de presencia que bloquea la caja y le avisa si nadie responde.",
+      "description": "Pedido el 2026-11-12: los trabajadores se ausentan del local mucho tiempo. Quiere que el dueno acomode los turnos por perfil y que todo lo que pase quede marcado con el nombre de quien tenia ese turno, y que cada hora se pida la huella (o algo que obligue a estar ahi) o el sistema se bloquee y le notifique. HALLADO: la huella es DATO SENSIBLE (Ley 1581 de 2012); exige autorizacion previa, expresa, informada y en documento aparte, es voluntaria \u2014no se puede condicionar el trabajo a entregarla, asi que tiene que haber alternativa\u2014 y la SIC multa hasta 2.000 SMMLV. SALIDA TECNICA: el navegador NO lee un huellero USB generico, pero WebAuthn si usa el lector del propio aparato (Windows Hello / Touch ID) y la huella NUNCA sale del dispositivo ni se guarda en nuestra base: recibimos un si/no firmado. Eso evita que tratemos dato biometrico. ALTERNATIVA MEJOR Y SIN HARDWARE: pedir la clave de 4 numeros en un momento AL AZAR dentro de cada hora (no en punto, que se puede anticipar), bloquear si nadie contesta en N minutos y avisar al dueno. LIMITE QUE HAY QUE DECIRLE: ninguna de las dos prueba permanencia, solo que alguien estuvo un segundo.",
+      "reason": "Es control sobre la mano de obra, que el dueno puso al mismo nivel que el control de produccion; y toca dato sensible, asi que una decision mal tomada aqui tiene multa."
+    },
+    {
+      "tier": "Project",
+      "created": "2026-11-12T14:05:00.000Z",
+      "updated": "2026-11-12T14:05:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "dependencies": [],
+      "id": "PEND-010",
+      "type": "Pending",
+      "status": "Ready",
+      "title": "Surtir lo que llego: tarea pendiente con minimo del 70%",
+      "task": "Construir, sobre la remesa de Compras que ya existe, la tarea de surtir con exigencia del 70% y su seccion de Tareas pendientes.",
+      "description": "Pedido el 2026-11-12: cuando llega un pedido (gaseosa, cerveza, aguardiente, arroz, huevos, harina, lo que sea) y el dueno lo registra como entrada, el sistema ya sabe que se mando y cuanto llego; a partir de ahi debe exigir que se surta MINIMO el 70% de lo que entro y mostrarlo en una seccion de Tareas pendientes cuando el jefe la mande. Lo que ya existe y se reusa: la remesa entera de Compras con sus lineas y cantidades, los perfiles, y la firma de quien hace cada cosa. Lo que falta: el concepto de tarea, quien la cierra, y como se mide el 70% (por unidades de la remesa, no por productos distintos).",
+      "reason": "Es la otra mitad del control que pidio \u2014sobre la produccion\u2014, y es barato porque la remesa ya guarda las cantidades."
     }
   ],
   "archives": [
