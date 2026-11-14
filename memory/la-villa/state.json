@@ -1,7 +1,7 @@
 {
   "projectId": "la-villa",
-  "snapshotDate": "2026-11-12T14:05:00.000Z",
-  "version": 9,
+  "snapshotDate": "2026-11-14T16:00:00.000Z",
+  "version": 10,
   "lastAmmRun": "2026-11-09T19:31:09.747Z",
   "objects": [
     {
@@ -543,6 +543,37 @@
       "task": "Construir, sobre la remesa de Compras que ya existe, la tarea de surtir con exigencia del 70% y su seccion de Tareas pendientes.",
       "description": "Pedido el 2026-11-12: cuando llega un pedido (gaseosa, cerveza, aguardiente, arroz, huevos, harina, lo que sea) y el dueno lo registra como entrada, el sistema ya sabe que se mando y cuanto llego; a partir de ahi debe exigir que se surta MINIMO el 70% de lo que entro y mostrarlo en una seccion de Tareas pendientes cuando el jefe la mande. Lo que ya existe y se reusa: la remesa entera de Compras con sus lineas y cantidades, los perfiles, y la firma de quien hace cada cosa. Lo que falta: el concepto de tarea, quien la cierra, y como se mide el 70% (por unidades de la remesa, no por productos distintos).",
       "reason": "Es la otra mitad del control que pidio \u2014sobre la produccion\u2014, y es barato porque la remesa ya guarda las cantidades."
+    },
+    {
+      "id": "DEC-010",
+      "type": "Decision",
+      "status": "Accepted",
+      "tier": "Project",
+      "created": "2026-11-14T16:00:00.000Z",
+      "updated": "2026-11-14T16:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "dependencies": [],
+      "title": "La Villa se publica en el VPS como ARCHIVOS, sin puerto ni servicio",
+      "description": "El dueno pidio el 2026-11-14 publicarlo en el VPS \u00abcomo lo hacemos\u00bb. Como hoy La Villa no es una aplicacion sino HTML que abre el navegador, Caddy sirve la carpeta con file_server en vez de reverse_proxy: no hay proceso, no hay puerto, no hay systemd y no hay nada que reiniciar ni que se pueda caer. Los puertos 3500 (sistema) y 3501 (vitrina) quedan RESERVADOS para cuando exista el sistema de produccion; ese dia los dos bloques pasan a reverse_proxy. Nombres: lavilla.prommter.pro (vitrina) y caja.lavilla.prommter.pro (caja, con rewrite / /sistema.html porque las dos paginas viven en la misma carpeta). VPS compartido: 2.25.89.240, donde ya viven villa-broaster y mercaplaza. Se creo el repositorio PRIVADO kalelfelpem-glitch/la-villa-repo (rama main) que hasta hoy no existia; el push de 63 MB fallo con HTTP 400 hasta subir http.postBuffer a 500 MB y forzar HTTP/1.1.",
+      "reason": "Menos piezas para lo que hoy es estatico, y la ruta a produccion queda abierta sin rehacer nada: solo cambia la linea de Caddy."
+    },
+    {
+      "id": "KN-010",
+      "type": "Knowledge",
+      "status": "Current",
+      "tier": "Project",
+      "created": "2026-11-14T16:00:00.000Z",
+      "updated": "2026-11-14T16:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "dependencies": [],
+      "title": "Un repositorio privado no se baja con curl en el VPS: el instalador se pega",
+      "description": "El patron de mercaplaza bajaba el instalador con curl a raw.githubusercontent. Con un repo PRIVADO eso contesta 404 y parece que el archivo no existe. La credencial que lo arreglaria no se pega en una terminal compartida. Solucion: despliegue/pegar-en-el-vps.txt trae el guion entero dentro de un heredoc, se pega una sola vez, se escribe en /tmp/lv.sh y corre la fase 1; la fase 2 ya clona el repo con la llave de despliegue y de ahi en adelante todo sale del clon.",
+      "fact": "Con repositorio privado, el instalador del VPS viaja pegado en la terminal, no descargado.",
+      "reason": "El 404 de un raw privado no dice que el problema sea el permiso, y se pierde tiempo buscando un archivo que si existe."
     }
   ],
   "archives": [
