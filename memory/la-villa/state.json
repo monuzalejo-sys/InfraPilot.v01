@@ -1,7 +1,7 @@
 {
   "projectId": "la-villa",
-  "snapshotDate": "2026-11-14T16:00:00.000Z",
-  "version": 10,
+  "snapshotDate": "2026-11-14T18:00:00.000Z",
+  "version": 11,
   "lastAmmRun": "2026-11-09T19:31:09.747Z",
   "objects": [
     {
@@ -574,6 +574,36 @@
       "description": "El patron de mercaplaza bajaba el instalador con curl a raw.githubusercontent. Con un repo PRIVADO eso contesta 404 y parece que el archivo no existe. La credencial que lo arreglaria no se pega en una terminal compartida. Solucion: despliegue/pegar-en-el-vps.txt trae el guion entero dentro de un heredoc, se pega una sola vez, se escribe en /tmp/lv.sh y corre la fase 1; la fase 2 ya clona el repo con la llave de despliegue y de ahi en adelante todo sale del clon.",
       "fact": "Con repositorio privado, el instalador del VPS viaja pegado en la terminal, no descargado.",
       "reason": "El 404 de un raw privado no dice que el problema sea el permiso, y se pierde tiempo buscando un archivo que si existe."
+    },
+    {
+      "id": "DEC-011",
+      "type": "Decision",
+      "status": "Accepted",
+      "tier": "Project",
+      "created": "2026-11-14T18:00:00.000Z",
+      "updated": "2026-11-14T18:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "High",
+      "priority": "High",
+      "dependencies": [],
+      "title": "La oficina es solo del dueno (Milton), y el puesto decide quien entra",
+      "description": "Correccion del dueno el 2026-11-14: \u00ablos perfiles de cajeros no pueden estar en la seccion de dueno; en el momento que alguien entre a la oficina solo aparece el perfil de Milton\u00bb. Se anadio \u00abquienes\u00bb a cada PUESTO \u2014la lista de PERFILES que entran por el\u2014 y la lista de personas se pinta DESPUES de elegir puesto, filtrada. La oficina admite solo \u00abdueno\u00bb; las cajas admiten cajero, apoyo y dueno, porque el dueno es el unico que entra a todas partes. El perfil g2 pasa de \u00abEl dueno\u00bb a \u00abMilton\u00bb (iniciales MI). Como una lista filtrada es cortesia, hay ademas puerta: puedeEntrar() se comprueba al dar la clave y otra vez en abrir(), asi que un turno guardado que dejo de valer devuelve a la puerta y se borra. Comprobado forzando {puesto:'ad',persona:'g1'} en localStorage: rebota.",
+      "reason": "Es la regla de acceso-roles-y-puestos aplicada a la PUERTA y no solo a las pantallas: antes la tabla PERFILES recortaba lo que se veia adentro, pero cualquiera podia entrar por cualquier puesto."
+    },
+    {
+      "id": "DEC-012",
+      "type": "Decision",
+      "status": "Accepted",
+      "tier": "Project",
+      "created": "2026-11-14T18:00:00.000Z",
+      "updated": "2026-11-14T18:00:00.000Z",
+      "lifetime": "Project",
+      "impact": "Medium",
+      "priority": "Medium",
+      "dependencies": [],
+      "title": "\u00abLlamativo e interactivo\u00bb se aplica al panel del dueno, no a la caja",
+      "description": "El dueno pidio el 2026-11-14 que el sistema tambien sea llamativo e interactivo. Se hizo donde se nota y sirve: las cuatro cifras de \u00abEl pulso de hoy\u00bb dejaron de ser carteles y son botones que llevan a la pantalla donde ese numero se explica (vendido->caja, plata->cierre, impuesto->imp, falta->inv), con afordancia visible (\u00abver ->\u00bb), levantamiento al pasar y latido en el icono cuando hay algo que pedir. kpi() solo las vuelve botones si puedeVer(destino): al cajero \u00abImpuesto del dia\u00bb le queda de solo mirar, porque un boton que no lleva a ninguna parte es peor que un cartel. La CAJA se deja sobria a proposito.",
+      "reason": "El tema aprendizajes-de-placita-mercaplaza dice que el minimalismo gobierna el INTERIOR de la app, donde el cajero trabaja seis horas, y la portada es la que da antojo. El panel del dueno es lo que el mira desde el celular y lo que ensena: ahi si."
     }
   ],
   "archives": [
