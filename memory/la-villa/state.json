@@ -1,7 +1,7 @@
 {
   "projectId": "la-villa",
-  "snapshotDate": "2026-11-14T18:00:00.000Z",
-  "version": 11,
+  "snapshotDate": "2026-11-17T15:00:00.000Z",
+  "version": 12,
   "lastAmmRun": "2026-11-09T19:31:09.747Z",
   "objects": [
     {
@@ -550,13 +550,13 @@
       "status": "Accepted",
       "tier": "Project",
       "created": "2026-11-14T16:00:00.000Z",
-      "updated": "2026-11-14T16:00:00.000Z",
+      "updated": "2026-11-17T15:00:00.000Z",
       "lifetime": "Project",
       "impact": "High",
       "priority": "High",
       "dependencies": [],
       "title": "La Villa se publica en el VPS como ARCHIVOS, sin puerto ni servicio",
-      "description": "El dueno pidio el 2026-11-14 publicarlo en el VPS \u00abcomo lo hacemos\u00bb. Como hoy La Villa no es una aplicacion sino HTML que abre el navegador, Caddy sirve la carpeta con file_server en vez de reverse_proxy: no hay proceso, no hay puerto, no hay systemd y no hay nada que reiniciar ni que se pueda caer. Los puertos 3500 (sistema) y 3501 (vitrina) quedan RESERVADOS para cuando exista el sistema de produccion; ese dia los dos bloques pasan a reverse_proxy. Nombres: lavilla.prommter.pro (vitrina) y caja.lavilla.prommter.pro (caja, con rewrite / /sistema.html porque las dos paginas viven en la misma carpeta). VPS compartido: 2.25.89.240, donde ya viven villa-broaster y mercaplaza. Se creo el repositorio PRIVADO kalelfelpem-glitch/la-villa-repo (rama main) que hasta hoy no existia; el push de 63 MB fallo con HTTP 400 hasta subir http.postBuffer a 500 MB y forzar HTTP/1.1.",
+      "description": "El dueno pidio el 2026-11-14 publicarlo en el VPS \u00abcomo lo hacemos\u00bb. Como hoy La Villa no es una aplicacion sino HTML que abre el navegador, Caddy sirve la carpeta con file_server en vez de reverse_proxy: no hay proceso, no hay puerto, no hay systemd y no hay nada que reiniciar ni que se pueda caer. Los puertos 3500 (sistema) y 3501 (vitrina) quedan RESERVADOS para cuando exista el sistema de produccion; ese dia los dos bloques pasan a reverse_proxy. Nombres (CAMBIADOS el 2026-11-17 por decision del dueno, de .pro a .org): lavilla.prommter.org (vitrina) y caja.lavilla.prommter.org (caja, con rewrite / /sistema.html porque las dos paginas viven en la misma carpeta). VPS compartido: 2.25.89.240, donde ya viven villa-broaster y mercaplaza. Se creo el repositorio PRIVADO kalelfelpem-glitch/la-villa-repo (rama main) que hasta hoy no existia; el push de 63 MB fallo con HTTP 400 hasta subir http.postBuffer a 500 MB y forzar HTTP/1.1. CAMBIO DE DOMINIO 2026-11-17: el dueno dijo \u00abvamos a usar prommter.org para la villa\u00bb. No costo nada porque los registros A de .pro nunca se llegaron a crear: no habia nada publicado, ni QR impreso, ni direccion repartida. Estado medido de prommter.org ese dia: NS de Hostinger (dns-parking), A a 84.32.84.221 y 88.222.222.43 \u2014hosting COMPARTIDO, no el VPS 2.25.89.240\u2014, raiz y www responden 503 con cuerpo de Hostinger, sin MX ni TXT, sin ningun subdominio salvo www, y certificado Let's Encrypt valido emitido el 15-oct-2026. O sea: hay un sitio conectado que no sirve nada. Los subdominios no dependen de eso y se crean igual.",
       "reason": "Menos piezas para lo que hoy es estatico, y la ruta a produccion queda abierta sin rehacer nada: solo cambia la linea de Caddy."
     },
     {
